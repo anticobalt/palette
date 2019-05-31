@@ -1,14 +1,25 @@
 package iced.egret.palette
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 
 import kotlinx.android.synthetic.main.activity_view_collection.*
+import kotlinx.android.synthetic.main.content_view_collection.*
 
 class ViewCollectionActivity : AppCompatActivity() {
+
+    val READ_EXTERNAL_CODE = 100
+    val WRITE_EXTERNAL_CODE = 101
+    val TAG = "VIEW"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +30,19 @@ class ViewCollectionActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
+
+        if (!Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
+        }
+
+        val words = arrayListOf("hey", "there", "hows")
+        collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
+        collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(this, words)
+
+        val ignore = arrayListOf("android", "music", "movies")
+        val f = Storage.getPictureFolder(Environment.getExternalStorageDirectory(), ignore)
+        Log.i(TAG, f.toString())
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -34,6 +58,18 @@ class ViewCollectionActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            READ_EXTERNAL_CODE -> {
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Log.i("External permission", "failed")
+                } else {
+                    Log.i("External permission","succeeded")
+                }
+            }
         }
     }
 }

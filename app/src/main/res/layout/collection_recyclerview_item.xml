@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="50dp"
-    android:layout_height="50dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:padding="5dp"
+    tools:ignore="ContentDescription">
 
-    <TextView
-        android:id="@+id/tv_item"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@color/colorAccent"/>
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_item"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cover_size"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_item"
+            android:gravity="center" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
 
 </LinearLayout>

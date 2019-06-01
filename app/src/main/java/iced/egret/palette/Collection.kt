@@ -1,7 +1,9 @@
 package iced.egret.palette
 
+
 abstract class Collection(val name: String) {
 
+    abstract var coverId: Int
     protected var pictures: ArrayList<Picture> = ArrayList()
     var size = 0
         protected set
@@ -23,6 +25,8 @@ abstract class Collection(val name: String) {
 }
 
 class Folder(name: String, val path: String, private var folders: MutableList<Folder> = mutableListOf()) : Collection(name) {
+
+    override var coverId = R.drawable.ic_folder_silver_24dp
 
     var recursiveSize = 0
         private set
@@ -70,6 +74,11 @@ class Folder(name: String, val path: String, private var folders: MutableList<Fo
     }
 
 }
-class Album(name: String) : Collection(name)
-class SmartAlbum(name: String, val folders: MutableList<Folder> = mutableListOf()) : Collection(name)
+class Album(name: String) : Collection(name) {
+    override var coverId = R.drawable.ic_folder_silver_24dp
+}
+
+class SmartAlbum(name: String, val folders: MutableList<Folder> = mutableListOf()) : Collection(name) {
+    override var coverId = R.drawable.ic_folder_silver_24dp
+}
 

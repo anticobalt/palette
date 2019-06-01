@@ -7,10 +7,10 @@ import android.os.Environment
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 
 import kotlinx.android.synthetic.main.activity_view_collection.*
 import kotlinx.android.synthetic.main.content_view_collection.*
@@ -35,13 +35,18 @@ class ViewCollectionActivity : AppCompatActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
-        val words = arrayListOf("hey", "there", "hows")
-        collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
-        collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(this, words)
-
         val ignore = arrayListOf("android", "music", "movies")
-        val f = Storage.getPictureFolder(Environment.getExternalStorageDirectory(), ignore)
-        Log.i(TAG, f.toString())
+        val root : Folder? = Storage.getPictureFolder(Environment.getExternalStorageDirectory(), ignore)
+
+        if (root != null) {
+            val rootSubFoldersNames = root.getFolders().map { folder -> folder.name } as ArrayList
+            collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
+            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(this, root.getFolders())
+        }
+        else {
+            val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)
+            toast.show()
+        }
 
     }
 

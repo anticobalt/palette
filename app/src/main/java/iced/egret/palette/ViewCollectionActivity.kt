@@ -3,15 +3,12 @@ package iced.egret.palette
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Environment
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 
 import kotlinx.android.synthetic.main.activity_view_collection.*
@@ -38,9 +35,7 @@ class ViewCollectionActivity : AppCompatActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
-        @Suppress("UNCHECKED_CAST")
-        val subFolders = CollectionManager.fetchRootSubFolders() as MutableList<Collection>
-        populateRecyclerView(subFolders)
+        initRecyclerView()
 
     }
 
@@ -72,15 +67,12 @@ class ViewCollectionActivity : AppCompatActivity() {
         }
     }
 
-    private fun populateRecyclerView(subFolders: MutableList<Collection>) {
-        val collectionClickListener = object : CollectionRecyclerViewAdapter.OnItemClickListener() {
-            override fun onItemClick(item: Collection) {
-                populateRecyclerView(item.getCollections())
-            }
-        }
+    private fun initRecyclerView() {
+        @Suppress("UNCHECKED_CAST")
+        val subFolders = CollectionManager.fetchRootSubFolders() as MutableList<Collection>
         if (subFolders.isNotEmpty()) {
             collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(subFolders, collectionClickListener)
+            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(subFolders)
         }
         else {
             val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)

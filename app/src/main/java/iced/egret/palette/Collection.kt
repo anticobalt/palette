@@ -3,23 +3,29 @@ package iced.egret.palette
 abstract class Collection(val name: String) {
 
     protected var pictures: ArrayList<Picture> = ArrayList()
-    protected var size = 0
+    var size = 0
+        protected set
 
-    open fun addPicture(picture: Picture) {
-        pictures.add(picture)
+    open fun addPicture(newPicture: Picture) {
+        pictures.add(newPicture)
         size += 1
     }
 
-    open fun addPictures(pictures: MutableList<Picture>) {
-        pictures.addAll(pictures)
-        size += pictures.size
+    open fun addPictures(newPictures: MutableList<Picture>) {
+        pictures.addAll(newPictures)
+        size += newPictures.size
+    }
+
+    open fun getPictures() : MutableList<Picture> {
+        return pictures
     }
 
 }
 
 class Folder(name: String, val path: String, private var folders: MutableList<Folder> = mutableListOf()) : Collection(name) {
 
-    private var recursiveSize = 0
+    var recursiveSize = 0
+        private set
 
     init {
         size += folders.size
@@ -34,17 +40,18 @@ class Folder(name: String, val path: String, private var folders: MutableList<Fo
         return !isEmpty()
     }
 
-    fun addFolder(folder: Folder) {
-        folders.add(folder)
+
+    fun addFolder(newFolder: Folder) {
+        folders.add(newFolder)
         size += 1
-        recursiveSize += folder.recursiveSize
+        recursiveSize += newFolder.recursiveSize
     }
 
-    fun addFolders(folders: MutableList<Folder>) {
-        folders.addAll(folders)
-        size += folders.size
-        for (folder: Folder in folders) {
-            recursiveSize += folder.recursiveSize
+    fun addFolders(newFolders: MutableList<Folder>) {
+        folders.addAll(newFolders)
+        size += newFolders.size
+        for (newFolder: Folder in newFolders) {
+            recursiveSize += newFolder.recursiveSize
         }
     }
 
@@ -52,14 +59,14 @@ class Folder(name: String, val path: String, private var folders: MutableList<Fo
         return folders
     }
 
-    override fun addPicture(picture: Picture) {
-        super.addPicture(picture)
+    override fun addPicture(newPicture: Picture) {
+        super.addPicture(newPicture)
         recursiveSize += 1
     }
 
-    override fun addPictures(pictures: MutableList<Picture>) {
-        super.addPictures(pictures)
-        recursiveSize += pictures.size
+    override fun addPictures(newPictures: MutableList<Picture>) {
+        super.addPictures(newPictures)
+        recursiveSize += newPictures.size
     }
 
 }

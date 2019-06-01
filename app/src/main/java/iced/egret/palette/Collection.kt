@@ -3,21 +3,23 @@ package iced.egret.palette
 
 abstract class Collection(val name: String) : Thumbnail {
 
-    // Standard
+    // Standard vars
     protected abstract var mPictures: ArrayList<Picture>
-    abstract var mCoverId: Int
+    protected abstract var mNameTag : String
 
-    // Read-Only
-    abstract var mNameTag : String
+    // Read-Only vars
+    abstract var mCoverId: Int
         protected set
     abstract var mSize : Int
         protected set
 
     abstract fun getContents() : MutableList<Thumbnail>
+    abstract fun getCollections() : MutableList<Collection>
 
     override fun getNameTag() : String {
         return mNameTag
     }
+
     open fun addPicture(newPicture: Picture) {
         mPictures.add(newPicture)
         mSize += 1
@@ -47,6 +49,11 @@ class Folder(mName: String, val mPath: String, private var mFolders: MutableList
         val folders = mFolders as ArrayList<Thumbnail>
         val pictures = mPictures as ArrayList<Thumbnail>
         return (folders + pictures) as ArrayList<Thumbnail>
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun getCollections(): MutableList<Collection> {
+        return getFolders() as MutableList<Collection>
     }
 
     fun isEmpty() : Boolean {
@@ -95,6 +102,10 @@ class Album(name: String) : Collection(name) {
     override fun getContents(): MutableList<Thumbnail> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun getCollections(): MutableList<Collection> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
 
 class SmartAlbum(name: String, private val folders: MutableList<Folder> = mutableListOf()) : Collection(name) {
@@ -103,6 +114,9 @@ class SmartAlbum(name: String, private val folders: MutableList<Folder> = mutabl
     override var mSize = folders.size
     override var mPictures = ArrayList<Picture>()
     override fun getContents(): MutableList<Thumbnail> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+    override fun getCollections(): MutableList<Collection> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

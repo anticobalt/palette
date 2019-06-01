@@ -29,12 +29,6 @@ class ViewCollectionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_view_collection)
         setSupportActionBar(toolbar)
 
-        val collectionClickListener = object : CollectionRecyclerViewAdapter.OnItemClickListener() {
-            override fun onItemClick(item: Collection) {
-                Toast.makeText(this@ViewCollectionActivity, item.getNameTag(), Toast.LENGTH_SHORT).show()
-            }
-        }
-
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
@@ -44,16 +38,9 @@ class ViewCollectionActivity : AppCompatActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
-        val subFolders = CollectionManager.fetchRootSubFolders()
-
-        if (subFolders.isNotEmpty()) {
-            collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(subFolders, collectionClickListener)
-        }
-        else {
-            val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)
-            toast.show()
-        }
+        @Suppress("UNCHECKED_CAST")
+        val subFolders = CollectionManager.fetchRootSubFolders() as MutableList<Collection>
+        populateRecyclerView(subFolders)
 
     }
 
@@ -84,4 +71,21 @@ class ViewCollectionActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun populateRecyclerView(subFolders: MutableList<Collection>) {
+        val collectionClickListener = object : CollectionRecyclerViewAdapter.OnItemClickListener() {
+            override fun onItemClick(item: Collection) {
+                populateRecyclerView(item.getCollections())
+            }
+        }
+        if (subFolders.isNotEmpty()) {
+            collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
+            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(subFolders, collectionClickListener)
+        }
+        else {
+            val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)
+            toast.show()
+        }
+    }
+
 }

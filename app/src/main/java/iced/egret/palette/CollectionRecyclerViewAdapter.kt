@@ -10,7 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.collection_recyclerview_item.view.*
 
-class CollectionRecyclerViewAdapter(private val items: MutableList<Folder>, private val listener: OnItemClickListener) :
+class CollectionRecyclerViewAdapter(private val items: MutableList<Collection>, private val listener: OnItemClickListener) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 

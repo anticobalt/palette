@@ -35,13 +35,12 @@ object CollectionManager {
      * Track new Collection, given a parent Collection's ID.
      */
     fun trackNewCollectionsFromNameTag(nameTag : String){
-        val taggedCollection : Collection? = mCollections.find { collection -> collection.mNameTag == nameTag }
+        val taggedCollection : Collection? = mCollections.find { collection -> collection.getNameTag() == nameTag }
         if (taggedCollection == null) {
             mCollections = ArrayList()
         }
         else {
-            @Suppress("UNCHECKED_CAST")
-            mCollections = taggedCollection.getContents().filter {content -> content is Collection} as MutableList<out Collection>
+            mCollections = taggedCollection.getCollections()
         }
     }
 

@@ -11,7 +11,7 @@ class CollectionUnitTest {
 
         var folder = Folder(name, path)
         assert(folder.name == name)
-        assert(folder.path == path)
+        assert(folder.mPath == path)
         assert(folder.getFolders().size == 0)
         assert(folder.getPictures().size == 0)
 
@@ -19,7 +19,7 @@ class CollectionUnitTest {
                 Folder("a", "path/to/a"),
                 Folder("b", "/a/path/to/b")
         )
-        folder = Folder(name, path, folders = subFolders)
+        folder = Folder(name, path, mFolders = subFolders)
         assert(folder.getFolders() == subFolders)
         assert(folder.getPictures().size == 0)
 
@@ -80,19 +80,19 @@ class CollectionUnitTest {
 
         assert(folder.isEmpty())
         assert(!(folder.isNotEmpty()))
-        assert(folder.size == 0)
-        assert(folder.recursiveSize == 0)
+        assert(folder.mSize == 0)
+        assert(folder.mRecursiveSize == 0)
 
         folder.addFolders(subFolders)
-        assert(folder.size == subFolders.size)
+        assert(folder.mSize == subFolders.size)
         for (f: Folder in subFolders) {
-            recursiveSize += f.recursiveSize
+            recursiveSize += f.mRecursiveSize
         }
-        assert(folder.recursiveSize == recursiveSize)
+        assert(folder.mRecursiveSize == recursiveSize)
 
         folder.addPictures(pictures)
-        assert(folder.size == subFolders.size + pictures.size)
-        assert(folder.recursiveSize == recursiveSize + pictures.size)
+        assert(folder.mSize == subFolders.size + pictures.size)
+        assert(folder.mRecursiveSize == recursiveSize + pictures.size)
 
     }
 

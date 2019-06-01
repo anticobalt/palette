@@ -7,9 +7,11 @@ import android.os.Environment
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 
 import kotlinx.android.synthetic.main.activity_view_collection.*
@@ -22,9 +24,16 @@ class ViewCollectionActivity : AppCompatActivity() {
     val TAG = "VIEW"
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_collection)
         setSupportActionBar(toolbar)
+
+        val collectionClickListener = object : CollectionRecyclerViewAdapter.OnItemClickListener() {
+            override fun onItemClick(item: Collection) {
+                Toast.makeText(this@ViewCollectionActivity, item.getNameTag(), Toast.LENGTH_SHORT).show()
+            }
+        }
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -35,13 +44,11 @@ class ViewCollectionActivity : AppCompatActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
-        val ignore = arrayListOf("android", "music", "movies")
-        val root : Folder? = Storage.getPictureFolder(Environment.getExternalStorageDirectory(), ignore)
+        val subFolders = CollectionManager.fetchRootSubFolders()
 
-        if (root != null) {
-            val rootSubFoldersNames = root.getFolders().map { folder -> folder.name } as ArrayList
+        if (subFolders.isNotEmpty()) {
             collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(this, root.getFolders())
+            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(subFolders, collectionClickListener)
         }
         else {
             val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)

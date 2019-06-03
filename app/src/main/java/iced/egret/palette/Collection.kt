@@ -1,32 +1,29 @@
 package iced.egret.palette
 
 
-abstract class Collection(val name: String) : Thumbnail {
+abstract class Collection(_name: String) : Coverable {
+
+    override val terminal: Boolean = false
+    override val name: String = _name
+    override val coverId: Int = R.drawable.ic_folder_silver_24dp
 
     // Standard vars
     protected abstract var mPictures: ArrayList<Picture>
-    protected abstract var mNameTag : String
 
     // Read-Only vars
-    abstract var mCoverId: Int
-        protected set
-    abstract var mSize : Int
+    abstract var size : Int
         protected set
 
-    abstract fun getContents() : MutableList<Thumbnail>
+    abstract fun getContents() : MutableList<Coverable>
     abstract fun getCollections() : MutableList<Collection>
-
-    override fun getNameTag() : String {
-        return mNameTag
-    }
 
     open fun addPicture(newPicture: Picture) {
         mPictures.add(newPicture)
-        mSize += 1
+        size += 1
     }
     open fun addPictures(newPictures: MutableList<Picture>) {
         mPictures.addAll(newPictures)
-        mSize += newPictures.size
+        size += newPictures.size
     }
     open fun getPictures() : MutableList<Picture> {
         return mPictures
@@ -34,21 +31,23 @@ abstract class Collection(val name: String) : Thumbnail {
 
 }
 
-class Folder(mName: String, val mPath: String, private var mFolders: MutableList<Folder> = mutableListOf()) : Collection(mName) {
+class Folder(_name: String, _path: String, _folders: MutableList<Folder> = mutableListOf()) : Collection(_name) {
 
-    override var mCoverId = R.drawable.ic_folder_silver_24dp
-    override var mNameTag = mPath
-    override var mSize = mFolders.size
+    private var mPath = _path
+    private var mFolders = _folders
+
+    override var coverId = R.drawable.ic_folder_silver_24dp
+    override var size = mFolders.size
     override var mPictures = ArrayList<Picture>()
 
     var mRecursiveSize = mFolders.size
         private set
 
     @Suppress("UNCHECKED_CAST")
-    override fun getContents(): MutableList<Thumbnail> {
-        val folders = mFolders as ArrayList<Thumbnail>
-        val pictures = mPictures as ArrayList<Thumbnail>
-        return (folders + pictures) as ArrayList<Thumbnail>
+    override fun getContents(): MutableList<Coverable> {
+        val folders = mFolders as ArrayList<Coverable>
+        val pictures = mPictures as ArrayList<Coverable>
+        return (folders + pictures) as ArrayList<Coverable>
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -64,16 +63,15 @@ class Folder(mName: String, val mPath: String, private var mFolders: MutableList
         return !isEmpty()
     }
 
-
     fun addFolder(newFolder: Folder) {
         mFolders.add(newFolder)
-        mSize += 1
+        size += 1
         mRecursiveSize += newFolder.mRecursiveSize
     }
 
     fun addFolders(newFolders: MutableList<Folder>) {
         mFolders.addAll(newFolders)
-        mSize += newFolders.size
+        size += newFolders.size
         for (newFolder: Folder in newFolders) {
             mRecursiveSize += newFolder.mRecursiveSize
         }
@@ -95,25 +93,23 @@ class Folder(mName: String, val mPath: String, private var mFolders: MutableList
 
 }
 class Album(name: String) : Collection(name) {
-    override var mCoverId = R.drawable.ic_folder_silver_24dp
-    override var mNameTag = name
-    override var mSize = 0
+    override var coverId = R.drawable.ic_folder_silver_24dp
+    override var size = 0
     override var mPictures = ArrayList<Picture>()
-    override fun getContents(): MutableList<Thumbnail> {
+    override fun getContents(): MutableList<Coverable> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
     override fun getCollections(): MutableList<Collection> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
-class SmartAlbum(name: String, private val folders: MutableList<Folder> = mutableListOf()) : Collection(name) {
-    override var mCoverId = R.drawable.ic_folder_silver_24dp
-    override var mNameTag = name
-    override var mSize = folders.size
+class SmartAlbum(name: String, _folders : MutableList<Folder> = mutableListOf()) : Collection(name) {
+    private var mFolders = _folders
+    override var coverId = R.drawable.ic_folder_silver_24dp
+    override var size = mFolders.size
     override var mPictures = ArrayList<Picture>()
-    override fun getContents(): MutableList<Thumbnail> {
+    override fun getContents(): MutableList<Coverable> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
     override fun getCollections(): MutableList<Collection> {

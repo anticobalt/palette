@@ -30,7 +30,7 @@ object Storage {
                         || obj.name.endsWith(".jpg")
                         || obj.name.endsWith("jpeg")
                         || obj.name.endsWith("gif")) {
-                    rootFolder!!.addPicture(Picture(obj.path))
+                    rootFolder!!.addPicture(Picture(obj.name, obj.path))
                 }
             }
         }

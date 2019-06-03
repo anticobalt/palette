@@ -4,44 +4,49 @@ import android.os.Environment
 
 object CollectionManager {
 
-    lateinit var mCollections: MutableList<out Collection>  // allow Collection or its subtypes
+    private var mContents: MutableList<Coverable>
+    private val mRoot : Folder?
+    private var mDefault : Collection?
 
-    /**
-     * Scan device for folders with images, track all folders, then return them.
-     */
-    fun fetchRootSubFolders() : MutableList<Folder>{
+    init {
 
+        mRoot = getRootFolder()
+        mDefault = getDefaultCollection()
+
+        val contents = mDefault?.getContents()
+        if (contents == null) {
+            mContents = ArrayList()
+        }
+        else {
+            mContents = contents
+        }
+
+    }
+
+    fun getContents() : MutableList<Coverable> {
+        return mContents
+    }
+
+    fun getContentByPosition(position: Int) : Coverable {
+        return mContents[position]
+    }
+
+    fun launch(item: Coverable, adapter : CollectionRecyclerViewAdapter) {
+        if (!item.terminal && item is Collection) {  // 2nd clause is cast
+            adapter.update(item.getContents())
+        }
+        else {
+            TODO()
+        }
+    }
+
+    private fun getRootFolder() : Folder? {
         val ignore = arrayListOf("android", "music", "movies")
-        val root : Folder? = Storage.getPictureFolder(Environment.getExternalStorageDirectory(), ignore)
-        val ret : MutableList<Folder>
-
-        if (root != null) {
-            ret = root.getFolders()
-        }
-        else {
-            ret = ArrayList()
-        }
-
-        mCollections = ret
-        return ret
-
+        return Storage.getPictureFolder(Environment.getExternalStorageDirectory(), ignore)
     }
 
-    fun getCollectionByPosition(position: Int) : Collection {
-        return mCollections[position]
-    }
-
-    /**
-     * Track new Collection, given a parent Collection's ID.
-     */
-    fun trackNewCollectionsFromNameTag(nameTag : String){
-        val taggedCollection : Collection? = mCollections.find { collection -> collection.getNameTag() == nameTag }
-        if (taggedCollection == null) {
-            mCollections = ArrayList()
-        }
-        else {
-            mCollections = taggedCollection.getCollections()
-        }
+    private fun getDefaultCollection() : Collection? {
+        return mRoot
     }
 
 }

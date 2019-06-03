@@ -1,5 +1,6 @@
 package iced.egret.palette
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -7,13 +8,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.android.synthetic.main.collection_recyclerview_item.view.*
+import java.lang.ref.WeakReference
 
-class CollectionRecyclerViewAdapter(private var mItems: MutableList<Collection>) :
+class CollectionRecyclerViewAdapter(private var mItems: MutableList<Coverable>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class OnItemClickListener {
-        fun onItemClick(item: Collection, adapter: CollectionRecyclerViewAdapter) {
-            adapter.update(item.getCollections())
+        fun onItemClick(item: Coverable, adapter: CollectionRecyclerViewAdapter) {
+            CollectionManager.launch(item, adapter)
+            //adapter.update(item.getCollections())
         }
     }
 
@@ -23,20 +26,22 @@ class CollectionRecyclerViewAdapter(private var mItems: MutableList<Collection>)
     }
 
     private val mListener = OnItemClickListener()
+    private lateinit var mContextReference : WeakReference<Context>
 
     override fun getItemCount(): Int {
         return mItems.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        mContextReference = WeakReference(parent.context)
         return ViewHolder(LayoutInflater.from(parent.context)
                 .inflate(R.layout.collection_recyclerview_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is ViewHolder) {
-            val item = CollectionManager.getCollectionByPosition(position)
-            holder.ivItem?.setImageResource(mItems[position].mCoverId)
+            val item = CollectionManager.getContentByPosition(position)
+            holder.ivItem?.setImageResource(mItems[position].coverId)
             holder.tvItem?.text = mItems[position].name
             holder.itemView.setOnClickListener{
                 mListener.onItemClick(item, this)
@@ -44,7 +49,7 @@ class CollectionRecyclerViewAdapter(private var mItems: MutableList<Collection>)
         }
     }
 
-    fun update(items: MutableList<Collection>) {
+    fun update(items: MutableList<Coverable>) {
         // mItems = items doesn't work
         // Need to clear + allAll, or onclick will refer to old items
         mItems.clear()

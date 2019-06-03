@@ -80,18 +80,18 @@ class CollectionUnitTest {
 
         assert(folder.isEmpty())
         assert(!(folder.isNotEmpty()))
-        assert(folder.mSize == 0)
+        assert(folder.size == 0)
         assert(folder.mRecursiveSize == 0)
 
         folder.addFolders(subFolders)
-        assert(folder.mSize == subFolders.size)
+        assert(folder.size == subFolders.size)
         for (f: Folder in subFolders) {
             recursiveSize += f.mRecursiveSize
         }
         assert(folder.mRecursiveSize == recursiveSize)
 
         folder.addPictures(pictures)
-        assert(folder.mSize == subFolders.size + pictures.size)
+        assert(folder.size == subFolders.size + pictures.size)
         assert(folder.mRecursiveSize == recursiveSize + pictures.size)
 
     }

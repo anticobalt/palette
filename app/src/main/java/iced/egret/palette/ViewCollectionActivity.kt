@@ -14,11 +14,11 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_view_collection.*
 import kotlinx.android.synthetic.main.content_view_collection.*
 
-class ViewCollectionActivity : AppCompatActivity() {
+const val READ_EXTERNAL_CODE = 100
+const val WRITE_EXTERNAL_CODE = 101
+const val TAG = "VIEW"
 
-    val READ_EXTERNAL_CODE = 100
-    val WRITE_EXTERNAL_CODE = 101
-    val TAG = "VIEW"
+class ViewCollectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -68,11 +68,10 @@ class ViewCollectionActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView() {
-        @Suppress("UNCHECKED_CAST")
-        val subFolders = CollectionManager.fetchRootSubFolders() as MutableList<Collection>
-        if (subFolders.isNotEmpty()) {
+        val contents = CollectionManager.getContents()
+        if (contents.isNotEmpty()) {
             collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(subFolders)
+            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(contents)
         }
         else {
             val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)

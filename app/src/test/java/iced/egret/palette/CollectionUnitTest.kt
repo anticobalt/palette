@@ -11,7 +11,7 @@ class CollectionUnitTest {
 
         var folder = Folder(name, path)
         assert(folder.name == name)
-        assert(folder.mPath == path)
+        assert(folder.path == path)
         assert(folder.getFolders().size == 0)
         assert(folder.getPictures().size == 0)
 
@@ -19,7 +19,7 @@ class CollectionUnitTest {
                 Folder("a", "path/to/a"),
                 Folder("b", "/a/path/to/b")
         )
-        folder = Folder(name, path, mFolders = subFolders)
+        folder = Folder(name, path, subFolders = subFolders)
         assert(folder.getFolders() == subFolders)
         assert(folder.getPictures().size == 0)
 
@@ -33,11 +33,11 @@ class CollectionUnitTest {
                 Folder("a", "path/to/a"),
                 Folder("b", "a/path/to/b")
         )
-        val picture = Picture("whats/in/a/name")
+        val picture = Picture("name", "whats/in/a/name")
         val pictures = arrayListOf(
-                Picture("/destination/here.jpg"),
-                Picture("source/here.png"),
-                Picture("/redirect/to/here.gif")
+                Picture("here.jpg", "/destination/here.jpg"),
+                Picture("here.png","source/here.png"),
+                Picture("here.gif", "/redirect/to/here.gif")
         )
 
         // one folder
@@ -72,9 +72,9 @@ class CollectionUnitTest {
                 Folder("b", "a/path/to/b")
         )
         val pictures = arrayListOf(
-                Picture("/destination/here.jpg"),
-                Picture("source/here.png"),
-                Picture("/redirect/to/here.gif")
+                Picture("here.jpg", "/destination/here.jpg"),
+                Picture("here.png","source/here.png"),
+                Picture("here.gif", "/redirect/to/here.gif")
         )
         var recursiveSize = 0
 

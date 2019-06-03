@@ -1,10 +1,9 @@
 package iced.egret.palette
 
 
-abstract class Collection(_name: String) : Coverable {
+abstract class Collection(override val name: String) : Coverable {
 
     override val terminal: Boolean = false
-    override val name: String = _name
     override val coverId: Int = R.drawable.ic_folder_silver_24dp
 
     // Standard vars
@@ -31,10 +30,9 @@ abstract class Collection(_name: String) : Coverable {
 
 }
 
-class Folder(_name: String, _path: String, _folders: MutableList<Folder> = mutableListOf()) : Collection(_name) {
+class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf()) : Collection(name) {
 
-    private var mPath = _path
-    private var mFolders = _folders
+    private var mFolders = subFolders
 
     override var coverId = R.drawable.ic_folder_silver_24dp
     override var size = mFolders.size
@@ -47,7 +45,7 @@ class Folder(_name: String, _path: String, _folders: MutableList<Folder> = mutab
     override fun getContents(): MutableList<Coverable> {
         val folders = mFolders as ArrayList<Coverable>
         val pictures = mPictures as ArrayList<Coverable>
-        return (folders + pictures) as ArrayList<Coverable>
+        return (folders + pictures) as MutableList<Coverable>
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -104,8 +102,8 @@ class Album(name: String) : Collection(name) {
     }
 }
 
-class SmartAlbum(name: String, _folders : MutableList<Folder> = mutableListOf()) : Collection(name) {
-    private var mFolders = _folders
+class SmartAlbum(name: String, folders : MutableList<Folder> = mutableListOf()) : Collection(name) {
+    private var mFolders = folders
     override var coverId = R.drawable.ic_folder_silver_24dp
     override var size = mFolders.size
     override var mPictures = ArrayList<Picture>()

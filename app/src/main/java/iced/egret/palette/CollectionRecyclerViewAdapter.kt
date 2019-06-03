@@ -39,10 +39,11 @@ class CollectionRecyclerViewAdapter(private var mItems: MutableList<Coverable>) 
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is ViewHolder) {
+        val context = mContextReference.get()
+        if (holder is ViewHolder && context != null) {
             val item = CollectionManager.getContentByPosition(position)
-            holder.ivItem?.setImageResource(mItems[position].coverId)
-            holder.tvItem?.text = mItems[position].name
+            item.loadCoverInto(holder.ivItem, context)
+            holder.tvItem?.text = item.name
             holder.itemView.setOnClickListener{
                 mListener.onItemClick(item, this)
             }

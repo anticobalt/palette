@@ -1,10 +1,16 @@
 package iced.egret.palette
 
+import android.content.Context
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+
 
 abstract class Collection(override val name: String) : Coverable {
 
-    override val terminal: Boolean = false
-    override val coverId: Int = R.drawable.ic_folder_silver_24dp
+    override val terminal = false
+    override val cover = mutableMapOf(
+            "id" to R.drawable.ic_folder_silver_24dp
+    )
 
     // Standard vars
     protected abstract var mPictures: ArrayList<Picture>
@@ -12,6 +18,12 @@ abstract class Collection(override val name: String) : Coverable {
     // Read-Only vars
     abstract var size : Int
         protected set
+
+    override fun loadCoverInto(imageView: ImageView?, context: Context) {
+        if (imageView != null) {
+            Glide.with(context).load(cover["id"]).into(imageView)
+        }
+    }
 
     abstract fun getContents() : MutableList<Coverable>
     abstract fun getCollections() : MutableList<Collection>
@@ -34,7 +46,6 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
 
     private var mFolders = subFolders
 
-    override var coverId = R.drawable.ic_folder_silver_24dp
     override var size = mFolders.size
     override var mPictures = ArrayList<Picture>()
 
@@ -91,7 +102,6 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
 
 }
 class Album(name: String) : Collection(name) {
-    override var coverId = R.drawable.ic_folder_silver_24dp
     override var size = 0
     override var mPictures = ArrayList<Picture>()
     override fun getContents(): MutableList<Coverable> {
@@ -104,7 +114,6 @@ class Album(name: String) : Collection(name) {
 
 class SmartAlbum(name: String, folders : MutableList<Folder> = mutableListOf()) : Collection(name) {
     private var mFolders = folders
-    override var coverId = R.drawable.ic_folder_silver_24dp
     override var size = mFolders.size
     override var mPictures = ArrayList<Picture>()
     override fun getContents(): MutableList<Coverable> {

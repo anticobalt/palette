@@ -1,5 +1,7 @@
 package iced.egret.palette
 
+import android.content.Context
+import android.content.Intent
 import android.os.Environment
 
 object CollectionManager {
@@ -32,11 +34,20 @@ object CollectionManager {
     }
 
     fun launch(item: Coverable, adapter : CollectionRecyclerViewAdapter) {
-        if (!item.terminal && item is Collection) {  // 2nd clause is cast
-            adapter.update(item.getContents())
+        if (!item.terminal) {
+            if (item as? Collection != null) {
+                adapter.update(item.getContents())
+            }
         }
         else {
-            TODO()
+            if (item as? TerminalCoverable != null) {
+                val context : Context? = adapter.getContext()
+                val intent = Intent(context, item.activity)
+                val key = context?.getString(R.string.intent_item_key)
+                intent.putExtra(key, item.toDataClass())
+                context?.startActivity(intent)
+            }
+
         }
     }
 

@@ -1,6 +1,10 @@
 <resources>
+
     <string name="app_name">Palette</string>
     <string name="action_settings">Settings</string>
 
     <string name="alert_no_folders">No folders found!</string>
+
+    <string name="intent_item_key">item</string>
+
 </resources>

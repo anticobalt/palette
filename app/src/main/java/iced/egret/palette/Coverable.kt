@@ -1,16 +1,20 @@
 package iced.egret.palette
 
+import android.app.Activity
 import android.content.Context
+import android.os.Parcelable
 import android.widget.ImageView
 
 interface Coverable {
     val terminal : Boolean
     val name : String
-    val cover: MutableMap<String, *>
+    val cover : MutableMap<String, *>
     fun loadCoverInto(imageView: ImageView?, context: Context)
 }
 
 interface TerminalCoverable : Coverable {
     override val terminal: Boolean
         get() = true
+    val activity: Class<out Activity>
+    fun toDataClass() : Parcelable
 }

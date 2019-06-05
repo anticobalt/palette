@@ -27,6 +27,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>) : PagerAda
         imageView.showImage(pictures[position].uri)
         container.addView(layoutItem)
         return layoutItem
+
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {

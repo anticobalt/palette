@@ -3,19 +3,21 @@ package iced.egret.palette
 import android.content.Context
 import android.content.Intent
 import android.os.Environment
+import java.util.*
+import kotlin.collections.ArrayList
 
 object CollectionManager {
 
     private var mContents: MutableList<Coverable>
     private val mRoot : Folder?
     private var mDefault : Collection?
-    var mCurrentCollection: Collection?
+    var mCollectionStack = ArrayDeque<Collection>()
 
     init {
 
         mRoot = getRootFolder()
         mDefault = getDefaultCollection()
-        mCurrentCollection = getDefaultCollection()
+        mCollectionStack.push(getDefaultCollection())
 
         val contents = mDefault?.getContents()
         if (contents == null) {
@@ -39,7 +41,7 @@ object CollectionManager {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 adapter.update(item.getContents())
-                mCurrentCollection = item
+                mCollectionStack.push(item)
             }
         }
         else {
@@ -50,12 +52,21 @@ object CollectionManager {
                 intent.putExtra(key, position)
                 context?.startActivity(intent)
             }
-
         }
     }
 
+    fun getParentCollectionContents() : MutableList<Coverable>? {
+        var contents : MutableList<Coverable>? = null
+        if (mCollectionStack.size >= 2) {
+            mCollectionStack.pop()
+            val parentCollection = mCollectionStack.peek()
+            contents = parentCollection.getContents()
+        }
+        return contents
+    }
+
     fun getCurrentCollectionPictures() : MutableList<Picture> {
-        val collection = mCurrentCollection
+        val collection = mCollectionStack.peek()
         var pictures : MutableList<Picture> = ArrayList()
         if (collection != null) {
             pictures = collection.getPictures()

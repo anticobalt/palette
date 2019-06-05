@@ -20,6 +20,8 @@ const val TAG = "VIEW"
 
 class ViewCollectionActivity : AppCompatActivity() {
 
+    private lateinit var mContents : MutableList<Coverable>
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -35,7 +37,8 @@ class ViewCollectionActivity : AppCompatActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
-        initRecyclerView()
+        mContents = CollectionManager.getContents()
+        buildRecyclerView()
 
     }
 
@@ -67,11 +70,22 @@ class ViewCollectionActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRecyclerView() {
-        val contents = CollectionManager.getContents()
-        if (contents.isNotEmpty()) {
+    override fun onBackPressed() {
+        val newContents = CollectionManager.getParentCollectionContents()
+        if (newContents != null) {
+            mContents.clear()
+            mContents.addAll(newContents)
+            collectionRecyclerView.adapter.notifyDataSetChanged()
+        }
+        else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun buildRecyclerView() {
+        if (mContents.isNotEmpty()) {
             collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(contents)
+            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(mContents)
         }
         else {
             val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)

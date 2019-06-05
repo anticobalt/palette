@@ -1,17 +1,16 @@
 package iced.egret.palette
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
-import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.view.*
+import android.view.GestureDetector
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
-import com.davemorrissey.labs.subscaleview.ImageSource
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.glide.GlideImageLoader
-import com.github.piasy.biv.view.BigImageView
+import kotlinx.android.synthetic.main.activity_view_picture.*
 
 class ViewPictureActivity : AppCompatActivity() {
 
@@ -64,7 +63,6 @@ class ViewPictureActivity : AppCompatActivity() {
         }
 
         val pictures = CollectionManager.getCurrentCollectionPictures()
-        val picturePager = findViewById<ViewPager>(R.id.picture_pager)
         val adapter = PicturePagerAdapter(pictures)
         picturePager.adapter = adapter
         picturePager.currentItem = position

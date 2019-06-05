@@ -1,5 +1,6 @@
 package iced.egret.palette
 
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -7,6 +8,9 @@ import android.view.MenuItem
 import android.view.View
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.github.piasy.biv.BigImageViewer
+import com.github.piasy.biv.loader.glide.GlideImageLoader
+import com.github.piasy.biv.view.BigImageView
 
 class ViewPictureActivity : AppCompatActivity() {
 
@@ -41,14 +45,14 @@ class ViewPictureActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        BigImageViewer.initialize(GlideImageLoader.with(this))
         setContentView(R.layout.activity_view_picture)
 
         val data = intent.getParcelableExtra<PictureData>(getString(R.string.intent_item_key))
         val picture = data.toFullClass()
-        val imageView = findViewById<SubsamplingScaleImageView>(R.id.iv_picture)
+        val imageView = findViewById<BigImageView>(R.id.iv_picture)
 
-        imageView.setImage(ImageSource.uri(picture.uri))
-        hideSystemUI()
+        imageView.showImage(picture.uri)
 
     }
 

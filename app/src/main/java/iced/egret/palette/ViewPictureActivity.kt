@@ -1,11 +1,12 @@
 package iced.egret.palette
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import android.widget.Toast
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.piasy.biv.BigImageViewer
@@ -42,17 +43,31 @@ class ViewPictureActivity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         BigImageViewer.initialize(GlideImageLoader.with(this))
         setContentView(R.layout.activity_view_picture)
+        hideSystemUI()
 
-        val data = intent.getParcelableExtra<PictureData>(getString(R.string.intent_item_key))
-        val picture = data.toFullClass()
-        val imageView = findViewById<BigImageView>(R.id.iv_picture)
+        lateinit var gestureDetector: GestureDetector
 
-        imageView.showImage(picture.uri)
+        //imageView.setOnTouchListener { _, event ->
+        //    gestureDetector.onTouchEvent(event)
+        //}
+
+        val position = intent.getIntExtra(getString(R.string.intent_item_key), -1)
+        if (position == -1) {
+            Toast.makeText(this, R.string.error_intent_extra, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val pictures = CollectionManager.getCurrentCollectionPictures()
+        val picturePager = findViewById<ViewPager>(R.id.picture_pager)
+        val adapter = PicturePagerAdapter(pictures)
+        picturePager.adapter = adapter
+        picturePager.currentItem = position
 
     }
 

@@ -9,11 +9,13 @@ object CollectionManager {
     private var mContents: MutableList<Coverable>
     private val mRoot : Folder?
     private var mDefault : Collection?
+    var mCurrentCollection: Collection?
 
     init {
 
         mRoot = getRootFolder()
         mDefault = getDefaultCollection()
+        mCurrentCollection = getDefaultCollection()
 
         val contents = mDefault?.getContents()
         if (contents == null) {
@@ -33,10 +35,11 @@ object CollectionManager {
         return mContents[position]
     }
 
-    fun launch(item: Coverable, adapter : CollectionRecyclerViewAdapter) {
+    fun launch(item: Coverable, adapter : CollectionRecyclerViewAdapter, position: Int) {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 adapter.update(item.getContents())
+                mCurrentCollection = item
             }
         }
         else {
@@ -44,11 +47,20 @@ object CollectionManager {
                 val context : Context? = adapter.getContext()
                 val intent = Intent(context, item.activity)
                 val key = context?.getString(R.string.intent_item_key)
-                intent.putExtra(key, item.toDataClass())
+                intent.putExtra(key, position)
                 context?.startActivity(intent)
             }
 
         }
+    }
+
+    fun getCurrentCollectionPictures() : MutableList<Picture> {
+        val collection = mCurrentCollection
+        var pictures : MutableList<Picture> = ArrayList()
+        if (collection != null) {
+            pictures = collection.getPictures()
+        }
+        return pictures
     }
 
     private fun getRootFolder() : Folder? {

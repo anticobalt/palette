@@ -14,8 +14,8 @@ class CollectionRecyclerViewAdapter(private var mItems: MutableList<Coverable>) 
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class OnItemClickListener {
-        fun onItemClick(item: Coverable, adapter: CollectionRecyclerViewAdapter) {
-            CollectionManager.launch(item, adapter)
+        fun onItemClick(item: Coverable, adapter: CollectionRecyclerViewAdapter, position: Int) {
+            CollectionManager.launch(item, adapter, position)
         }
     }
 
@@ -44,7 +44,7 @@ class CollectionRecyclerViewAdapter(private var mItems: MutableList<Coverable>) 
             item.loadCoverInto(holder.ivItem, context)
             holder.tvItem?.text = item.name
             holder.itemView.setOnClickListener{
-                mListener.onItemClick(item, this)
+                mListener.onItemClick(item, this, position)
             }
         }
     }

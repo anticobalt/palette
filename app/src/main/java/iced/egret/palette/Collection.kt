@@ -105,18 +105,18 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
         mRecursiveSize += newPictures.size
     }
 
-    fun toDataClass() : SerializedFolder {
+    fun toDataClass() : FolderData {
         val picturePaths = mPictures.map { picture -> picture.path }
         val subFolders = mFolders.map {folder -> folder.toDataClass() }
-        return SerializedFolder(name, path, subFolders, picturePaths)
+        return FolderData(name, path, subFolders, picturePaths)
     }
 
 }
 
-class SerializedFolder(val name: String,
-                       val path: String,
-                       val subFolders: List<SerializedFolder> = mutableListOf(),
-                       val picturePaths : List<String> = mutableListOf()) : Serializable {
+data class FolderData(val name: String,
+                      val path: String,
+                      val subFolders: List<FolderData> = mutableListOf(),
+                      val picturePaths : List<String> = mutableListOf()) : Serializable {
 
     fun toFullClass() : Folder {
         val fullSubFolders = subFolders.map {folder -> folder.toFullClass() } as MutableList<Folder>

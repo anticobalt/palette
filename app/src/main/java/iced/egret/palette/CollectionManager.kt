@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.google.gson.Gson
-import java.io.BufferedReader
 import java.io.File
 import java.io.FileNotFoundException
+import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -24,22 +24,13 @@ object CollectionManager {
     fun initRootFolder(activity: Activity) {
         // TODO: account for multiple roots
 
-        getRootFromDisk(activity.filesDir)
-        val root = mRoot
-        if (root == null) {
-            val folders = Storage.getPictureFoldersMediaStore(activity)
-            if (folders.isNotEmpty()) {
-                val folder = folders[0]
-                mRoot = folder
-                mContents = folder.getContents()
-                mCollectionStack.clear()
-                mCollectionStack.push(folder)
-                saveRootToDisk(activity.filesDir)
-            }
-        } else {
-            mContents = root.getContents()
+        val folders = Storage.getPictureFoldersMediaStore(activity)
+        if (folders.isNotEmpty()) {
+            val folder = getPracticalRoot(folders[0])
+            mRoot = folder
+            mContents = folder.getContents()
             mCollectionStack.clear()
-            mCollectionStack.push(root)
+            mCollectionStack.push(folder)
         }
 
     }
@@ -104,12 +95,24 @@ object CollectionManager {
     private fun getRootFromDisk(fileDirectory : File) {
         try {
             val json = File(fileDirectory, rootCacheFileName).bufferedReader().readText()
-            val rootData = gson.fromJson(json, SerializedFolder::class.java)
+            val rootData = gson.fromJson(json, FolderData::class.java)
             mRoot = rootData.toFullClass()
         }
         catch (e : FileNotFoundException) {
             Log.i("collection-manager", "couldn't find root cache when trying to read")
         }
+    }
+
+    /**
+     * Return folder with path /storage/emulated/0,
+     * since storage and emulated are always empty anyways
+     */
+    private fun getPracticalRoot(folder: Folder) : Folder {
+        var f = folder
+        while (f.path != "/storage/emulated/0") {
+            f = f.getFolders().first()
+        }
+        return f
     }
 
 }

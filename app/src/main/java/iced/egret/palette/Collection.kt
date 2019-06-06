@@ -3,6 +3,7 @@ package iced.egret.palette
 import android.content.Context
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import java.io.Serializable
 
 
 abstract class Collection(override val name: String) : Coverable {
@@ -104,7 +105,30 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
         mRecursiveSize += newPictures.size
     }
 
+    fun toDataClass() : SerializedFolder {
+        val picturePaths = mPictures.map { picture -> picture.path }
+        val subFolders = mFolders.map {folder -> folder.toDataClass() }
+        return SerializedFolder(name, path, subFolders, picturePaths)
+    }
+
 }
+
+class SerializedFolder(val name: String,
+                       val path: String,
+                       val subFolders: List<SerializedFolder> = mutableListOf(),
+                       val picturePaths : List<String> = mutableListOf()) : Serializable {
+
+    fun toFullClass() : Folder {
+        val fullSubFolders = subFolders.map {folder -> folder.toFullClass() } as MutableList<Folder>
+        val pictures = picturePaths.map {path -> Picture(path.split("/").last(), path)} as MutableList<Picture>
+        val folder = Folder(name, path, fullSubFolders)
+        folder.addPictures(pictures)
+        return folder
+    }
+
+}
+
+
 class Album(name: String) : Collection(name) {
     override var size = 0
     override var mPictures = ArrayList<Picture>()

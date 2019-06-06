@@ -73,7 +73,6 @@ class ViewCollectionActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val newContents = CollectionManager.getParentCollectionContents()
-        Log.i("view", newContents.toString())
         if (newContents != null) {
             mContents.clear()
             mContents.addAll(newContents)

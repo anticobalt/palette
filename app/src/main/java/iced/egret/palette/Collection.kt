@@ -64,6 +64,10 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
         return getFolders() as MutableList<Collection>
     }
 
+    override fun toString(): String {
+        return "$path, $size"
+    }
+
     fun isEmpty() : Boolean {
         return (mFolders.size + mPictures.size) == 0
     }

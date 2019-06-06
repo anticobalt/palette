@@ -37,6 +37,7 @@ class ViewCollectionActivity : AppCompatActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
+        CollectionManager.initRootFolder(this)
         mContents = CollectionManager.getContents()
         buildRecyclerView()
 
@@ -72,6 +73,7 @@ class ViewCollectionActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val newContents = CollectionManager.getParentCollectionContents()
+        Log.i("view", newContents.toString())
         if (newContents != null) {
             mContents.clear()
             mContents.addAll(newContents)

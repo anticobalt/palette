@@ -1,32 +1,29 @@
 package iced.egret.palette
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Environment
+import android.util.Log
 import java.util.*
 import kotlin.collections.ArrayList
 
 object CollectionManager {
 
-    private var mContents: MutableList<Coverable>
-    private val mRoot : Folder?
-    private var mDefault : Collection?
+    private var mContents: MutableList<Coverable> = ArrayList()
+    private var mRoot : Folder? = null
+    private var mDefault : Collection? = null
     var mCollectionStack = ArrayDeque<Collection>()
 
-    init {
-
-        mRoot = getRootFolder()
-        mDefault = getDefaultCollection()
-        mCollectionStack.push(getDefaultCollection())
-
-        val contents = mDefault?.getContents()
-        if (contents == null) {
-            mContents = ArrayList()
+    fun initRootFolder(activity: Activity) {
+        // TODO: account for multiple roots
+        val folders = Storage.getPictureFoldersMediaStore(activity)
+        if (folders.isNotEmpty()) {
+            val folder = folders[0]
+            mRoot = folder
+            mContents = folder.getContents()
+            mCollectionStack.clear()
+            mCollectionStack.push(folder)
         }
-        else {
-            mContents = contents
-        }
-
     }
 
     fun getContents() : MutableList<Coverable> {
@@ -72,15 +69,6 @@ object CollectionManager {
             pictures = collection.getPictures()
         }
         return pictures
-    }
-
-    private fun getRootFolder() : Folder? {
-        val ignore = arrayListOf("android", "music", "movies")
-        return Storage.getPictureFolder(Environment.getExternalStorageDirectory(), ignore)
-    }
-
-    private fun getDefaultCollection() : Collection? {
-        return mRoot
     }
 
 }

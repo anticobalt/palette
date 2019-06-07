@@ -24,7 +24,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ViewPictureActivity" />
+        <activity
+            android:name=".ViewPictureActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
 
     </application>
 

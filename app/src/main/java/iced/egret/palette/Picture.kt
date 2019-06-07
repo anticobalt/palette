@@ -3,6 +3,7 @@ package iced.egret.palette
 import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
+import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import kotlinx.android.parcel.Parcelize
@@ -10,7 +11,7 @@ import java.io.File
 
 class Picture(override val name: String, val path: String) : TerminalCoverable {
 
-    val file : File = File(path)
+    private val file : File = File(path)
     val uri : Uri = Uri.fromFile(file)
 
     override val terminal = true
@@ -19,10 +20,24 @@ class Picture(override val name: String, val path: String) : TerminalCoverable {
     )
     override val activity = ViewPictureActivity::class.java
 
-    override fun loadCoverInto(imageView: ImageView?, context: Context) {
+    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder, context: Context) {
+
+        val imageView = holder.ivItem
+        val textView = holder.tvItem
+
         if (imageView != null) {
-            Glide.with(context).load(cover["uri"]).placeholder(R.drawable.ic_folder_silver_24dp).into(imageView)
+            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+            Glide.with(context)
+                    .load(cover["uri"])
+                    .placeholder(R.drawable.ic_image_silver_128dp)
+                    .error(R.drawable.ic_broken_image_silver_128dp)
+                    .into(imageView)
         }
+
+        if (textView != null) {
+            holder.tvItem.visibility = View.INVISIBLE
+        }
+
     }
 
     override fun toDataClass() = PictureData(name, path)

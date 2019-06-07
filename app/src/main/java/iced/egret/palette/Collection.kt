@@ -1,6 +1,7 @@
 package iced.egret.palette
 
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import java.io.Serializable
@@ -10,7 +11,7 @@ abstract class Collection(override val name: String) : Coverable {
 
     override val terminal = false
     override val cover = mutableMapOf(
-            "id" to R.drawable.ic_folder_silver_24dp
+            "id" to R.drawable.ic_folder_silver_64dp
     )
 
     // Standard vars
@@ -20,9 +21,13 @@ abstract class Collection(override val name: String) : Coverable {
     abstract var size : Int
         protected set
 
-    override fun loadCoverInto(imageView: ImageView?, context: Context) {
-        if (imageView != null) {
-            Glide.with(context).load(cover["id"]).into(imageView)
+    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder, context: Context) {
+        if (holder.ivItem != null) {
+            holder.ivItem.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            Glide.with(context).load(cover["id"]).into(holder.ivItem)
+        }
+        if (holder.tvItem != null) {
+            holder.tvItem.visibility = View.VISIBLE
         }
     }
 

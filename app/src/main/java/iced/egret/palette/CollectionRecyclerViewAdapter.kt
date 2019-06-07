@@ -41,7 +41,7 @@ class CollectionRecyclerViewAdapter(private var mItems: MutableList<Coverable>) 
         val context = mContextReference.get()
         if (holder is ViewHolder && context != null) {
             val item = CollectionManager.getContentByPosition(position)
-            item.loadCoverInto(holder.ivItem, context)
+            item.loadCoverInto(holder, context)
             holder.tvItem?.text = item.name
             holder.itemView.setOnClickListener{
                 mListener.onItemClick(item, this, position)

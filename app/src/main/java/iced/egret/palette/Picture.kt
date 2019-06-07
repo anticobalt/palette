@@ -1,10 +1,8 @@
 package iced.egret.palette
 
-import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
 import android.view.View
-import android.widget.ImageView
 import com.bumptech.glide.Glide
 import kotlinx.android.parcel.Parcelize
 import java.io.File
@@ -20,15 +18,16 @@ class Picture(override val name: String, val path: String) : TerminalCoverable {
     )
     override val activity = ViewPictureActivity::class.java
 
-    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder, context: Context) {
+    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder) {
 
         val imageView = holder.ivItem
         val textView = holder.tvItem
 
+        // FIXME: loading is slow because the covers are large (e.g. set to 24dp and its fine)
         if (imageView != null) {
-            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-            Glide.with(context)
+            Glide.with(holder.itemView.context)
                     .load(cover["uri"])
+                    .centerCrop()
                     .placeholder(R.drawable.ic_image_silver_128dp)
                     .error(R.drawable.ic_broken_image_silver_128dp)
                     .into(imageView)

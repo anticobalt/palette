@@ -9,7 +9,7 @@ interface Coverable {
     val terminal : Boolean
     val name : String
     val cover : MutableMap<String, *>
-    fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder, context: Context)
+    fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder)
 }
 
 interface TerminalCoverable : Coverable {

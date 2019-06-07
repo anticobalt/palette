@@ -1,9 +1,7 @@
 package iced.egret.palette
 
-import android.content.Context
 import android.net.Uri
 import android.view.View
-import android.widget.ImageView
 import com.bumptech.glide.Glide
 import java.io.Serializable
 
@@ -22,11 +20,13 @@ abstract class Collection(override val name: String) : Coverable {
     abstract var size : Int
         protected set
 
-    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder, context: Context) {
+    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder) {
         if (holder.ivItem != null) {
             setUri()
-            holder.ivItem.scaleType = ImageView.ScaleType.CENTER_CROP
-            Glide.with(context).load(cover["uri"]).into(holder.ivItem)
+            Glide.with(holder.itemView.context)
+                    .load(cover["uri"])
+                    .centerCrop()
+                    .into(holder.ivItem)
         }
         if (holder.tvItem != null) {
             holder.tvItem.visibility = View.VISIBLE

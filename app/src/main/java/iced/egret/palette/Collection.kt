@@ -1,6 +1,7 @@
 package iced.egret.palette
 
 import android.content.Context
+import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
@@ -10,7 +11,7 @@ import java.io.Serializable
 abstract class Collection(override val name: String) : Coverable {
 
     override val terminal = false
-    override val cover = mutableMapOf(
+    override val cover = mutableMapOf<String, Any>(
             "id" to R.drawable.ic_folder_silver_64dp
     )
 
@@ -23,8 +24,9 @@ abstract class Collection(override val name: String) : Coverable {
 
     override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder, context: Context) {
         if (holder.ivItem != null) {
-            holder.ivItem.scaleType = ImageView.ScaleType.CENTER_INSIDE
-            Glide.with(context).load(cover["id"]).into(holder.ivItem)
+            setUri()
+            holder.ivItem.scaleType = ImageView.ScaleType.CENTER_CROP
+            Glide.with(context).load(cover["uri"]).into(holder.ivItem)
         }
         if (holder.tvItem != null) {
             holder.tvItem.visibility = View.VISIBLE
@@ -33,6 +35,7 @@ abstract class Collection(override val name: String) : Coverable {
 
     abstract fun getContents() : MutableList<Coverable>
     abstract fun getCollections() : MutableList<Collection>
+    abstract fun setUri()
 
     open fun addPicture(newPicture: Picture) {
         mPictures.add(newPicture)
@@ -116,6 +119,22 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
         return FolderData(name, path, subFolders, picturePaths)
     }
 
+    override fun setUri() {
+        val uri = getOnePictureUri()
+        if (uri != null) {
+            cover["uri"] = uri
+        }
+    }
+
+    private fun getOnePictureUri() : Uri? {
+        if (mPictures.isNotEmpty()) {
+            return mPictures[0].uri
+        } else if (mFolders.isNotEmpty()) {
+            return mFolders[0].getOnePictureUri()
+        }
+        return null
+    }
+
 }
 
 data class FolderData(val name: String,
@@ -135,6 +154,10 @@ data class FolderData(val name: String,
 
 
 class Album(name: String) : Collection(name) {
+    override fun setUri() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override var size = 0
     override var mPictures = ArrayList<Picture>()
     override fun getContents(): MutableList<Coverable> {
@@ -146,6 +169,10 @@ class Album(name: String) : Collection(name) {
 }
 
 class SmartAlbum(name: String, folders : MutableList<Folder> = mutableListOf()) : Collection(name) {
+    override fun setUri() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private var mFolders = folders
     override var size = mFolders.size
     override var mPictures = ArrayList<Picture>()

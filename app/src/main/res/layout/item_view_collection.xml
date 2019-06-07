@@ -11,13 +11,15 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
         <ImageView
             android:id="@+id/iv_item"
             android:layout_width="match_parent"
             android:layout_height="@dimen/cover_size"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <TextView
             android:id="@+id/tv_item"
@@ -25,7 +27,12 @@
             android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="@id/iv_item"
             android:gravity="center"
-            android:paddingBottom="10dp" />
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:background="@color/translucentGrey"
+            android:ellipsize="end"
+            android:singleLine="true"
+            />
 
     </android.support.constraint.ConstraintLayout>
 

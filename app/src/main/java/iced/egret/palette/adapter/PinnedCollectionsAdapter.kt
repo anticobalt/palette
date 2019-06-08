@@ -1,22 +1,29 @@
 package iced.egret.palette.adapter
 
 import android.content.Context
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import iced.egret.palette.R
+import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.MainFragmentManager
 import java.lang.ref.WeakReference
 
 class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class OnItemClickListener {
-        fun onItemClick(item: Coverable, adapter: PinnedCollectionsAdapter, position: Int) {
-            Toast.makeText(adapter.mContextReference.get(), "hey", Toast.LENGTH_SHORT).show()
+        fun onItemClick(item: Coverable) {
+            val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
+            val fragment =
+                    MainFragmentManager.getFragmentByIndex(fragmentIndex) as CollectionViewFragment
+            val viewPager = fragment.activity?.findViewById<ViewPager>(R.id.viewpagerMainFragments)
+            viewPager?.setCurrentItem(fragmentIndex, true)
+            CollectionManager.launch(item, fragment.adapter)
         }
     }
 
@@ -44,7 +51,7 @@ class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection
             item.loadCoverInto(holder)
             holder.tvItem?.text = item.name
             holder.itemView.setOnClickListener{
-                mListener.onItemClick(item, this, position)
+                mListener.onItemClick(item)
             }
         }
     }

@@ -9,8 +9,8 @@ import iced.egret.palette.fragment.PinnedCollectionsFragment
 
 object MainFragmentManager {
 
-    private const val PINNED_COLLECTIONS = 0
-    private const val COLLECTION_CONTENTS = 1
+    const val PINNED_COLLECTIONS = 0
+    const val COLLECTION_CONTENTS = 1
 
     private lateinit var nativeFragmentManager : FragmentManager
     var fragments : Array<Fragment> = Array(6) {Fragment()}

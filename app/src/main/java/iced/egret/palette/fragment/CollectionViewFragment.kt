@@ -18,20 +18,23 @@ import iced.egret.palette.util.CollectionManager
 class CollectionViewFragment : MainFragment() {
 
     private lateinit var mContents : MutableList<Coverable>
-    private var rootView : View? = null
-    private lateinit var toolbarItem : android.support.v7.widget.Toolbar
-    private lateinit var collectionRecyclerView : RecyclerView
-    private lateinit var floatingActionButton : FloatingActionButton
+    private var mRootView : View? = null
+    private lateinit var mToolbarItem : android.support.v7.widget.Toolbar
+    private lateinit var mCollectionRecyclerView : RecyclerView
+    private lateinit var mFloatingActionButton : FloatingActionButton
+
+    lateinit var adapter: CollectionViewAdapter
+        private set
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        rootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
-        collectionRecyclerView = rootView!!.findViewById(R.id.rvCollectionItems)
-        floatingActionButton = rootView!!.findViewById(R.id.fab)
-        toolbarItem = rootView!!.findViewById(R.id.toolbar)
-        toolbarItem.setTitle(R.string.app_name)
+        mRootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
+        mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
+        mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
+        mToolbarItem = mRootView!!.findViewById(R.id.toolbar)
+        mToolbarItem.setTitle(R.string.app_name)
 
-        floatingActionButton.setOnClickListener { view ->
+        mFloatingActionButton.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
@@ -42,23 +45,24 @@ class CollectionViewFragment : MainFragment() {
             buildRecyclerView()
         }
 
-        return rootView
+        return mRootView
 
-    }
-
-    override fun onBackPressed() : Boolean {
-        return returnToParentCollection()
     }
 
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
-            collectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
-            collectionRecyclerView.adapter = CollectionViewAdapter()
+            mCollectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
+            adapter = CollectionViewAdapter()
+            mCollectionRecyclerView.adapter = adapter
         }
         else {
             val toast = Toast.makeText(activity, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)
             toast.show()
         }
+    }
+
+    override fun onBackPressed() : Boolean {
+        return returnToParentCollection()
     }
 
     /**
@@ -69,7 +73,7 @@ class CollectionViewFragment : MainFragment() {
         return if (newContents != null){
             mContents.clear()
             mContents.addAll(newContents)
-            collectionRecyclerView.adapter?.notifyDataSetChanged()
+            mCollectionRecyclerView.adapter?.notifyDataSetChanged()
             true
         }
         else {

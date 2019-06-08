@@ -53,7 +53,7 @@ object CollectionManager {
         return mContents[position]
     }
 
-    fun launch(item: Coverable, adapter : CollectionViewAdapter, position: Int) {
+    fun launch(item: Coverable, adapter : CollectionViewAdapter, position: Int = -1) {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 val contents = item.getContents()

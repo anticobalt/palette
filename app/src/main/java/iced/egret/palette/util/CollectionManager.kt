@@ -11,16 +11,14 @@ import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import java.io.File
 import java.io.FileNotFoundException
-import java.util.*
-import kotlin.collections.ArrayList
 
 object CollectionManager {
 
     private const val rootCacheFileName = "root-cache.json"
 
+    private var mCurrentCollection: Collection? = null
     private var mContents: MutableList<Coverable> = ArrayList()
     private var mRoot : Folder? = null
-    private var mCollectionStack = ArrayDeque<Collection>()
 
     private var gson = Gson()
 
@@ -31,10 +29,10 @@ object CollectionManager {
         if (folders.isNotEmpty()) {
             val folder = getPracticalRoot(folders[0])
             folder.name = "Device Storage"
+            folder.parent = null
             mRoot = folder
+            mCurrentCollection = folder
             mContents = folder.getContents()
-            mCollectionStack.clear()
-            mCollectionStack.push(folder)
         }
 
     }
@@ -58,8 +56,10 @@ object CollectionManager {
     fun launch(item: Coverable, adapter : CollectionViewAdapter, position: Int) {
         if (!item.terminal) {
             if (item as? Collection != null) {
-                adapter.update(item.getContents())
-                mCollectionStack.push(item)
+                val contents = item.getContents()
+                adapter.update(contents)
+                mCurrentCollection = item
+                mContents = contents
             }
         }
         else {
@@ -73,18 +73,16 @@ object CollectionManager {
         }
     }
 
-    fun getParentCollectionContents() : MutableList<Coverable>? {
-        var contents : MutableList<Coverable>? = null
-        if (mCollectionStack.size >= 2) {
-            mCollectionStack.pop()
-            val parentCollection = mCollectionStack.peek()
-            contents = parentCollection.getContents()
+    fun revertToParent() : MutableList<Coverable>? {
+        val siblings = mCurrentCollection?.parent?.getContents()
+        if (siblings != null) {
+            mCurrentCollection = mCurrentCollection!!.parent  // not null b/c siblings not null
         }
-        return contents
+        return siblings
     }
 
     fun getCurrentCollectionPictures() : MutableList<Picture> {
-        val collection = mCollectionStack.peek()
+        val collection = mCurrentCollection
         var pictures : MutableList<Picture> = ArrayList()
         if (collection != null) {
             pictures = collection.getPictures()

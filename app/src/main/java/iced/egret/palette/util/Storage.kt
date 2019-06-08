@@ -1,13 +1,13 @@
 package iced.egret.palette.util
 
-import java.io.File
-import android.provider.MediaStore
-import android.provider.MediaStore.MediaColumns
 import android.app.Activity
 import android.database.Cursor
 import android.net.Uri
+import android.provider.MediaStore
+import android.provider.MediaStore.MediaColumns
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
+import java.io.File
 
 
 object Storage {
@@ -93,7 +93,7 @@ object Storage {
 
                 childFolder = parentFolder!!.getFolders().find {folder -> folder.path == folderPath}
                 if (childFolder == null) {
-                    childFolder = Folder(level, folderPath)
+                    childFolder = Folder(level, folderPath, parent = parentFolder)
                     parentFolder.addFolder(childFolder)
                 }
                 parentFolder = childFolder

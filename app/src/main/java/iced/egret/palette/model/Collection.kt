@@ -21,6 +21,7 @@ abstract class Collection(override var name: String) : Coverable {
     // Read-Only vars
     abstract var size : Int
         protected set
+    abstract var parent : Collection?
 
     override fun loadCoverInto(holder: CoverViewHolder) {
         if (holder.ivItem != null) {
@@ -54,7 +55,11 @@ abstract class Collection(override var name: String) : Coverable {
 
 }
 
-class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf()) : Collection(name) {
+class Folder(name: String,
+             val path: String,
+             subFolders: MutableList<Folder> = mutableListOf(),
+             override var parent: Collection? = null)
+    : Collection(name) {
 
     private var mFolders = subFolders
 
@@ -156,7 +161,7 @@ data class FolderData(val name: String,
 }
 
 
-class Album(name: String) : Collection(name) {
+class Album(name: String, override var parent: Collection?) : Collection(name) {
     override fun setUri() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -171,7 +176,7 @@ class Album(name: String) : Collection(name) {
     }
 }
 
-class SmartAlbum(name: String, folders : MutableList<Folder> = mutableListOf()) : Collection(name) {
+class SmartAlbum(name: String, folders : MutableList<Folder> = mutableListOf(), override var parent: Collection?) : Collection(name) {
     override fun setUri() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

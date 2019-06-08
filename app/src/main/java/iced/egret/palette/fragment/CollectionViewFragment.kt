@@ -61,10 +61,12 @@ class CollectionViewFragment : MainFragment() {
         }
     }
 
+    /**
+     * If contents are updated inside CollectionManager, changes are not reflected in adapter.
+     */
     private fun returnToParentCollection() : Boolean {
-        val newContents = CollectionManager.getParentCollectionContents()
-        val success : Boolean
-        success = if (newContents != null) {
+        val newContents = CollectionManager.revertToParent()
+        return if (newContents != null){
             mContents.clear()
             mContents.addAll(newContents)
             collectionRecyclerView.adapter?.notifyDataSetChanged()
@@ -73,7 +75,6 @@ class CollectionViewFragment : MainFragment() {
         else {
             false
         }
-        return success
     }
 
 }

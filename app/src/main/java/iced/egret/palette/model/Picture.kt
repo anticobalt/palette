@@ -1,9 +1,12 @@
-package iced.egret.palette
+package iced.egret.palette.model
 
 import android.net.Uri
 import android.os.Parcelable
 import android.view.View
 import com.bumptech.glide.Glide
+import iced.egret.palette.R
+import iced.egret.palette.activity.PictureViewActivity
+import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 
@@ -16,7 +19,9 @@ class Picture(override val name: String, val path: String) : TerminalCoverable {
     override val cover = mutableMapOf(
         "uri" to uri
     )
-    override val activity = ViewPictureActivity::class.java
+    override val activity = PictureViewActivity::class.java
+
+    override fun toDataClass() = PictureData(name, path)
 
     override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder) {
 
@@ -38,8 +43,6 @@ class Picture(override val name: String, val path: String) : TerminalCoverable {
         }
 
     }
-
-    override fun toDataClass() = PictureData(name, path)
 
 }
 

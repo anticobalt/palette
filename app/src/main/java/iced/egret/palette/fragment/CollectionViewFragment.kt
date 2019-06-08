@@ -1,6 +1,5 @@
-package iced.egret.palette
+package iced.egret.palette.fragment
 
-import android.Manifest
 import android.app.Fragment
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -11,6 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import iced.egret.palette.R
+import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
+import iced.egret.palette.model.Coverable
+import iced.egret.palette.util.CollectionManager
 
 class CollectionViewFragment : Fragment() {
 
@@ -22,7 +25,7 @@ class CollectionViewFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        rootView = inflater?.inflate(R.layout.content_view_collection, container, false)
+        rootView = inflater?.inflate(R.layout.fragment_view_collection, container, false)
         collectionRecyclerView = rootView!!.findViewById(R.id.collectionRecyclerView)
         floatingActionButton = rootView!!.findViewById(R.id.fab)
         toolbarItem = rootView!!.findViewById(R.id.toolbar)
@@ -31,10 +34,6 @@ class CollectionViewFragment : Fragment() {
         floatingActionButton.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
-        }
-
-        if (!Permission.isAccepted(activity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Permission.request(activity, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
         CollectionManager.initRootFolder(activity)

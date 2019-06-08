@@ -1,13 +1,16 @@
-package iced.egret.palette
+package iced.egret.palette.util
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.google.gson.Gson
+import iced.egret.palette.*
+import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
+import iced.egret.palette.model.*
+import iced.egret.palette.model.Collection
 import java.io.File
 import java.io.FileNotFoundException
-import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 

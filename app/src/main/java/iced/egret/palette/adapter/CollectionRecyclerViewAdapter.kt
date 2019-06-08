@@ -1,4 +1,4 @@
-package iced.egret.palette
+package iced.egret.palette.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import iced.egret.palette.R
+import iced.egret.palette.model.Coverable
+import iced.egret.palette.util.CollectionManager
 import kotlinx.android.synthetic.main.item_view_collection.view.*
 import java.lang.ref.WeakReference
 

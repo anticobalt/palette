@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ViewCollectionActivity"
-    tools:showIn="@layout/activity_view_collection">
+    tools:context=".activity.MainActivity"
+    tools:showIn="@layout/activity_main">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/toolbar_wrapper"

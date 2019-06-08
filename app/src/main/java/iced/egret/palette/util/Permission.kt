@@ -1,4 +1,4 @@
-package iced.egret.palette
+package iced.egret.palette.util
 
 import android.app.Activity
 import android.content.pm.PackageManager

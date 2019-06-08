@@ -1,4 +1,4 @@
-package iced.egret.palette
+package iced.egret.palette.adapter
 
 import android.support.v4.view.PagerAdapter
 import android.view.LayoutInflater
@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.github.piasy.biv.view.BigImageView
+import iced.egret.palette.R
+import iced.egret.palette.model.Picture
 
 class PicturePagerAdapter(private val pictures: MutableList<Picture>) : PagerAdapter() {
 

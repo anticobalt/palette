@@ -1,9 +1,8 @@
-package iced.egret.palette
+package iced.egret.palette.model
 
 import android.app.Activity
-import android.content.Context
 import android.os.Parcelable
-import android.widget.ImageView
+import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
 
 interface Coverable {
     val terminal : Boolean

@@ -1,33 +1,33 @@
-package iced.egret.palette
+package iced.egret.palette.activity
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-
-import kotlinx.android.synthetic.main.activity_view_collection.*
-import kotlinx.android.synthetic.main.content_view_collection.*
+import iced.egret.palette.R
+import iced.egret.palette.fragment.CollectionViewFragment
+import iced.egret.palette.util.Permission
 
 const val READ_EXTERNAL_CODE = 100
 const val WRITE_EXTERNAL_CODE = 101
 const val TAG = "VIEW"
 
-class ViewCollectionActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_view_collection)
+        setContentView(R.layout.activity_main)
+        if (!Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_view_collection, menu)
+        menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 

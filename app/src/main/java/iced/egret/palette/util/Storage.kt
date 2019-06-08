@@ -1,4 +1,4 @@
-package iced.egret.palette
+package iced.egret.palette.util
 
 import java.io.File
 import android.provider.MediaStore
@@ -6,6 +6,8 @@ import android.provider.MediaStore.MediaColumns
 import android.app.Activity
 import android.database.Cursor
 import android.net.Uri
+import iced.egret.palette.model.Folder
+import iced.egret.palette.model.Picture
 
 
 object Storage {

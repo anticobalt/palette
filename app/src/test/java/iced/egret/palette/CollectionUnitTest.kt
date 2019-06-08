@@ -1,5 +1,7 @@
 package iced.egret.palette
 
+import iced.egret.palette.model.Folder
+import iced.egret.palette.model.Picture
 import org.junit.Test
 
 class CollectionUnitTest {
@@ -36,7 +38,7 @@ class CollectionUnitTest {
         val picture = Picture("name", "whats/in/a/name")
         val pictures = arrayListOf(
                 Picture("here.jpg", "/destination/here.jpg"),
-                Picture("here.png","source/here.png"),
+                Picture("here.png", "source/here.png"),
                 Picture("here.gif", "/redirect/to/here.gif")
         )
 
@@ -73,7 +75,7 @@ class CollectionUnitTest {
         )
         val pictures = arrayListOf(
                 Picture("here.jpg", "/destination/here.jpg"),
-                Picture("here.png","source/here.png"),
+                Picture("here.png", "source/here.png"),
                 Picture("here.gif", "/redirect/to/here.gif")
         )
         var recursiveSize = 0

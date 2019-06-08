@@ -5,10 +5,10 @@
     android:id="@id/view_collection"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ViewCollectionActivity">
+    tools:context=".activity.MainActivity">
 
     <fragment
-        android:name="iced.egret.palette.CollectionViewFragment"
+        android:name="iced.egret.palette.fragment.CollectionViewFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/view_collection" />

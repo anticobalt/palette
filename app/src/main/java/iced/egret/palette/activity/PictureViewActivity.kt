@@ -65,8 +65,8 @@ class PictureViewActivity : AppCompatActivity() {
 
         val pictures = CollectionManager.getCurrentCollectionPictures()
         val adapter = PicturePagerAdapter(pictures)
-        picturePager.adapter = adapter
-        picturePager.currentItem = position
+        viewpagerPictures.adapter = adapter
+        viewpagerPictures.currentItem = position
 
     }
 

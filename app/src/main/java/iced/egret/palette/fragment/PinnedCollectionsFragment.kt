@@ -22,7 +22,7 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
-        mRecyclerView = mRootView!!.findViewById(R.id.pinnedRecyclerView)
+        mRecyclerView = mRootView!!.findViewById(R.id.rvPinnedCollections)
 
         if (activity != null) {
             CollectionManager.initRootFolder(activity as FragmentActivity)

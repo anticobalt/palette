@@ -15,17 +15,17 @@
         >
 
         <ImageView
-            android:id="@+id/iv_item"
+            android:id="@+id/ivCollectionItemImage"
             android:layout_width="match_parent"
             android:layout_height="@dimen/cover_size"
             app:layout_constraintTop_toTopOf="parent"
             />
 
         <TextView
-            android:id="@+id/tv_item"
+            android:id="@+id/tvCollectionItemText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="@id/iv_item"
+            app:layout_constraintBottom_toBottomOf="@id/ivCollectionItemImage"
             android:gravity="center"
             android:padding="10dp"
             android:textColor="@color/white"

@@ -26,7 +26,7 @@ class CollectionViewFragment : MainFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         rootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
-        collectionRecyclerView = rootView!!.findViewById(R.id.collectionRecyclerView)
+        collectionRecyclerView = rootView!!.findViewById(R.id.rvCollectionItems)
         floatingActionButton = rootView!!.findViewById(R.id.fab)
         toolbarItem = rootView!!.findViewById(R.id.toolbar)
         toolbarItem.setTitle(R.string.app_name)
@@ -53,7 +53,7 @@ class CollectionViewFragment : MainFragment() {
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
             collectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(mContents)
+            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter()
         }
         else {
             val toast = Toast.makeText(activity, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)

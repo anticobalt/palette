@@ -24,7 +24,7 @@ class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvItem : TextView? = view.pinnedCollectionLabel
+        val tvItem : TextView? = view.tvPinnedCollectionLabel
     }
 
     private val mListener = OnItemClickListener()

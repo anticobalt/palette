@@ -24,8 +24,8 @@ class CollectionRecyclerViewAdapter :
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val ivItem : ImageView? = view.iv_item
-        val tvItem : TextView? = view.tv_item
+        val ivItem : ImageView? = view.ivCollectionItemImage
+        val tvItem : TextView? = view.tvCollectionItemText
     }
 
     private var mItems: MutableList<Coverable> = CollectionManager.getContents()

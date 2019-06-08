@@ -32,7 +32,7 @@ class MainActivity : FragmentActivity() {
         }
 
         fragments = FragmentFactory.create()
-        mainFragmentPager.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
+        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -67,7 +67,7 @@ class MainActivity : FragmentActivity() {
         // A hack: https://stackoverflow.com/a/18611036
         // Good since 2013, so good enough for me
         val currentFragment = supportFragmentManager.findFragmentByTag(
-                "android:switcher:" + R.id.mainFragmentPager + ":0"
+                "android:switcher:" + R.id.viewpagerMainFragments + ":0"
         )
         val success = (currentFragment as MainFragment).onBackPressed()
         if (!success) {

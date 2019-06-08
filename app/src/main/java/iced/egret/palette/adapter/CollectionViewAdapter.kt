@@ -3,29 +3,20 @@ package iced.egret.palette.adapter
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.CollectionManager
-import kotlinx.android.synthetic.main.item_view_collection.view.*
 import java.lang.ref.WeakReference
 
 
-class CollectionRecyclerViewAdapter :
+class CollectionViewAdapter :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class OnItemClickListener {
-        fun onItemClick(item: Coverable, adapter: CollectionRecyclerViewAdapter, position: Int) {
+        fun onItemClick(item: Coverable, adapter: CollectionViewAdapter, position: Int) {
             CollectionManager.launch(item, adapter, position)
         }
-    }
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val ivItem : ImageView? = view.ivCollectionItemImage
-        val tvItem : TextView? = view.tvCollectionItemText
     }
 
     private var mItems: MutableList<Coverable> = CollectionManager.getContents()
@@ -36,15 +27,19 @@ class CollectionRecyclerViewAdapter :
         return mItems.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CoverViewHolder {
         mContextReference = WeakReference(parent.context)
-        return ViewHolder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_view_collection, parent, false))
+        return CoverViewHolder(
+                LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_view_collection, parent, false),
+                imageViewId = R.id.ivCollectionItemImage,
+                textViewId = R.id.tvCollectionItemText
+        )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val context = mContextReference.get()
-        if (holder is ViewHolder && context != null) {
+        if (holder is CoverViewHolder && context != null) {
             val item = mItems[position]
             item.loadCoverInto(holder)
             holder.tvItem?.text = item.name

@@ -4,11 +4,11 @@ import android.net.Uri
 import android.view.View
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
-import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
+import iced.egret.palette.adapter.CoverViewHolder
 import java.io.Serializable
 
 
-abstract class Collection(override val name: String) : Coverable {
+abstract class Collection(override var name: String) : Coverable {
 
     override val terminal = false
     override val cover = mutableMapOf<String, Any>(
@@ -22,7 +22,7 @@ abstract class Collection(override val name: String) : Coverable {
     abstract var size : Int
         protected set
 
-    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder) {
+    override fun loadCoverInto(holder: CoverViewHolder) {
         if (holder.ivItem != null) {
             setUri()
             Glide.with(holder.itemView.context)

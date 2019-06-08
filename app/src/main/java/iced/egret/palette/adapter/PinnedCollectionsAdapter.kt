@@ -3,15 +3,12 @@ package iced.egret.palette.adapter
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import iced.egret.palette.R
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.CollectionManager
-import kotlinx.android.synthetic.main.item_pinned_collections.view.*
 import java.lang.ref.WeakReference
 
 class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection>) :
@@ -23,17 +20,17 @@ class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection
         }
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvItem : TextView? = view.tvPinnedCollectionLabel
-    }
-
     private val mListener = OnItemClickListener()
     private lateinit var mContextReference : WeakReference<Context>
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CoverViewHolder {
         mContextReference = WeakReference(parent.context)
-        return ViewHolder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_pinned_collections, parent, false))
+        return CoverViewHolder(
+                LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_pinned_collections, parent, false),
+                textViewId = R.id.tvPinnedCollectionLabel,
+                imageViewId = R.id.ivPinnedCollectionCover
+        )
     }
 
     override fun getItemCount(): Int {
@@ -42,8 +39,9 @@ class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val context = mContextReference.get()
-        if (holder is ViewHolder && context != null) {
+        if (holder is CoverViewHolder && context != null) {
             val item = CollectionManager.getCollectionByPosition(position)
+            item.loadCoverInto(holder)
             holder.tvItem?.text = item.name
             holder.itemView.setOnClickListener{
                 mListener.onItemClick(item, this, position)

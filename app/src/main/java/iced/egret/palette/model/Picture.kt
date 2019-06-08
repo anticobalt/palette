@@ -6,11 +6,11 @@ import android.view.View
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
-import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
+import iced.egret.palette.adapter.CoverViewHolder
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 
-class Picture(override val name: String, val path: String) : TerminalCoverable {
+class Picture(override var name: String, val path: String) : TerminalCoverable {
 
     private val file : File = File(path)
     val uri : Uri = Uri.fromFile(file)
@@ -23,7 +23,7 @@ class Picture(override val name: String, val path: String) : TerminalCoverable {
 
     override fun toDataClass() = PictureData(name, path)
 
-    override fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder) {
+    override fun loadCoverInto(holder: CoverViewHolder) {
 
         val imageView = holder.ivItem
         val textView = holder.tvItem

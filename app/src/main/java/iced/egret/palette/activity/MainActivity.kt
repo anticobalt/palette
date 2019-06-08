@@ -3,15 +3,13 @@ package iced.egret.palette.activity
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import iced.egret.palette.R
 import iced.egret.palette.adapter.MainFragmentPagerAdapter
-import iced.egret.palette.fragment.MainFragment
-import iced.egret.palette.util.FragmentFactory
+import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Permission
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -21,8 +19,6 @@ const val TAG = "VIEW"
 
 class MainActivity : FragmentActivity() {
 
-    private lateinit var fragments : ArrayList<Fragment>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -31,8 +27,9 @@ class MainActivity : FragmentActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
-        fragments = FragmentFactory.create()
-        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
+        MainFragmentManager.setup(supportFragmentManager)
+        MainFragmentManager.createFragments()
+        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, MainFragmentManager.fragments)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -66,10 +63,9 @@ class MainActivity : FragmentActivity() {
     override fun onBackPressed() {
         // A hack: https://stackoverflow.com/a/18611036
         // Good since 2013, so good enough for me
-        val currentFragment = supportFragmentManager.findFragmentByTag(
-                "android:switcher:" + R.id.viewpagerMainFragments + ":0"
-        )
-        val success = (currentFragment as MainFragment).onBackPressed()
+        val currentFragmentIndex = viewpagerMainFragments.currentItem
+        val currentFragment = MainFragmentManager.getFragmentByIndex(currentFragmentIndex)
+        val success = (currentFragment).onBackPressed()
         if (!success) {
             super.onBackPressed()
         }

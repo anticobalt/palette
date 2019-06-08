@@ -2,13 +2,13 @@ package iced.egret.palette.model
 
 import android.app.Activity
 import android.os.Parcelable
-import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
+import iced.egret.palette.adapter.CoverViewHolder
 
 interface Coverable {
     val terminal : Boolean
-    val name : String
+    var name : String
     val cover : MutableMap<String, *>
-    fun loadCoverInto(holder: CollectionRecyclerViewAdapter.ViewHolder)
+    fun loadCoverInto(holder: CoverViewHolder)
 }
 
 interface TerminalCoverable : Coverable {

@@ -1,20 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvPinnedCollectionLabel"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="10dp"
-        android:textColor="@color/white"
-        android:background="@color/translucentGrey"
-        android:ellipsize="end"
-        android:singleLine="true"
-        />
+        >
+
+        <ImageView
+            android:id="@+id/ivPinnedCollectionCover"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cover_size"
+            tools:ignore="ContentDescription"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tvPinnedCollectionLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/ivPinnedCollectionCover"
+            android:gravity="start"
+            android:padding="15dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:shadowColor="@color/black"
+            android:ellipsize="end"
+            android:singleLine="true"
+            />
+
+    </android.support.constraint.ConstraintLayout>
 
 </LinearLayout>

@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentActivity
 import android.util.Log
 import com.google.gson.Gson
 import iced.egret.palette.R
-import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
+import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import java.io.File
@@ -30,6 +30,7 @@ object CollectionManager {
         val folders = Storage.getPictureFoldersMediaStore(activity)
         if (folders.isNotEmpty()) {
             val folder = getPracticalRoot(folders[0])
+            folder.name = "Device Storage"
             mRoot = folder
             mContents = folder.getContents()
             mCollectionStack.clear()
@@ -54,7 +55,7 @@ object CollectionManager {
         return mContents[position]
     }
 
-    fun launch(item: Coverable, adapter : CollectionRecyclerViewAdapter, position: Int) {
+    fun launch(item: Coverable, adapter : CollectionViewAdapter, position: Int) {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 adapter.update(item.getContents())

@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import iced.egret.palette.R
-import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
+import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.CollectionManager
 
@@ -53,7 +53,7 @@ class CollectionViewFragment : MainFragment() {
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
             collectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter()
+            collectionRecyclerView.adapter = CollectionViewAdapter()
         }
         else {
             val toast = Toast.makeText(activity, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)

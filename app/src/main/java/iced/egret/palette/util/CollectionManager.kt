@@ -38,6 +38,14 @@ object CollectionManager {
 
     }
 
+    fun getCollections() : MutableList<Collection> {
+        return mutableListOf(mRoot as Folder)
+    }
+
+    fun getCollectionByPosition(position: Int) : Collection {
+        return mRoot as Collection
+    }
+
     fun getContents() : MutableList<Coverable> {
         return mContents
     }

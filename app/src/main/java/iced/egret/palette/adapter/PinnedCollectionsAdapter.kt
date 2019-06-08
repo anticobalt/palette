@@ -5,65 +5,50 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import iced.egret.palette.R
+import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.CollectionManager
-import kotlinx.android.synthetic.main.item_view_collection.view.*
+import kotlinx.android.synthetic.main.item_pinned_collections.view.*
 import java.lang.ref.WeakReference
 
-
-class CollectionRecyclerViewAdapter :
+class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class OnItemClickListener {
-        fun onItemClick(item: Coverable, adapter: CollectionRecyclerViewAdapter, position: Int) {
-            CollectionManager.launch(item, adapter, position)
+        fun onItemClick(item: Coverable, adapter: PinnedCollectionsAdapter, position: Int) {
+            Toast.makeText(adapter.mContextReference.get(), "hey", Toast.LENGTH_SHORT).show()
         }
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val ivItem : ImageView? = view.iv_item
-        val tvItem : TextView? = view.tv_item
+        val tvItem : TextView? = view.pinnedCollectionLabel
     }
 
-    private var mItems: MutableList<Coverable> = CollectionManager.getContents()
     private val mListener = OnItemClickListener()
     private lateinit var mContextReference : WeakReference<Context>
 
-    override fun getItemCount(): Int {
-        return mItems.size
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         mContextReference = WeakReference(parent.context)
         return ViewHolder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_view_collection, parent, false))
+                .inflate(R.layout.item_pinned_collections, parent, false))
+    }
+
+    override fun getItemCount(): Int {
+        return mCollections.size
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val context = mContextReference.get()
         if (holder is ViewHolder && context != null) {
-            val item = mItems[position]
-            item.loadCoverInto(holder)
+            val item = CollectionManager.getCollectionByPosition(position)
             holder.tvItem?.text = item.name
             holder.itemView.setOnClickListener{
                 mListener.onItemClick(item, this, position)
             }
         }
-    }
-
-    fun update(items: MutableList<Coverable>) {
-        // mItems = items doesn't work
-        // Need to clear + allAll, or onclick will refer to old items
-        mItems.clear()
-        mItems.addAll(items)
-        notifyDataSetChanged()
-    }
-
-    fun getContext() : Context? {
-        return mContextReference.get()
     }
 
 }

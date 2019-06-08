@@ -28,7 +28,7 @@ object CollectionManager {
         val folders = Storage.getPictureFoldersMediaStore(activity)
         if (folders.isNotEmpty()) {
             val folder = getPracticalRoot(folders[0])
-            folder.name = "Device Storage"
+            folder.name = activity.getString(R.string.external_storage_name)
             folder.parent = null
             mRoot = folder
             mCurrentCollection = folder

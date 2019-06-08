@@ -22,6 +22,7 @@ class PinnedCollectionsAdapter(private val mCollections : MutableList<Collection
             val fragment =
                     MainFragmentManager.getFragmentByIndex(fragmentIndex) as CollectionViewFragment
             val viewPager = fragment.activity?.findViewById<ViewPager>(R.id.viewpagerMainFragments)
+            // FIXME: animate slower e.g https://stackoverflow.com/a/28297483
             viewPager?.setCurrentItem(fragmentIndex, true)
             CollectionManager.launch(item, fragment.adapter)
         }

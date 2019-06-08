@@ -20,27 +20,9 @@ const val TAG = "VIEW"
 
 class ViewCollectionActivity : AppCompatActivity() {
 
-    private lateinit var mContents : MutableList<Coverable>
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_collection)
-        setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
-
-        if (!Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
-        }
-
-        CollectionManager.initRootFolder(this)
-        mContents = CollectionManager.getContents()
-        buildRecyclerView()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -72,25 +54,10 @@ class ViewCollectionActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val newContents = CollectionManager.getParentCollectionContents()
-        if (newContents != null) {
-            mContents.clear()
-            mContents.addAll(newContents)
-            collectionRecyclerView.adapter.notifyDataSetChanged()
-        }
-        else {
+        val currentFragment = fragmentManager.findFragmentById(R.id.view_collection)
+        val success = (currentFragment as CollectionViewFragment).onBackPressed()
+        if (!success) {
             super.onBackPressed()
-        }
-    }
-
-    private fun buildRecyclerView() {
-        if (mContents.isNotEmpty()) {
-            collectionRecyclerView.layoutManager = GridLayoutManager(this, 3)
-            collectionRecyclerView.adapter = CollectionRecyclerViewAdapter(mContents)
-        }
-        else {
-            val toast = Toast.makeText(this, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)
-            toast.show()
         }
     }
 

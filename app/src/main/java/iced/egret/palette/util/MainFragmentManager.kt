@@ -9,8 +9,11 @@ import iced.egret.palette.fragment.PinnedCollectionsFragment
 
 object MainFragmentManager {
 
+    private const val PINNED_COLLECTIONS = 0
+    private const val COLLECTION_CONTENTS = 1
+
     private lateinit var nativeFragmentManager : FragmentManager
-    var fragments = ArrayList<Fragment>()
+    var fragments : Array<Fragment> = Array(6) {Fragment()}
         private set
 
     fun setup(fm: FragmentManager) {
@@ -18,15 +21,15 @@ object MainFragmentManager {
     }
 
     fun createFragments() {
-        fragments.add(PinnedCollectionsFragment())
-        fragments.add(CollectionViewFragment())
+        fragments[PINNED_COLLECTIONS] = PinnedCollectionsFragment()
+        fragments[COLLECTION_CONTENTS] = CollectionViewFragment()
     }
 
     fun getFragmentByIndex(index: Int) : MainFragment {
-        val currentFragment = nativeFragmentManager.findFragmentByTag(
+        val fragment = nativeFragmentManager.findFragmentByTag(
                 "android:switcher:" + R.id.viewpagerMainFragments + ":" + index
         )
-        return currentFragment as MainFragment
+        return fragment as MainFragment
     }
 
 }

@@ -29,7 +29,8 @@ class MainActivity : FragmentActivity() {
 
         MainFragmentManager.setup(supportFragmentManager)
         MainFragmentManager.createFragments()
-        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, MainFragmentManager.fragments)
+        val fragments = MainFragmentManager.fragments.toMutableList()
+        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

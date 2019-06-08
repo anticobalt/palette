@@ -1,11 +1,11 @@
 package iced.egret.palette.util
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.support.v4.app.FragmentActivity
 import android.util.Log
 import com.google.gson.Gson
-import iced.egret.palette.*
+import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionRecyclerViewAdapter
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
@@ -24,7 +24,7 @@ object CollectionManager {
 
     private var gson = Gson()
 
-    fun initRootFolder(activity: Activity) {
+    fun initRootFolder(activity: FragmentActivity) {
         // TODO: account for multiple roots
 
         val folders = Storage.getPictureFoldersMediaStore(activity)

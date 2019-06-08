@@ -48,7 +48,7 @@ class PictureViewActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         hideSystemUI()
-        BigImageViewer.initialize(GlideImageLoader.with(this))
+        BigImageViewer.initialize(GlideImageLoader.with(applicationContext))
         setContentView(R.layout.activity_view_picture)
 
         lateinit var gestureDetector: GestureDetector

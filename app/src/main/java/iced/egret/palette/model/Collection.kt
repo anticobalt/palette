@@ -7,7 +7,15 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CoverViewHolder
 import java.io.Serializable
 
-
+/***
+ * Properties:
+ * - name
+ * - terminal
+ * - cover
+ * - parent
+ * - pictures
+ * - size
+ */
 abstract class Collection(override var name: String) : Coverable {
 
     override val terminal = false
@@ -15,17 +23,23 @@ abstract class Collection(override var name: String) : Coverable {
             "id" to R.drawable.ic_folder_silver_64dp
     )
 
-    // Standard vars
-    protected abstract var mPictures: ArrayList<Picture>
-
-    // Read-Only vars
-    abstract var size : Int
+    abstract var pictures: ArrayList<Picture>
+        protected set
+    var size = 0
         protected set
     abstract var parent : Collection?
 
+    fun isEmpty() : Boolean {
+        return size == 0
+    }
+
+    fun isNotEmpty() : Boolean {
+        return !isEmpty()
+    }
+
     override fun loadCoverInto(holder: CoverViewHolder) {
         if (holder.ivItem != null) {
-            setUri()
+            setCoverUri()
             Glide.with(holder.itemView.context)
                     .load(cover["uri"])
                     .centerCrop()
@@ -36,111 +50,101 @@ abstract class Collection(override var name: String) : Coverable {
         }
     }
 
-    abstract fun setUri()
     abstract fun getContents() : MutableList<Coverable>
-    abstract fun getCollections() : MutableList<Collection>
-
-    open fun getPictures() : MutableList<Picture> {
-        return mPictures
-    }
 
     open fun addPicture(newPicture: Picture) {
-        mPictures.add(newPicture)
+        pictures.add(newPicture)
         size += 1
     }
     open fun addPictures(newPictures: MutableList<Picture>) {
-        mPictures.addAll(newPictures)
+        pictures.addAll(newPictures)
         size += newPictures.size
     }
 
-}
-
-class Folder(name: String,
-             val path: String,
-             subFolders: MutableList<Folder> = mutableListOf(),
-             override var parent: Collection? = null)
-    : Collection(name) {
-
-    private var mFolders = subFolders
-
-    override var size = mFolders.size
-    override var mPictures = ArrayList<Picture>()
-
-    var mRecursiveSize = mFolders.size
-        private set
-
-    override fun toString(): String {
-        return "$path, $size"
-    }
-
-    fun isEmpty() : Boolean {
-        return (mFolders.size + mPictures.size) == 0
-    }
-
-    fun isNotEmpty() : Boolean {
-        return !isEmpty()
-    }
-
-    fun toDataClass() : FolderData {
-        val picturePaths = mPictures.map { picture -> picture.path }
-        val subFolders = mFolders.map {folder -> folder.toDataClass() }
-        return FolderData(name, path, subFolders, picturePaths)
-    }
-
-    override fun setUri() {
+    private fun setCoverUri() {
         val uri = getOnePictureUri()
         if (uri != null) {
             cover["uri"] = uri
         }
     }
 
-    private fun getOnePictureUri() : Uri? {
-        if (mPictures.isNotEmpty()) {
-            return mPictures[0].uri
-        } else if (mFolders.isNotEmpty()) {
-            return mFolders[0].getOnePictureUri()
+    abstract fun getOnePictureUri() : Uri?
+
+}
+
+/***
+ * Properties:
+ * - name
+ * - path
+ * - terminal
+ * - cover
+ * - parent
+ * - pictures
+ * - folders
+ * - size
+ * - recursiveSize
+ */
+class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf(), override var parent: Collection? = null) : Collection(name) {
+
+    override var pictures = ArrayList<Picture>()
+    var folders = subFolders
+        private set
+    var recursiveSize : Int
+        private set
+
+    init {
+        size = folders.size
+        recursiveSize = folders.size
+    }
+
+    override fun toString(): String {
+        return "$path, $size"
+    }
+
+    fun toDataClass() : FolderData {
+        val picturePaths = pictures.map { picture -> picture.path }
+        val subFolders = folders.map { folder -> folder.toDataClass() }
+        return FolderData(name, path, subFolders, picturePaths)
+    }
+
+    override fun getOnePictureUri() : Uri? {
+        if (pictures.isNotEmpty()) {
+            return pictures[0].uri
+        } else if (folders.isNotEmpty()) {
+            return folders[0].getOnePictureUri()
         }
         return null
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun getContents(): MutableList<Coverable> {
-        val folders = mFolders as ArrayList<Coverable>
-        val pictures = mPictures as ArrayList<Coverable>
+        val folders = folders as ArrayList<Coverable>
+        val pictures = pictures as ArrayList<Coverable>
         return (folders + pictures) as MutableList<Coverable>
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun getCollections(): MutableList<Collection> {
-        return getFolders() as MutableList<Collection>
-    }
-
-    fun getFolders() : MutableList<Folder> {
-        return mFolders
-    }
-
     fun addFolder(newFolder: Folder) {
-        mFolders.add(newFolder)
+        folders.add(newFolder)
         size += 1
-        mRecursiveSize += newFolder.mRecursiveSize
+        recursiveSize += newFolder.recursiveSize
     }
 
     fun addFolders(newFolders: MutableList<Folder>) {
-        mFolders.addAll(newFolders)
+        folders.addAll(newFolders)
         size += newFolders.size
         for (newFolder: Folder in newFolders) {
-            mRecursiveSize += newFolder.mRecursiveSize
+            recursiveSize += newFolder.recursiveSize
         }
     }
 
     override fun addPicture(newPicture: Picture) {
         super.addPicture(newPicture)
-        mRecursiveSize += 1
+        recursiveSize += 1
     }
 
     override fun addPictures(newPictures: MutableList<Picture>) {
         super.addPictures(newPictures)
-        mRecursiveSize += newPictures.size
+        recursiveSize += newPictures.size
     }
 
 }
@@ -160,35 +164,50 @@ data class FolderData(val name: String,
 
 }
 
-
+/***
+ * Properties:
+ * - name
+ * - terminal
+ * - cover
+ * - parent
+ * - albums
+ * - folders
+ * - pictures
+ * - size
+ * - recursiveSize
+ */
 class Album(name: String, override var parent: Collection?) : Collection(name) {
-    override fun setUri() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    override var pictures = ArrayList<Picture>()
+    var recursiveSize = 0
+        private set
+    var albums : MutableList<Album> = ArrayList()
+        private set
+    var folders : MutableList<Folder> = ArrayList()
+        private set
+
+    override fun getOnePictureUri(): Uri? {
+        val collections = getCollections()
+        if (pictures.isNotEmpty()) {
+            return pictures[0].uri
+        } else if (collections.isNotEmpty()) {
+            return collections[0].getOnePictureUri()
+        }
+        return null
     }
 
-    override var size = 0
-    override var mPictures = ArrayList<Picture>()
+    @Suppress("UNCHECKED_CAST")
+    private fun getCollections() : MutableList<Collection> {
+        return ((albums as ArrayList<Collection>) + (folders as ArrayList<Collection>)) as MutableList<Collection>
+    }
+
+    @Suppress("UNCHECKED_CAST")
     override fun getContents(): MutableList<Coverable> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-    override fun getCollections(): MutableList<Collection> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-}
-
-class SmartAlbum(name: String, folders : MutableList<Folder> = mutableListOf(), override var parent: Collection?) : Collection(name) {
-    override fun setUri() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val folders = folders as ArrayList<Coverable>
+        val pictures = pictures as ArrayList<Coverable>
+        val albums = albums as ArrayList<Coverable>
+        return (folders + pictures + albums) as MutableList<Coverable>
     }
 
-    private var mFolders = folders
-    override var size = mFolders.size
-    override var mPictures = ArrayList<Picture>()
-    override fun getContents(): MutableList<Coverable> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-    override fun getCollections(): MutableList<Collection> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }
 

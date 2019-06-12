@@ -14,16 +14,16 @@ class CollectionUnitTest {
         var folder = Folder(name, path)
         assert(folder.name == name)
         assert(folder.path == path)
-        assert(folder.getFolders().size == 0)
-        assert(folder.getPictures().size == 0)
+        assert(folder.folders.size == 0)
+        assert(folder.pictures.size == 0)
 
         val subFolders = arrayListOf(
                 Folder("a", "path/to/a"),
                 Folder("b", "/a/path/to/b")
         )
         folder = Folder(name, path, subFolders = subFolders)
-        assert(folder.getFolders() == subFolders)
-        assert(folder.getPictures().size == 0)
+        assert(folder.folders == subFolders)
+        assert(folder.pictures.size == 0)
 
     }
 
@@ -43,26 +43,26 @@ class CollectionUnitTest {
         )
 
         // one folder
-        assert(subFolder !in folder.getFolders())
+        assert(subFolder !in folder.folders)
         folder.addFolder(subFolder)
-        assert(subFolder in folder.getFolders())
+        assert(subFolder in folder.folders)
 
         // many folders
-        assert(folder.getFolders().intersect(subFolders).isEmpty())
+        assert(folder.folders.intersect(subFolders).isEmpty())
         folder.addFolders(subFolders)
-        assert(folder.getFolders().intersect(subFolders).size == subFolders.size)
-        assert(subFolder in folder.getFolders())
+        assert(folder.folders.intersect(subFolders).size == subFolders.size)
+        assert(subFolder in folder.folders)
 
         // one picture
-        assert(picture !in folder.getPictures())
+        assert(picture !in folder.pictures)
         folder.addPicture(picture)
-        assert(picture in folder.getPictures())
+        assert(picture in folder.pictures)
 
         // many pictures
-        assert(folder.getPictures().intersect(pictures).isEmpty())
+        assert(folder.pictures.intersect(pictures).isEmpty())
         folder.addPictures(pictures)
-        assert(folder.getPictures().intersect(pictures).size == pictures.size)
-        assert(picture in folder.getPictures())
+        assert(folder.pictures.intersect(pictures).size == pictures.size)
+        assert(picture in folder.pictures)
 
     }
 
@@ -83,18 +83,18 @@ class CollectionUnitTest {
         assert(folder.isEmpty())
         assert(!(folder.isNotEmpty()))
         assert(folder.size == 0)
-        assert(folder.mRecursiveSize == 0)
+        assert(folder.recursiveSize == 0)
 
         folder.addFolders(subFolders)
         assert(folder.size == subFolders.size)
         for (f: Folder in subFolders) {
-            recursiveSize += f.mRecursiveSize
+            recursiveSize += f.recursiveSize
         }
-        assert(folder.mRecursiveSize == recursiveSize)
+        assert(folder.recursiveSize == recursiveSize)
 
         folder.addPictures(pictures)
         assert(folder.size == subFolders.size + pictures.size)
-        assert(folder.mRecursiveSize == recursiveSize + pictures.size)
+        assert(folder.recursiveSize == recursiveSize + pictures.size)
 
     }
 

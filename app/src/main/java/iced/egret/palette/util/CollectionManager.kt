@@ -85,7 +85,7 @@ object CollectionManager {
         val collection = mCurrentCollection
         var pictures : MutableList<Picture> = ArrayList()
         if (collection != null) {
-            pictures = collection.getPictures()
+            pictures = collection.pictures
         }
         return pictures
     }
@@ -120,7 +120,7 @@ object CollectionManager {
     private fun getPracticalRoot(folder: Folder) : Folder {
         var f = folder
         while (f.path != "/storage/emulated/0") {
-            f = f.getFolders().first()
+            f = f.folders.first()
         }
         return f
     }

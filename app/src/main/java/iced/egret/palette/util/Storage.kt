@@ -91,7 +91,7 @@ object Storage {
 
                 folderPath = pathLevels.subList(0, levelInt + 1).joinToString("/")
 
-                childFolder = parentFolder!!.getFolders().find {folder -> folder.path == folderPath}
+                childFolder = parentFolder!!.folders.find {folder -> folder.path == folderPath}
                 if (childFolder == null) {
                     childFolder = Folder(level, folderPath, parent = parentFolder)
                     parentFolder.addFolder(childFolder)

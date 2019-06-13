@@ -1,5 +1,7 @@
 package iced.egret.palette.fragment
 
-abstract class MainFragment : android.support.v4.app.Fragment() {
+import androidx.fragment.app.Fragment
+
+abstract class MainFragment : Fragment() {
     abstract fun onBackPressed() : Boolean
 }

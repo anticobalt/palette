@@ -3,8 +3,8 @@ package iced.egret.palette.activity
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import iced.egret.palette.R
 import iced.egret.palette.adapter.MainFragmentPagerAdapter
 import iced.egret.palette.util.MainFragmentManager

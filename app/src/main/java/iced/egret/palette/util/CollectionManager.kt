@@ -2,7 +2,7 @@ package iced.egret.palette.util
 
 import android.content.Context
 import android.content.Intent
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.FragmentActivity
 import android.util.Log
 import com.google.gson.Gson
 import iced.egret.palette.R

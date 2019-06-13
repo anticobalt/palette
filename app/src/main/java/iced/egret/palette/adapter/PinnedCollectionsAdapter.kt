@@ -1,8 +1,8 @@
 package iced.egret.palette.adapter
 
 import android.content.Context
-import android.support.v4.view.ViewPager
-import android.support.v7.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import iced.egret.palette.R

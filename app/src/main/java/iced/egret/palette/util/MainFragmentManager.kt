@@ -1,7 +1,7 @@
 package iced.egret.palette.util
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.MainFragment
@@ -14,7 +14,7 @@ object MainFragmentManager {
     const val NUM_FRAGMENTS = 2
 
     private lateinit var nativeFragmentManager : FragmentManager
-    var fragments : Array<Fragment> = Array(NUM_FRAGMENTS) {Fragment()}
+    var fragments : Array<Fragment> = Array(NUM_FRAGMENTS) { Fragment() }
         private set
 
     fun setup(fm: FragmentManager) {

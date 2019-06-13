@@ -33,8 +33,7 @@ class Picture(override var name: String, val path: String) : TerminalCoverable {
             Glide.with(holder.itemView.context)
                     .load(cover["uri"])
                     .centerCrop()
-                    .placeholder(R.drawable.ic_image_silver_128dp)
-                    .error(R.drawable.ic_broken_image_silver_128dp)
+                    .error(R.drawable.ic_broken_image_black_128dp)
                     .into(imageView)
         }
 

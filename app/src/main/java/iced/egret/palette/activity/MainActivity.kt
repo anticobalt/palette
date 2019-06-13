@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import iced.egret.palette.R
 import iced.egret.palette.adapter.MainFragmentPagerAdapter
+import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Permission
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,6 +26,7 @@ class MainActivity : FragmentActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
+        CollectionManager.initRootFolder(this)
         MainFragmentManager.setup(supportFragmentManager)
         MainFragmentManager.createFragments()
         val fragments = MainFragmentManager.fragments.toMutableList()

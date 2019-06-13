@@ -2,8 +2,8 @@ package iced.egret.palette.util
 
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.FragmentActivity
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
@@ -19,6 +19,7 @@ object CollectionManager {
     private var mCurrentCollection: Collection? = null
     private var mContents: MutableList<Coverable> = ArrayList()
     private var mRoot : Folder? = null
+    private var mCollections : MutableList<Collection> = ArrayList()
 
     private var gson = Gson()
 
@@ -33,16 +34,19 @@ object CollectionManager {
             mRoot = folder
             mCurrentCollection = folder
             mContents = folder.getContents()
+            mCollections.add(folder)
         }
 
     }
 
     fun getCollections() : MutableList<Collection> {
-        return mutableListOf(mRoot as Folder)
+        return mCollections as ArrayList<Collection>
     }
 
-    fun getCollectionByPosition(position: Int) : Collection {
-        return mRoot as Collection
+    fun createNewAlbum(name: String) : Album {
+        val album = Album(name, null)
+        mCollections.add(album)
+        return album
     }
 
     fun getContents() : MutableList<Coverable> {

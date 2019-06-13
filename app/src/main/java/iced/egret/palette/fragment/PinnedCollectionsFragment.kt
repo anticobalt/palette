@@ -1,17 +1,18 @@
 package iced.egret.palette.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
+import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.util.CollectionManager
 
@@ -31,8 +32,6 @@ class PinnedCollectionsFragment : MainFragment() {
         buildToolbar()
 
         if (activity != null) {
-            CollectionManager.initRootFolder(activity as FragmentActivity)
-            mCollections = CollectionManager.getCollections()
             buildRecyclerView()
         }
 
@@ -49,14 +48,8 @@ class PinnedCollectionsFragment : MainFragment() {
     }
 
     private fun buildRecyclerView() {
-        if (mCollections.isNotEmpty()) {
-            mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
-            mRecyclerView.adapter = PinnedCollectionsAdapter(mCollections)
-        }
-        else {
-            val toast = Toast.makeText(activity, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)
-            toast.show()
-        }
+        mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
+        mRecyclerView.adapter = PinnedCollectionsAdapter()
     }
 
     override fun onBackPressed(): Boolean {
@@ -68,9 +61,26 @@ class PinnedCollectionsFragment : MainFragment() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
+            R.id.actionPinnedCollectionsCreateAlbum -> {
+                MaterialDialog(this.context!!).show {
+                    title(R.string.title_album_form)
+                    input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH) {
+                        _, charSequence ->
+                            onCreateNewAlbum(charSequence)
+                    }
+                    positiveButton(R.string.action_create_album)
+                    negativeButton()
+                }
+                true
+            }
             R.id.actionPinnedCollectionsSettings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun onCreateNewAlbum(charSequence: CharSequence) {
+        CollectionManager.createNewAlbum(charSequence.toString())
+        mRecyclerView.adapter?.notifyDataSetChanged()
     }
 
 }

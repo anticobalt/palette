@@ -1,16 +1,15 @@
 package iced.egret.palette.fragment
 
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Coverable
@@ -40,7 +39,6 @@ class CollectionViewFragment : MainFragment() {
         }
 
         if (activity != null) {
-            CollectionManager.initRootFolder(activity as FragmentActivity)
             mContents = CollectionManager.getContents()
             mToolbarItem.title = CollectionManager.getCurrentCollectionName()
             buildRecyclerView()

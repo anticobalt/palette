@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -18,11 +20,15 @@ class PinnedCollectionsFragment : MainFragment() {
     private lateinit var mCollections : MutableList<Collection>
     private var mRootView : View? = null
     private lateinit var mRecyclerView : RecyclerView
+    private lateinit var mToolbarItem : Toolbar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
         mRecyclerView = mRootView!!.findViewById(R.id.rvPinnedCollections)
+        mToolbarItem = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
+
+        buildToolbar()
 
         if (activity != null) {
             CollectionManager.initRootFolder(activity as FragmentActivity)
@@ -32,6 +38,14 @@ class PinnedCollectionsFragment : MainFragment() {
 
         return mRootView
 
+    }
+
+    private fun buildToolbar() {
+        mToolbarItem.setTitle(R.string.app_name)
+        mToolbarItem.inflateMenu(R.menu.menu_pinned_collections)
+        mToolbarItem.setOnMenuItemClickListener {
+            onOptionsItemSelected(it)
+        }
     }
 
     private fun buildRecyclerView() {
@@ -47,6 +61,16 @@ class PinnedCollectionsFragment : MainFragment() {
 
     override fun onBackPressed(): Boolean {
         return false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when (item.itemId) {
+            R.id.actionPinnedCollectionsSettings -> true
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }

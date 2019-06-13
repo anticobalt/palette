@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,7 @@ class CollectionViewFragment : MainFragment() {
 
     private lateinit var mContents : MutableList<Coverable>
     private var mRootView : View? = null
-    private lateinit var mToolbarItem : android.support.v7.widget.Toolbar
+    private lateinit var mToolbarItem : Toolbar
     private lateinit var mCollectionRecyclerView : RecyclerView
     private lateinit var mFloatingActionButton : FloatingActionButton
 
@@ -31,8 +32,7 @@ class CollectionViewFragment : MainFragment() {
         mRootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
-        mToolbarItem = mRootView!!.findViewById(R.id.toolbar)
-        mToolbarItem.setTitle(R.string.app_name)
+        mToolbarItem = mRootView!!.findViewById(R.id.toolbarViewCollection)
 
         mFloatingActionButton.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -42,6 +42,7 @@ class CollectionViewFragment : MainFragment() {
         if (activity != null) {
             CollectionManager.initRootFolder(activity as FragmentActivity)
             mContents = CollectionManager.getContents()
+            mToolbarItem.title = CollectionManager.getCurrentCollectionName()
             buildRecyclerView()
         }
 

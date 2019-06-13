@@ -86,6 +86,10 @@ object CollectionManager {
         return pictures
     }
 
+    fun getCurrentCollectionName() : String? {
+        return mCurrentCollection?.name
+    }
+
     private fun saveRootToDisk(fileDirectory : File) {
         val rootData = mRoot?.toDataClass()
         val json = gson.toJson(rootData)

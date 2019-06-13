@@ -5,8 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import iced.egret.palette.R
 import iced.egret.palette.adapter.MainFragmentPagerAdapter
 import iced.egret.palette.util.MainFragmentManager
@@ -33,22 +31,6 @@ class MainActivity : FragmentActivity() {
         viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             READ_EXTERNAL_CODE -> {
@@ -62,8 +44,6 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onBackPressed() {
-        // A hack: https://stackoverflow.com/a/18611036
-        // Good since 2013, so good enough for me
         val currentFragmentIndex = viewpagerMainFragments.currentItem
         val currentFragment = MainFragmentManager.getFragmentByIndex(currentFragmentIndex)
         val success = (currentFragment).onBackPressed()

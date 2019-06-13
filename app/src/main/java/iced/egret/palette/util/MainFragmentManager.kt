@@ -11,9 +11,10 @@ object MainFragmentManager {
 
     const val PINNED_COLLECTIONS = 0
     const val COLLECTION_CONTENTS = 1
+    const val NUM_FRAGMENTS = 2
 
     private lateinit var nativeFragmentManager : FragmentManager
-    var fragments : Array<Fragment> = Array(6) {Fragment()}
+    var fragments : Array<Fragment> = Array(NUM_FRAGMENTS) {Fragment()}
         private set
 
     fun setup(fm: FragmentManager) {
@@ -25,6 +26,10 @@ object MainFragmentManager {
         fragments[COLLECTION_CONTENTS] = CollectionViewFragment()
     }
 
+    /**
+     * A hack: https://stackoverflow.com/a/18611036
+     * Good since 2013, so good enough for me
+     */
     fun getFragmentByIndex(index: Int) : MainFragment {
         val fragment = nativeFragmentManager.findFragmentByTag(
                 "android:switcher:" + R.id.viewpagerMainFragments + ":" + index

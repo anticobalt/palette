@@ -189,6 +189,13 @@ class Album(name: String) : Collection(name) {
     var folders : MutableList<Folder> = ArrayList()
         private set
 
+    fun toDataClass() : AlbumData {
+        val picturePaths = pictures.map { picture -> picture.path }
+        val foldersData = folders.map { folder -> folder.toDataClass() }
+        val albumsData = albums.map { album -> album.toDataClass() }
+        return AlbumData(name, picturePaths, foldersData, albumsData)
+    }
+
     override fun getOnePictureUri(): Uri? {
         val collections = getCollections()
         if (pictures.isNotEmpty()) {

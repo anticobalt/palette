@@ -184,7 +184,7 @@ data class FolderData(val name: String,
 class Album(name: String, override var parent: Collection?) : Collection(name) {
 
     companion object {
-        const val NAME_MAX_LENGTH = 50
+        const val NAME_MAX_LENGTH = 25
     }
 
     override var pictures = ArrayList<Picture>()

@@ -23,6 +23,7 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             // FIXME: animate slower e.g https://stackoverflow.com/a/28297483
             viewPager?.setCurrentItem(fragmentIndex, true)
             CollectionManager.launch(item, fragment.adapter)
+            fragment.setToolbarTitle()
         }
     }
 

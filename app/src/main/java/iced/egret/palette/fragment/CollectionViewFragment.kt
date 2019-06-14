@@ -40,12 +40,19 @@ class CollectionViewFragment : MainFragment() {
 
         if (activity != null) {
             mContents = CollectionManager.getContents()
-            mToolbarItem.title = CollectionManager.getCurrentCollectionName()
+            setToolbarTitle()
             buildRecyclerView()
         }
 
         return mRootView
 
+    }
+
+    fun setToolbarTitle(title: String = "") {
+        mToolbarItem.title = if (title.isEmpty()) {
+            CollectionManager.getCurrentCollectionName()
+        }
+        else title
     }
 
     private fun buildRecyclerView() {

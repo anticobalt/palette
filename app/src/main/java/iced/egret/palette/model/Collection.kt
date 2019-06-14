@@ -20,7 +20,7 @@ abstract class Collection(override var name: String) : Coverable {
 
     override val terminal = false
     override val cover = mutableMapOf<String, Any>(
-            "id" to R.drawable.ic_folder_black_64dp
+            "id" to R.drawable.ic_default_collection_cover
     )
 
     abstract var pictures: ArrayList<Picture>
@@ -40,8 +40,13 @@ abstract class Collection(override var name: String) : Coverable {
     override fun loadCoverInto(holder: CoverViewHolder) {
         if (holder.ivItem != null) {
             setCoverUri()
+            val image : Any? = if (cover["uri"] != null) {
+                cover["uri"]
+            } else {
+                cover["id"]
+            }
             Glide.with(holder.itemView.context)
-                    .load(cover["uri"])
+                    .load(image)
                     .centerCrop()
                     .into(holder.ivItem)
         }

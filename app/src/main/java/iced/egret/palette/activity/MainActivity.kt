@@ -50,7 +50,7 @@ class MainActivity : FragmentActivity() {
         val currentFragment = MainFragmentManager.getFragmentByIndex(currentFragmentIndex)
         val success = (currentFragment).onBackPressed()
         if (!success) {
-            super.onBackPressed()
+            moveTaskToBack(true)  // don't destroy
         }
     }
 

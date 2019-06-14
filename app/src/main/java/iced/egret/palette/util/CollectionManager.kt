@@ -34,6 +34,7 @@ object CollectionManager {
             mRoot = folder
             mCurrentCollection = folder
             mContents = folder.getContents()
+            mCollections.clear()  // defensive
             mCollections.add(folder)
         }
 

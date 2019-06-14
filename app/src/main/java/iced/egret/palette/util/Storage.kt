@@ -93,7 +93,7 @@ object Storage {
 
                 childFolder = parentFolder!!.folders.find {folder -> folder.path == folderPath}
                 if (childFolder == null) {
-                    childFolder = Folder(level, folderPath, parent = parentFolder)
+                    childFolder = Folder(level, folderPath)
                     parentFolder.addFolder(childFolder)
                 }
                 parentFolder = childFolder

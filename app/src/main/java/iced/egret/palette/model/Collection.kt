@@ -12,7 +12,6 @@ import java.io.Serializable
  * - name
  * - terminal
  * - cover
- * - parent
  * - pictures
  * - size
  */
@@ -27,7 +26,8 @@ abstract class Collection(override var name: String) : Coverable {
         protected set
     var size = 0
         protected set
-    abstract var parent : Collection?
+    var recursiveSize = 0
+        protected set
 
     fun isEmpty() : Boolean {
         return size == 0
@@ -83,18 +83,15 @@ abstract class Collection(override var name: String) : Coverable {
  * - path
  * - terminal
  * - cover
- * - parent
  * - pictures
  * - folders
  * - size
  * - recursiveSize
  */
-class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf(), override var parent: Collection? = null) : Collection(name) {
+class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf()) : Collection(name) {
 
     override var pictures = ArrayList<Picture>()
     var folders = subFolders
-        private set
-    var recursiveSize : Int
         private set
 
     init {
@@ -174,22 +171,19 @@ data class FolderData(val name: String,
  * - name
  * - terminal
  * - cover
- * - parent
  * - albums
  * - folders
  * - pictures
  * - size
  * - recursiveSize
  */
-class Album(name: String, override var parent: Collection?) : Collection(name) {
+class Album(name: String) : Collection(name) {
 
     companion object {
         const val NAME_MAX_LENGTH = 25
     }
 
     override var pictures = ArrayList<Picture>()
-    var recursiveSize = 0
-        private set
     var albums : MutableList<Album> = ArrayList()
         private set
     var folders : MutableList<Folder> = ArrayList()
@@ -218,5 +212,65 @@ class Album(name: String, override var parent: Collection?) : Collection(name) {
         return (folders + pictures + albums) as MutableList<Coverable>
     }
 
+    private fun addCollection(newCollection: Collection, collectionList: MutableList<Collection>) {
+        collectionList.add(newCollection)
+        size += 1
+        recursiveSize += newCollection.recursiveSize
+    }
+
+    private fun addCollections(newCollections: MutableList<Collection>, collectionList: MutableList<Collection>) {
+        collectionList.addAll(newCollections)
+        size += newCollections.size
+        for (newCollection: Collection in newCollections) {
+            recursiveSize += newCollection.recursiveSize
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun addFolder(newFolder: Folder) {
+        addCollection(newFolder, folders as MutableList<Collection>)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun addFolders(newFolders: MutableList<Folder>) {
+        addCollections(newFolders as MutableList<Collection>, folders as MutableList<Collection>)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun addAlbum(newAlbum: Album) {
+        addCollection(newAlbum, albums as MutableList<Collection>)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun addAlbums(newAlbums: MutableList<Album>) {
+        addCollections(newAlbums as MutableList<Collection>, albums as MutableList<Collection>)
+    }
+
+    override fun addPicture(newPicture: Picture) {
+        super.addPicture(newPicture)
+        recursiveSize += 1
+    }
+
+    override fun addPictures(newPictures: MutableList<Picture>) {
+        super.addPictures(newPictures)
+        recursiveSize += newPictures.size
+    }
+
 }
 
+data class AlbumData(val name: String,
+                     val picturePaths: List<String>,
+                     val foldersData: List<FolderData>,
+                     val albumsData: List<AlbumData>) : Serializable {
+
+    fun toFullClass() : Album {
+        val album = Album(name)
+        val folders = foldersData.map {data -> data.toFullClass() } as MutableList<Folder>
+        val albums = albumsData.map {data -> data.toFullClass() } as MutableList<Album>
+        val pictures = picturePaths.map {path -> Picture(path.split("/").last(), path) } as MutableList<Picture>
+        album.addFolders(folders)
+        album.addAlbums(albums)
+        album.addPictures(pictures)
+        return album
+    }
+}

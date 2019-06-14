@@ -22,6 +22,7 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             val viewPager = fragment.activity?.findViewById<ViewPager>(R.id.viewpagerMainFragments)
             // FIXME: animate slower e.g https://stackoverflow.com/a/28297483
             viewPager?.setCurrentItem(fragmentIndex, true)
+            CollectionManager.clearStack()
             CollectionManager.launch(item, fragment.adapter)
             fragment.setToolbarTitle()
         }

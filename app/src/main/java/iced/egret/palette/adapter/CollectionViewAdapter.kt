@@ -1,16 +1,16 @@
 package iced.egret.palette.adapter
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.CollectionManager
 import java.lang.ref.WeakReference
 
 
-class CollectionViewAdapter :
+class CollectionViewAdapter(contents: MutableList<Coverable>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     class OnItemClickListener {
@@ -19,7 +19,7 @@ class CollectionViewAdapter :
         }
     }
 
-    private var mItems: MutableList<Coverable> = CollectionManager.getContents()
+    private var mItems: MutableList<Coverable> = contents
     private val mListener = OnItemClickListener()
     private lateinit var mContextReference : WeakReference<Context>
 

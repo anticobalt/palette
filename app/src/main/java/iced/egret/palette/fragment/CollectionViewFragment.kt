@@ -39,7 +39,7 @@ class CollectionViewFragment : MainFragment() {
         }
 
         if (activity != null) {
-            mContents = CollectionManager.getContents()
+            mContents = CollectionManager.getContents().toMutableList()
             setToolbarTitle()
             buildRecyclerView()
         }
@@ -58,7 +58,7 @@ class CollectionViewFragment : MainFragment() {
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
             mCollectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
-            adapter = CollectionViewAdapter()
+            adapter = CollectionViewAdapter(mContents)
             mCollectionRecyclerView.adapter = adapter
         }
         else {
@@ -77,9 +77,7 @@ class CollectionViewFragment : MainFragment() {
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null){
-            mContents.clear()
-            mContents.addAll(newContents)
-            mCollectionRecyclerView.adapter?.notifyDataSetChanged()
+            adapter.update(newContents)
             true
         }
         else {

@@ -11,31 +11,44 @@ import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import java.io.File
 import java.io.FileNotFoundException
+import java.util.*
+import kotlin.collections.ArrayList
 
 object CollectionManager {
 
     private const val rootCacheFileName = "root-cache.json"
 
-    private var mCurrentCollection: Collection? = null
-    private var mContents: MutableList<Coverable> = ArrayList()
     private var mRoot : Folder? = null
     private var mCollections : MutableList<Collection> = ArrayList()
-
+    private var mCollectionStack = ArrayDeque<Collection>()
     private var gson = Gson()
+
+    // Aliases
+    private var mCurrentCollection: Collection?
+        get() = mCollectionStack.peek()
+        set(value) = mCollectionStack.push(value)
+    private val mContents: MutableList<Coverable>
+        get() {
+            return mCurrentCollection?.getContents() ?: ArrayList()
+        }
 
     fun initRootFolder(activity: FragmentActivity) {
         // TODO: account for multiple roots
 
         val folders = Storage.getPictureFoldersMediaStore(activity)
         if (folders.isNotEmpty()) {
+
             val folder = getPracticalRoot(folders[0])
             folder.name = activity.getString(R.string.external_storage_name)
-            folder.parent = null
             mRoot = folder
-            mCurrentCollection = folder
-            mContents = folder.getContents()
-            mCollections.clear()  // defensive
+
+            // defensive
+            mCollectionStack.clear()
+            mCollections.clear()
+
+            mCollectionStack.push(folder)
             mCollections.add(folder)
+
         }
 
     }
@@ -45,7 +58,7 @@ object CollectionManager {
     }
 
     fun createNewAlbum(name: String) : Album {
-        val album = Album(name, null)
+        val album = Album(name)
         mCollections.add(album)
         return album
     }
@@ -60,7 +73,6 @@ object CollectionManager {
                 val contents = item.getContents()
                 adapter.update(contents)
                 mCurrentCollection = item
-                mContents = contents
             }
         }
         else {
@@ -75,11 +87,17 @@ object CollectionManager {
     }
 
     fun revertToParent() : MutableList<Coverable>? {
-        val siblings = mCurrentCollection?.parent?.getContents()
-        if (siblings != null) {
-            mCurrentCollection = mCurrentCollection!!.parent  // not null b/c siblings not null
+        return if (mCollectionStack.size > 1) {
+            mCollectionStack.pop()
+            mContents
         }
-        return siblings
+        else {
+            null
+        }
+    }
+
+    fun clearStack() {
+        mCollectionStack.clear()
     }
 
     fun getCurrentCollectionPictures() : MutableList<Picture> {
@@ -93,6 +111,10 @@ object CollectionManager {
 
     fun getCurrentCollectionName() : String? {
         return mCurrentCollection?.name
+    }
+
+    private fun saveCollectionsToDisk(fileDirectory : File) {
+
     }
 
     private fun saveRootToDisk(fileDirectory : File) {

@@ -4,11 +4,13 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import iced.egret.palette.R
 import iced.egret.palette.adapter.MainFragmentPagerAdapter
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.MainFragmentManager
+import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Permission
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -27,10 +29,13 @@ class MainActivity : FragmentActivity() {
         }
 
         CollectionManager.setup(this)
+        Painter.color = ContextCompat.getColor(this, Painter.colorResource)
+
         MainFragmentManager.setup(supportFragmentManager)
         MainFragmentManager.createFragments()
         val fragments = MainFragmentManager.fragments.toMutableList()
         viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

@@ -1,6 +1,8 @@
 package iced.egret.palette.adapter
 
+import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.model.Coverable
+import java.lang.ref.WeakReference
 
 /**
  * Basically a custom, stripped-down implementation of ActionMode, which doesn't exist for
@@ -11,12 +13,13 @@ import iced.egret.palette.model.Coverable
  *
  * Activated when long click occurs. Activation causes state change (e.g. switching to edit mode).
  */
-class LongClickSelector {
+class LongClickSelector(fragment: MainFragment) {
 
     private var active = false
-    private var selectedItemIds = ArrayList<Long>()
+    var selectedItemIds = ArrayList<Long>()
 
     var clickListener : CoverableClickListener? = null
+    var fragmentReference = WeakReference(fragment)
 
     fun onItemClick(item: Coverable, position: Int, holder: CoverViewHolder, sharedClickListener: CoverableClickListener) {
 
@@ -35,18 +38,47 @@ class LongClickSelector {
 
     fun onItemLongClick(item: Coverable, position: Int, holder: CoverViewHolder, sharedClickListener: CoverableClickListener) : Boolean {
 
+        var handled = false
         clickListener = sharedClickListener
         clickListener?.setup(item, position, holder)
 
-        return if (active) {
-            clickListener?.tearDown()
-            false
-        }
-        else {
-            active = true
+        if (!active) {
+            activate()
             clickListener?.onItemDefaultLongClick(selectedItemIds)
             clickListener?.tearDown()
+            handled = true
+        }
+
+        return handled
+    }
+
+    /**
+     * @return Whether event handled here (true) or ignored (false)
+     */
+    fun onBackPressed() : Boolean {
+        return if (active) {
+            deactivate()
             true
+        }
+        else {
+            false
+        }
+    }
+
+    private fun activate() {
+        val fragment = fragmentReference.get()
+        if (fragment is MainFragment) {
+            fragment.onAlternateModeActivated()
+            active = true
+        }
+    }
+
+    private fun deactivate() {
+        val fragment = fragmentReference.get()
+        if (fragment is MainFragment) {
+            selectedItemIds.clear()
+            fragment.onAlternateModeDeactivated()
+            active = false
         }
     }
 

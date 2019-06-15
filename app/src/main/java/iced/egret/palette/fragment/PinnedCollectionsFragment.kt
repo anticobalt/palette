@@ -11,9 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
 import iced.egret.palette.R
+import iced.egret.palette.adapter.LongClickSelector
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.Painter
 
 class PinnedCollectionsFragment : MainFragment() {
 
@@ -22,6 +24,7 @@ class PinnedCollectionsFragment : MainFragment() {
     private lateinit var mToolbarItem : Toolbar
 
     private lateinit var mAdapter : PinnedCollectionsAdapter
+    private lateinit var mSelector: LongClickSelector
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -45,13 +48,17 @@ class PinnedCollectionsFragment : MainFragment() {
     }
 
     private fun buildRecyclerView() {
+
+        mSelector = LongClickSelector(this)
+
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
-        mAdapter = PinnedCollectionsAdapter()
+        mAdapter = PinnedCollectionsAdapter(mSelector)
         mRecyclerView.adapter = mAdapter
+
     }
 
     override fun onBackPressed(): Boolean {
-        return false
+        return mSelector.onBackPressed()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -74,6 +81,32 @@ class PinnedCollectionsFragment : MainFragment() {
             R.id.actionPinnedCollectionsSettings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    /**
+     * Called by LongClickSelector upon its activation
+     */
+    override fun onAlternateModeActivated() {
+
+        val back = activity?.getDrawable(R.drawable.ic_chevron_left_black_24dp)
+        Painter.paintDrawable(back)
+
+        mToolbarItem.menu.clear()
+        mToolbarItem.inflateMenu(R.menu.menu_pinned_collections_edit)
+        mToolbarItem.navigationIcon = back
+        mToolbarItem.setNavigationOnClickListener {
+            onBackPressed()
+        }
+    }
+
+    /**
+     * Called by LongClickSelector after it finishes cleaning up
+     */
+    override fun onAlternateModeDeactivated() {
+        mToolbarItem.menu.clear()
+        mToolbarItem.inflateMenu(R.menu.menu_pinned_collections)
+        mToolbarItem.navigationIcon = null
+        mAdapter.notifyDataSetChanged()  // signal that selections were cleared
     }
 
     private fun onCreateNewAlbum(charSequence: CharSequence) {

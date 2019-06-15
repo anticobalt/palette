@@ -71,6 +71,9 @@ class CollectionViewFragment : MainFragment() {
         return returnToParentCollection()
     }
 
+    override fun onAlternateModeActivated() {}
+    override fun onAlternateModeDeactivated() {}
+
     /**
      * If contents are updated inside CollectionManager, changes are not reflected in adapter.
      */

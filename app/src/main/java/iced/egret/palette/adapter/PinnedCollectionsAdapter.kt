@@ -12,8 +12,11 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.MainFragmentManager
 import java.lang.ref.WeakReference
 
-class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    /**
+     * Responds to click actions, by changing display or launching items.
+     */
     class ActionClickListener : CoverableClickListener() {
 
         private var item: Coverable? = null
@@ -55,11 +58,11 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
             val positionLong = position!!.toLong()
             if (positionLong in selectedItemIds) {
-                holder!!.ivItem?.clearColorFilter()
+                indicateSelection(holder!!, false)
                 selectedItemIds.remove(positionLong)
             }
             else {
-                holder!!.ivItem?.setColorFilter(R.color.translucentGrey)
+                indicateSelection(holder!!, true)
                 selectedItemIds.add(positionLong)
             }
         }
@@ -71,13 +74,18 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
         override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {}
 
+        private fun indicateSelection(holder: CoverViewHolder, selected: Boolean) {
+            if (selected) holder.ivItem?.setColorFilter(R.color.translucentGrey)
+            else holder.ivItem?.clearColorFilter()
+        }
+
     }
 
     private var mCollections = CollectionManager.getCollections()
     private lateinit var mContextReference : WeakReference<Context>
 
     private val mClickListener = ActionClickListener()
-    private var mSelector = LongClickSelector()
+    private var mSelector = selector
 
     init {
         setHasStableIds(true)
@@ -109,6 +117,8 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
             val item = mCollections[position]
             item.loadCoverInto(holder)
+
+            setDefaultLook(holder)
             holder.tvItem?.text = item.name
 
             holder.itemView.setOnClickListener{
@@ -122,6 +132,8 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
 
     }
 
-
+    private fun setDefaultLook(holder: CoverViewHolder) {
+        holder.ivItem?.clearColorFilter()
+    }
 
 }

@@ -85,7 +85,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
 
     }
 
-    private var mCollections = CollectionManager.getCollections()
+    private var mCollections = CollectionManager.getCollections().toMutableList()
     private lateinit var mContextReference : WeakReference<Context>
 
     private val mClickListener = ActionClickListener()

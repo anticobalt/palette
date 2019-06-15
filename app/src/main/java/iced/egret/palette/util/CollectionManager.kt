@@ -60,7 +60,7 @@ object CollectionManager {
     }
 
     fun getCollections() : MutableList<Collection> {
-        return mCollections as ArrayList<Collection>
+        return mCollections
     }
 
     fun createNewAlbum(name: String) : Album {

@@ -6,10 +6,12 @@
     <string name="action_settings">Settings</string>
     <string name="select">Select</string>
     <string name="action_create_album">Create Album</string>
-    <string name="action_delete_album">Delete Album</string>
+    <string name="action_delete_albums">Delete Albums</string>
 
     <string name="title_album_form">New Album</string>
     <string name="hint_set_name">Name goes here</string>
+    <string name="title_delete_album_confirm">Delete Albums?</string>
+    <string name="message_delete_album_confirm">This action is irreversible. You are NOT deleting pictures.</string>
 
     <string name="alert_no_folders">No folders found!</string>
     <string name="error_intent_extra">Something went wrong!</string>

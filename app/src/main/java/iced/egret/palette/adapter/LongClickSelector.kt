@@ -65,7 +65,7 @@ class LongClickSelector(fragment: MainFragment) {
         }
     }
 
-    private fun activate() {
+    fun activate() {
         val fragment = fragmentReference.get()
         if (fragment is MainFragment) {
             fragment.onAlternateModeActivated()
@@ -73,7 +73,7 @@ class LongClickSelector(fragment: MainFragment) {
         }
     }
 
-    private fun deactivate() {
+    fun deactivate() {
         val fragment = fragmentReference.get()
         if (fragment is MainFragment) {
             selectedItemIds.clear()

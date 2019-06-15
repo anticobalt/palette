@@ -27,16 +27,13 @@ class PinnedCollectionsFragment : MainFragment() {
 
     private lateinit var mAdapter : PinnedCollectionsAdapter
     private lateinit var mSelector: LongClickSelector
+    // FIXME: selections don't persist when fragment rebuilt (e.g. when rotating screen)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
         mRecyclerView = mRootView!!.findViewById(R.id.rvPinnedCollections)
-
         buildRecyclerView()
-
         return mRootView
-
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -97,6 +94,19 @@ class PinnedCollectionsFragment : MainFragment() {
                 }
                 true
             }
+            R.id.actionPinnedCollectionsDeleteAlbum -> {
+                MaterialDialog(this.context!!).show {
+                    title(R.string.title_delete_album_confirm)
+                    message(R.string.message_delete_album_confirm)
+                    negativeButton()
+                    positiveButton(R.string.action_delete_albums) {
+                        CollectionManager.deleteCollectionsByPosition(mSelector.selectedItemIds)
+                        mSelector.deactivate()
+                        mAdapter.updateCollections()
+                    }
+                }
+                true
+            }
             R.id.actionPinnedCollectionsSettings -> true
             else -> super.onOptionsItemSelected(item)
         }
@@ -121,7 +131,7 @@ class PinnedCollectionsFragment : MainFragment() {
 
     private fun onCreateNewAlbum(charSequence: CharSequence) {
         CollectionManager.createNewAlbum(charSequence.toString())
-        mAdapter.notifyDataSetChanged()
+        mAdapter.updateCollections()
     }
 
 }

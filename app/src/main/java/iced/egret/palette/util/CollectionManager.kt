@@ -70,6 +70,18 @@ object CollectionManager {
         return album
     }
 
+    fun deleteCollectionsByPosition(positions: ArrayList<Long>) {
+        val indices = positions.toSet()
+        val remainingCollections = ArrayList<Collection>()
+        for (i in 0 until mCollections.size) {
+            if (!indices.contains(i.toLong())) {
+                remainingCollections.add(mCollections[i])
+            }
+        }
+        mCollections = remainingCollections
+        saveAlbumsToDisk()
+    }
+
     fun getContents() : MutableList<Coverable> {
         return mContents
     }

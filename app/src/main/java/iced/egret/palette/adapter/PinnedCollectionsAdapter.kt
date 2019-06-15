@@ -142,4 +142,10 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
         }
     }
 
+    fun updateCollections() {
+        mCollections.clear()
+        mCollections.addAll(CollectionManager.getCollections())
+        notifyDataSetChanged()
+    }
+
 }

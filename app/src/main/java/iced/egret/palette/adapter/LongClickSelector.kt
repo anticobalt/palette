@@ -28,10 +28,11 @@ class LongClickSelector(fragment: MainFragment) {
 
         if (active) {
             clickListener?.onItemAlternateClick(selectedItemIds)
+            if (selectedItemIds.isEmpty()) {
+                deactivate()
+            }
         }
-        else {
-            clickListener?.onItemDefaultClick(selectedItemIds)
-        }
+        else clickListener?.onItemDefaultClick(selectedItemIds)
 
         clickListener?.tearDown()
     }
@@ -43,9 +44,11 @@ class LongClickSelector(fragment: MainFragment) {
         clickListener?.setup(item, position, holder)
 
         if (!active) {
-            activate()
             clickListener?.onItemDefaultLongClick(selectedItemIds)
             clickListener?.tearDown()
+            if (selectedItemIds.isNotEmpty()) {  // empty if clicking on non-deletable item
+                activate()
+            }
             handled = true
         }
 

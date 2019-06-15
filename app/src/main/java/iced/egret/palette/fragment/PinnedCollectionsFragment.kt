@@ -13,12 +13,10 @@ import com.afollestad.materialdialogs.input.input
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.Collection
 import iced.egret.palette.util.CollectionManager
 
 class PinnedCollectionsFragment : MainFragment() {
 
-    private lateinit var mCollections : MutableList<Collection>
     private var mRootView : View? = null
     private lateinit var mRecyclerView : RecyclerView
     private lateinit var mToolbarItem : Toolbar

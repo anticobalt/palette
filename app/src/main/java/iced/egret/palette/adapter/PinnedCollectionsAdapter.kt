@@ -14,9 +14,31 @@ import java.lang.ref.WeakReference
 
 class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    class OnItemClickListener {
+    class ActionClickListener : CoverableClickListener() {
 
-        fun onItemClick(item: Coverable) {
+        private var item: Coverable? = null
+        private var position: Int? = null
+        private var holder: CoverViewHolder? = null
+
+        private var ready = false
+
+        override fun setup(item: Coverable, position: Int, holder: CoverViewHolder) {
+            this.item = item
+            this.position = position
+            this.holder = holder
+            this.ready = true
+        }
+
+        override fun tearDown() {
+            this.item = null
+            this.position = null
+            this.holder = null
+            this.ready = false
+        }
+
+        override fun onItemDefaultClick(selectedItemIds: ArrayList<Long>) {
+            if (!ready) return
+
             val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
             val fragment =
                     MainFragmentManager.getFragmentByIndex(fragmentIndex) as CollectionViewFragment
@@ -24,30 +46,38 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             // FIXME: animate slower e.g https://stackoverflow.com/a/28297483
             viewPager?.setCurrentItem(fragmentIndex, true)
             CollectionManager.clearStack()
-            CollectionManager.launch(item, fragment.adapter)
+            CollectionManager.launch(item!!, fragment.adapter)
             fragment.setToolbarTitle()
         }
 
-        fun onItemLongClick(position: Int, holder: CoverViewHolder, adapter: PinnedCollectionsAdapter) : Boolean {
-            val positionLong = position.toLong()
-            if (positionLong in adapter.mSelectedItemIds) {
-                holder.ivItem?.clearColorFilter()
-                adapter.mSelectedItemIds.remove(positionLong)
+        override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {
+            if (!ready) return
+
+            val positionLong = position!!.toLong()
+            if (positionLong in selectedItemIds) {
+                holder!!.ivItem?.clearColorFilter()
+                selectedItemIds.remove(positionLong)
             }
             else {
-                holder.ivItem?.setColorFilter(R.color.translucentGrey)
-                adapter.mSelectedItemIds.add(positionLong)
+                holder!!.ivItem?.setColorFilter(R.color.translucentGrey)
+                selectedItemIds.add(positionLong)
             }
-            return true
         }
+
+        override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
+            if (!ready) return
+            onItemDefaultLongClick(selectedItemIds)
+        }
+
+        override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {}
 
     }
 
     private var mCollections = CollectionManager.getCollections()
-    private val mListener = OnItemClickListener()
     private lateinit var mContextReference : WeakReference<Context>
 
-    private var mSelectedItemIds = ArrayList<Long>()
+    private val mClickListener = ActionClickListener()
+    private var mSelector = LongClickSelector()
 
     init {
         setHasStableIds(true)
@@ -72,7 +102,9 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
         val context = mContextReference.get()
+
         if (holder is CoverViewHolder && context != null) {
 
             val item = mCollections[position]
@@ -80,13 +112,14 @@ class PinnedCollectionsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>()
             holder.tvItem?.text = item.name
 
             holder.itemView.setOnClickListener{
-                mListener.onItemClick(item)
+                mSelector.onItemClick(item, position, holder, mClickListener)
             }
             holder.itemView.setOnLongClickListener {
-                mListener.onItemLongClick(position, holder, this)
+                mSelector.onItemLongClick(item, position, holder, mClickListener)
             }
 
         }
+
     }
 
 

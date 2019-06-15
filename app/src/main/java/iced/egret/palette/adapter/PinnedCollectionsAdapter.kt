@@ -2,7 +2,9 @@ package iced.egret.palette.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import iced.egret.palette.R
@@ -75,8 +77,9 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
         override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {}
 
         private fun indicateSelection(holder: CoverViewHolder, selected: Boolean) {
-            if (selected) holder.ivItem?.setColorFilter(R.color.translucentGrey)
-            else holder.ivItem?.clearColorFilter()
+            val button = holder.itemView.findViewById<ImageButton>(R.id.btnSelect)
+            if (selected) button.visibility = View.VISIBLE
+            else button.visibility = View.INVISIBLE
         }
 
     }
@@ -110,30 +113,33 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
         val context = mContextReference.get()
-
         if (holder is CoverViewHolder && context != null) {
-
             val item = mCollections[position]
-            item.loadCoverInto(holder)
-
-            setDefaultLook(holder)
-            holder.tvItem?.text = item.name
-
+            buildHolder(holder, item)
+            indicateSelection(holder, position)
             holder.itemView.setOnClickListener{
                 mSelector.onItemClick(item, position, holder, mClickListener)
             }
             holder.itemView.setOnLongClickListener {
                 mSelector.onItemLongClick(item, position, holder, mClickListener)
             }
-
         }
-
     }
 
-    private fun setDefaultLook(holder: CoverViewHolder) {
-        holder.ivItem?.clearColorFilter()
+    private fun buildHolder(holder: CoverViewHolder, item: Coverable) {
+        item.loadCoverInto(holder)
+        holder.tvItem?.text = item.name
+    }
+
+    private fun indicateSelection(holder: CoverViewHolder, position: Int) {
+        val button = holder.itemView.findViewById<ImageButton>(R.id.btnSelect)
+        if (position.toLong() in mSelector.selectedItemIds) {
+            button.visibility = View.VISIBLE
+        }
+        else {
+            button.visibility = View.INVISIBLE
+        }
     }
 
 }

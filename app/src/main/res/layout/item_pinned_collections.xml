@@ -34,6 +34,19 @@
             android:singleLine="true"
             />
 
+        <ImageButton
+            android:id="@+id/btnSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/ivPinnedCollectionCover"
+            app:layout_constraintRight_toRightOf="@id/ivPinnedCollectionCover"
+            android:src="@drawable/ic_check_black_24dp"
+            android:tint="@color/white"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:visibility="invisible"
+            android:contentDescription="@string/select"
+            />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

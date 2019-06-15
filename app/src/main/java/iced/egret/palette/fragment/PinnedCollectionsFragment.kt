@@ -21,7 +21,9 @@ class PinnedCollectionsFragment : MainFragment() {
 
     private var mRootView : View? = null
     private lateinit var mRecyclerView : RecyclerView
-    private lateinit var mToolbarItem : Toolbar
+
+    private lateinit var mDefaultToolbar : Toolbar
+    private lateinit var mEditToolbar : Toolbar
 
     private lateinit var mAdapter : PinnedCollectionsAdapter
     private lateinit var mSelector: LongClickSelector
@@ -30,31 +32,48 @@ class PinnedCollectionsFragment : MainFragment() {
 
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
         mRecyclerView = mRootView!!.findViewById(R.id.rvPinnedCollections)
-        mToolbarItem = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
 
-        buildToolbar()
         buildRecyclerView()
 
         return mRootView
 
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        buildToolbar()  // edit menu needs activity
+    }
+
     private fun buildToolbar() {
-        mToolbarItem.setTitle(R.string.app_name)
-        mToolbarItem.inflateMenu(R.menu.menu_pinned_collections)
-        mToolbarItem.setOnMenuItemClickListener {
+
+        mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
+        mEditToolbar = mRootView!!.findViewById(R.id.toolbarEditPinnedCollections)
+
+        mDefaultToolbar.setTitle(R.string.app_name)
+        mDefaultToolbar.inflateMenu(R.menu.menu_pinned_collections)
+        mDefaultToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
+
+        mEditToolbar.setTitle(R.string.app_name)
+        mEditToolbar.inflateMenu(R.menu.menu_pinned_collections_edit)
+        mEditToolbar.setOnMenuItemClickListener {
+            onOptionsItemSelected(it)
+        }
+        val back = activity?.getDrawable(R.drawable.ic_chevron_left_black_24dp)
+        Painter.paintDrawable(back)
+        mEditToolbar.navigationIcon = back
+        mEditToolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
+
     }
 
     private fun buildRecyclerView() {
-
         mSelector = LongClickSelector(this)
-
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
         mAdapter = PinnedCollectionsAdapter(mSelector)
         mRecyclerView.adapter = mAdapter
-
     }
 
     override fun onBackPressed(): Boolean {
@@ -87,25 +106,16 @@ class PinnedCollectionsFragment : MainFragment() {
      * Called by LongClickSelector upon its activation
      */
     override fun onAlternateModeActivated() {
-
-        val back = activity?.getDrawable(R.drawable.ic_chevron_left_black_24dp)
-        Painter.paintDrawable(back)
-
-        mToolbarItem.menu.clear()
-        mToolbarItem.inflateMenu(R.menu.menu_pinned_collections_edit)
-        mToolbarItem.navigationIcon = back
-        mToolbarItem.setNavigationOnClickListener {
-            onBackPressed()
-        }
+        mDefaultToolbar.visibility = Toolbar.GONE
+        mEditToolbar.visibility = Toolbar.VISIBLE
     }
 
     /**
      * Called by LongClickSelector after it finishes cleaning up
      */
     override fun onAlternateModeDeactivated() {
-        mToolbarItem.menu.clear()
-        mToolbarItem.inflateMenu(R.menu.menu_pinned_collections)
-        mToolbarItem.navigationIcon = null
+        mEditToolbar.visibility = Toolbar.GONE
+        mDefaultToolbar.visibility = Toolbar.VISIBLE
         mAdapter.notifyDataSetChanged()  // signal that selections were cleared
     }
 

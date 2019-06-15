@@ -15,7 +15,7 @@ import java.lang.ref.WeakReference
  */
 class LongClickSelector(fragment: MainFragment) {
 
-    private var active = false
+    var active = false
     var selectedItemIds = ArrayList<Long>()
 
     var clickListener : CoverableClickListener? = null

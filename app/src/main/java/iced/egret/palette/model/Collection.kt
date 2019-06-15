@@ -90,6 +90,7 @@ abstract class Collection(override var name: String) : Coverable {
  */
 class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf()) : Collection(name) {
 
+    override val deletable = false
     override var pictures = ArrayList<Picture>()
     var folders = subFolders
         private set
@@ -183,6 +184,7 @@ class Album(name: String) : Collection(name) {
         const val NAME_MAX_LENGTH = 25
     }
 
+    override val deletable = true
     override var pictures = ArrayList<Picture>()
     var albums : MutableList<Album> = ArrayList()
         private set

@@ -57,6 +57,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
 
         override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {
             if (!ready) return
+            if (!item!!.deletable) return
 
             val positionLong = position!!.toLong()
             if (positionLong in selectedItemIds) {
@@ -117,7 +118,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
         if (holder is CoverViewHolder && context != null) {
             val item = mCollections[position]
             buildHolder(holder, item)
-            indicateSelection(holder, position)
+            indicateSelection(holder, position, item)
             holder.itemView.setOnClickListener{
                 mSelector.onItemClick(item, position, holder, mClickListener)
             }
@@ -127,18 +128,33 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
         }
     }
 
+    /**
+     * Fill holder with mandatory elements
+     */
     private fun buildHolder(holder: CoverViewHolder, item: Coverable) {
         item.loadCoverInto(holder)
         holder.tvItem?.text = item.name
     }
 
-    private fun indicateSelection(holder: CoverViewHolder, position: Int) {
+    /**
+     * Style holder to match various selection states (e.g. is selected, selectable, etc)
+     */
+    private fun indicateSelection(holder: CoverViewHolder, position: Int, item: Coverable) {
+
         val button = holder.itemView.findViewById<ImageButton>(R.id.btnSelect)
+
         if (position.toLong() in mSelector.selectedItemIds) {
             button.visibility = View.VISIBLE
         }
         else {
             button.visibility = View.INVISIBLE
+        }
+
+        if (mSelector.active && !item.deletable) {
+            holder.itemView.alpha = 0.5F
+        }
+        else {
+            holder.itemView.alpha = 1F
         }
     }
 

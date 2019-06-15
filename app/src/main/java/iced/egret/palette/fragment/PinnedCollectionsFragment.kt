@@ -118,6 +118,7 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onAlternateModeActivated() {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
+        mAdapter.notifyDataSetChanged()  // signal style changes
     }
 
     /**

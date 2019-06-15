@@ -35,9 +35,7 @@ object CollectionManager {
             return mCurrentCollection?.getContents() ?: ArrayList()
         }
 
-    fun initCollections(activity: FragmentActivity) {
-
-
+    fun setup(activity: FragmentActivity) {
 
         // TODO: account for multiple roots
         val folders = Storage.getPictureFoldersMediaStore(activity)

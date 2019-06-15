@@ -23,6 +23,8 @@ class PinnedCollectionsFragment : MainFragment() {
     private lateinit var mRecyclerView : RecyclerView
     private lateinit var mToolbarItem : Toolbar
 
+    private lateinit var mAdapter : PinnedCollectionsAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
@@ -30,10 +32,7 @@ class PinnedCollectionsFragment : MainFragment() {
         mToolbarItem = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
 
         buildToolbar()
-
-        if (activity != null) {
-            buildRecyclerView()
-        }
+        buildRecyclerView()
 
         return mRootView
 
@@ -49,7 +48,8 @@ class PinnedCollectionsFragment : MainFragment() {
 
     private fun buildRecyclerView() {
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
-        mRecyclerView.adapter = PinnedCollectionsAdapter()
+        mAdapter = PinnedCollectionsAdapter()
+        mRecyclerView.adapter = mAdapter
     }
 
     override fun onBackPressed(): Boolean {
@@ -80,7 +80,7 @@ class PinnedCollectionsFragment : MainFragment() {
 
     private fun onCreateNewAlbum(charSequence: CharSequence) {
         CollectionManager.createNewAlbum(charSequence.toString())
-        mRecyclerView.adapter?.notifyDataSetChanged()
+        mAdapter.notifyDataSetChanged()
     }
 
 }

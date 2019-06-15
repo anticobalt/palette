@@ -26,7 +26,7 @@ class MainActivity : FragmentActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
 
-        CollectionManager.initCollections(this)
+        CollectionManager.setup(this)
         MainFragmentManager.setup(supportFragmentManager)
         MainFragmentManager.createFragments()
         val fragments = MainFragmentManager.fragments.toMutableList()

@@ -29,7 +29,6 @@
             android:padding="15dp"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:shadowColor="@color/black"
             android:ellipsize="end"
             android:singleLine="true"
             />

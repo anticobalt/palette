@@ -1,6 +1,7 @@
 package iced.egret.palette.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,8 +133,16 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
      * Fill holder with mandatory elements
      */
     private fun buildHolder(holder: CoverViewHolder, item: Coverable) {
+
         item.loadCoverInto(holder)
         holder.tvItem?.text = item.name
+
+        // Darken a little, so that white text is readable
+        // https://stackoverflow.com/a/15896811
+        holder.ivItem?.setColorFilter(
+                Color.rgb(200, 200, 200),
+                android.graphics.PorterDuff.Mode.MULTIPLY
+        )
     }
 
     /**

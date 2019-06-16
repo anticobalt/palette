@@ -8,10 +8,13 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
+import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.CollectionManager
 
@@ -33,13 +36,12 @@ class CollectionViewFragment : MainFragment() {
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
         mToolbarItem = mRootView!!.findViewById(R.id.toolbarViewCollection)
 
-        mFloatingActionButton.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        mFloatingActionButton.setOnClickListener {
+            onFabClick()
         }
 
         if (activity != null) {
-            mContents = CollectionManager.getContents().toMutableList()
+            mContents = CollectionManager.contents.toMutableList()
             setToolbarTitle()
             buildRecyclerView()
         }
@@ -48,9 +50,33 @@ class CollectionViewFragment : MainFragment() {
 
     }
 
+    private fun onFabClick() {
+        val collection = CollectionManager.currentCollection
+        if (collection is Album) {
+            MaterialDialog(this.context!!).show {
+                title(R.string.title_album_form)
+                input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH) {
+                    _, charSequence ->
+                    createNewAlbum(charSequence.toString())
+                }
+                positiveButton(R.string.action_create_album)
+                negativeButton()
+            }
+        }
+        else {
+            Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+        }
+    }
+
+    private fun createNewAlbum(name: String) {
+        CollectionManager.createNewAlbum(name, addToCurrent = true)
+        adapter.update(CollectionManager.contents)
+    }
+
     fun setToolbarTitle(title: String = "") {
         mToolbarItem.title = if (title.isEmpty()) {
-            CollectionManager.getCurrentCollectionName()
+            CollectionManager.currentCollection?.name
         }
         else title
     }

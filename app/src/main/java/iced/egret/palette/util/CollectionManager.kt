@@ -27,12 +27,12 @@ object CollectionManager {
     private var gson = Gson()
 
     // Aliases
-    private var mCurrentCollection: Collection?
+    var currentCollection: Collection?
         get() = mCollectionStack.peek()
-        set(value) = mCollectionStack.push(value)
-    private val mContents: MutableList<Coverable>
+        private set(value) = mCollectionStack.push(value)
+    val contents: MutableList<Coverable>
         get() {
-            return mCurrentCollection?.getContents() ?: ArrayList()
+            return currentCollection?.getContents() ?: ArrayList()
         }
 
     fun setup(activity: FragmentActivity) {
@@ -63,9 +63,12 @@ object CollectionManager {
         return mCollections
     }
 
-    fun createNewAlbum(name: String) : Album {
+    fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Album {
         val album = Album(name)
-        mCollections.add(album)
+        if (addToCurrent) {
+            if (currentCollection is Album) (currentCollection as Album).addAlbum(album)
+        }
+        else mCollections.add(album)
         saveAlbumsToDisk()
         return album
     }
@@ -82,16 +85,12 @@ object CollectionManager {
         saveAlbumsToDisk()
     }
 
-    fun getContents() : MutableList<Coverable> {
-        return mContents
-    }
-
     fun launch(item: Coverable, adapter : CollectionViewAdapter, position: Int = -1) {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 val contents = item.getContents()
                 adapter.update(contents)
-                mCurrentCollection = item
+                currentCollection = item
             }
         }
         else {
@@ -108,7 +107,7 @@ object CollectionManager {
     fun revertToParent() : MutableList<Coverable>? {
         return if (mCollectionStack.size > 1) {
             mCollectionStack.pop()
-            mContents
+            contents
         }
         else {
             null
@@ -120,16 +119,12 @@ object CollectionManager {
     }
 
     fun getCurrentCollectionPictures() : MutableList<Picture> {
-        val collection = mCurrentCollection
+        val collection = currentCollection
         var pictures : MutableList<Picture> = ArrayList()
         if (collection != null) {
             pictures = collection.pictures
         }
         return pictures
-    }
-
-    fun getCurrentCollectionName() : String? {
-        return mCurrentCollection?.name
     }
 
     private fun saveAlbumsToDisk() {

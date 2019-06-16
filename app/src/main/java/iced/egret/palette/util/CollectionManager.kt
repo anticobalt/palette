@@ -12,7 +12,6 @@ import kotlin.collections.ArrayList
 
 object CollectionManager {
 
-    private var mRoot : Folder? = null
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
 
@@ -29,20 +28,21 @@ object CollectionManager {
 
     fun setup(activity: FragmentActivity) {
 
-        // TODO: account for multiple roots
-        val folders = Storage.retrievedFolders
-        if (folders.isNotEmpty()) {
+        val root = Storage.retrievedFolders.firstOrNull()
 
-            val folder = getPracticalRoot(folders[0])
-            folder.name = activity.getString(R.string.external_storage_name)
-            mRoot = folder
+        if (root != null) {
 
             // defensive
             mCollectionStack.clear()
             mCollections.clear()
 
-            mCollectionStack.push(folder)
-            mCollections.add(folder)
+            for (folder in root.folders) {
+                val practicalRoot = getPracticalRoot(folder)
+                mCollections.add(practicalRoot)
+            }
+
+            mCollections[0].name = activity.getString(R.string.external_storage_name)
+            mCollectionStack.push(mCollections[0])
 
         }
 
@@ -119,12 +119,13 @@ object CollectionManager {
     }
 
     /**
-     * Return folder with path /storage/emulated/0,
-     * since storage and emulated are always empty anyways
+     * Given a folder in /storage/, return folder with path
+     * /storage/emulated/0 or /storage/<SD-CARD ID>,
+     * since emulated is always empty anyways
      */
     private fun getPracticalRoot(folder: Folder) : Folder {
         var f = folder
-        while (f.path != "/storage/emulated/0") {
+        if (f.name == "emulated") {
             f = f.folders.first()
         }
         return f

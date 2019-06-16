@@ -44,7 +44,7 @@
             android:tint="@color/white"
             android:backgroundTint="@color/colorPrimaryDark"
             android:visibility="invisible"
-            android:contentDescription="@string/select"
+            android:contentDescription="@string/action_select"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

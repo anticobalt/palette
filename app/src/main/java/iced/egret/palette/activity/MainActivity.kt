@@ -3,9 +3,9 @@ package iced.egret.palette.activity
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
 import iced.egret.palette.adapter.MainFragmentPagerAdapter
 import iced.egret.palette.util.CollectionManager
@@ -27,14 +27,12 @@ class MainActivity : FragmentActivity() {
         if (!Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
+        else {
+            CollectionManager.setup(this)
+        }
 
-        CollectionManager.setup(this)
         Painter.color = ContextCompat.getColor(this, Painter.colorResource)
-
-        MainFragmentManager.setup(supportFragmentManager)
-        MainFragmentManager.createFragments()
-        val fragments = MainFragmentManager.fragments.toMutableList()
-        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
+        buildFragments()  // for visuals only
 
     }
 
@@ -42,9 +40,18 @@ class MainActivity : FragmentActivity() {
         when (requestCode) {
             READ_EXTERNAL_CODE -> {
                 if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Log.i("External permission", "failed")
+                    val dialog = MaterialDialog(this)
+                    dialog.cancelable(false)
+                    dialog.show {
+                        title(R.string.title_permission_error)
+                        message(R.string.message_permission_error)
+                        positiveButton(R.string.confirm) {
+                            finish()
+                        }
+                    }
                 } else {
-                    Log.i("External permission","succeeded")
+                    CollectionManager.setup(this)
+                    buildFragments()
                 }
             }
         }
@@ -57,6 +64,13 @@ class MainActivity : FragmentActivity() {
         if (!success) {
             moveTaskToBack(true)  // don't destroy
         }
+    }
+
+    private fun buildFragments() {
+        MainFragmentManager.setup(supportFragmentManager)
+        MainFragmentManager.createFragments()
+        val fragments = MainFragmentManager.fragments.toMutableList()
+        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
     }
 
 }

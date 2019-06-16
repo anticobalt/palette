@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -86,10 +85,6 @@ class CollectionViewFragment : MainFragment() {
             mCollectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
             adapter = CollectionViewAdapter(mContents)
             mCollectionRecyclerView.adapter = adapter
-        }
-        else {
-            val toast = Toast.makeText(activity, getString(R.string.alert_no_folders), Toast.LENGTH_LONG)
-            toast.show()
         }
     }
 

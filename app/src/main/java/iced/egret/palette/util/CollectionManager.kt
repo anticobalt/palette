@@ -2,29 +2,19 @@ package iced.egret.palette.util
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
-import java.io.File
-import java.io.FileNotFoundException
 import java.util.*
 import kotlin.collections.ArrayList
 
 object CollectionManager {
 
-    private const val rootCacheFileName = "root-cache.json"
-    private const val albumsFileName = "albums.json"
-    private lateinit var fileDirectory : File
-
     private var mRoot : Folder? = null
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
-    private var gson = Gson()
 
     // Aliases
     var currentCollection: Collection?
@@ -34,11 +24,13 @@ object CollectionManager {
         get() {
             return currentCollection?.getContents() ?: ArrayList()
         }
+    val albums: List<Album>
+        get() = mCollections.filterIsInstance<Album>()
 
     fun setup(activity: FragmentActivity) {
 
         // TODO: account for multiple roots
-        val folders = Storage.getPictureFoldersMediaStore(activity)
+        val folders = Storage.retrievedFolders
         if (folders.isNotEmpty()) {
 
             val folder = getPracticalRoot(folders[0])
@@ -54,8 +46,7 @@ object CollectionManager {
 
         }
 
-        fileDirectory = activity.filesDir
-        getAlbumsFromDisk()
+        mCollections.addAll(Storage.retrievedAlbums)
 
     }
 
@@ -69,7 +60,7 @@ object CollectionManager {
             if (currentCollection is Album) (currentCollection as Album).addAlbum(album)
         }
         else mCollections.add(album)
-        saveAlbumsToDisk()
+        Storage.saveAlbumsToDisk(albums)
         return album
     }
 
@@ -82,7 +73,7 @@ object CollectionManager {
             }
         }
         mCollections = remainingCollections
-        saveAlbumsToDisk()
+        Storage.saveAlbumsToDisk(albums)
     }
 
     fun launch(item: Coverable, adapter : CollectionViewAdapter, position: Int = -1) {
@@ -125,64 +116,6 @@ object CollectionManager {
             pictures = collection.pictures
         }
         return pictures
-    }
-
-    private fun saveAlbumsToDisk() {
-        val albumsData = ArrayList<AlbumData>()
-        for (collection in mCollections) {
-            if (collection is Album) {
-                albumsData.add(collection.toDataClass())
-            }
-        }
-        val json = gson.toJson(albumsData)
-        saveJsonToDisk(json, albumsFileName)
-    }
-
-    private fun getAlbumsFromDisk() {
-        val json = readJsonFromDisk(albumsFileName)
-        val type = object : TypeToken<ArrayList<AlbumData>>() {}.type
-        if (json != null) {
-            val albumsData = gson.fromJson<ArrayList<AlbumData>>(json, type)
-            val albums  = ArrayList<Album>()
-            for (data in albumsData) {
-                albums.add(data.toFullClass())
-            }
-            mCollections.addAll(albums)
-        }
-    }
-
-    private fun saveRootToDisk() {
-        val rootData = mRoot?.toDataClass()
-        val json = gson.toJson(rootData)
-        saveJsonToDisk(json, rootCacheFileName)
-    }
-
-    private fun getRootFromDisk() {
-        val json = readJsonFromDisk(rootCacheFileName)
-        if (json != null) {
-            val rootData = gson.fromJson(json, FolderData::class.java)
-            mRoot = rootData.toFullClass()
-        }
-    }
-
-    private fun saveJsonToDisk(json: String, fileName: String) {
-        try {
-            File(fileDirectory, fileName).writeText(json)
-        }
-        catch (e : FileNotFoundException) {
-            File(fileDirectory, fileName).createNewFile()
-            File(fileDirectory, fileName).writeText(json)
-        }
-    }
-
-    private fun readJsonFromDisk(fileName: String) : String? {
-        return try {
-            File(fileDirectory, fileName).bufferedReader().readText()
-        }
-        catch (e : FileNotFoundException) {
-            Log.i("collection-manager", "couldn't find $fileName when trying to read")
-            null
-        }
     }
 
     /**

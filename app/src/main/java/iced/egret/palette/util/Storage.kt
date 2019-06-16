@@ -5,12 +5,31 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns
-import iced.egret.palette.model.Folder
-import iced.egret.palette.model.Picture
+import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import iced.egret.palette.model.*
 import java.io.File
+import java.io.FileNotFoundException
 
 
 object Storage {
+
+    private const val rootCacheFileName = "root-cache.json"
+    private const val albumsFileName = "albums.json"
+    private lateinit var fileDirectory : File
+
+    var retrievedFolders = mutableListOf<Folder>()
+    var retrievedAlbums = mutableListOf<Album>()
+    val retrievedPictures = mutableMapOf<String, Picture>()
+
+    private var gson = Gson()
+
+    fun setup(activity: Activity) {
+        fileDirectory = activity.filesDir
+        retrievedFolders = getPictureFoldersMediaStore(activity)
+        retrievedAlbums = getAlbumsFromDisk()
+    }
 
     /**
      * @param root Root directory
@@ -52,15 +71,16 @@ object Storage {
      * Gets images from Android's default gallery API
      * API access stuff from https://stackoverflow.com/a/36815451
      */
-     fun getPictureFoldersMediaStore(activity: Activity) : ArrayList<Folder> {
+     private fun getPictureFoldersMediaStore(activity: Activity) : ArrayList<Folder> {
 
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val cursor: Cursor?
         val columnIndexData: Int
         val projection = arrayOf(MediaColumns.DATA)
+        val sortBy = MediaStore.Images.ImageColumns.DATE_ADDED + " DESC"
         val rootFolders = ArrayList<Folder>()
 
-        cursor = activity.contentResolver.query(uri, projection, null, null, null)
+        cursor = activity.contentResolver.query(uri, projection, null, null, sortBy)
         columnIndexData = cursor!!.getColumnIndexOrThrow(MediaColumns.DATA)
 
         val rootLevelIndex = 1  // level 0 is empty due to /path/to/file syntax
@@ -103,13 +123,73 @@ object Storage {
             }
 
             // add picture, parentFolder guaranteed to exist
-            parentFolder!!.addPicture(Picture(pathLevels[pathLevels.size - 1], absolutePathOfImage))
+            val picture = Picture(pathLevels[pathLevels.size - 1], absolutePathOfImage)
+            parentFolder!!.addPicture(picture)
+            retrievedPictures[absolutePathOfImage] = picture
 
         }
 
         cursor.close()
         return rootFolders
 
+    }
+
+    fun saveAlbumsToDisk(albums: List<Album>) {
+        val albumsData = ArrayList<AlbumData>()
+        for (album in albums) {
+            albumsData.add(album.toDataClass())
+        }
+        val json = gson.toJson(albumsData)
+        saveJsonToDisk(json, albumsFileName)
+    }
+
+    fun getAlbumsFromDisk() : MutableList<Album> {
+        val json = readJsonFromDisk(albumsFileName)
+        val type = object : TypeToken<ArrayList<AlbumData>>() {}.type
+        if (json != null) {
+            val albumsData = gson.fromJson<ArrayList<AlbumData>>(json, type)
+            val albums  = ArrayList<Album>()
+            for (data in albumsData) {
+                albums.add(data.toFullClass())
+            }
+            return albums
+        }
+        return arrayListOf()
+    }
+
+    fun saveFolderToDisk(folder: Folder) {
+        val rootData = folder.toDataClass()
+        val json = gson.toJson(rootData)
+        saveJsonToDisk(json, rootCacheFileName)
+    }
+
+    fun getFolderFromDisk() : Folder? {
+        val json = readJsonFromDisk(rootCacheFileName)
+        if (json != null) {
+            val rootData = gson.fromJson(json, FolderData::class.java)
+            return rootData.toFullClass()
+        }
+        return null
+    }
+
+    private fun saveJsonToDisk(json: String, fileName: String) {
+        try {
+            File(fileDirectory, fileName).writeText(json)
+        }
+        catch (e : FileNotFoundException) {
+            File(fileDirectory, fileName).createNewFile()
+            File(fileDirectory, fileName).writeText(json)
+        }
+    }
+
+    private fun readJsonFromDisk(fileName: String) : String? {
+        return try {
+            File(fileDirectory, fileName).bufferedReader().readText()
+        }
+        catch (e : FileNotFoundException) {
+            Log.i("collection-manager", "couldn't find $fileName when trying to read")
+            null
+        }
     }
 
 }

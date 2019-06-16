@@ -8,10 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
 import iced.egret.palette.adapter.MainFragmentPagerAdapter
-import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.MainFragmentManager
-import iced.egret.palette.util.Painter
-import iced.egret.palette.util.Permission
+import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val READ_EXTERNAL_CODE = 100
@@ -28,11 +25,10 @@ class MainActivity : FragmentActivity() {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
         else {
-            CollectionManager.setup(this)
+            Storage.setup(this)
         }
 
-        Painter.color = ContextCompat.getColor(this, Painter.colorResource)
-        buildFragments()  // for visuals only
+        buildApp()
 
     }
 
@@ -50,8 +46,8 @@ class MainActivity : FragmentActivity() {
                         }
                     }
                 } else {
-                    CollectionManager.setup(this)
-                    buildFragments()
+                    Storage.setup(this)
+                    buildApp()
                 }
             }
         }
@@ -64,6 +60,17 @@ class MainActivity : FragmentActivity() {
         if (!success) {
             moveTaskToBack(true)  // don't destroy
         }
+    }
+
+    /**
+     * Setup up models, visuals, and fragments.
+     * If Storage is not set up before this, the app won't immediately crash, but it will
+     * after some user input.
+     */
+    private fun buildApp() {
+        CollectionManager.setup(this)
+        Painter.color = ContextCompat.getColor(this, Painter.colorResource)
+        buildFragments()
     }
 
     private fun buildFragments() {

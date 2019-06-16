@@ -11,6 +11,7 @@ import java.io.Serializable
  * Properties:
  * - name
  * - terminal
+ * - deletable
  * - cover
  * - pictures
  * - size
@@ -82,6 +83,7 @@ abstract class Collection(override var name: String) : Coverable {
  * - name
  * - path
  * - terminal
+ * - deletable
  * - cover
  * - pictures
  * - folders
@@ -171,6 +173,7 @@ data class FolderData(val name: String,
  * Properties:
  * - name
  * - terminal
+ * - deletable
  * - cover
  * - albums
  * - folders

@@ -34,6 +34,21 @@
             android:singleLine="true"
             />
 
+        <ImageView
+            android:id="@+id/ivCollectionItemSelectStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ivCollectionItemImage"
+            android:src="@drawable/ic_check_black_24dp"
+            android:tint="@color/white"
+            android:visibility="gone"
+            />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

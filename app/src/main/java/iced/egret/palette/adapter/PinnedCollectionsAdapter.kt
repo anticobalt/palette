@@ -149,7 +149,9 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
     }
 
     /**
-     * Style holder to match various selection states (e.g. is selected, selectable, etc)
+     * Style holder to match various selection states (e.g. is selected, selectable, etc).
+     * If this is not called, selection won't be visually represented initially.
+     * Should be called indirectly by fragment on mode change.
      */
     private fun indicateSelection(holder: CoverViewHolder, position: Int, item: Coverable) {
 

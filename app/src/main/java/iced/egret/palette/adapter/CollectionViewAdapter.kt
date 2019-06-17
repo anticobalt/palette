@@ -1,8 +1,11 @@
 package iced.egret.palette.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
@@ -20,12 +23,14 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
         private var item: Coverable? = null
         private var position: Int? = null
         private var adapter: CoverableAdapter? = null
+        private var holder: CoverViewHolder? = null
 
         private var ready = false
 
         override fun setup(item: Coverable, position: Int, holder: CoverViewHolder, adapter: CoverableAdapter) {
             this.item = item
             this.position = position
+            this.holder = holder
             this.adapter = adapter
             this.ready = true
         }
@@ -33,6 +38,7 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
         override fun tearDown() {
             this.item = null
             this.position = null
+            this.holder = null
             this.adapter = null
             this.ready = false
         }
@@ -43,15 +49,39 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
         }
 
         override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {
-            //TODO
+            if (!ready) return
+
+            val positionLong = position!!.toLong()
+            if (positionLong in selectedItemIds) {
+                indicateSelection(holder!!, false)
+                selectedItemIds.remove(positionLong)
+            }
+            else {
+                indicateSelection(holder!!, true)
+                selectedItemIds.add(positionLong)
+            }
         }
 
         override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
-            //TODO
+            if (!ready) return
+            onItemDefaultLongClick(selectedItemIds)
         }
 
-        override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {
-            //TODO
+        override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {}
+
+        private fun indicateSelection(holder: CoverViewHolder, selected: Boolean) {
+            val statusView = holder.itemView.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
+            if (selected){
+                statusView.visibility = View.VISIBLE
+                holder.ivItem?.setColorFilter(
+                        Color.rgb(200, 200, 200),
+                        android.graphics.PorterDuff.Mode.MULTIPLY
+                )
+            }
+            else {
+                statusView.visibility = View.GONE
+                holder.ivItem?.colorFilter = null
+            }
         }
 
     }
@@ -79,14 +109,40 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
         val context = mContextReference.get()
         if (holder is CoverViewHolder && context != null) {
             val item = mItems[position]
-            item.loadCoverInto(holder)
-            holder.tvItem?.text = item.toString()
+            buildHolder(holder, item)
+            indicateSelection(holder, position)
             holder.itemView.setOnClickListener{
                 mSelector.onItemClick(item, position, holder, this, mListener)
+            }
+            holder.itemView.setOnLongClickListener{
+                mSelector.onItemLongClick(item, position, holder, this, mListener)
             }
         }
     }
 
+    private fun buildHolder(holder: CoverViewHolder, item: Coverable) {
+        item.loadCoverInto(holder)
+        holder.tvItem?.text = item.toString()
+    }
+
+    /**
+     * If this is not called, selection won't be visually represented initially.
+     * Should be called indirectly by fragment on mode change.
+     */
+    private fun indicateSelection(holder: CoverViewHolder, position: Int) {
+
+        val statusView = holder.itemView.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
+        if (position.toLong() in mSelector.selectedItemIds) {
+            statusView.visibility = View.VISIBLE
+            holder.ivItem?.setColorFilter(
+                    Color.rgb(200, 200, 200),
+                    android.graphics.PorterDuff.Mode.MULTIPLY
+            )
+        } else {
+            statusView.visibility = View.GONE
+            holder.ivItem?.colorFilter = null
+        }
+    }
     fun update(items: MutableList<Coverable>) {
         // mItems = items doesn't work
         // Need to clear + allAll, or onclick will refer to old items

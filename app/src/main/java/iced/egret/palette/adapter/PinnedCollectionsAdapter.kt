@@ -135,7 +135,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
     private fun buildHolder(holder: CoverViewHolder, item: Coverable) {
 
         item.loadCoverInto(holder)
-        holder.tvItem?.text = item.name
+        holder.tvItem?.text = item.toString()
 
         // Darken a little, so that white text is readable
         // https://stackoverflow.com/a/15896811

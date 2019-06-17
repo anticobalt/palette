@@ -150,7 +150,7 @@ object Storage {
             val albumsData = gson.fromJson<ArrayList<AlbumData>>(json, type)
             val albums  = ArrayList<Album>()
             for (data in albumsData) {
-                albums.add(data.toFullClass())
+                albums.add(data.toFullClass(existingPictures = retrievedPictures))
             }
             return albums
         }

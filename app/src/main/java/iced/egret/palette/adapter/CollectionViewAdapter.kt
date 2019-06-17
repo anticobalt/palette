@@ -42,7 +42,7 @@ class CollectionViewAdapter(contents: MutableList<Coverable>) :
         if (holder is CoverViewHolder && context != null) {
             val item = mItems[position]
             item.loadCoverInto(holder)
-            holder.tvItem?.text = item.name
+            holder.tvItem?.text = item.toString()
             holder.itemView.setOnClickListener{
                 mListener.onItemClick(item, this, position)
             }

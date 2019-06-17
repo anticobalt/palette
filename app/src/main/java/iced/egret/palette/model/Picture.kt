@@ -22,6 +22,9 @@ class Picture(override var name: String, val path: String) : TerminalCoverable {
     )
     override val activity = PictureViewActivity::class.java
 
+    override fun toString(): String {
+        return name
+    }
     override fun toDataClass() = PictureData(name, path)
 
     override fun loadCoverInto(holder: CoverViewHolder) {

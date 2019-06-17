@@ -15,6 +15,7 @@ import java.io.Serializable
  * - cover
  * - pictures
  * - size
+ * - totalSize
  */
 abstract class Collection(override var name: String) : Coverable {
 
@@ -25,9 +26,8 @@ abstract class Collection(override var name: String) : Coverable {
 
     abstract var pictures: ArrayList<Picture>
         protected set
+    abstract val totalSize : Int
     var size = 0
-        protected set
-    var recursiveSize = 0
         protected set
 
     fun isEmpty() : Boolean {
@@ -36,6 +36,10 @@ abstract class Collection(override var name: String) : Coverable {
 
     fun isNotEmpty() : Boolean {
         return !isEmpty()
+    }
+
+    override fun toString(): String {
+        return "$name, $size, $totalSize"
     }
 
     override fun loadCoverInto(holder: CoverViewHolder) {
@@ -91,7 +95,7 @@ abstract class Collection(override var name: String) : Coverable {
  * - pictures
  * - folders
  * - size
- * - recursiveSize
+ * - totalSize
  */
 class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf()) : Collection(name) {
 
@@ -100,13 +104,17 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
     var folders = subFolders
         private set
 
+    override val totalSize: Int
+        get() {
+            var rs = pictures.size
+            for (folder in folders) {
+                rs += folder.totalSize
+            }
+            return rs
+        }
+
     init {
         size = folders.size
-        recursiveSize = folders.size
-    }
-
-    override fun toString(): String {
-        return "$path, $size"
     }
 
     fun toDataClass() : FolderData {
@@ -134,25 +142,11 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
     fun addFolder(newFolder: Folder) {
         folders.add(newFolder)
         size += 1
-        recursiveSize += newFolder.recursiveSize
     }
 
     fun addFolders(newFolders: MutableList<Folder>) {
         folders.addAll(newFolders)
         size += newFolders.size
-        for (newFolder: Folder in newFolders) {
-            recursiveSize += newFolder.recursiveSize
-        }
-    }
-
-    override fun addPicture(newPicture: Picture) {
-        super.addPicture(newPicture)
-        recursiveSize += 1
-    }
-
-    override fun addPictures(newPictures: MutableList<Picture>) {
-        super.addPictures(newPictures)
-        recursiveSize += newPictures.size
     }
 
 }
@@ -182,7 +176,7 @@ data class FolderData(val name: String,
  * - folders
  * - pictures
  * - size
- * - recursiveSize
+ * - totalSize
  */
 class Album(name: String) : Collection(name) {
 
@@ -196,6 +190,18 @@ class Album(name: String) : Collection(name) {
         private set
     var folders : MutableList<Folder> = ArrayList()
         private set
+
+    override val totalSize: Int
+        get() {
+            var rs = pictures.size
+            for (folder in folders) {
+                rs += folder.totalSize
+            }
+            for (album in albums) {
+                rs += album.totalSize
+            }
+            return rs
+        }
 
     fun toDataClass() : AlbumData {
         val picturePaths = pictures.map { picture -> picture.path }
@@ -230,15 +236,11 @@ class Album(name: String) : Collection(name) {
     private fun addCollection(newCollection: Collection, collectionList: MutableList<Collection>) {
         collectionList.add(newCollection)
         size += 1
-        recursiveSize += newCollection.recursiveSize
     }
 
     private fun addCollections(newCollections: MutableList<Collection>, collectionList: MutableList<Collection>) {
         collectionList.addAll(newCollections)
         size += newCollections.size
-        for (newCollection: Collection in newCollections) {
-            recursiveSize += newCollection.recursiveSize
-        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -261,16 +263,6 @@ class Album(name: String) : Collection(name) {
         addCollections(newAlbums as MutableList<Collection>, albums as MutableList<Collection>)
     }
 
-    override fun addPicture(newPicture: Picture) {
-        super.addPicture(newPicture)
-        recursiveSize += 1
-    }
-
-    override fun addPictures(newPictures: MutableList<Picture>) {
-        super.addPictures(newPictures)
-        recursiveSize += newPictures.size
-    }
-
 }
 
 data class AlbumData(val name: String,
@@ -278,11 +270,21 @@ data class AlbumData(val name: String,
                      val foldersData: List<FolderData>,
                      val albumsData: List<AlbumData>) : Serializable {
 
-    fun toFullClass() : Album {
+    fun toFullClass(existingPictures: Map<String, Picture> = mapOf()) : Album {
+
         val album = Album(name)
         val folders = foldersData.map {data -> data.toFullClass() } as MutableList<Folder>
         val albums = albumsData.map {data -> data.toFullClass() } as MutableList<Album>
-        val pictures = picturePaths.map {path -> Picture(path.split("/").last(), path) } as MutableList<Picture>
+        val pictures = arrayListOf<Picture>()
+
+        for (path in picturePaths) {
+            var picture = existingPictures[path]
+            if (picture == null) {
+                picture = Picture(path.split("/").last(), path)
+            }
+            pictures.add(picture)
+        }
+
         album.addFolders(folders)
         album.addAlbums(albums)
         album.addPictures(pictures)

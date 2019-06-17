@@ -22,7 +22,7 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
 
         private var item: Coverable? = null
         private var position: Int? = null
-        private var adapter: CoverableAdapter? = null
+        private var adapter: CollectionViewAdapter? = null
         private var holder: CoverViewHolder? = null
 
         private var ready = false
@@ -31,7 +31,7 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
             this.item = item
             this.position = position
             this.holder = holder
-            this.adapter = adapter
+            this.adapter = adapter as CollectionViewAdapter
             this.ready = true
         }
 
@@ -52,14 +52,10 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
             if (!ready) return
 
             val positionLong = position!!.toLong()
-            if (positionLong in selectedItemIds) {
-                indicateSelection(holder!!, false)
-                selectedItemIds.remove(positionLong)
-            }
-            else {
-                indicateSelection(holder!!, true)
-                selectedItemIds.add(positionLong)
-            }
+            if (positionLong in selectedItemIds) selectedItemIds.remove(positionLong)
+            else selectedItemIds.add(positionLong)
+
+            adapter!!.indicateSelection(holder!!, position!!, selectedItemIds)
         }
 
         override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
@@ -68,21 +64,6 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
         }
 
         override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {}
-
-        private fun indicateSelection(holder: CoverViewHolder, selected: Boolean) {
-            val statusView = holder.itemView.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
-            if (selected){
-                statusView.visibility = View.VISIBLE
-                holder.ivItem?.setColorFilter(
-                        Color.rgb(200, 200, 200),
-                        android.graphics.PorterDuff.Mode.MULTIPLY
-                )
-            }
-            else {
-                statusView.visibility = View.GONE
-                holder.ivItem?.colorFilter = null
-            }
-        }
 
     }
 
@@ -108,9 +89,14 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val context = mContextReference.get()
         if (holder is CoverViewHolder && context != null) {
+
             val item = mItems[position]
             buildHolder(holder, item)
-            indicateSelection(holder, position)
+
+            // Update selection visuals to match state, so that they show
+            // properly in the case that the ViewHolder is recycled
+            indicateSelection(holder, position, mSelector.selectedItemIds)
+
             holder.itemView.setOnClickListener{
                 mSelector.onItemClick(item, position, holder, this, mListener)
             }
@@ -126,13 +112,23 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
     }
 
     /**
-     * If this is not called, selection won't be visually represented initially.
-     * Should be called indirectly by fragment on mode change.
+     * Set all indications about selection status.
+     * Requires mSelector to be properly activated or deactivated.
      */
-    private fun indicateSelection(holder: CoverViewHolder, position: Int) {
+    fun setAllIndications(rv: RecyclerView) {
+        for (pos in 0 until mItems.size) {
+            val holder = rv.findViewHolderForAdapterPosition(pos)
+            if (holder is CoverViewHolder) indicateSelection(holder, pos, mSelector.selectedItemIds)
+        }
+    }
+
+    /**
+     * Show a checkmark + black tint if item is selected, otherwise reset visuals.
+     */
+    private fun indicateSelection(holder: CoverViewHolder, position: Int, selectedItemIds: ArrayList<Long>) {
 
         val statusView = holder.itemView.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
-        if (position.toLong() in mSelector.selectedItemIds) {
+        if (position.toLong() in selectedItemIds) {
             statusView.visibility = View.VISIBLE
             holder.ivItem?.setColorFilter(
                     Color.rgb(200, 200, 200),

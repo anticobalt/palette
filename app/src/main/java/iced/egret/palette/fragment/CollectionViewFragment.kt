@@ -149,7 +149,6 @@ class CollectionViewFragment : MainFragment() {
     override fun onAlternateModeActivated() {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
-        adapter.notifyDataSetChanged()  // signal style changes
     }
 
     /**
@@ -158,7 +157,7 @@ class CollectionViewFragment : MainFragment() {
     override fun onAlternateModeDeactivated() {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
-        adapter.notifyDataSetChanged()  // signal that selections were cleared
+        adapter.setAllIndications(mCollectionRecyclerView)  // reset all views
     }
 
     /**

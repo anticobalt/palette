@@ -15,7 +15,7 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.MainFragmentManager
 import java.lang.ref.WeakReference
 
-class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter() {
 
     /**
      * Responds to click actions, by changing display or launching items.
@@ -28,7 +28,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
 
         private var ready = false
 
-        override fun setup(item: Coverable, position: Int, holder: CoverViewHolder) {
+        override fun setup(item: Coverable, position: Int, holder: CoverViewHolder, adapter: CoverableAdapter) {
             this.item = item
             this.position = position
             this.holder = holder
@@ -121,10 +121,10 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : RecyclerView.Adapt
             buildHolder(holder, item)
             indicateSelection(holder, position, item)
             holder.itemView.setOnClickListener{
-                mSelector.onItemClick(item, position, holder, mClickListener)
+                mSelector.onItemClick(item, position, holder, this, mClickListener)
             }
             holder.itemView.setOnLongClickListener {
-                mSelector.onItemLongClick(item, position, holder, mClickListener)
+                mSelector.onItemLongClick(item, position, holder, this, mClickListener)
             }
         }
     }

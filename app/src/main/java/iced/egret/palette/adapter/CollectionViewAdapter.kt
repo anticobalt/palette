@@ -10,8 +10,7 @@ import iced.egret.palette.util.CollectionManager
 import java.lang.ref.WeakReference
 
 
-class CollectionViewAdapter(contents: MutableList<Coverable>) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CollectionViewAdapter(contents: MutableList<Coverable>) : CoverableAdapter() {
 
     class OnItemClickListener {
         fun onItemClick(item: Coverable, adapter: CollectionViewAdapter, position: Int) {

@@ -21,10 +21,14 @@ class LongClickSelector(fragment: MainFragment) {
     var clickListener : CoverableClickListener? = null
     var fragmentReference = WeakReference(fragment)
 
-    fun onItemClick(item: Coverable, position: Int, holder: CoverViewHolder, sharedClickListener: CoverableClickListener) {
+    fun onItemClick(item: Coverable,
+                    position: Int,
+                    holder: CoverViewHolder,
+                    adapter: CoverableAdapter,
+                    sharedClickListener: CoverableClickListener) {
 
         clickListener = sharedClickListener
-        clickListener?.setup(item, position, holder)
+        clickListener?.setup(item, position, holder, adapter)
 
         if (active) {
             clickListener?.onItemAlternateClick(selectedItemIds)
@@ -37,11 +41,15 @@ class LongClickSelector(fragment: MainFragment) {
         clickListener?.tearDown()
     }
 
-    fun onItemLongClick(item: Coverable, position: Int, holder: CoverViewHolder, sharedClickListener: CoverableClickListener) : Boolean {
+    fun onItemLongClick(item: Coverable,
+                        position: Int,
+                        holder: CoverViewHolder,
+                        adapter: CoverableAdapter,
+                        sharedClickListener: CoverableClickListener) : Boolean {
 
         var handled = false
         clickListener = sharedClickListener
-        clickListener?.setup(item, position, holder)
+        clickListener?.setup(item, position, holder, adapter)
 
         if (!active) {
             clickListener?.onItemDefaultLongClick(selectedItemIds)
@@ -92,7 +100,7 @@ class LongClickSelector(fragment: MainFragment) {
  */
 abstract class CoverableClickListener {
 
-    abstract fun setup(item: Coverable, position: Int, holder: CoverViewHolder)
+    abstract fun setup(item: Coverable, position: Int, holder: CoverViewHolder, adapter: CoverableAdapter)
     abstract fun tearDown()
 
     /**

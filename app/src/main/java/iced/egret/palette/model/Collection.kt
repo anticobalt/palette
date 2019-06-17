@@ -56,6 +56,9 @@ abstract class Collection(override var name: String) : Coverable {
         }
     }
 
+    // If contents are of varying types,
+    // Non-Terminals should be before Terminals
+    // to simplify launching (because position is required)
     abstract fun getContents() : MutableList<Coverable>
 
     open fun addPicture(newPicture: Picture) {

@@ -89,7 +89,8 @@ object CollectionManager {
                 val context : Context? = adapter.getContext()
                 val intent = Intent(context, item.activity)
                 val key = context?.getString(R.string.intent_item_key)
-                intent.putExtra(key, position)
+                val relativePosition = currentCollection?.pictures?.indexOf(contents[position])
+                intent.putExtra(key, relativePosition)
                 context?.startActivity(intent)
             }
         }

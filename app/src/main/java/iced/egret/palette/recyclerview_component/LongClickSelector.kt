@@ -1,5 +1,6 @@
-package iced.egret.palette.adapter
+package iced.egret.palette.recyclerview_component
 
+import iced.egret.palette.adapter.CoverableAdapter
 import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.model.Coverable
 import java.lang.ref.WeakReference
@@ -8,10 +9,18 @@ import java.lang.ref.WeakReference
  * Basically a custom, stripped-down implementation of ActionMode, which doesn't exist for
  * RecyclerViews.
  *
- * Keeps track of selected Coverable items, and delegates click actions to a communal
- * CoverableClickListener, which MUST be setup manually with the proper item's values on click.
- *
  * Activated when long click occurs. Activation causes state change (e.g. switching to edit mode).
+ *
+ * How to use:
+ *  1. Ensure fragments implement onAlternateModeActivated() and onAlternateModeDeactivated(),
+ *     so that fragment components (like toolbars) can change in response to mode changes.
+ *  2. Adapters should call onItemClick() or onItemLongClick() when a ViewHolder's view is clicked.
+ *     Ensure these two methods receive a CoverableClickListener; the listener will do the
+ *     actual responding to clicks. The only thing LongClickSelector should do is decide which
+ *     specific click type to emulate, based on state.
+ *  3. LongClickSelector only manages selection state: it has nothing to do with actions done
+ *     to selected items, responses to clicks, or visual representation of selection. All of those
+ *     are delegated to fragment, adapter, or click listener.
  */
 class LongClickSelector(fragment: MainFragment) {
 

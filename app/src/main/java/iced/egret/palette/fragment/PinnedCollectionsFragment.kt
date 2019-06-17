@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
 import iced.egret.palette.R
-import iced.egret.palette.adapter.LongClickSelector
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
 import iced.egret.palette.model.Album
+import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter
 

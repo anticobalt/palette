@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.recyclerview_component.CoverViewHolder
 import iced.egret.palette.util.CollectionManager
 import java.lang.ref.WeakReference
 

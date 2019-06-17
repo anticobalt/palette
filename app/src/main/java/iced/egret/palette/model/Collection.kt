@@ -4,7 +4,7 @@ import android.net.Uri
 import android.view.View
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
-import iced.egret.palette.adapter.CoverViewHolder
+import iced.egret.palette.recyclerview_component.CoverViewHolder
 import java.io.Serializable
 
 /***

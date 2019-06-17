@@ -6,7 +6,7 @@ import android.view.View
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
-import iced.egret.palette.adapter.CoverViewHolder
+import iced.egret.palette.recyclerview_component.CoverViewHolder
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 

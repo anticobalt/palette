@@ -11,6 +11,9 @@ import androidx.viewpager.widget.ViewPager
 import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.recyclerview_component.CoverableClickListener
+import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.MainFragmentManager
 import java.lang.ref.WeakReference

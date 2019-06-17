@@ -2,7 +2,7 @@ package iced.egret.palette.model
 
 import android.app.Activity
 import android.os.Parcelable
-import iced.egret.palette.adapter.CoverViewHolder
+import iced.egret.palette.recyclerview_component.CoverViewHolder
 
 interface Coverable {
     val terminal : Boolean

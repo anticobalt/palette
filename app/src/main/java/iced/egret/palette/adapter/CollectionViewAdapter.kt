@@ -86,9 +86,9 @@ class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClic
         )
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindCoverViewHolder(holder: CoverViewHolder, position: Int) {
         val context = mContextReference.get()
-        if (holder is CoverViewHolder && context != null) {
+        if (context != null) {
 
             val item = mItems[position]
             buildHolder(holder, item)

@@ -111,9 +111,9 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
         return mCollections.size
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindCoverViewHolder(holder: CoverViewHolder, position: Int) {
         val context = mContextReference.get()
-        if (holder is CoverViewHolder && context != null) {
+        if (context != null) {
 
             val item = mCollections[position]
             buildHolder(holder, item)

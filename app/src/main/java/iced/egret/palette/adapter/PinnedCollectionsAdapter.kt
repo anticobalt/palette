@@ -56,7 +56,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
             viewPager?.setCurrentItem(fragmentIndex, true)
             CollectionManager.clearStack()
             CollectionManager.launch(item!!, fragment.adapter)
-            fragment.setToolbarTitle()
+            fragment.setDefaultToolbarTitle()
         }
 
         override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {

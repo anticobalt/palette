@@ -10,6 +10,7 @@ import java.lang.ref.WeakReference
  * RecyclerViews.
  *
  * Activated when long click occurs. Activation causes state change (e.g. switching to edit mode).
+ * Can also decide to deactivate via onBackPressed().
  *
  * How to use:
  *  1. Ensure fragments implement onAlternateModeActivated() and onAlternateModeDeactivated(),

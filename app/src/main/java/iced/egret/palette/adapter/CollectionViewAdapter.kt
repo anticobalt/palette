@@ -7,21 +7,59 @@ import androidx.recyclerview.widget.RecyclerView
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.recyclerview_component.CoverableClickListener
+import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
 import java.lang.ref.WeakReference
 
 
-class CollectionViewAdapter(contents: MutableList<Coverable>) : CoverableAdapter() {
+class CollectionViewAdapter(contents: MutableList<Coverable>, selector: LongClickSelector) : CoverableAdapter() {
 
-    class OnItemClickListener {
-        fun onItemClick(item: Coverable, adapter: CollectionViewAdapter, position: Int) {
-            CollectionManager.launch(item, adapter, position)
+    class OnItemClickListener : CoverableClickListener() {
+
+        private var item: Coverable? = null
+        private var position: Int? = null
+        private var adapter: CoverableAdapter? = null
+
+        private var ready = false
+
+        override fun setup(item: Coverable, position: Int, holder: CoverViewHolder, adapter: CoverableAdapter) {
+            this.item = item
+            this.position = position
+            this.adapter = adapter
+            this.ready = true
         }
+
+        override fun tearDown() {
+            this.item = null
+            this.position = null
+            this.adapter = null
+            this.ready = false
+        }
+
+        override fun onItemDefaultClick(selectedItemIds: ArrayList<Long>) {
+            if (!ready) return
+            CollectionManager.launch(item!!, adapter as CollectionViewAdapter, position!!)
+        }
+
+        override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {
+            //TODO
+        }
+
+        override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
+            //TODO
+        }
+
+        override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {
+            //TODO
+        }
+
     }
 
     private var mItems: MutableList<Coverable> = contents
     private val mListener = OnItemClickListener()
     private lateinit var mContextReference : WeakReference<Context>
+    private val mSelector = selector
 
     override fun getItemCount(): Int {
         return mItems.size
@@ -44,7 +82,7 @@ class CollectionViewAdapter(contents: MutableList<Coverable>) : CoverableAdapter
             item.loadCoverInto(holder)
             holder.tvItem?.text = item.toString()
             holder.itemView.setOnClickListener{
-                mListener.onItemClick(item, this, position)
+                mSelector.onItemClick(item, position, holder, this, mListener)
             }
         }
     }

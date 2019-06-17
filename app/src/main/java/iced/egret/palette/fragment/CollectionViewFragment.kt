@@ -15,15 +15,20 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.Painter
 
 class CollectionViewFragment : MainFragment() {
 
-    private lateinit var mContents : MutableList<Coverable>
     private var mRootView : View? = null
-    private lateinit var mToolbarItem : Toolbar
+    private lateinit var mDefaultToolbar : Toolbar
+    private lateinit var mEditToolbar : Toolbar
     private lateinit var mCollectionRecyclerView : RecyclerView
     private lateinit var mFloatingActionButton : FloatingActionButton
+
+    private lateinit var mContents : MutableList<Coverable>
+    private lateinit var mSelector: LongClickSelector
 
     lateinit var adapter: CollectionViewAdapter
         private set
@@ -33,22 +38,24 @@ class CollectionViewFragment : MainFragment() {
         mRootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
-        mToolbarItem = mRootView!!.findViewById(R.id.toolbarViewCollection)
+
+        mContents = CollectionManager.contents.toMutableList()
+        mSelector = LongClickSelector(this)
 
         mFloatingActionButton.setOnClickListener {
             onFabClick()
         }
 
-        if (activity != null) {
-            mContents = CollectionManager.contents.toMutableList()
-            setToolbarTitle()
-            buildRecyclerView()
-        }
+        buildToolbars()
+        buildRecyclerView()
 
         return mRootView
 
     }
 
+    /**
+     * Adds new Coverables to current Collection
+     */
     private fun onFabClick() {
         val collection = CollectionManager.currentCollection
         if (collection is Album) {
@@ -68,35 +75,94 @@ class CollectionViewFragment : MainFragment() {
         }
     }
 
+    /**
+     * Adds new album to current Collection
+     */
     private fun createNewAlbum(name: String) {
         CollectionManager.createNewAlbum(name, addToCurrent = true)
         adapter.update(CollectionManager.contents)
     }
 
-    fun setToolbarTitle(title: String = "") {
-        mToolbarItem.title = if (title.isEmpty()) {
+    /**
+     * Makes default and edit toolbars and fills with items and titles
+     */
+    private fun buildToolbars() {
+
+        mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarViewCollection)
+        mEditToolbar = mRootView!!.findViewById(R.id.toolbarViewCollectionEdit)
+
+        mDefaultToolbar.setTitle(R.string.app_name)
+        mDefaultToolbar.inflateMenu(R.menu.menu_view_collection)
+        mDefaultToolbar.setOnMenuItemClickListener {
+            onOptionsItemSelected(it)
+        }
+
+        mEditToolbar.setTitle(R.string.app_name)
+        mEditToolbar.inflateMenu(R.menu.menu_view_collection_edit)
+        mEditToolbar.setOnMenuItemClickListener {
+            onOptionsItemSelected(it)
+        }
+        val back = activity?.getDrawable(R.drawable.ic_chevron_left_black_24dp)
+        Painter.paintDrawable(back)
+        mEditToolbar.navigationIcon = back
+        mEditToolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
+
+    }
+
+    /**
+     * Sets default toolbar's title to current Collection name
+     */
+    fun setDefaultToolbarTitle(title: String = "") {
+        mDefaultToolbar.title = if (title.isEmpty()) {
             CollectionManager.currentCollection?.name
         }
         else title
     }
 
+    /**
+     * Hooks up adapter and LayoutManager to RecyclerView
+     */
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
             mCollectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
-            adapter = CollectionViewAdapter(mContents)
+            adapter = CollectionViewAdapter(mContents, mSelector)
             mCollectionRecyclerView.adapter = adapter
         }
     }
 
+    /**
+     * @return handled here (true) or not (false)
+     */
     override fun onBackPressed() : Boolean {
-        return returnToParentCollection()
+        val handledBySelector = mSelector.onBackPressed()
+        return if (!handledBySelector) {
+            returnToParentCollection()
+        }
+        else true
     }
 
-    override fun onAlternateModeActivated() {}
-    override fun onAlternateModeDeactivated() {}
+    /**
+     * Called by LongClickSelector upon its activation
+     */
+    override fun onAlternateModeActivated() {
+        mDefaultToolbar.visibility = Toolbar.GONE
+        mEditToolbar.visibility = Toolbar.VISIBLE
+        adapter.notifyDataSetChanged()  // signal style changes
+    }
 
     /**
-     * If contents are updated inside CollectionManager, changes are not reflected in adapter.
+     * Called by LongClickSelector after it finishes cleaning up
+     */
+    override fun onAlternateModeDeactivated() {
+        mEditToolbar.visibility = Toolbar.GONE
+        mDefaultToolbar.visibility = Toolbar.VISIBLE
+        adapter.notifyDataSetChanged()  // signal that selections were cleared
+    }
+
+    /**
+     * Decide if parent exists and can be returned to
      */
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()

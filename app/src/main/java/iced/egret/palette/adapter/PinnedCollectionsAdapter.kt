@@ -28,6 +28,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
         private var item: Coverable? = null
         private var position: Int? = null
         private var holder: CoverViewHolder? = null
+        private var adapter: PinnedCollectionsAdapter? = null
 
         private var ready = false
 
@@ -35,6 +36,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
             this.item = item
             this.position = position
             this.holder = holder
+            this.adapter = adapter as PinnedCollectionsAdapter
             this.ready = true
         }
 
@@ -42,6 +44,7 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
             this.item = null
             this.position = null
             this.holder = null
+            this.adapter = null
             this.ready = false
         }
 
@@ -64,14 +67,11 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
             if (!item!!.deletable) return
 
             val positionLong = position!!.toLong()
-            if (positionLong in selectedItemIds) {
-                indicateSelection(holder!!, false)
-                selectedItemIds.remove(positionLong)
-            }
-            else {
-                indicateSelection(holder!!, true)
-                selectedItemIds.add(positionLong)
-            }
+            if (positionLong in selectedItemIds) selectedItemIds.remove(positionLong)
+            else selectedItemIds.add(positionLong)
+
+            adapter!!.indicateSelectionStatus(holder!!, position!!, selectedItemIds)
+
         }
 
         override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
@@ -80,12 +80,6 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
         }
 
         override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {}
-
-        private fun indicateSelection(holder: CoverViewHolder, selected: Boolean) {
-            val button = holder.itemView.findViewById<ImageButton>(R.id.btnSelect)
-            if (selected) button.visibility = View.VISIBLE
-            else button.visibility = View.INVISIBLE
-        }
 
     }
 
@@ -120,9 +114,15 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val context = mContextReference.get()
         if (holder is CoverViewHolder && context != null) {
+
             val item = mCollections[position]
             buildHolder(holder, item)
-            indicateSelection(holder, position, item)
+
+            // Indications must be remade in case ViewHolder is recycled,
+            // even though it is sometimes redundant (e.g. on activity start)
+            indicateIsSelectable(holder, item)
+            indicateSelectionStatus(holder, position, mSelector.selectedItemIds)
+
             holder.itemView.setOnClickListener{
                 mSelector.onItemClick(item, position, holder, this, mClickListener)
             }
@@ -148,26 +148,58 @@ class PinnedCollectionsAdapter(selector: LongClickSelector) : CoverableAdapter()
         )
     }
 
+
+    /**
+     * Set all indications about selectability and selection status.
+     * Requires mSelector to be properly activated or deactivated.
+     */
+    fun setAllIndications(rv: RecyclerView) {
+        setAllIndicateIsSelectable(rv)
+        for (pos in 0 until mCollections.size) {
+            val holder = rv.findViewHolderForAdapterPosition(pos)
+            if (holder is CoverViewHolder) indicateSelectionStatus(holder, pos, mSelector.selectedItemIds)
+        }
+    }
+
+    /**
+     * Indicate that certain covers are not selectable based on item attributes.
+     * Requires mSelector to be properly activated or deactivated.
+     */
+    fun setAllIndicateIsSelectable(rv: RecyclerView) {
+        for (pos in 0 until mCollections.size) {
+            val item = mCollections[pos]
+            if (!item.deletable) {
+                val holder = rv.findViewHolderForAdapterPosition(pos)
+                if (holder is CoverViewHolder) indicateIsSelectable(holder, item)
+            }
+        }
+    }
+
     /**
      * Style holder to match various selection states (e.g. is selected, selectable, etc).
      * If this is not called, selection won't be visually represented initially.
      * Should be called indirectly by fragment on mode change.
      */
-    private fun indicateSelection(holder: CoverViewHolder, position: Int, item: Coverable) {
+    private fun indicateSelectionStatus(holder: CoverViewHolder, position: Int, selectedItemIds: ArrayList<Long>) {
 
         val button = holder.itemView.findViewById<ImageButton>(R.id.btnSelect)
 
-        if (position.toLong() in mSelector.selectedItemIds) {
+        if (position.toLong() in selectedItemIds) {
             button.visibility = View.VISIBLE
         }
         else {
             button.visibility = View.INVISIBLE
         }
 
+    }
+
+    /**
+     * Style in order to hint to user that item is or isn't selectable
+     */
+    private fun indicateIsSelectable(holder: CoverViewHolder, item: Coverable) {
         if (mSelector.active && !item.deletable) {
             holder.itemView.alpha = 0.5F
-        }
-        else {
+        } else {
             holder.itemView.alpha = 1F
         }
     }

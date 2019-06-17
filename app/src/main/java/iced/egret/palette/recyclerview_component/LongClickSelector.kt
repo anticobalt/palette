@@ -89,8 +89,8 @@ class LongClickSelector(fragment: MainFragment) {
     fun activate() {
         val fragment = fragmentReference.get()
         if (fragment is MainFragment) {
+            active = true  // must be before fragment call
             fragment.onAlternateModeActivated()
-            active = true
         }
     }
 
@@ -98,8 +98,8 @@ class LongClickSelector(fragment: MainFragment) {
         val fragment = fragmentReference.get()
         if (fragment is MainFragment) {
             selectedItemIds.clear()
+            active = false  // must be before fragment call
             fragment.onAlternateModeDeactivated()
-            active = false
         }
     }
 

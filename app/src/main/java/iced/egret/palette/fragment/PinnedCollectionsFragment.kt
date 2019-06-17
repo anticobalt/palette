@@ -118,7 +118,7 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onAlternateModeActivated() {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
-        mAdapter.notifyDataSetChanged()  // signal style changes
+        mAdapter.setAllIndicateIsSelectable(mRecyclerView)  // indicate non-deletable collections
     }
 
     /**
@@ -127,7 +127,7 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onAlternateModeDeactivated() {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
-        mAdapter.notifyDataSetChanged()  // signal that selections were cleared
+        mAdapter.setAllIndications(mRecyclerView)  // remove all indications, clear selected items
     }
 
     private fun onCreateNewAlbum(charSequence: CharSequence) {

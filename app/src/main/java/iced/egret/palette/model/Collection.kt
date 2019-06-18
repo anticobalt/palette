@@ -169,6 +169,7 @@ data class FolderData(val name: String,
 /***
  * Properties:
  * - name
+ * - path
  * - terminal
  * - deletable
  * - cover
@@ -178,7 +179,7 @@ data class FolderData(val name: String,
  * - size
  * - totalSize
  */
-class Album(name: String) : Collection(name) {
+class Album(name: String, val path: String) : Collection(name) {
 
     companion object {
         const val NAME_MAX_LENGTH = 25
@@ -207,7 +208,7 @@ class Album(name: String) : Collection(name) {
         val picturePaths = pictures.map { picture -> picture.path }
         val foldersData = folders.map { folder -> folder.toDataClass() }
         val albumsData = albums.map { album -> album.toDataClass() }
-        return AlbumData(name, picturePaths, foldersData, albumsData)
+        return AlbumData(name, path, picturePaths, foldersData, albumsData)
     }
 
     override fun getOnePictureUri(): Uri? {
@@ -266,13 +267,14 @@ class Album(name: String) : Collection(name) {
 }
 
 data class AlbumData(val name: String,
+                     val path: String,
                      val picturePaths: List<String>,
                      val foldersData: List<FolderData>,
                      val albumsData: List<AlbumData>) : Serializable {
 
     fun toFullClass(existingPictures: Map<String, Picture> = mapOf()) : Album {
 
-        val album = Album(name)
+        val album = Album(name, path)
         val folders = foldersData.map {data -> data.toFullClass() } as MutableList<Folder>
         val albums = albumsData.map {data -> data.toFullClass() } as MutableList<Album>
         val pictures = arrayListOf<Picture>()

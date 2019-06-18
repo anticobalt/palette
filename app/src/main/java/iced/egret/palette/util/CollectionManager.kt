@@ -55,13 +55,18 @@ object CollectionManager {
     }
 
     fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Album {
-        val album = Album(name)
-        if (addToCurrent) {
-            if (currentCollection is Album) (currentCollection as Album).addAlbum(album)
+        val newAlbum : Album
+        if (addToCurrent && currentCollection is Album) {
+            val currentAlbum = currentCollection as Album
+            newAlbum = Album(name, path = "${currentAlbum.path}/$name")
+            currentAlbum.addAlbum(newAlbum)
         }
-        else mCollections.add(album)
+        else {
+            newAlbum = Album(name, path = name)
+            mCollections.add(newAlbum)
+        }
         Storage.saveAlbumsToDisk(albums)
-        return album
+        return newAlbum
     }
 
     fun deleteCollectionsByPosition(positions: ArrayList<Long>) {

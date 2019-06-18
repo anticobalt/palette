@@ -14,8 +14,10 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.recyclerview_component.LongClickSelector
+import iced.egret.palette.recyclerview_component.PinnedCollectionsSection
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter
+import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
 class PinnedCollectionsFragment : MainFragment() {
 
@@ -67,9 +69,14 @@ class PinnedCollectionsFragment : MainFragment() {
     }
 
     private fun buildRecyclerView() {
-        mSelector = LongClickSelector(this)
+
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
-        mAdapter = PinnedCollectionsAdapter(mSelector)
+        mAdapter = PinnedCollectionsAdapter()
+
+        val section = PinnedCollectionsSection(CollectionManager.getCollections(), mAdapter, this)
+        mAdapter.addSection(section)
+        mSelector = section.selector
+
         mRecyclerView.adapter = mAdapter
     }
 
@@ -115,19 +122,23 @@ class PinnedCollectionsFragment : MainFragment() {
     /**
      * Called by LongClickSelector upon its activation
      */
-    override fun onAlternateModeActivated() {
+    override fun onAlternateModeActivated(section: StatelessSection) {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
-        mAdapter.setAllIndicateIsSelectable(mRecyclerView)  // indicate non-deletable collections
+
+        // indicate non-deletable collections
+        mAdapter.setAllIndicateIsSelectable(mRecyclerView, section as PinnedCollectionsSection)
     }
 
     /**
      * Called by LongClickSelector after it finishes cleaning up
      */
-    override fun onAlternateModeDeactivated() {
+    override fun onAlternateModeDeactivated(section: StatelessSection) {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
-        mAdapter.setAllIndications(mRecyclerView)  // remove all indications, clear selected items
+
+        // remove all indications, clear selected items
+        mAdapter.setAllIndications(mRecyclerView, section as PinnedCollectionsSection)
     }
 
     private fun onCreateNewAlbum(charSequence: CharSequence) {

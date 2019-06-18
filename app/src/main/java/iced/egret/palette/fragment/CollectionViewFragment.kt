@@ -16,9 +16,12 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.model.Folder
+import iced.egret.palette.recyclerview_component.CollectionViewSection
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter
+import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
 class CollectionViewFragment : MainFragment() {
 
@@ -29,9 +32,14 @@ class CollectionViewFragment : MainFragment() {
     private lateinit var mFloatingActionButton : FloatingActionButton
 
     private lateinit var mContents : MutableList<Coverable>
-    private lateinit var mSelector: LongClickSelector
 
     lateinit var adapter: CollectionViewAdapter
+        private set
+    lateinit var folderSelector: LongClickSelector
+        private set
+    lateinit var albumSelector: LongClickSelector
+        private set
+    lateinit var pictureSelector: LongClickSelector
         private set
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -41,7 +49,6 @@ class CollectionViewFragment : MainFragment() {
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
 
         mContents = CollectionManager.contents.toMutableList()
-        mSelector = LongClickSelector(this)
 
         mFloatingActionButton.setOnClickListener {
             onFabClick()
@@ -94,7 +101,7 @@ class CollectionViewFragment : MainFragment() {
      */
     private fun createNewAlbum(name: String) {
         CollectionManager.createNewAlbum(name, addToCurrent = true)
-        adapter.update(CollectionManager.contents)
+        adapter.update()
     }
 
     /**
@@ -140,9 +147,37 @@ class CollectionViewFragment : MainFragment() {
      */
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
+
             mCollectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
-            adapter = CollectionViewAdapter(mContents, mSelector)
+            adapter = CollectionViewAdapter(mContents)
+
+            val collection = CollectionManager.currentCollection
+            val folderSection:  CollectionViewSection
+            val albumSection : CollectionViewSection
+            val pictureSection : CollectionViewSection
+
+            when (collection) {
+                is Album -> {
+                    folderSection = CollectionViewSection(getString(R.string.folders), collection.folders, adapter, this)
+                    pictureSection = CollectionViewSection(getString(R.string.pictures), collection.pictures, adapter, this)
+                    albumSection = CollectionViewSection(getString(R.string.albums), collection.albums, adapter, this)
+                    adapter.addSection(albumSection)
+                    albumSelector = albumSection.selector
+                }
+                is Folder -> {
+                    folderSection = CollectionViewSection(getString(R.string.folders), collection.folders, adapter, this)
+                    pictureSection = CollectionViewSection(getString(R.string.pictures), collection.pictures, adapter, this)
+                }
+                else -> return
+            }
+
+            adapter.addSection(folderSection)
+            adapter.addSection(pictureSection)
+            folderSelector = folderSection.selector
+            pictureSelector = pictureSection.selector
+
             mCollectionRecyclerView.adapter = adapter
+
         }
     }
 
@@ -150,7 +185,12 @@ class CollectionViewFragment : MainFragment() {
      * @return handled here (true) or not (false)
      */
     override fun onBackPressed() : Boolean {
-        val handledBySelector = mSelector.onBackPressed()
+
+        val handledBySelector =
+                folderSelector.onBackPressed()
+                        || albumSelector.onBackPressed()
+                        || pictureSelector.onBackPressed()
+
         return if (!handledBySelector) {
             returnToParentCollection()
         }
@@ -160,7 +200,7 @@ class CollectionViewFragment : MainFragment() {
     /**
      * Called by LongClickSelector upon its activation
      */
-    override fun onAlternateModeActivated() {
+    override fun onAlternateModeActivated(section: StatelessSection) {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
     }
@@ -168,10 +208,10 @@ class CollectionViewFragment : MainFragment() {
     /**
      * Called by LongClickSelector after it finishes cleaning up
      */
-    override fun onAlternateModeDeactivated() {
+    override fun onAlternateModeDeactivated(section: StatelessSection) {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
-        adapter.setAllIndications(mCollectionRecyclerView)  // reset all views
+        adapter.setAllIndications(mCollectionRecyclerView, section as CollectionViewSection)  // reset all views
     }
 
     /**
@@ -180,7 +220,7 @@ class CollectionViewFragment : MainFragment() {
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null){
-            adapter.update(newContents)
+            adapter.update()
             true
         }
         else {

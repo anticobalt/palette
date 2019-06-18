@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import iced.egret.palette.R
-import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
+import iced.egret.palette.recyclerview_component.CoverViewHolder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -20,11 +20,11 @@ object CollectionManager {
         get() = mCollectionStack.peek()
         private set(value) = mCollectionStack.push(value)
     val contents: MutableList<Coverable>
-        get() {
-            return currentCollection?.getContents() ?: ArrayList()
-        }
+        get() = currentCollection?.getContents() ?: ArrayList()
     val albums: List<Album>
         get() = mCollections.filterIsInstance<Album>()
+    val folders: List<Folder>
+        get() = mCollections.filterIsInstance<Folder>()
 
     fun setup(activity: FragmentActivity) {
 
@@ -81,17 +81,21 @@ object CollectionManager {
         Storage.saveAlbumsToDisk(albums)
     }
 
-    fun launch(item: Coverable, adapter : CollectionViewAdapter, position: Int = -1) {
+    /**
+     * Launch an item by updating current collection, or creating activity.
+     *
+     * @return Adapter needs to be updated (true) or not (false)
+     */
+    fun launch(item: Coverable, holder: CoverViewHolder, position: Int = -1) : Boolean {
         if (!item.terminal) {
             if (item as? Collection != null) {
-                val contents = item.getContents()
-                adapter.update(contents)
                 currentCollection = item
+                return true
             }
         }
         else {
             if (item as? TerminalCoverable != null) {
-                val context : Context? = adapter.getContext()
+                val context : Context? = holder.ivItem?.context
                 val intent = Intent(context, item.activity)
                 val key = context?.getString(R.string.intent_item_key)
                 val relativePosition = currentCollection?.pictures?.indexOf(contents[position])
@@ -99,6 +103,7 @@ object CollectionManager {
                 context?.startActivity(intent)
             }
         }
+        return false
     }
 
     fun revertToParent() : MutableList<Coverable>? {

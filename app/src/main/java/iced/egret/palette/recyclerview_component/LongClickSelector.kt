@@ -1,8 +1,8 @@
 package iced.egret.palette.recyclerview_component
 
-import iced.egret.palette.adapter.CoverableAdapter
 import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.model.Coverable
+import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 import java.lang.ref.WeakReference
 
 /**
@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
  *     to selected items, responses to clicks, or visual representation of selection. All of those
  *     are delegated to fragment, adapter, or click listener.
  */
-class LongClickSelector(fragment: MainFragment) {
+class LongClickSelector(fragment: MainFragment, val section: StatelessSection) {
 
     var active = false
     var selectedItemIds = ArrayList<Long>()
@@ -31,14 +31,17 @@ class LongClickSelector(fragment: MainFragment) {
     var clickListener : CoverableClickListener? = null
     var fragmentReference = WeakReference(fragment)
 
+    /**
+     * @return If adapter data changed (true) or not (false)
+     */
     fun onItemClick(item: Coverable,
                     position: Int,
                     holder: CoverViewHolder,
-                    adapter: CoverableAdapter,
-                    sharedClickListener: CoverableClickListener) {
+                    sharedClickListener: CoverableClickListener) : Boolean {
 
+        var dataChanged : Boolean? = false
         clickListener = sharedClickListener
-        clickListener?.setup(item, position, holder, adapter)
+        clickListener?.setup(item, position, holder, section)
 
         if (active) {
             clickListener?.onItemAlternateClick(selectedItemIds)
@@ -46,20 +49,23 @@ class LongClickSelector(fragment: MainFragment) {
                 deactivate()
             }
         }
-        else clickListener?.onItemDefaultClick(selectedItemIds)
+        else {
+            dataChanged = clickListener?.onItemDefaultClick(selectedItemIds)
+        }
 
         clickListener?.tearDown()
+        return dataChanged ?: false
+
     }
 
     fun onItemLongClick(item: Coverable,
                         position: Int,
                         holder: CoverViewHolder,
-                        adapter: CoverableAdapter,
                         sharedClickListener: CoverableClickListener) : Boolean {
 
         var handled = false
         clickListener = sharedClickListener
-        clickListener?.setup(item, position, holder, adapter)
+        clickListener?.setup(item, position, holder, section)
 
         if (!active) {
             clickListener?.onItemDefaultLongClick(selectedItemIds)
@@ -90,7 +96,7 @@ class LongClickSelector(fragment: MainFragment) {
         val fragment = fragmentReference.get()
         if (fragment is MainFragment) {
             active = true  // must be before fragment call
-            fragment.onAlternateModeActivated()
+            fragment.onAlternateModeActivated(section)
         }
     }
 
@@ -99,7 +105,7 @@ class LongClickSelector(fragment: MainFragment) {
         if (fragment is MainFragment) {
             selectedItemIds.clear()
             active = false  // must be before fragment call
-            fragment.onAlternateModeDeactivated()
+            fragment.onAlternateModeDeactivated(section)
         }
     }
 
@@ -110,13 +116,15 @@ class LongClickSelector(fragment: MainFragment) {
  */
 abstract class CoverableClickListener {
 
-    abstract fun setup(item: Coverable, position: Int, holder: CoverViewHolder, adapter: CoverableAdapter)
+    abstract fun setup(item: Coverable, position: Int, holder: CoverViewHolder, section: StatelessSection)
     abstract fun tearDown()
 
     /**
      * Short click action for when view is default/normal state
+     *
+     * @return Adapter data changed (true) or didn't (false)
      */
-    abstract fun onItemDefaultClick(selectedItemIds: ArrayList<Long>)
+    abstract fun onItemDefaultClick(selectedItemIds: ArrayList<Long>) : Boolean
 
     /**
      * Long click action for when view is default/normal state

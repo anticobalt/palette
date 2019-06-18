@@ -2,6 +2,7 @@ package iced.egret.palette.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
@@ -72,6 +73,19 @@ class CollectionViewFragment : MainFragment() {
         else {
             Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.actionViewCollectionAddToAlbum -> {
+                true
+            }
+            R.id.actionViewCollectionDeleteAlbum -> {
+                true
+            }
+            R.id.actionViewCollectionSettings -> true
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

@@ -16,7 +16,6 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
-import iced.egret.palette.model.Folder
 import iced.egret.palette.recyclerview_component.CollectionViewSection
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
@@ -31,15 +30,12 @@ class CollectionViewFragment : MainFragment() {
     private lateinit var mCollectionRecyclerView : RecyclerView
     private lateinit var mFloatingActionButton : FloatingActionButton
 
+    private val mSelectors = mutableListOf<LongClickSelector>()
+    private val mSections = mutableListOf<CollectionViewSection>()
+
     private lateinit var mContents : MutableList<Coverable>
 
     lateinit var adapter: CollectionViewAdapter
-        private set
-    lateinit var folderSelector: LongClickSelector
-        private set
-    lateinit var albumSelector: LongClickSelector
-        private set
-    lateinit var pictureSelector: LongClickSelector
         private set
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -151,30 +147,14 @@ class CollectionViewFragment : MainFragment() {
             mCollectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
             adapter = CollectionViewAdapter(mContents)
 
-            val collection = CollectionManager.currentCollection
-            val folderSection:  CollectionViewSection
-            val albumSection : CollectionViewSection
-            val pictureSection : CollectionViewSection
+            val collection = CollectionManager.currentCollection ?: return
 
-            when (collection) {
-                is Album -> {
-                    folderSection = CollectionViewSection(getString(R.string.folders), collection.folders, adapter, this)
-                    pictureSection = CollectionViewSection(getString(R.string.pictures), collection.pictures, adapter, this)
-                    albumSection = CollectionViewSection(getString(R.string.albums), collection.albums, adapter, this)
-                    adapter.addSection(albumSection)
-                    albumSelector = albumSection.selector
-                }
-                is Folder -> {
-                    folderSection = CollectionViewSection(getString(R.string.folders), collection.folders, adapter, this)
-                    pictureSection = CollectionViewSection(getString(R.string.pictures), collection.pictures, adapter, this)
-                }
-                else -> return
+            for ((type, coverables) in collection.contentsMap) {
+                val section = CollectionViewSection(type.capitalize(), coverables, adapter, this)
+                mSections.add(section)
+                mSelectors.add(section.selector)
+                adapter.addSection(section)
             }
-
-            adapter.addSection(folderSection)
-            adapter.addSection(pictureSection)
-            folderSelector = folderSection.selector
-            pictureSelector = pictureSection.selector
 
             mCollectionRecyclerView.adapter = adapter
 
@@ -186,15 +166,17 @@ class CollectionViewFragment : MainFragment() {
      */
     override fun onBackPressed() : Boolean {
 
-        val handledBySelector =
-                folderSelector.onBackPressed()
-                        || albumSelector.onBackPressed()
-                        || pictureSelector.onBackPressed()
+        var handledBySelector = false
 
-        return if (!handledBySelector) {
-            returnToParentCollection()
+        /**
+         * Try to find one selector to handle
+         */
+        for (selector in mSelectors) {
+            handledBySelector = handledBySelector || selector.onBackPressed()
+            if (handledBySelector) return true
         }
-        else true
+
+        return returnToParentCollection()
     }
 
     /**

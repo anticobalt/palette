@@ -12,8 +12,8 @@ import iced.egret.palette.util.CollectionManager
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
-class CollectionViewSection(private val title: String,
-                            private val items: List<Coverable>,
+class CollectionViewSection(val title: String,
+                            list: List<Coverable>,
                             private val adapter: CollectionViewAdapter,
                             val fragment: MainFragment) :
         StatelessSection(SectionParameters.builder()
@@ -74,6 +74,7 @@ class CollectionViewSection(private val title: String,
 
     private val mListener = OnItemClickListener()
     val selector = LongClickSelector(fragment, this)
+    val items = list.toMutableList()  // must make a copy to prevent side-effects
 
     override fun getContentItemsTotal(): Int {
         return items.size

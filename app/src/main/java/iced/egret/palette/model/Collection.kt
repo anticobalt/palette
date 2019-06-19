@@ -24,6 +24,7 @@ abstract class Collection(override var name: String) : Coverable {
             "id" to R.drawable.ic_default_collection_cover
     )
 
+    abstract val contentsMap: Map<String, List<Coverable>>
     abstract var pictures: ArrayList<Picture>
         protected set
     abstract val totalSize : Int
@@ -103,6 +104,14 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
     override var pictures = ArrayList<Picture>()
     var folders = subFolders
         private set
+
+    override val contentsMap: Map<String, List<Coverable>>
+        get() {
+            val map = mutableMapOf<String, List<Coverable>>()
+            map["folders"] = folders
+            map["pictures"] = pictures
+            return map
+        }
 
     override val totalSize: Int
         get() {
@@ -192,6 +201,15 @@ class Album(name: String, val path: String) : Collection(name) {
     var folders : MutableList<Folder> = ArrayList()
         private set
 
+    override val contentsMap: Map<String, List<Coverable>>
+        get() {
+            val map = mutableMapOf<String, List<Coverable>>()
+            map["folders"] = folders
+            map["albums"] = albums
+            map["pictures"] = pictures
+            return map
+        }
+
     override val totalSize: Int
         get() {
             var rs = pictures.size
@@ -231,7 +249,7 @@ class Album(name: String, val path: String) : Collection(name) {
         val folders = folders as ArrayList<Coverable>
         val pictures = pictures as ArrayList<Coverable>
         val albums = albums as ArrayList<Coverable>
-        return (folders + pictures + albums) as MutableList<Coverable>
+        return (folders + albums + pictures) as MutableList<Coverable>
     }
 
     private fun addCollection(newCollection: Collection, collectionList: MutableList<Collection>) {

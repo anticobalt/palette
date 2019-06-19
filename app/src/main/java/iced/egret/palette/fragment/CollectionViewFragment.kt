@@ -17,6 +17,7 @@ import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.recyclerview_component.CollectionViewSection
+import iced.egret.palette.recyclerview_component.GridSectionSpanSizeLookup
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter
@@ -144,11 +145,12 @@ class CollectionViewFragment : MainFragment() {
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
 
-            mCollectionRecyclerView.layoutManager = GridLayoutManager(activity, 3)
+            val manager = GridLayoutManager(activity, 3)
             adapter = CollectionViewAdapter(mContents)
 
-            val collection = CollectionManager.currentCollection ?: return
+            manager.spanSizeLookup = GridSectionSpanSizeLookup(adapter, 3)
 
+            val collection = CollectionManager.currentCollection ?: return
             for ((type, coverables) in collection.contentsMap) {
                 val section = CollectionViewSection(type.capitalize(), coverables, adapter, this)
                 mSections.add(section)
@@ -156,6 +158,7 @@ class CollectionViewFragment : MainFragment() {
                 adapter.addSection(section)
             }
 
+            mCollectionRecyclerView.layoutManager = manager
             mCollectionRecyclerView.adapter = adapter
 
         }

@@ -18,6 +18,7 @@ class CollectionViewSection(val title: String,
                             val fragment: MainFragment) :
         StatelessSection(SectionParameters.builder()
                 .itemResourceId(R.layout.item_view_collection)
+                .headerResourceId(R.layout.header_section_view_collection)
                 .build()) {
 
     class OnItemClickListener : CoverableClickListener() {
@@ -80,11 +81,24 @@ class CollectionViewSection(val title: String,
         return items.size
     }
 
+    override fun getHeaderViewHolder(view: View): RecyclerView.ViewHolder {
+        return SectionHeaderViewHolder(view)
+    }
+
+    override fun onBindHeaderViewHolder(holder: RecyclerView.ViewHolder) {
+        holder as SectionHeaderViewHolder
+        holder.tvItem.text = title
+    }
+
+    override fun getItemViewHolder(view: View): RecyclerView.ViewHolder {
+        return CoverViewHolder(view, imageViewId = R.id.ivCollectionItemImage, textViewId = R.id.tvCollectionItemText)
+    }
+
     override fun onBindItemViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
 
         holder as CoverViewHolder
         val item = items[position]
-        buildHolder(holder, item)
+        buildItemHolder(holder, item)
 
         // Update selection visuals to match state, so that they show
         // properly in the case that the ViewHolder is recycled
@@ -102,7 +116,7 @@ class CollectionViewSection(val title: String,
 
     }
 
-    private fun buildHolder(holder: CoverViewHolder, item: Coverable) {
+    private fun buildItemHolder(holder: CoverViewHolder, item: Coverable) {
         item.loadCoverInto(holder)
         holder.tvItem?.text = item.toString()
     }
@@ -123,10 +137,6 @@ class CollectionViewSection(val title: String,
             statusView.visibility = View.GONE
             holder.ivItem?.colorFilter = null
         }
-    }
-
-    override fun getItemViewHolder(view: View): RecyclerView.ViewHolder {
-        return CoverViewHolder(view, imageViewId = R.id.ivCollectionItemImage, textViewId = R.id.tvCollectionItemText)
     }
 
 }

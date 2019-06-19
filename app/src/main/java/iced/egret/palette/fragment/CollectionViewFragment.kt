@@ -150,8 +150,8 @@ class CollectionViewFragment : MainFragment() {
 
             manager.spanSizeLookup = GridSectionSpanSizeLookup(adapter, 3)
 
-            val collection = CollectionManager.currentCollection ?: return
-            for ((type, coverables) in collection.contentsMap) {
+            val contentsMap = CollectionManager.getContentsMap()
+            for ((type, coverables) in contentsMap) {
                 val section = CollectionViewSection(type.capitalize(), coverables, adapter, this)
                 mSections.add(section)
                 mSelectors.add(section.selector)
@@ -196,7 +196,7 @@ class CollectionViewFragment : MainFragment() {
     override fun onAlternateModeDeactivated(section: StatelessSection) {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
-        adapter.setAllIndications(mCollectionRecyclerView, section as CollectionViewSection)  // reset all views
+        adapter.notifyDataSetChanged()  // reset all views
     }
 
     /**

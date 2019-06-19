@@ -14,17 +14,22 @@ object CollectionManager {
 
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
+    private val mContentsMap = linkedMapOf<String, List<Coverable>>(
+            "folders" to listOf(),
+            "albums" to listOf(),
+            "pictures" to listOf()
+    )
 
-    // Aliases
+    val albums: List<Album>
+        get() = mCollections.filterIsInstance<Album>()
+    val folders: List<Folder>
+        get() = mCollections.filterIsInstance<Folder>()
+
     var currentCollection: Collection?
         get() = mCollectionStack.peek()
         private set(value) = mCollectionStack.push(value)
     val contents: MutableList<Coverable>
         get() = currentCollection?.getContents() ?: ArrayList()
-    val albums: List<Album>
-        get() = mCollections.filterIsInstance<Album>()
-    val folders: List<Folder>
-        get() = mCollections.filterIsInstance<Folder>()
 
     fun setup(activity: FragmentActivity) {
 
@@ -52,6 +57,22 @@ object CollectionManager {
 
     fun getCollections() : MutableList<Collection> {
         return mCollections
+    }
+
+    /**
+     * Lazily create ordered contents map
+     */
+    fun getContentsMap() : LinkedHashMap<String, List<Coverable>> {
+
+        val currentMap = (currentCollection?.contentsMap ?: mapOf())
+                as MutableMap<String, List<Coverable>>
+
+        for (type in mContentsMap.keys)
+        {
+            val contentsOfType = currentMap[type] ?: listOf()
+            mContentsMap[type] = contentsOfType
+        }
+        return mContentsMap
     }
 
     fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Album {

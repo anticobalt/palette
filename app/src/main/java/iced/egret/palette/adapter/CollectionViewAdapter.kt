@@ -35,7 +35,7 @@ class CollectionViewAdapter(contents: MutableList<Coverable>) : CoverableAdapter
         mItems.addAll(CollectionManager.contents)
 
         // Map<LowerCaseString, List<Coverable>>
-        val contentsMap = CollectionManager.currentCollection!!.contentsMap
+        val contentsMap = CollectionManager.getContentsMap()
 
         for (section in mSections) {
             val sectionItems = contentsMap[section.title.toLowerCase()]

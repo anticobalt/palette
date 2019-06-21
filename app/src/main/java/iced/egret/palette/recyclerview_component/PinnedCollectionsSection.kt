@@ -86,6 +86,7 @@ class PinnedCollectionsSection(val title: String,
             else selectedItemIds.add(positionLong)
 
             section!!.indicateSelectionStatus(holder!!, position!!, selectedItemIds)
+            section!!.isolateSelf(true)
 
         }
 
@@ -125,8 +126,6 @@ class PinnedCollectionsSection(val title: String,
         val item = items[position]
         buildHolder(holder, item)
 
-        // Indications must be remade in case ViewHolder is recycled,
-        // even though it is sometimes redundant (e.g. on activity start)
         indicateIsSelectable(holder, item)
         indicateSelectionStatus(holder, position, selector.selectedItemIds)
 
@@ -169,6 +168,14 @@ class PinnedCollectionsSection(val title: String,
             button.visibility = View.INVISIBLE
         }
 
+    }
+
+    /**
+     * Make this section the only section visible in adapter, or not
+     */
+    fun isolateSelf(isolate: Boolean) {
+        if (isolate) adapter.isolateSection(this)
+        else adapter.showAllSections()
     }
 
     /**

@@ -146,8 +146,8 @@ class PinnedCollectionsFragment : MainFragment() {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
 
-        // remove all indications, clear selected items
-        mAdapter.notifyDataSetChanged()
+        // already does notifyDataSetChanged(), so don't call it again to reset views
+        mAdapter.showAllSections()
     }
 
     private fun onCreateNewAlbum(charSequence: CharSequence) {

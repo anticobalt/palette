@@ -126,7 +126,7 @@ class PinnedCollectionsSection(val title: String,
         val item = items[position]
         buildHolder(holder, item)
 
-        indicateIsSelectable(holder, item)
+        // Update selection visuals to match state
         indicateSelectionStatus(holder, position, selector.selectedItemIds)
 
         holder.itemView.setOnClickListener{
@@ -178,14 +178,4 @@ class PinnedCollectionsSection(val title: String,
         else adapter.showAllSections()
     }
 
-    /**
-     * Style in order to hint to user that item is or isn't selectable
-     */
-    fun indicateIsSelectable(holder: CoverViewHolder, item: Coverable) {
-        if (selector.active && !item.deletable) {
-            holder.itemView.alpha = 0.5F
-        } else {
-            holder.itemView.alpha = 1F
-        }
-    }
 }

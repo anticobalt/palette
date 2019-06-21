@@ -196,7 +196,9 @@ class CollectionViewFragment : MainFragment() {
     override fun onAlternateModeDeactivated(section: StatelessSection) {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
-        adapter.notifyDataSetChanged()  // reset all views
+
+        // already does notifyDataSetChanged(), so don't call it again to reset views
+        adapter.showAllSections()
     }
 
     /**

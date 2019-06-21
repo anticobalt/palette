@@ -41,4 +41,18 @@ class CollectionViewAdapter(contents: MutableList<Coverable>) : CoverableAdapter
         return super.addSection(section)
     }
 
+    fun isolateSection(toIsolateSection: CollectionViewSection) {
+        (mSections.filter {section -> section != toIsolateSection}).map { section -> super.removeSection(section) }
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Need to remove all then add all again to retain order.
+     */
+    fun showAllSections() {
+        mSections.map { section -> super.removeSection(section) }
+        mSections.map { section -> super.addSection(section) }
+        notifyDataSetChanged()
+    }
+
 }

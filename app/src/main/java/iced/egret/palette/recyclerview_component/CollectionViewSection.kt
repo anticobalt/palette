@@ -15,7 +15,7 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 class CollectionViewSection(val title: String,
                             list: List<Coverable>,
                             private val adapter: CollectionViewAdapter,
-                            val fragment: MainFragment) :
+                            fragment: MainFragment) :
         StatelessSection(SectionParameters.builder()
                 .itemResourceId(R.layout.item_view_collection)
                 .headerResourceId(R.layout.header_section_view_collection)
@@ -62,6 +62,7 @@ class CollectionViewSection(val title: String,
             else selectedItemIds.add(positionLong)
 
             section!!.indicateSelection(holder!!, position!!, selectedItemIds)
+            section!!.isolateSelf(true)
         }
 
         override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
@@ -100,8 +101,7 @@ class CollectionViewSection(val title: String,
         val item = items[position]
         buildItemHolder(holder, item)
 
-        // Update selection visuals to match state, so that they show
-        // properly in the case that the ViewHolder is recycled
+        // Update selection visuals to match state
         indicateSelection(holder, position, selector.selectedItemIds)
 
         holder.itemView.setOnClickListener{
@@ -137,6 +137,14 @@ class CollectionViewSection(val title: String,
             statusView.visibility = View.GONE
             holder.ivItem?.colorFilter = null
         }
+    }
+
+    /**
+     * Make this section the only section visible in adapter, or not
+     */
+    fun isolateSelf(isolate: Boolean) {
+        if (isolate) adapter.isolateSection(this)
+        else adapter.showAllSections()
     }
 
 }

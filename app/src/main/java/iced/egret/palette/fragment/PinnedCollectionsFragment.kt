@@ -28,8 +28,7 @@ class PinnedCollectionsFragment : MainFragment() {
     private lateinit var mEditToolbar : Toolbar
 
     private lateinit var mAdapter : PinnedCollectionsAdapter
-    private lateinit var mSelector: LongClickSelector
-    // FIXME: selections don't persist when fragment rebuilt (e.g. when rotating screen)
+    private var mSelectors = mutableListOf<LongClickSelector>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
@@ -73,15 +72,27 @@ class PinnedCollectionsFragment : MainFragment() {
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
         mAdapter = PinnedCollectionsAdapter()
 
-        val section = PinnedCollectionsSection(CollectionManager.getCollections(), mAdapter, this)
-        mAdapter.addSection(section)
-        mSelector = section.selector
+        val folderSection = PinnedCollectionsSection("Folders", CollectionManager.folders, mAdapter, this)
+        mAdapter.addSection(folderSection)
+        mSelectors.add(folderSection.selector)
+
+        val albumSection = PinnedCollectionsSection("Albums", CollectionManager.albums, mAdapter, this)
+        mAdapter.addSection(albumSection)
+        mSelectors.add(albumSection.selector)
 
         mRecyclerView.adapter = mAdapter
     }
 
     override fun onBackPressed(): Boolean {
-        return mSelector.onBackPressed()
+        var handledBySelector = false
+        /**
+         * Try to find one selector to handle
+         */
+        for (selector in mSelectors) {
+            handledBySelector = handledBySelector || selector.onBackPressed()
+            if (handledBySelector) return true
+        }
+        return handledBySelector
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -107,8 +118,9 @@ class PinnedCollectionsFragment : MainFragment() {
                     message(R.string.message_delete_album_confirm)
                     negativeButton()
                     positiveButton(R.string.action_delete_albums) {
-                        CollectionManager.deleteCollectionsByPosition(mSelector.selectedItemIds)
-                        mSelector.deactivate()
+                        val activeSelector = mSelectors.find { s -> s.active } ?: return@positiveButton
+                        CollectionManager.deleteCollectionsByPosition(activeSelector.selectedItemIds)
+                        activeSelector.deactivate()
                         mAdapter.updateCollections()
                     }
                 }
@@ -125,9 +137,6 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onAlternateModeActivated(section: StatelessSection) {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
-
-        // indicate non-deletable collections
-        mAdapter.setAllIndicateIsSelectable(mRecyclerView, section as PinnedCollectionsSection)
     }
 
     /**
@@ -138,7 +147,7 @@ class PinnedCollectionsFragment : MainFragment() {
         mDefaultToolbar.visibility = Toolbar.VISIBLE
 
         // remove all indications, clear selected items
-        mAdapter.setAllIndications(mRecyclerView, section as PinnedCollectionsSection)
+        mAdapter.notifyDataSetChanged()
     }
 
     private fun onCreateNewAlbum(charSequence: CharSequence) {

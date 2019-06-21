@@ -15,11 +15,13 @@ import iced.egret.palette.util.MainFragmentManager
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
-class PinnedCollectionsSection(private val items: List<Coverable>,
+class PinnedCollectionsSection(val title: String,
+                               list: List<Coverable>,
                                private val adapter: PinnedCollectionsAdapter,
                                val fragment: MainFragment)
     : StatelessSection(SectionParameters.builder()
         .itemResourceId(R.layout.item_pinned_collections)
+        .headerResourceId(R.layout.header_section_view_collection)
         .build()) {
 
     /**
@@ -98,9 +100,23 @@ class PinnedCollectionsSection(private val items: List<Coverable>,
 
     private val mListener = ActionClickListener()
     val selector = LongClickSelector(fragment, this)
+    val items = list.toMutableList()
 
     override fun getContentItemsTotal(): Int {
         return items.size
+    }
+
+    override fun getHeaderViewHolder(view: View): RecyclerView.ViewHolder {
+        return SectionHeaderViewHolder(view)
+    }
+
+    override fun onBindHeaderViewHolder(holder: RecyclerView.ViewHolder) {
+        holder as SectionHeaderViewHolder
+        holder.tvItem.text = title
+    }
+
+    override fun getItemViewHolder(view: View): RecyclerView.ViewHolder {
+        return CoverViewHolder(view, imageViewId = R.id.ivPinnedCollectionCover, textViewId = R.id.tvPinnedCollectionLabel)
     }
 
     override fun onBindItemViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
@@ -164,9 +180,5 @@ class PinnedCollectionsSection(private val items: List<Coverable>,
         } else {
             holder.itemView.alpha = 1F
         }
-    }
-
-    override fun getItemViewHolder(view: View): RecyclerView.ViewHolder {
-        return CoverViewHolder(view, imageViewId = R.id.ivPinnedCollectionCover, textViewId = R.id.tvPinnedCollectionLabel)
     }
 }

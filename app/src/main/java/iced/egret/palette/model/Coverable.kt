@@ -8,7 +8,6 @@ interface Coverable {
     val terminal : Boolean
     var name : String
     val cover : MutableMap<String, *>
-    val deletable : Boolean
     fun loadCoverInto(holder: CoverViewHolder)
 }
 

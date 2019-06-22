@@ -9,6 +9,7 @@
         app:iconTint="@color/white"
         android:title="@string/action_add_to_album"
         app:showAsAction="ifRoom"
+        android:visible="false"
         />
 
     <item
@@ -18,6 +19,7 @@
         app:iconTint="@color/white"
         android:title="@string/action_delete_albums"
         app:showAsAction="ifRoom"
+        android:visible="false"
         />
 
 </menu>

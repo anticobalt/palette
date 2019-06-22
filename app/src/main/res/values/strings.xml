@@ -17,6 +17,7 @@
     <string name="action_create_album">Create Album</string>
     <string name="action_delete_albums">Delete Albums</string>
     <string name="action_add_to_album">Add to Album</string>
+    <string name="action_hide">Hide</string>
 
     <string name="title_permission_error">Permission Request Failed!</string>
     <string name="message_permission_error">

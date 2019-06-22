@@ -137,6 +137,17 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onAlternateModeActivated(section: StatelessSection) {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
+
+        section as PinnedCollectionsSection  // cast
+        val editMenu = mEditToolbar.menu
+        when (section.title.toLowerCase()) {
+            "folders" -> {
+                editMenu.findItem(R.id.actionPinnedCollectionsHide).isVisible = true
+            }
+            "albums" -> {
+                editMenu.findItem(R.id.actionPinnedCollectionsDeleteAlbum).isVisible = true
+            }
+        }
     }
 
     /**
@@ -145,6 +156,10 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onAlternateModeDeactivated(section: StatelessSection) {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
+
+        val editMenu = mEditToolbar.menu
+        editMenu.findItem(R.id.actionPinnedCollectionsHide).isVisible = false
+        editMenu.findItem(R.id.actionPinnedCollectionsDeleteAlbum).isVisible = false
 
         // already does notifyDataSetChanged(), so don't call it again to reset views
         mAdapter.showAllSections()

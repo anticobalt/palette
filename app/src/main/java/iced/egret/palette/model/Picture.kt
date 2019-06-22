@@ -16,7 +16,6 @@ class Picture(override var name: String, val path: String) : TerminalCoverable {
     val uri : Uri = Uri.fromFile(file)
 
     override val terminal = true
-    override val deletable = false
     override val cover = mutableMapOf(
         "uri" to uri
     )

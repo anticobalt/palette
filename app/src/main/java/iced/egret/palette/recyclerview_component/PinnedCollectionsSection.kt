@@ -79,7 +79,6 @@ class PinnedCollectionsSection(val title: String,
 
         override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {
             if (!ready) return
-            if (!item!!.deletable) return
 
             val positionLong = position!!.toLong()
             if (positionLong in selectedItemIds) selectedItemIds.remove(positionLong)

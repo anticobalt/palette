@@ -188,6 +188,21 @@ class CollectionViewFragment : MainFragment() {
     override fun onAlternateModeActivated(section: StatelessSection) {
         mDefaultToolbar.visibility = Toolbar.GONE
         mEditToolbar.visibility = Toolbar.VISIBLE
+
+        section as CollectionViewSection  // cast
+        val editMenu = mEditToolbar.menu
+        when (section.title.toLowerCase()) {
+            "folders" -> {
+                editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = true
+            }
+            "albums" -> {
+                editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = true
+                editMenu.findItem(R.id.actionViewCollectionDeleteAlbum).isVisible = true
+            }
+            "pictures" -> {
+                editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = true
+            }
+        }
     }
 
     /**
@@ -196,6 +211,10 @@ class CollectionViewFragment : MainFragment() {
     override fun onAlternateModeDeactivated(section: StatelessSection) {
         mEditToolbar.visibility = Toolbar.GONE
         mDefaultToolbar.visibility = Toolbar.VISIBLE
+
+        val editMenu = mEditToolbar.menu
+        editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = false
+        editMenu.findItem(R.id.actionViewCollectionDeleteAlbum).isVisible = false
 
         // already does notifyDataSetChanged(), so don't call it again to reset views
         adapter.showAllSections()

@@ -12,7 +12,7 @@ import kotlin.collections.ArrayList
 
 object CollectionManager {
 
-    const val originalExternalStorageName = "emulated"
+    private const val originalExternalStorageName = "emulated"
 
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
@@ -36,7 +36,7 @@ object CollectionManager {
     fun setup(activity: FragmentActivity) {
 
         val root = Storage.retrievedFolders.firstOrNull()
-        val newExteralStorageName = activity.getString(R.string.external_storage_name)
+        val newExternalStorageName = activity.getString(R.string.external_storage_name)
 
         if (root != null) {
 
@@ -51,7 +51,7 @@ object CollectionManager {
 
             val externalStorage = mCollections.find {collection -> collection.name == originalExternalStorageName }
             if (externalStorage != null) {  // should always be true
-                externalStorage.name = newExteralStorageName
+                externalStorage.name = newExternalStorageName
                 mCollections.remove(externalStorage)
                 mCollections.add(0, externalStorage)
                 mCollectionStack.push(externalStorage)
@@ -202,9 +202,9 @@ object CollectionManager {
      */
     private fun getPracticalRoot(folder: Folder) : Folder {
         var f = folder
-        if (f.name == "emulated") {
+        if (f.name == originalExternalStorageName) {
             f = f.folders.first()
-            f.name = "emulated"
+            f.name = originalExternalStorageName
         }
         return f
     }

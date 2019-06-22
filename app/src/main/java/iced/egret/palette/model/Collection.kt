@@ -61,10 +61,7 @@ abstract class Collection(override var name: String) : Coverable {
         }
     }
 
-    // If contents are of varying types,
-    // Non-Terminals should be before Terminals
-    // to simplify launching (because position is required)
-    abstract fun getContents() : MutableList<Coverable>
+    abstract fun getContents() : List<Coverable>
 
     open fun addPicture(newPicture: Picture) {
         pictures.add(newPicture)
@@ -141,10 +138,10 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun getContents(): MutableList<Coverable> {
+    override fun getContents(): List<Coverable> {
         val folders = folders as ArrayList<Coverable>
         val pictures = pictures as ArrayList<Coverable>
-        return (folders + pictures) as MutableList<Coverable>
+        return (folders + pictures)
     }
 
     fun addFolder(newFolder: Folder) {
@@ -194,10 +191,14 @@ class Album(name: String, val path: String) : Collection(name) {
     }
 
     override var pictures = ArrayList<Picture>()
-    var albums : MutableList<Album> = ArrayList()
-        private set
-    var folders : MutableList<Folder> = ArrayList()
-        private set
+
+    private var _albums : MutableList<Album> = ArrayList()
+    val albums : List<Album>
+        get() = _albums
+
+    private var _folders : MutableList<Folder> = ArrayList()
+    val folders : List<Folder>
+        get() = _folders
 
     override val contentsMap: Map<String, List<Coverable>>
         get() {
@@ -214,7 +215,7 @@ class Album(name: String, val path: String) : Collection(name) {
             for (folder in folders) {
                 rs += folder.totalSize
             }
-            for (album in albums) {
+            for (album in _albums) {
                 rs += album.totalSize
             }
             return rs
@@ -222,8 +223,8 @@ class Album(name: String, val path: String) : Collection(name) {
 
     fun toDataClass() : AlbumData {
         val picturePaths = pictures.map { picture -> picture.path }
-        val foldersData = folders.map { folder -> folder.toDataClass() }
-        val albumsData = albums.map { album -> album.toDataClass() }
+        val foldersData = _folders.map { folder -> folder.toDataClass() }
+        val albumsData = _albums.map { album -> album.toDataClass() }
         return AlbumData(name, path, picturePaths, foldersData, albumsData)
     }
 
@@ -237,17 +238,16 @@ class Album(name: String, val path: String) : Collection(name) {
         return null
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun getCollections() : MutableList<Collection> {
-        return ((albums as ArrayList<Collection>) + (folders as ArrayList<Collection>)) as MutableList<Collection>
+    private fun getCollections() : List<Collection> {
+        return ((_albums as List<Collection>) + (_folders as List<Collection>))
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun getContents(): MutableList<Coverable> {
-        val folders = folders as ArrayList<Coverable>
-        val pictures = pictures as ArrayList<Coverable>
-        val albums = albums as ArrayList<Coverable>
-        return (folders + albums + pictures) as MutableList<Coverable>
+    override fun getContents(): List<Coverable> {
+        val folders = _folders as List<Coverable>
+        val pictures = pictures as List<Coverable>
+        val albums = _albums as List<Coverable>
+        return (folders + albums + pictures)
     }
 
     private fun addCollection(newCollection: Collection, collectionList: MutableList<Collection>) {
@@ -255,29 +255,29 @@ class Album(name: String, val path: String) : Collection(name) {
         size += 1
     }
 
-    private fun addCollections(newCollections: MutableList<Collection>, collectionList: MutableList<Collection>) {
+    private fun addCollections(newCollections: List<Collection>, collectionList: MutableList<Collection>) {
         collectionList.addAll(newCollections)
         size += newCollections.size
     }
 
     @Suppress("UNCHECKED_CAST")
     fun addFolder(newFolder: Folder) {
-        addCollection(newFolder, folders as MutableList<Collection>)
+        addCollection(newFolder, _folders as MutableList<Collection>)
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun addFolders(newFolders: MutableList<Folder>) {
-        addCollections(newFolders as MutableList<Collection>, folders as MutableList<Collection>)
+    fun addFolders(newFolders: List<Folder>) {
+        addCollections(newFolders as List<Collection>, _folders as MutableList<Collection>)
     }
 
     @Suppress("UNCHECKED_CAST")
     fun addAlbum(newAlbum: Album) {
-        addCollection(newAlbum, albums as MutableList<Collection>)
+        addCollection(newAlbum, _albums as MutableList<Collection>)
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun addAlbums(newAlbums: MutableList<Album>) {
-        addCollections(newAlbums as MutableList<Collection>, albums as MutableList<Collection>)
+    fun addAlbums(newAlbums: List<Album>) {
+        addCollections(newAlbums as List<Collection>, _albums as MutableList<Collection>)
     }
 
 }

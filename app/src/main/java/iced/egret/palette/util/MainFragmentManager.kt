@@ -37,4 +37,8 @@ object MainFragmentManager {
         return fragment as MainFragment
     }
 
+    fun notifyAlbumUpdateFromCollectionView() {
+        (fragments[PINNED_COLLECTIONS] as PinnedCollectionsFragment).notifyChanges()
+    }
+
 }

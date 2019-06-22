@@ -28,8 +28,8 @@ object CollectionManager {
     var currentCollection: Collection?
         get() = mCollectionStack.peek()
         private set(value) = mCollectionStack.push(value)
-    val contents: MutableList<Coverable>
-        get() = currentCollection?.getContents() ?: ArrayList()
+    val contents: List<Coverable>
+        get() = currentCollection?.getContents() ?: listOf()
 
     fun setup(activity: FragmentActivity) {
 
@@ -57,6 +57,14 @@ object CollectionManager {
 
     fun getCollections() : MutableList<Collection> {
         return mCollections
+    }
+
+    fun getNestedAlbums(albums : List<Album> = this.albums, runningList: MutableList<Album> = mutableListOf()) : MutableList<Album> {
+        for (album in albums) {
+            runningList.add(album)
+            getNestedAlbums(album.albums, runningList)
+        }
+        return runningList
     }
 
     /**
@@ -103,6 +111,36 @@ object CollectionManager {
     }
 
     /**
+     * Adds given contents to all given albums. Does not add if already exists in collection.
+     *
+     */
+    fun addContentToAllAlbums(contents: List<Coverable>, albums: List<Album>) {
+        if (contents.isEmpty()) return
+
+        for (album in albums) {
+            loop@ for (content in contents) {
+                when (content) {
+                    is Folder -> {
+                        if (album.folders.contains(content)) continue@loop
+                        album.addFolder(content)
+                    }
+                    is Album -> {
+                        if (album.albums.contains(content)) continue@loop
+                        album.addAlbum(content)
+                    }
+                    is Picture -> {
+                        if (album.pictures.contains(content)) continue@loop
+                        album.addPicture(content)
+                    }
+                }
+            }
+        }
+
+        Storage.saveAlbumsToDisk(this.albums)
+
+    }
+
+    /**
      * Launch an item by updating current collection, or creating activity.
      *
      * @return Adapter needs to be updated (true) or not (false)
@@ -126,7 +164,7 @@ object CollectionManager {
         return false
     }
 
-    fun revertToParent() : MutableList<Coverable>? {
+    fun revertToParent() : List<Coverable>? {
         return if (mCollectionStack.size > 1) {
             mCollectionStack.pop()
             contents

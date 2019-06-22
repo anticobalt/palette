@@ -158,4 +158,11 @@ class PinnedCollectionsFragment : MainFragment() {
         mAdapter.updateCollections()
     }
 
+    /**
+     * Update everything to reflect changes
+     */
+    fun notifyChanges() {
+        mAdapter.updateCollections()
+    }
+
 }

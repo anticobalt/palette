@@ -72,8 +72,7 @@ class PinnedCollectionsSection(val title: String,
             CollectionManager.launch(item!!, holder!!)  // == true
             fragment.setDefaultToolbarTitle()
 
-            val adapter = fragment.adapter
-            adapter.update()
+            fragment.notifyChanges()
             return true
         }
 

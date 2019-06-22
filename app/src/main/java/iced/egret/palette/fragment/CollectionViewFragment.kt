@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,7 @@ import iced.egret.palette.recyclerview_component.GridSectionSpanSizeLookup
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
@@ -30,13 +32,19 @@ class CollectionViewFragment : MainFragment() {
     private lateinit var mCollectionRecyclerView : RecyclerView
     private lateinit var mFloatingActionButton : FloatingActionButton
 
+    // these two lists are parallel
     private val mSelectors = mutableListOf<LongClickSelector>()
     private val mSections = mutableListOf<CollectionViewSection>()
 
+    // relies on mSelectors and mSections being parallel
+    private val mActiveSelector: LongClickSelector?
+        get() = mSelectors.find { s -> s.active }
+    private val mActiveSection: CollectionViewSection
+        get() = mSections[mSelectors.indexOf(mActiveSelector)]
+
     private lateinit var mContents : MutableList<Coverable>
 
-    lateinit var adapter: CollectionViewAdapter
-        private set
+    private lateinit var mAdapter: CollectionViewAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -55,41 +63,6 @@ class CollectionViewFragment : MainFragment() {
 
         return mRootView
 
-    }
-
-    /**
-     * Adds new Coverables to current Collection
-     */
-    private fun onFabClick() {
-        val collection = CollectionManager.currentCollection
-        if (collection is Album) {
-            DialogGenerator.createAlbum(context!!, ::createNewAlbum)
-        }
-        else {
-            Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.actionViewCollectionAddToAlbum -> {
-                true
-            }
-            R.id.actionViewCollectionDeleteAlbum -> {
-                true
-            }
-            R.id.actionViewCollectionSettings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    /**
-     * Adds new album to current Collection
-     */
-    private fun createNewAlbum(name: CharSequence) {
-        CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
-        adapter.update()
     }
 
     /**
@@ -137,22 +110,79 @@ class CollectionViewFragment : MainFragment() {
         if (mContents.isNotEmpty()) {
 
             val manager = GridLayoutManager(activity, 3)
-            adapter = CollectionViewAdapter(mContents)
+            mAdapter = CollectionViewAdapter(mContents)
 
-            manager.spanSizeLookup = GridSectionSpanSizeLookup(adapter, 3)
+            manager.spanSizeLookup = GridSectionSpanSizeLookup(mAdapter, 3)
 
             val contentsMap = CollectionManager.getContentsMap()
             for ((type, coverables) in contentsMap) {
-                val section = CollectionViewSection(type.capitalize(), coverables, adapter, this)
+                val section = CollectionViewSection(type.capitalize(), coverables, mAdapter, this)
                 mSections.add(section)
                 mSelectors.add(section.selector)
-                adapter.addSection(section)
+                mAdapter.addSection(section)
             }
 
             mCollectionRecyclerView.layoutManager = manager
-            mCollectionRecyclerView.adapter = adapter
+            mCollectionRecyclerView.adapter = mAdapter
 
         }
+    }
+
+    /**
+     * Adds new Coverables to current Collection
+     */
+    private fun onFabClick() {
+        val collection = CollectionManager.currentCollection
+        if (collection is Album) {
+            DialogGenerator.createAlbum(context!!, ::createNewAlbum)
+        }
+        else {
+            Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.actionViewCollectionAddToAlbum -> {
+                // null if no active selector
+                val coverables = getSelectedCoverables() ?: return false
+
+                DialogGenerator.addToAlbum(context!!) { indices, albums ->
+                    val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
+                    CollectionManager.addContentToAllAlbums(coverables, destinations)
+                    Toast.makeText(
+                            context,
+                            "Added ${indices.size} ${mActiveSection.title.toLowerCase()} to ${destinations.size} albums.",
+                            Toast.LENGTH_SHORT
+                    ).show()
+                    mActiveSelector!!.deactivate()  // would previously return if null
+                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()
+                }
+                true
+            }
+            R.id.actionViewCollectionDeleteAlbum -> {
+                true
+            }
+            R.id.actionViewCollectionSettings -> true
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    /**
+     * Adds new album to current Collection
+     */
+    private fun createNewAlbum(name: CharSequence) {
+        CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
+        mAdapter.update()
+    }
+
+    /**
+     * Gets all selected items.
+     */
+    private fun getSelectedCoverables() : List<Coverable>? {
+        val positions = mActiveSelector?.selectedItemIds?.toSet() ?: return null
+        return mActiveSection.items.filterIndexed { index, _ -> positions.contains(index.toLong()) }
     }
 
     /**
@@ -208,7 +238,7 @@ class CollectionViewFragment : MainFragment() {
         editMenu.findItem(R.id.actionViewCollectionDeleteAlbum).isVisible = false
 
         // already does notifyDataSetChanged(), so don't call it again to reset views
-        adapter.showAllSections()
+        mAdapter.showAllSections()
     }
 
     /**
@@ -217,12 +247,19 @@ class CollectionViewFragment : MainFragment() {
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null){
-            adapter.update()
+            mAdapter.update()
             true
         }
         else {
             false
         }
+    }
+
+    /**
+     * Update everything to reflect changes
+     */
+    fun notifyChanges() {
+        mAdapter.update()
     }
 
 }

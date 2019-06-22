@@ -153,7 +153,7 @@ class CollectionViewFragment : MainFragment() {
                     CollectionManager.addContentToAllAlbums(coverables, destinations)
                     Toast.makeText(
                             context,
-                            "Added ${indices.size} ${mActiveSection.title.toLowerCase()} to ${destinations.size} albums.",
+                            "Added ${coverables.size} ${mActiveSection.title.toLowerCase()} to ${destinations.size} albums.",
                             Toast.LENGTH_SHORT
                     ).show()
                     mActiveSelector!!.deactivate()  // would previously return if null

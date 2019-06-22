@@ -24,9 +24,10 @@ abstract class Collection(override var name: String) : Coverable {
             "id" to R.drawable.ic_default_collection_cover
     )
 
+    abstract var _pictures: MutableList<Picture>  // internal
+    abstract val pictures: List<Picture>  // external
+
     abstract val contentsMap: Map<String, List<Coverable>>
-    abstract var pictures: ArrayList<Picture>
-        protected set
     abstract val totalSize : Int
     var size = 0
         protected set
@@ -64,11 +65,11 @@ abstract class Collection(override var name: String) : Coverable {
     abstract fun getContents() : List<Coverable>
 
     open fun addPicture(newPicture: Picture) {
-        pictures.add(newPicture)
+        _pictures.add(newPicture)
         size += 1
     }
     open fun addPictures(newPictures: MutableList<Picture>) {
-        pictures.addAll(newPictures)
+        _pictures.addAll(newPictures)
         size += newPictures.size
     }
 
@@ -94,12 +95,18 @@ abstract class Collection(override var name: String) : Coverable {
  * - folders
  * - size
  * - totalSize
+ *
+ * Backing fields _folders and _pictures only used when adding/deleting internally.
  */
 class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf()) : Collection(name) {
 
-    override var pictures = ArrayList<Picture>()
-    var folders = subFolders
-        private set
+    override var _pictures : MutableList<Picture> = ArrayList()
+    override val pictures : List<Picture>
+        get() = _pictures
+
+    private var _folders : MutableList<Folder> = subFolders
+    val folders : List<Folder>
+        get() = _folders
 
     override val contentsMap: Map<String, List<Coverable>>
         get() {
@@ -139,18 +146,18 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
 
     @Suppress("UNCHECKED_CAST")
     override fun getContents(): List<Coverable> {
-        val folders = folders as ArrayList<Coverable>
-        val pictures = pictures as ArrayList<Coverable>
+        val folders = folders as List<Coverable>
+        val pictures = pictures as List<Coverable>
         return (folders + pictures)
     }
 
     fun addFolder(newFolder: Folder) {
-        folders.add(newFolder)
+        _folders.add(newFolder)
         size += 1
     }
 
     fun addFolders(newFolders: MutableList<Folder>) {
-        folders.addAll(newFolders)
+        _folders.addAll(newFolders)
         size += newFolders.size
     }
 
@@ -183,6 +190,8 @@ data class FolderData(val name: String,
  * - pictures
  * - size
  * - totalSize
+ *
+ * Backing fields _folders, _albums, and _pictures only used when adding/deleting internally.
  */
 class Album(name: String, val path: String) : Collection(name) {
 
@@ -190,7 +199,9 @@ class Album(name: String, val path: String) : Collection(name) {
         const val NAME_MAX_LENGTH = 25
     }
 
-    override var pictures = ArrayList<Picture>()
+    override var _pictures : MutableList<Picture> = ArrayList()
+    override val pictures : List<Picture>
+        get() = _pictures
 
     private var _albums : MutableList<Album> = ArrayList()
     val albums : List<Album>
@@ -215,7 +226,7 @@ class Album(name: String, val path: String) : Collection(name) {
             for (folder in folders) {
                 rs += folder.totalSize
             }
-            for (album in _albums) {
+            for (album in albums) {
                 rs += album.totalSize
             }
             return rs
@@ -223,8 +234,8 @@ class Album(name: String, val path: String) : Collection(name) {
 
     fun toDataClass() : AlbumData {
         val picturePaths = pictures.map { picture -> picture.path }
-        val foldersData = _folders.map { folder -> folder.toDataClass() }
-        val albumsData = _albums.map { album -> album.toDataClass() }
+        val foldersData = folders.map { folder -> folder.toDataClass() }
+        val albumsData = albums.map { album -> album.toDataClass() }
         return AlbumData(name, path, picturePaths, foldersData, albumsData)
     }
 
@@ -239,14 +250,14 @@ class Album(name: String, val path: String) : Collection(name) {
     }
 
     private fun getCollections() : List<Collection> {
-        return ((_albums as List<Collection>) + (_folders as List<Collection>))
+        return ((albums as List<Collection>) + (folders as List<Collection>))
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun getContents(): List<Coverable> {
-        val folders = _folders as List<Coverable>
+        val folders = folders as List<Coverable>
         val pictures = pictures as List<Coverable>
-        val albums = _albums as List<Coverable>
+        val albums = albums as List<Coverable>
         return (folders + albums + pictures)
     }
 

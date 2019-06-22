@@ -9,7 +9,7 @@ import com.github.piasy.biv.view.BigImageView
 import iced.egret.palette.R
 import iced.egret.palette.model.Picture
 
-class PicturePagerAdapter(private val pictures: MutableList<Picture>) : PagerAdapter() {
+class PicturePagerAdapter(private val pictures: List<Picture>) : PagerAdapter() {
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view == `object` as LinearLayout

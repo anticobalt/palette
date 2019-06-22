@@ -12,6 +12,8 @@ import kotlin.collections.ArrayList
 
 object CollectionManager {
 
+    const val originalExternalStorageName = "emulated"
+
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
     private val mContentsMap = linkedMapOf<String, List<Coverable>>(
@@ -34,6 +36,7 @@ object CollectionManager {
     fun setup(activity: FragmentActivity) {
 
         val root = Storage.retrievedFolders.firstOrNull()
+        val newExteralStorageName = activity.getString(R.string.external_storage_name)
 
         if (root != null) {
 
@@ -46,11 +49,16 @@ object CollectionManager {
                 mCollections.add(practicalRoot)
             }
 
-            mCollections[0].name = activity.getString(R.string.external_storage_name)
-            mCollectionStack.push(mCollections[0])
-
+            val externalStorage = mCollections.find {collection -> collection.name == originalExternalStorageName }
+            if (externalStorage != null) {  // should always be true
+                externalStorage.name = newExteralStorageName
+                mCollections.remove(externalStorage)
+                mCollections.add(0, externalStorage)
+                mCollectionStack.push(externalStorage)
+            }
         }
 
+        mCollectionStack.push(mCollections[0])
         mCollections.addAll(Storage.retrievedAlbums)
 
     }
@@ -178,9 +186,9 @@ object CollectionManager {
         mCollectionStack.clear()
     }
 
-    fun getCurrentCollectionPictures() : MutableList<Picture> {
+    fun getCurrentCollectionPictures() : List<Picture> {
         val collection = currentCollection
-        var pictures : MutableList<Picture> = ArrayList()
+        var pictures : List<Picture> = listOf()
         if (collection != null) {
             pictures = collection.pictures
         }
@@ -196,6 +204,7 @@ object CollectionManager {
         var f = folder
         if (f.name == "emulated") {
             f = f.folders.first()
+            f.name = "emulated"
         }
         return f
     }

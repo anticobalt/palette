@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.input.input
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import iced.egret.palette.R
@@ -20,6 +18,7 @@ import iced.egret.palette.recyclerview_component.CollectionViewSection
 import iced.egret.palette.recyclerview_component.GridSectionSpanSizeLookup
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
@@ -64,15 +63,7 @@ class CollectionViewFragment : MainFragment() {
     private fun onFabClick() {
         val collection = CollectionManager.currentCollection
         if (collection is Album) {
-            MaterialDialog(this.context!!).show {
-                title(R.string.title_album_form)
-                input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH) {
-                    _, charSequence ->
-                    createNewAlbum(charSequence.toString())
-                }
-                positiveButton(R.string.action_create_album)
-                negativeButton()
-            }
+            DialogGenerator.createAlbum(context!!, ::createNewAlbum)
         }
         else {
             Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -96,8 +87,8 @@ class CollectionViewFragment : MainFragment() {
     /**
      * Adds new album to current Collection
      */
-    private fun createNewAlbum(name: String) {
-        CollectionManager.createNewAlbum(name, addToCurrent = true)
+    private fun createNewAlbum(name: CharSequence) {
+        CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
         adapter.update()
     }
 

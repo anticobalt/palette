@@ -90,12 +90,12 @@ object CollectionManager {
         return newAlbum
     }
 
-    fun deleteCollectionsByPosition(positions: ArrayList<Long>) {
+    fun deleteAlbumsByPosition(positions: ArrayList<Long>) {
         val indices = positions.toSet()
-        val remainingCollections = ArrayList<Collection>()
-        for (i in 0 until mCollections.size) {
+        val remainingCollections : MutableList<Collection> = folders.toMutableList()
+        for (i in 0 until albums.size) {
             if (!indices.contains(i.toLong())) {
-                remainingCollections.add(mCollections[i])
+                remainingCollections.add(albums[i])
             }
         }
         mCollections = remainingCollections

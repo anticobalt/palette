@@ -8,14 +8,12 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.input.input
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
-import iced.egret.palette.model.Album
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.recyclerview_component.PinnedCollectionsSection
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
@@ -99,36 +97,26 @@ class PinnedCollectionsFragment : MainFragment() {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
+
+        val context = context!!
+
+        when (item.itemId) {
             R.id.actionPinnedCollectionsCreateAlbum -> {
-                MaterialDialog(this.context!!).show {
-                    title(R.string.title_album_form)
-                    input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH) {
-                        _, charSequence ->
-                            onCreateNewAlbum(charSequence)
-                    }
-                    positiveButton(R.string.action_create_album)
-                    negativeButton()
-                }
-                true
+                DialogGenerator.createAlbum(context, onConfirm = ::onCreateNewAlbum)
             }
             R.id.actionPinnedCollectionsDeleteAlbum -> {
-                MaterialDialog(this.context!!).show {
-                    title(R.string.title_delete_album_confirm)
-                    message(R.string.message_delete_album_confirm)
-                    negativeButton()
-                    positiveButton(R.string.action_delete_albums) {
-                        val activeSelector = mSelectors.find { s -> s.active } ?: return@positiveButton
-                        CollectionManager.deleteCollectionsByPosition(activeSelector.selectedItemIds)
-                        activeSelector.deactivate()
-                        mAdapter.updateCollections()
-                    }
+                val callback = callback@ {
+                    val activeSelector = mSelectors.find { s -> s.active } ?: return@callback
+                    CollectionManager.deleteAlbumsByPosition(activeSelector.selectedItemIds)
+                    activeSelector.deactivate()
+                    mAdapter.updateCollections()
                 }
-                true
+                DialogGenerator.deleteAlbum(context, onConfirm = callback)
             }
-            R.id.actionPinnedCollectionsSettings -> true
             else -> super.onOptionsItemSelected(item)
         }
+
+        return true
     }
 
     /**

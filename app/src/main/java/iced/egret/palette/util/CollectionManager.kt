@@ -149,6 +149,24 @@ object CollectionManager {
     }
 
     /**
+     * Remove given contents from current album. References may still exist in other collections.
+     */
+    fun removeContentFromCurrentAlbum(contents: List<Coverable>) {
+        if (currentCollection !is Album) return
+
+        val album = currentCollection as Album
+        for (content in contents) {
+            when (content) {
+                is Folder -> album.removeFolder(content)
+                is Album -> album.removeAlbum(content)
+                is Picture -> album.removePicture(content)
+            }
+        }
+
+        Storage.saveAlbumsToDisk(albums)
+    }
+
+    /**
      * Launch an item by updating current collection, or creating activity.
      *
      * @return Adapter needs to be updated (true) or not (false)

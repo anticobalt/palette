@@ -73,6 +73,11 @@ abstract class Collection(override var name: String) : Coverable {
         size += newPictures.size
     }
 
+    open fun removePicture(picture: Picture) {
+        _pictures.remove(picture)
+        size -= 1
+    }
+
     private fun setCoverUri() {
         val uri = getOnePictureUri()
         if (uri != null) {
@@ -159,6 +164,11 @@ class Folder(name: String, val path: String, subFolders: MutableList<Folder> = m
     fun addFolders(newFolders: MutableList<Folder>) {
         _folders.addAll(newFolders)
         size += newFolders.size
+    }
+
+    fun removeFolder(folder: Folder) {
+        _folders.remove(folder)
+        size -= 1
     }
 
 }
@@ -289,6 +299,16 @@ class Album(name: String, val path: String) : Collection(name) {
     @Suppress("UNCHECKED_CAST")
     fun addAlbums(newAlbums: List<Album>) {
         addCollections(newAlbums as List<Collection>, _albums as MutableList<Collection>)
+    }
+
+    fun removeFolder(folder: Folder) {
+        _folders.remove(folder)
+        size -= 1
+    }
+
+    fun removeAlbum(album: Album) {
+        _albums.remove(album)
+        size -= 1
     }
 
 }

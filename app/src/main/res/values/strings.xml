@@ -17,7 +17,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_hide">Hide</string>
     <string name="action_create_album">Create Album</string>
-    <string name="action_add_to_album">Add to New Album</string>
+    <string name="action_add_to_album">Add to Album</string>
     <string name="action_remove_from_album">Remove from this Album</string>
 
     <string name="label_album_actions">Album Actions</string>

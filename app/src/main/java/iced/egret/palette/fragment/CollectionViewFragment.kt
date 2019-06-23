@@ -143,11 +143,21 @@ class CollectionViewFragment : MainFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        // Get selected items, if applicable
+        var coverables = listOf<Coverable>()
+        when (item.itemId) {
+            R.id.actionViewCollectionAddToAlbum,
+            R.id.actionViewCollectionRemoveFromAlbum,
+            R.id.actionViewCollectionDelete -> {
+                // null if no active selector, which should never happen
+                coverables = getSelectedCoverables() ?: return false
+            }
+        }
+
+        // reaching here assumes (if applicable) active selector exists and coverables is not empty
         return when (item.itemId) {
             R.id.actionViewCollectionAddToAlbum -> {
-                // null if no active selector
-                val coverables = getSelectedCoverables() ?: return false
-
                 DialogGenerator.addToAlbum(context!!) { indices, albums ->
                     val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
                     CollectionManager.addContentToAllAlbums(coverables, destinations)
@@ -156,12 +166,22 @@ class CollectionViewFragment : MainFragment() {
                             "Added ${coverables.size} ${mActiveSection.title.toLowerCase()} to ${destinations.size} albums.",
                             Toast.LENGTH_SHORT
                     ).show()
-                    mActiveSelector!!.deactivate()  // would previously return if null
+                    mActiveSelector!!.deactivate()
                     MainFragmentManager.notifyAlbumUpdateFromCollectionView()
                 }
                 true
             }
-            R.id.actionViewCollectionRemoveFromAlbum -> true
+            R.id.actionViewCollectionRemoveFromAlbum -> {
+                CollectionManager.removeContentFromCurrentAlbum(coverables)
+                Toast.makeText(
+                        context,
+                        "Removed ${coverables.size} ${mActiveSection.title.toLowerCase()}.",
+                        Toast.LENGTH_SHORT
+                ).show()
+                mActiveSelector!!.deactivate()
+                mAdapter.update()
+                true
+            }
             R.id.actionViewCollectionDelete -> {
                 true
             }

@@ -161,7 +161,8 @@ class CollectionViewFragment : MainFragment() {
                 }
                 true
             }
-            R.id.actionViewCollectionDeleteAlbum -> {
+            R.id.actionViewCollectionRemoveFromAlbum -> true
+            R.id.actionViewCollectionDelete -> {
                 true
             }
             R.id.actionViewCollectionSettings -> true
@@ -213,15 +214,16 @@ class CollectionViewFragment : MainFragment() {
         section as CollectionViewSection  // cast
         val editMenu = mEditToolbar.menu
         when (section.title.toLowerCase()) {
-            "folders" -> {
+            "folders", "pictures" -> {
+                editMenu.findItem(R.id.actionViewCollectionAlbumActions).isVisible = true
                 editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = true
+                editMenu.findItem(R.id.actionViewCollectionDelete).isVisible = true
+                if (CollectionManager.currentCollection is Album) {
+                    editMenu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = true
+                }
             }
             "albums" -> {
-                editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = true
-                editMenu.findItem(R.id.actionViewCollectionDeleteAlbum).isVisible = true
-            }
-            "pictures" -> {
-                editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = true
+                editMenu.findItem(R.id.actionViewCollectionDelete).isVisible = true
             }
         }
     }
@@ -234,8 +236,10 @@ class CollectionViewFragment : MainFragment() {
         mDefaultToolbar.visibility = Toolbar.VISIBLE
 
         val editMenu = mEditToolbar.menu
+        editMenu.findItem(R.id.actionViewCollectionAlbumActions).isVisible = false
         editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = false
-        editMenu.findItem(R.id.actionViewCollectionDeleteAlbum).isVisible = false
+        editMenu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = false
+        editMenu.findItem(R.id.actionViewCollectionDelete).isVisible = false
 
         // already does notifyDataSetChanged(), so don't call it again to reset views
         mAdapter.showAllSections()

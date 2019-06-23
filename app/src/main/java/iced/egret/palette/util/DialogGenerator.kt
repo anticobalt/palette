@@ -29,7 +29,7 @@ object DialogGenerator {
             title(R.string.title_delete_album_confirm)
             message(R.string.message_delete_album_confirm)
             negativeButton()
-            positiveButton(R.string.action_delete_albums) {
+            positiveButton(R.string.action_delete) {
                 onConfirm()
             }
         }

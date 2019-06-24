@@ -15,7 +15,7 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
-import iced.egret.palette.recyclerview_component.CollectionViewSection
+import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.recyclerview_component.GridSectionSpanSizeLookup
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.util.CollectionManager

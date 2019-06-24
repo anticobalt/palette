@@ -1,38 +1,36 @@
-package iced.egret.palette.recyclerview_component
+package iced.egret.palette.section
 
 import android.graphics.Color
 import android.view.View
-import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import iced.egret.palette.R
-import iced.egret.palette.adapter.PinnedCollectionsAdapter
-import iced.egret.palette.fragment.CollectionViewFragment
+import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.recyclerview_component.CoverableClickListener
+import iced.egret.palette.recyclerview_component.LongClickSelector
+import iced.egret.palette.recyclerview_component.SectionHeaderViewHolder
 import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.MainFragmentManager
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
-class PinnedCollectionsSection(val title: String,
-                               list: List<Coverable>,
-                               private val adapter: PinnedCollectionsAdapter,
-                               val fragment: MainFragment)
-    : StatelessSection(SectionParameters.builder()
-        .itemResourceId(R.layout.item_pinned_collections)
-        .headerResourceId(R.layout.header_section_view_collection)
-        .build()) {
+class CollectionViewSection(val title: String,
+                            list: List<Coverable>,
+                            private val adapter: CollectionViewAdapter,
+                            fragment: MainFragment) :
+        StatelessSection(SectionParameters.builder()
+                .itemResourceId(R.layout.item_view_collection)
+                .headerResourceId(R.layout.header_section_view_collection)
+                .build()) {
 
-    /**
-     * Responds to click actions, by changing display or launching items.
-     */
-    class ActionClickListener : CoverableClickListener() {
+    class OnItemClickListener : CoverableClickListener() {
 
         private var item: Coverable? = null
         private var position: Int? = null
+        private var section: CollectionViewSection? = null
         private var holder: CoverViewHolder? = null
-        private var section: PinnedCollectionsSection? = null
 
         private var ready = false
 
@@ -40,7 +38,7 @@ class PinnedCollectionsSection(val title: String,
             this.item = item
             this.position = position
             this.holder = holder
-            this.section = section as PinnedCollectionsSection
+            this.section = section as CollectionViewSection
             this.ready = true
         }
 
@@ -53,27 +51,11 @@ class PinnedCollectionsSection(val title: String,
         }
 
         /**
-         * Handles the adapter updating, because the adapter to update does not belong
-         * to the current fragment.
-         *
          *@return Adapter data changed (true) or didn't (false)
          */
         override fun onItemDefaultClick(selectedItemIds: ArrayList<Long>) : Boolean {
             if (!ready) return false
-
-            val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
-            val fragment =
-                    MainFragmentManager.getFragmentByIndex(fragmentIndex) as CollectionViewFragment
-            val viewPager = fragment.activity?.findViewById<ViewPager>(R.id.viewpagerMainFragments)
-
-            // FIXME: animate slower e.g https://stackoverflow.com/a/28297483
-            viewPager?.setCurrentItem(fragmentIndex, true)
-            CollectionManager.clearStack()
-            CollectionManager.launch(item!!, holder!!)  // == true
-            fragment.setDefaultToolbarTitle()
-
-            fragment.notifyChanges()
-            return true
+            return CollectionManager.launch(item!!, holder!!, position!!)
         }
 
         override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {
@@ -83,9 +65,8 @@ class PinnedCollectionsSection(val title: String,
             if (positionLong in selectedItemIds) selectedItemIds.remove(positionLong)
             else selectedItemIds.add(positionLong)
 
-            section!!.indicateSelectionStatus(holder!!, position!!, selectedItemIds)
+            section!!.indicateSelection(holder!!, position!!, selectedItemIds)
             section!!.isolateSelf(true)
-
         }
 
         override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
@@ -97,9 +78,9 @@ class PinnedCollectionsSection(val title: String,
 
     }
 
-    private val mListener = ActionClickListener()
+    private val mListener = OnItemClickListener()
     val selector = LongClickSelector(fragment, this)
-    val items = list.toMutableList()
+    val items = list.toMutableList()  // must make a copy to prevent side-effects
 
     override fun getContentItemsTotal(): Int {
         return items.size
@@ -115,57 +96,51 @@ class PinnedCollectionsSection(val title: String,
     }
 
     override fun getItemViewHolder(view: View): RecyclerView.ViewHolder {
-        return CoverViewHolder(view, imageViewId = R.id.ivPinnedCollectionCover, textViewId = R.id.tvPinnedCollectionLabel)
+        return CoverViewHolder(view, imageViewId = R.id.ivCollectionItemImage, textViewId = R.id.tvCollectionItemText)
     }
 
     override fun onBindItemViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
 
         holder as CoverViewHolder
         val item = items[position]
-        buildHolder(holder, item)
+        buildItemHolder(holder, item)
 
         // Update selection visuals to match state
-        indicateSelectionStatus(holder, position, selector.selectedItemIds)
+        indicateSelection(holder, position, selector.selectedItemIds)
 
         holder.itemView.setOnClickListener{
-            selector.onItemClick(item, position, holder, mListener)
+            val dataChanged = selector.onItemClick(item, position, holder, mListener)
+            if (dataChanged) {
+                adapter.update()
+            }
         }
-        holder.itemView.setOnLongClickListener {
+        holder.itemView.setOnLongClickListener{
             selector.onItemLongClick(item, position, holder, mListener)
         }
 
     }
 
-    /**
-     * Fill holder with mandatory elements
-     */
-    private fun buildHolder(holder: CoverViewHolder, item: Coverable) {
-
+    private fun buildItemHolder(holder: CoverViewHolder, item: Coverable) {
         item.loadCoverInto(holder)
         holder.tvItem?.text = item.toString()
-
-        // Darken a little, so that white text is readable
-        // https://stackoverflow.com/a/15896811
-        holder.ivItem?.setColorFilter(
-                Color.rgb(200, 200, 200),
-                android.graphics.PorterDuff.Mode.MULTIPLY
-        )
     }
 
     /**
-     * Style holder to match selection status as described in selectedItemIds
+     * Show a checkmark + black tint if item is selected, otherwise reset visuals.
      */
-    fun indicateSelectionStatus(holder: CoverViewHolder, position: Int, selectedItemIds: ArrayList<Long>) {
+    fun indicateSelection(holder: CoverViewHolder, position: Int, selectedItemIds: ArrayList<Long>) {
 
-        val button = holder.itemView.findViewById<ImageButton>(R.id.btnSelect)
-
+        val statusView = holder.itemView.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
         if (position.toLong() in selectedItemIds) {
-            button.visibility = View.VISIBLE
+            statusView.visibility = View.VISIBLE
+            holder.ivItem?.setColorFilter(
+                    Color.rgb(200, 200, 200),
+                    android.graphics.PorterDuff.Mode.MULTIPLY
+            )
+        } else {
+            statusView.visibility = View.GONE
+            holder.ivItem?.colorFilter = null
         }
-        else {
-            button.visibility = View.INVISIBLE
-        }
-
     }
 
     /**

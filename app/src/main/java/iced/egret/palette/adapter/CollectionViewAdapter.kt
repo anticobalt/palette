@@ -1,7 +1,7 @@
 package iced.egret.palette.adapter
 
 import iced.egret.palette.model.Coverable
-import iced.egret.palette.recyclerview_component.CollectionViewSection
+import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.util.CollectionManager
 import io.github.luizgrp.sectionedrecyclerviewadapter.Section
 

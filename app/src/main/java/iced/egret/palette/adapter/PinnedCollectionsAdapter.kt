@@ -1,7 +1,7 @@
 package iced.egret.palette.adapter
 
 import iced.egret.palette.model.Collection
-import iced.egret.palette.recyclerview_component.PinnedCollectionsSection
+import iced.egret.palette.section.PinnedCollectionsSection
 import iced.egret.palette.util.CollectionManager
 import io.github.luizgrp.sectionedrecyclerviewadapter.Section
 

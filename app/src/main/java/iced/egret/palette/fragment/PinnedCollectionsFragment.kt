@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
 import iced.egret.palette.recyclerview_component.LongClickSelector
-import iced.egret.palette.recyclerview_component.PinnedCollectionsSection
+import iced.egret.palette.section.PinnedCollectionsSection
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter

@@ -91,19 +91,25 @@ object CollectionManager {
         return mContentsMap
     }
 
-    fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Album {
+    /**
+     * @return Relative position of new album amongst other albums
+     */
+    fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Int {
         val newAlbum : Album
+        val position : Int
         if (addToCurrent && currentCollection is Album) {
             val currentAlbum = currentCollection as Album
             newAlbum = Album(name, path = "${currentAlbum.path}/$name")
+            position = currentAlbum.albums.size
             currentAlbum.addAlbum(newAlbum)
         }
         else {
             newAlbum = Album(name, path = name)
+            position = mCollections.size
             mCollections.add(newAlbum)
         }
         Storage.saveAlbumsToDisk(albums)
-        return newAlbum
+        return position
     }
 
     fun deleteAlbumsByPosition(positions: ArrayList<Long>) {

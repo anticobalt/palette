@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -15,6 +14,7 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.recyclerview_component.AnimatedGridLayoutManager
 import iced.egret.palette.recyclerview_component.GridSectionSpanSizeLookup
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.section.CollectionViewSection
@@ -23,6 +23,7 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
 
 class CollectionViewFragment : MainFragment() {
 
@@ -109,8 +110,8 @@ class CollectionViewFragment : MainFragment() {
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
 
-            val manager = GridLayoutManager(activity, 3)
-            mAdapter = CollectionViewAdapter(mContents)
+            val manager = AnimatedGridLayoutManager(activity!!, 3)
+            mAdapter = CollectionViewAdapter(mContents, mCollectionRecyclerView)
 
             manager.spanSizeLookup = GridSectionSpanSizeLookup(mAdapter, 3)
 
@@ -124,6 +125,7 @@ class CollectionViewFragment : MainFragment() {
 
             mCollectionRecyclerView.layoutManager = manager
             mCollectionRecyclerView.adapter = mAdapter
+            mCollectionRecyclerView.itemAnimator = FadeInAnimator()
 
         }
     }
@@ -194,8 +196,8 @@ class CollectionViewFragment : MainFragment() {
      * Adds new album to current Collection
      */
     private fun createNewAlbum(name: CharSequence) {
-        CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
-        mAdapter.update()
+        val pos = CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
+        mAdapter.updateNewAlbum(listOf(pos))
     }
 
     /**

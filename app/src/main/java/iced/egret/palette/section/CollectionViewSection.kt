@@ -60,27 +60,42 @@ class CollectionViewSection(val title: String,
 
         override fun onItemDefaultLongClick(selectedItemIds: ArrayList<Long>) {
             if (!ready) return
-
-            val positionLong = position!!.toLong()
-            if (positionLong in selectedItemIds) selectedItemIds.remove(positionLong)
-            else selectedItemIds.add(positionLong)
-
-            section!!.indicateSelection(holder!!, position!!, selectedItemIds)
+            selectAtPosition(selectedItemIds)
             section!!.isolateSelf(true)
         }
 
         override fun onItemAlternateClick(selectedItemIds: ArrayList<Long>) {
             if (!ready) return
-            onItemDefaultLongClick(selectedItemIds)
+            selectAtPosition(selectedItemIds)
         }
 
         override fun onItemAlternateLongClick(selectedItemIds: ArrayList<Long>) {}
+
+        private fun selectAtPosition(selectedItemIds: ArrayList<Long>) {
+            val positionLong = position!!.toLong()
+            if (positionLong in selectedItemIds) selectedItemIds.remove(positionLong)
+            else selectedItemIds.add(positionLong)
+
+            section!!.indicateSelection(holder!!, position!!, selectedItemIds)
+        }
 
     }
 
     private val mListener = OnItemClickListener()
     val selector = LongClickSelector(fragment, this)
     val items = list.toMutableList()  // must make a copy to prevent side-effects
+    private var backupItems : MutableList<Coverable>? = null
+
+    fun backup() {
+        backupItems = items.toMutableList()
+    }
+
+    fun restore() {
+        val new = backupItems?.toList() ?: return
+        items.clear()
+        items.addAll(new)
+        backupItems = null
+    }
 
     override fun getContentItemsTotal(): Int {
         return items.size

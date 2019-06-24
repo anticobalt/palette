@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
+import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -53,15 +54,19 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    /*
+
     override fun onBackPressed() {
-        val currentFragmentIndex = viewpagerMainFragments.currentItem
-        val currentFragment = MainFragmentManager.getFragmentByIndex(currentFragmentIndex)
+        var index = MainFragmentManager.COLLECTION_CONTENTS
+        if (slidingPaneMain.isOpen) {
+            index = MainFragmentManager.PINNED_COLLECTIONS
+        }
+
+        val currentFragment = MainFragmentManager.fragments[index] as MainFragment
         val success = (currentFragment).onBackPressed()
         if (!success) {
             moveTaskToBack(true)  // don't destroy
         }
-    }*/
+    }
 
     /**
      * Setup up models, visuals, and fragments.
@@ -80,8 +85,14 @@ class MainActivity : FragmentActivity() {
         val fragments = MainFragmentManager.fragments.toMutableList()
 
         // bind fragments
-        supportFragmentManager.beginTransaction().replace(R.id.frag1, fragments[0]).commit()
-        supportFragmentManager.beginTransaction().replace(R.id.frag2, fragments[1]).commit()
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.linksFragment, fragments[MainFragmentManager.PINNED_COLLECTIONS])
+                .commit()
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.contentsFragment, fragments[MainFragmentManager.COLLECTION_CONTENTS])
+                .commit()
 
         // convert dp to px: https://stackoverflow.com/a/4275969
         val dpParallax = 60

@@ -4,8 +4,10 @@ import android.graphics.Color
 import android.view.View
 import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PinnedCollectionsAdapter
+import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.recyclerview_component.CoverViewHolder
@@ -64,17 +66,13 @@ class PinnedCollectionsSection(val title: String,
             if (!ready) return false
 
             val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
-            //val fragment =
-            //        MainFragmentManager.getFragmentByIndex(fragmentIndex) as CollectionViewFragment
-            //val viewPager = fragment.activity?.findViewById<ViewPager>(R.id.viewpagerMainFragments)
+            val fragment = MainFragmentManager.fragments[fragmentIndex] as CollectionViewFragment
+            fragment.activity?.findViewById<SlidingPaneLayout>(R.id.slidingPaneMain)?.closePane()
 
-            // FIXME: animate slower e.g https://stackoverflow.com/a/28297483
-            //viewPager?.setCurrentItem(fragmentIndex, true)
             CollectionManager.clearStack()
             CollectionManager.launch(item!!, holder!!)  // == true
-            //fragment.setDefaultToolbarTitle()
-
-            //fragment.notifyChanges()
+            fragment.setDefaultToolbarTitle()
+            fragment.notifyChanges()
             return true
         }
 

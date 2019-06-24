@@ -15,9 +15,9 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
-import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.recyclerview_component.GridSectionSpanSizeLookup
 import iced.egret.palette.recyclerview_component.LongClickSelector
+import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
@@ -73,7 +73,7 @@ class CollectionViewFragment : MainFragment() {
         mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarViewCollection)
         mEditToolbar = mRootView!!.findViewById(R.id.toolbarViewCollectionEdit)
 
-        mDefaultToolbar.setTitle(R.string.app_name)
+        mDefaultToolbar.title = CollectionManager.currentCollection?.name
         mDefaultToolbar.inflateMenu(R.menu.menu_view_collection)
         mDefaultToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)

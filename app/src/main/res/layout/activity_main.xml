@@ -6,9 +6,23 @@
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity">
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewpagerMainFragments"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+    <androidx.slidingpanelayout.widget.SlidingPaneLayout
+        android:id="@+id/slidingPaneMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Would prefer width to be percentage based, but setting layout_weight
+            prevents pagination and puts everything on one screen. -->
+        <FrameLayout
+            android:layout_width="@dimen/cover_width"
+            android:layout_height="match_parent"
+            android:id="@+id/frag1" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/frag2" />
+
+    </androidx.slidingpanelayout.widget.SlidingPaneLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

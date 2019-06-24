@@ -2,9 +2,7 @@ package iced.egret.palette.util
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
-import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.fragment.PinnedCollectionsFragment
 
 object MainFragmentManager {
@@ -29,13 +27,13 @@ object MainFragmentManager {
     /**
      * A hack: https://stackoverflow.com/a/18611036
      * Good since 2013, so good enough for me
-     */
+     *//*
     fun getFragmentByIndex(index: Int) : MainFragment {
         val fragment = nativeFragmentManager.findFragmentByTag(
                 "android:switcher:" + R.id.viewpagerMainFragments + ":" + index
         )
         return fragment as MainFragment
-    }
+    }*/
 
     fun notifyAlbumUpdateFromCollectionView() {
         (fragments[PINNED_COLLECTIONS] as PinnedCollectionsFragment).notifyChanges()

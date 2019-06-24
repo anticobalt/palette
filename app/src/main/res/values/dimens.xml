@@ -1,4 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="cover_size">128dp</dimen>
+    <dimen name="cover_height">128dp</dimen>
+    <dimen name="cover_width">256dp</dimen>
 </resources>

@@ -2,12 +2,12 @@ package iced.egret.palette.activity
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
-import iced.egret.palette.adapter.MainFragmentPagerAdapter
 import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -53,6 +53,7 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    /*
     override fun onBackPressed() {
         val currentFragmentIndex = viewpagerMainFragments.currentItem
         val currentFragment = MainFragmentManager.getFragmentByIndex(currentFragmentIndex)
@@ -60,7 +61,7 @@ class MainActivity : FragmentActivity() {
         if (!success) {
             moveTaskToBack(true)  // don't destroy
         }
-    }
+    }*/
 
     /**
      * Setup up models, visuals, and fragments.
@@ -77,7 +78,20 @@ class MainActivity : FragmentActivity() {
         MainFragmentManager.setup(supportFragmentManager)
         MainFragmentManager.createFragments()
         val fragments = MainFragmentManager.fragments.toMutableList()
-        viewpagerMainFragments.adapter = MainFragmentPagerAdapter(supportFragmentManager, fragments)
+
+        // bind fragments
+        supportFragmentManager.beginTransaction().replace(R.id.frag1, fragments[0]).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.frag2, fragments[1]).commit()
+
+        // convert px to dp: https://stackoverflow.com/a/4275969
+        val dpParallax = 60
+        val scale = resources.displayMetrics.density
+        val pxParallax = (dpParallax * scale + 0.5f).toInt()
+
+        slidingPaneMain.parallaxDistance = pxParallax  // make left move when scrolling right
+        slidingPaneMain.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
+        slidingPaneMain.setShadowResourceLeft(R.drawable.shadow)
+
     }
 
 }

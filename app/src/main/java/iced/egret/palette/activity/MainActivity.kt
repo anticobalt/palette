@@ -83,7 +83,7 @@ class MainActivity : FragmentActivity() {
         supportFragmentManager.beginTransaction().replace(R.id.frag1, fragments[0]).commit()
         supportFragmentManager.beginTransaction().replace(R.id.frag2, fragments[1]).commit()
 
-        // convert px to dp: https://stackoverflow.com/a/4275969
+        // convert dp to px: https://stackoverflow.com/a/4275969
         val dpParallax = 60
         val scale = resources.displayMetrics.density
         val pxParallax = (dpParallax * scale + 0.5f).toInt()

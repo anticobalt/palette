@@ -75,28 +75,8 @@ class CollectionViewAdapter(contents: MutableList<Coverable>,
             }
         }
 
-        for (index in 0 until toIsolateSection.items.size) {
-            notifyItemChanged(getPositionInAdapter(toIsolateSection, index))
-        }
-
-        //sectionsToRemove.map { section -> section.backup(); section.items.clear() }
         sectionsToRemove.map { section -> super.removeSection(section) }
         notifyItemsRemoved(positionsToRemove)
-        //notifyDataSetChanged()
-
-        /*
-        for (section in sectionsToRemove) {
-            val start = getHeaderPositionInAdapter(section)
-            val count = section.items.size
-            notifyItemRangeRemoved(start, count)
-        }
-        sectionsToRemove.map { section -> super.removeSection(section) }*/
-
-        /*
-        sectionsToRemove.map { section -> super.removeSection(section) }
-        for (index in 0 until mItems.size) {
-            notifyItemChanged(index)
-        }*/
 
     }
 
@@ -112,7 +92,6 @@ class CollectionViewAdapter(contents: MutableList<Coverable>,
     fun showAllSections() {
         mSections.map { section -> super.removeSection(section) }
         mSections.map { section -> super.addSection(section) }
-        //mSections.map { section -> section.restore() }
         notifyDataSetChanged()
     }
 

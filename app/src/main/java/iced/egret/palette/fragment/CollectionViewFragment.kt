@@ -148,12 +148,16 @@ class CollectionViewFragment : MainFragment() {
 
         // Get selected items, if applicable
         var coverables = listOf<Coverable>()
+        val typePlural = mActiveSection.title.toLowerCase()
+        val typeSingular = typePlural.dropLast(1)  // only works on s-appending plurals
+        var typeString = typePlural  // temp so that it compiles
         when (item.itemId) {
             R.id.actionViewCollectionAddToAlbum,
             R.id.actionViewCollectionRemoveFromAlbum,
             R.id.actionViewCollectionDelete -> {
                 // null if no active selector, which should never happen
                 coverables = getSelectedCoverables() ?: return false
+                typeString = if (coverables.size > 1) typePlural else typeSingular
             }
         }
 
@@ -162,10 +166,11 @@ class CollectionViewFragment : MainFragment() {
             R.id.actionViewCollectionAddToAlbum -> {
                 DialogGenerator.addToAlbum(context!!) { indices, albums ->
                     val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
+                    val albumString = if (destinations.size > 1) "albums" else "album"
                     CollectionManager.addContentToAllAlbums(coverables, destinations)
                     Toast.makeText(
                             context,
-                            "Added ${coverables.size} ${mActiveSection.title.toLowerCase()} to ${destinations.size} albums.",
+                            "Added ${coverables.size} $typeString to ${destinations.size} $albumString.",
                             Toast.LENGTH_SHORT
                     ).show()
                     mActiveSelector!!.deactivate()
@@ -174,15 +179,17 @@ class CollectionViewFragment : MainFragment() {
                 true
             }
             R.id.actionViewCollectionRemoveFromAlbum -> {
-                CollectionManager.removeContentFromCurrentAlbum(coverables)
-                Toast.makeText(
-                        context,
-                        "Removed ${coverables.size} ${mActiveSection.title.toLowerCase()}.",
-                        Toast.LENGTH_SHORT
-                ).show()
-                mActiveSelector!!.deactivate()
-                mAdapter.update()
-                MainFragmentManager.notifyAlbumUpdateFromCollectionView()
+                DialogGenerator.removeFromAlbum(context!!, typeString) {
+                    CollectionManager.removeContentFromCurrentAlbum(coverables)
+                    Toast.makeText(
+                            context,
+                            "Removed ${coverables.size} $typeString.",
+                            Toast.LENGTH_SHORT
+                    ).show()
+                    mActiveSelector!!.deactivate()
+                    mAdapter.update()
+                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()
+                }
                 true
             }
             R.id.actionViewCollectionDelete -> {

@@ -48,4 +48,15 @@ object DialogGenerator {
         }
     }
 
+    fun removeFromAlbum(context: Context, type: String, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(R.string.title_remove)
+            message(text = "Remove the selected $type from this album?")
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
+        }
+    }
+
 }

@@ -32,6 +32,7 @@
     <string name="hint_set_name">Name goes here</string>
     <string name="title_delete_album_confirm">Delete Albums?</string>
     <string name="message_delete_album_confirm">This action is irreversible. You are NOT deleting pictures.</string>
+    <string name="title_remove">Remove</string>
 
     <string name="alert_no_folders">No folders found!</string>
     <string name="error_intent_extra">Something went wrong!</string>

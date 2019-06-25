@@ -82,6 +82,8 @@ abstract class Collection(override var name: String) : Coverable {
         val uri = getOnePictureUri()
         if (uri != null) {
             cover["uri"] = uri
+        } else {
+            cover.remove("uri")
         }
     }
 

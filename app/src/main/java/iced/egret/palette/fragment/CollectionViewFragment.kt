@@ -182,6 +182,7 @@ class CollectionViewFragment : MainFragment() {
                 ).show()
                 mActiveSelector!!.deactivate()
                 mAdapter.update()
+                MainFragmentManager.notifyAlbumUpdateFromCollectionView()
                 true
             }
             R.id.actionViewCollectionDelete -> {

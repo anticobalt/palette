@@ -3,8 +3,6 @@ package iced.egret.palette.fragment
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,13 +11,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
-import eu.davidea.flexibleadapter.helpers.ActionModeHelper
 import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.recyclerview_component.CollectionViewItem
 import iced.egret.palette.recyclerview_component.LongClickSelector
+import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
@@ -34,7 +32,7 @@ class CollectionViewFragment :
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener {
 
-    private lateinit var mActionModeHelper: ActionModeHelper
+    private lateinit var mActionModeHelper: ToolbarActionModeHelper
 
     private var mRootView : View? = null
     private lateinit var mDefaultToolbar : Toolbar
@@ -56,59 +54,7 @@ class CollectionViewFragment :
     private var mContentItems = mutableListOf<CollectionViewItem>()
 
     private lateinit var mAdapter: CollectionViewAdapter
-    private lateinit var mAdapterNew: FlexibleAdapter<CollectionViewItem>
-
-    /**
-     * Straight from https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper
-     */
-    private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
-        //this = ActionMode.Callback instance
-        mActionModeHelper = object : ActionModeHelper(mAdapterNew, R.menu.menu_view_collection_edit, this as ActionMode.Callback) {
-            // Override to customize the title
-            override fun updateContextTitle(count: Int) {
-                // You can use the internal mActionMode instance
-                if (mActionMode != null) {
-                    mActionMode.title = if (count == 1)
-                        getString(R.string.action_selected_one, count)
-                    else
-                        getString(R.string.action_selected_many, count)
-                }
-            }
-        }.withDefaultMode(mode)
-    }
-
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        return true
-    }
-
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return true
-    }
-
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return true
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode?) {}
-
-    override fun onItemClick(view: View, position: Int): Boolean {
-        return if (mAdapterNew.mode != SelectableAdapter.Mode.IDLE) {
-            mActionModeHelper.onClick(position)
-        }
-        else {
-            val coverable = mContents[position]
-            val updates = CollectionManager.launch(coverable, position = position, c = this.context)
-            if (updates) {
-                fetchContents()
-                mAdapterNew.updateDataSet(mContentItems)
-            }
-            false
-        }
-    }
-
-    override fun onItemLongClick(position: Int) {
-        mActionModeHelper.onLongClick(this.activity as AppCompatActivity, position)
-    }
+    lateinit var adapter: FlexibleAdapter<CollectionViewItem>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -185,16 +131,66 @@ class CollectionViewFragment :
             }
             */
 
-            mAdapterNew = FlexibleAdapter(mContentItems)
+            adapter = FlexibleAdapter(mContentItems)
 
             mCollectionRecyclerView.layoutManager = manager
-            mCollectionRecyclerView.adapter = mAdapterNew
+            mCollectionRecyclerView.adapter = adapter
 
             initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
-
-            mAdapterNew.addListener(this)
+            adapter.addListener(this)
 
         }
+    }
+
+    /**
+     * Straight from https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper
+     */
+    private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
+        //this = ActionMode.Callback instance
+        mActionModeHelper = object : ToolbarActionModeHelper(adapter, R.menu.menu_view_collection_edit, this as ActionMode.Callback) {
+            // Override to customize the title
+            override fun updateContextTitle(count: Int) {
+                // You can use the internal mActionMode instance
+                mActionMode?.title = if (count == 1)
+                    getString(R.string.action_selected_one, count)
+                else
+                    getString(R.string.action_selected_many, count)
+            }
+        }.withDefaultMode(mode)
+    }
+
+    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+        return true
+    }
+
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu?): Boolean {
+        return true
+    }
+
+    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        return true
+    }
+
+    override fun onDestroyActionMode(mode: ActionMode) {
+    }
+
+    override fun onItemClick(view: View, position: Int): Boolean {
+        return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
+            mActionModeHelper.onClick(position)
+        }
+        else {
+            val coverable = mContents[position]
+            val updates = CollectionManager.launch(coverable, position = position, c = this.context)
+            if (updates) {
+                fetchContents()
+                adapter.updateDataSet(mContentItems)
+            }
+            false
+        }
+    }
+
+    override fun onItemLongClick(position: Int) {
+        mActionModeHelper.onLongClick(mDefaultToolbar, position)
     }
 
     /**

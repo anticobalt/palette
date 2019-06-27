@@ -88,6 +88,7 @@ class CollectionViewSection(val title: String,
 
     fun backup() {
         backupItems = items.toMutableList()
+        items.clear()
     }
 
     fun restore() {

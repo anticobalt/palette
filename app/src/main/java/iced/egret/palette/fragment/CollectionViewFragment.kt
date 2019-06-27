@@ -111,7 +111,7 @@ class CollectionViewFragment : MainFragment() {
         if (mContents.isNotEmpty()) {
 
             val manager = AnimatedGridLayoutManager(activity!!, 3)
-            mAdapter = CollectionViewAdapter(mContents, mCollectionRecyclerView)
+            mAdapter = CollectionViewAdapter(mCollectionRecyclerView)
 
             manager.spanSizeLookup = GridSectionSpanSizeLookup(mAdapter, 3)
 
@@ -271,7 +271,7 @@ class CollectionViewFragment : MainFragment() {
         editMenu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = false
         editMenu.findItem(R.id.actionViewCollectionDelete).isVisible = false
 
-        // already does notifyDataSetChanged(), so don't call it again to reset views
+        // already notifies adapter, so don't do it again to reset views
         mAdapter.showAllSections()
     }
 

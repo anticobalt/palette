@@ -58,7 +58,6 @@ object CollectionManager {
             }
         }
 
-        mCollectionStack.push(mCollections[0])
         mCollections.addAll(Storage.retrievedAlbums)
 
     }

@@ -181,10 +181,7 @@ class CollectionViewFragment :
         else {
             val coverable = mContents[position]
             val updates = CollectionManager.launch(coverable, position = position, c = this.context)
-            if (updates) {
-                fetchContents()
-                adapter.updateDataSet(mContentItems)
-            }
+            if (updates) refreshData()
             false
         }
     }
@@ -283,17 +280,6 @@ class CollectionViewFragment :
      * @return handled here (true) or not (false)
      */
     override fun onBackPressed() : Boolean {
-
-        var handledBySelector = false
-
-        /**
-         * Try to find one selector to handle
-         */
-        for (selector in mSelectors) {
-            handledBySelector = handledBySelector || selector.onBackPressed()
-            if (handledBySelector) return true
-        }
-
         return returnToParentCollection()
     }
 
@@ -344,7 +330,7 @@ class CollectionViewFragment :
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null){
-            mAdapter.update()
+            refreshData()
             true
         }
         else {
@@ -359,6 +345,17 @@ class CollectionViewFragment :
         mAdapter.update()
     }
 
+    /**
+     * Refresh the content shown in the recycler view.
+     */
+    private fun refreshData() {
+        fetchContents()
+        adapter.updateDataSet(mContentItems)
+    }
+
+    /**
+     * Get new data from Collection Manager.
+     */
     private fun fetchContents() {
         mContents.clear()
         mContentItems.clear()

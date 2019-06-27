@@ -1,21 +1,24 @@
 package iced.egret.palette.fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Visibility
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import eu.davidea.flexibleadapter.FlexibleAdapter
+import eu.davidea.flexibleadapter.SelectableAdapter
+import eu.davidea.flexibleadapter.helpers.ActionModeHelper
 import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
-import iced.egret.palette.recyclerview_component.AnimatedGridLayoutManager
-import iced.egret.palette.recyclerview_component.GridSectionSpanSizeLookup
+import iced.egret.palette.recyclerview_component.CollectionViewItem
 import iced.egret.palette.recyclerview_component.LongClickSelector
 import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.util.CollectionManager
@@ -23,9 +26,15 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
-import jp.wasabeef.recyclerview.animators.FadeInAnimator
 
-class CollectionViewFragment : MainFragment() {
+
+class CollectionViewFragment :
+        MainFragment(),
+        ActionMode.Callback,
+        FlexibleAdapter.OnItemClickListener,
+        FlexibleAdapter.OnItemLongClickListener {
+
+    private lateinit var mActionModeHelper: ActionModeHelper
 
     private var mRootView : View? = null
     private lateinit var mDefaultToolbar : Toolbar
@@ -43,9 +52,63 @@ class CollectionViewFragment : MainFragment() {
     private val mActiveSection: CollectionViewSection
         get() = mSections[mSelectors.indexOf(mActiveSelector)]
 
-    private lateinit var mContents : MutableList<Coverable>
+    private var mContents = mutableListOf<Coverable>()
+    private var mContentItems = mutableListOf<CollectionViewItem>()
 
     private lateinit var mAdapter: CollectionViewAdapter
+    private lateinit var mAdapterNew: FlexibleAdapter<CollectionViewItem>
+
+    /**
+     * Straight from https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper
+     */
+    private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
+        //this = ActionMode.Callback instance
+        mActionModeHelper = object : ActionModeHelper(mAdapterNew, R.menu.menu_view_collection_edit, this as ActionMode.Callback) {
+            // Override to customize the title
+            override fun updateContextTitle(count: Int) {
+                // You can use the internal mActionMode instance
+                if (mActionMode != null) {
+                    mActionMode.title = if (count == 1)
+                        getString(R.string.action_selected_one, count)
+                    else
+                        getString(R.string.action_selected_many, count)
+                }
+            }
+        }.withDefaultMode(mode)
+    }
+
+    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+        return true
+    }
+
+    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        return true
+    }
+
+    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        return true
+    }
+
+    override fun onDestroyActionMode(mode: ActionMode?) {}
+
+    override fun onItemClick(view: View, position: Int): Boolean {
+        return if (mAdapterNew.mode != SelectableAdapter.Mode.IDLE) {
+            mActionModeHelper.onClick(position)
+        }
+        else {
+            val coverable = mContents[position]
+            val updates = CollectionManager.launch(coverable, position = position, c = this.context)
+            if (updates) {
+                fetchContents()
+                mAdapterNew.updateDataSet(mContentItems)
+            }
+            false
+        }
+    }
+
+    override fun onItemLongClick(position: Int) {
+        mActionModeHelper.onLongClick(this.activity as AppCompatActivity, position)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -53,7 +116,7 @@ class CollectionViewFragment : MainFragment() {
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
 
-        mContents = CollectionManager.contents.toMutableList()
+        fetchContents()
 
         mFloatingActionButton.setOnClickListener {
             onFabClick()
@@ -110,11 +173,9 @@ class CollectionViewFragment : MainFragment() {
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
 
-            val manager = AnimatedGridLayoutManager(activity!!, 3)
-            mAdapter = CollectionViewAdapter(mCollectionRecyclerView)
+            val manager = GridLayoutManager(activity, 3)
 
-            manager.spanSizeLookup = GridSectionSpanSizeLookup(mAdapter, 3)
-
+            /*
             val contentsMap = CollectionManager.getContentsMap()
             for ((type, coverables) in contentsMap) {
                 val section = CollectionViewSection(type.capitalize(), coverables, mAdapter, this)
@@ -122,10 +183,16 @@ class CollectionViewFragment : MainFragment() {
                 mSelectors.add(section.selector)
                 mAdapter.addSection(section)
             }
+            */
+
+            mAdapterNew = FlexibleAdapter(mContentItems)
 
             mCollectionRecyclerView.layoutManager = manager
-            mCollectionRecyclerView.adapter = mAdapter
-            mCollectionRecyclerView.itemAnimator = FadeInAnimator()
+            mCollectionRecyclerView.adapter = mAdapterNew
+
+            initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
+
+            mAdapterNew.addListener(this)
 
         }
     }
@@ -294,6 +361,13 @@ class CollectionViewFragment : MainFragment() {
      */
     fun notifyChanges() {
         mAdapter.update()
+    }
+
+    private fun fetchContents() {
+        mContents.clear()
+        mContentItems.clear()
+        mContents.addAll(CollectionManager.contents.toMutableList())
+        mContents.map {content -> mContentItems.add(CollectionViewItem(content))}
     }
 
 }

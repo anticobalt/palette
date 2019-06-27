@@ -177,7 +177,9 @@ object CollectionManager {
      *
      * @return Adapter needs to be updated (true) or not (false)
      */
-    fun launch(item: Coverable, holder: CoverViewHolder, position: Int = -1) : Boolean {
+    fun launch(item: Coverable, holder: CoverViewHolder? = null, position: Int = -1, c: Context? = null) : Boolean {
+        var context = c  // TODO: remove backwards compatibility
+
         if (!item.terminal) {
             if (item as? Collection != null) {
                 currentCollection = item
@@ -186,7 +188,8 @@ object CollectionManager {
         }
         else {
             if (item as? TerminalCoverable != null) {
-                val context : Context? = holder.ivItem?.context
+                if (holder != null) context = holder.ivItem?.context
+
                 val intent = Intent(context, item.activity)
                 val key = context?.getString(R.string.intent_item_key)
                 intent.putExtra(key, position)

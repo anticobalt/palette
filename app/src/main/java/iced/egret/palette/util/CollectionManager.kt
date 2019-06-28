@@ -3,12 +3,12 @@ package iced.egret.palette.util
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.recyclerview_component.CoverableItem
 import iced.egret.palette.recyclerview_component.SectionHeaderItem
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,15 +39,35 @@ object CollectionManager {
     /**
      * Used by FlexibleAdapter to sort sections with Coverables
      */
-    object SectionComparator : Comparator<IFlexible<RecyclerView.ViewHolder>> {
-        override fun compare(p0: IFlexible<RecyclerView.ViewHolder>?, p1: IFlexible<RecyclerView.ViewHolder>?): Int {
+    object SectionComparator : Comparator<IFlexible<*>> {
+
+        // Sort by same order as in mContentsMap
+        override fun compare(p0: IFlexible<*>, p1: IFlexible<*>): Int {
             val types = mContentsMap.keys.map {key -> key.toLowerCase()}
-            val title0 = (p0 as? SectionHeaderItem)?.title ?: return 0
-            val title1 = (p1 as? SectionHeaderItem)?.title ?: return 0
+            var title0 = ""
+            var title1 = ""
+
+            if (p0 is SectionHeaderItem && p1 is SectionHeaderItem) {
+                title0 = p0.title.toLowerCase()
+                title1 = p1.title.toLowerCase()
+            }
+            else if (p0 is CoverableItem && p1 is CoverableItem) {
+                title0 = p0.header.title.toLowerCase()
+                title1 = p1.header.title.toLowerCase()
+            }
+            else if (p0 is SectionHeaderItem && p1 is CoverableItem){
+                title0 = p0.title.toLowerCase()
+                title1 = p1.header.title.toLowerCase()
+            }
+            else if (p0 is CoverableItem && p1 is SectionHeaderItem){
+                title0 = p0.header.title.toLowerCase()
+                title1 = p1.title.toLowerCase()
+            }
+
             return when {
-                types.indexOf(title0) < types.indexOf(title1) -> 1
+                types.indexOf(title0) < types.indexOf(title1) -> -1
                 types.indexOf(title0) == types.indexOf(title1) -> 0
-                else -> -1
+                else -> 1
             }
         }
     }

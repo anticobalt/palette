@@ -14,10 +14,13 @@ import eu.davidea.flexibleadapter.utils.Log
 /**
  * A copy of ActionModeHelper (from FlexibleAdapter) that uses Toolbar
  * instead of Activity to start Action Mode.
+ * https://github.com/davideas/FlexibleAdapter
  *
  * Literally copy-pasted the original class, converted to Kotlin,
- * and changed the class of return objects and properties.
- * https://github.com/davideas/FlexibleAdapter
+ * changed the classes of some return objects and properties.
+ *
+ * Also modified behaviour of onClick(), onLongClick() and toggleSelection() to handle
+ * more advanced visual selection than the ones provided by FlexibleUtils.
  */
 open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
                               @MenuRes cabMenu: Int,
@@ -106,9 +109,9 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
      * and continue
      * @since 1.0.0-b1
      */
-    fun onClick(position: Int): Boolean {
+    fun onClick(position: Int, item: CoverableItem?): Boolean {
         if (position != RecyclerView.NO_POSITION) {
-            toggleSelection(position)
+            toggleSelection(position, item)
             return true
         }
         return false
@@ -119,16 +122,17 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
      *
      * @param toolbar the current Fragment's toolbar
      * @param position the position of the clicked item
+     * @param item the clicked item
      * @return the initialized ActionMode or null if nothing was done
      * @since 1.0.0-b1
      */
-    fun onLongClick(toolbar: Toolbar, position: Int): ActionMode? {
+    fun onLongClick(toolbar: Toolbar, position: Int, item: CoverableItem?): ActionMode? {
         // Activate ActionMode
         if (mActionMode == null) {
             mActionMode = toolbar.startActionMode(this)
         }
         // We have to select this on our own as we will consume the event
-        toggleSelection(position)
+        toggleSelection(position, item)
         return mActionMode
     }
 
@@ -139,11 +143,13 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
      * Note that the selection must already be started (actionMode must not be null).
      *
      * @param position position of the item to toggle the selection state
+     * @param item: item whose visuals will be modified to represent selection state
      * @since 1.0.0-b1
      */
-    fun toggleSelection(position: Int) {
+    fun toggleSelection(position: Int, item: CoverableItem?) {
         if (position >= 0 && (mAdapter.mode == Mode.SINGLE && !mAdapter.isSelected(position) || mAdapter.mode == Mode.MULTI)) {
             mAdapter.toggleSelection(position)
+            item?.toggleSelection()
         }
         // If SINGLE is active then ActionMode can be null
         if (mActionMode == null) return
@@ -183,7 +189,7 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
      */
     fun restoreSelection(toolbar: Toolbar) {
         if (defaultMode == Mode.IDLE && mAdapter.selectedItemCount > 0 || defaultMode == Mode.SINGLE && mAdapter.selectedItemCount > 1) {
-            onLongClick(toolbar, -1)
+            onLongClick(toolbar, -1, null)
         }
     }
 

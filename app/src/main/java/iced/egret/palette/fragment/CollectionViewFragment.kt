@@ -172,11 +172,14 @@ class CollectionViewFragment :
     }
 
     override fun onDestroyActionMode(mode: ActionMode) {
+        // ToolbarActionModeHelper doesn't have references to CoverableItems,
+        // so can't clear all selections visually
+        mContentItems.map {item -> item.clearSelection()}
     }
 
     override fun onItemClick(view: View, position: Int): Boolean {
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
-            mActionModeHelper.onClick(position)
+            mActionModeHelper.onClick(position, mContentItems[position])
         }
         else {
             val coverable = mContents[position]
@@ -187,7 +190,7 @@ class CollectionViewFragment :
     }
 
     override fun onItemLongClick(position: Int) {
-        mActionModeHelper.onLongClick(mDefaultToolbar, position)
+        mActionModeHelper.onLongClick(mDefaultToolbar, position, mContentItems[position])
     }
 
     /**

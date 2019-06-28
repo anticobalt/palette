@@ -5,12 +5,17 @@ import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
+import eu.davidea.flexibleadapter.items.AbstractSectionableItem
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 
-abstract class CoverableItem(private val obj: Coverable) : AbstractFlexibleItem<CoverViewHolder>() {
+/**
+ * An item for an expandable section.
+ * Has IFlexible and ISectionable functionality.
+ */
+abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderItem) :
+        AbstractSectionableItem<CoverViewHolder, SectionHeaderItem>(header) {
 
     var viewHolder: CoverViewHolder? = null
     private var pendingSetSelectionOn = false

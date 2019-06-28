@@ -15,9 +15,7 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
-import iced.egret.palette.recyclerview_component.CollectionViewItem
-import iced.egret.palette.recyclerview_component.LongClickSelector
-import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
+import iced.egret.palette.recyclerview_component.*
 import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
@@ -52,9 +50,10 @@ class CollectionViewFragment :
 
     private var mContents = mutableListOf<Coverable>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
+    private var mHeaders = mutableListOf<SectionHeaderItem>()
 
     private lateinit var mAdapter: CollectionViewAdapter
-    lateinit var adapter: FlexibleAdapter<CollectionViewItem>
+    lateinit var adapter: FlexibleAdapter<SectionHeaderItem>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -119,25 +118,17 @@ class CollectionViewFragment :
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
 
+            fetchContents()
             val manager = GridLayoutManager(activity, 3)
-
-            /*
-            val contentsMap = CollectionManager.getContentsMap()
-            for ((type, coverables) in contentsMap) {
-                val section = CollectionViewSection(type.capitalize(), coverables, mAdapter, this)
-                mSections.add(section)
-                mSelectors.add(section.selector)
-                mAdapter.addSection(section)
-            }
-            */
-
-            adapter = FlexibleAdapter(mContentItems)
+            adapter = FlexibleAdapter(mHeaders)
+            manager.spanSizeLookup = GridSectionSpanLookup(adapter, 3)
 
             mCollectionRecyclerView.layoutManager = manager
             mCollectionRecyclerView.adapter = adapter
 
             initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
             adapter.addListener(this)
+            adapter.expandItemsAtStartUp()
 
         }
     }
@@ -369,7 +360,7 @@ class CollectionViewFragment :
      */
     private fun refreshData() {
         fetchContents()
-        adapter.updateDataSet(mContentItems)
+        adapter.updateDataSet(mHeaders)
     }
 
     /**
@@ -378,8 +369,19 @@ class CollectionViewFragment :
     private fun fetchContents() {
         mContents.clear()
         mContentItems.clear()
-        mContents.addAll(CollectionManager.contents.toMutableList())
-        mContents.map {content -> mContentItems.add(CollectionViewItem(content))}
+        mHeaders.clear()
+
+        val contentsMap = CollectionManager.getContentsMap()
+        for ((type, coverables) in contentsMap) {
+            val header = SectionHeaderItem(type)
+            val coverableItems = coverables.map {content -> CollectionViewItem(content, header)}
+            for (item in coverableItems) {
+                header.addSubItem(item)
+            }
+            mHeaders.add(header)
+            mContents.addAll(coverables)
+            mContentItems.addAll(coverableItems)
+        }
     }
 
 }

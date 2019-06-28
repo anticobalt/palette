@@ -3,10 +3,13 @@ package iced.egret.palette.util
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
+import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.recyclerview_component.SectionHeaderItem
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -32,6 +35,22 @@ object CollectionManager {
         private set(value) = mCollectionStack.push(value)
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
+
+    /**
+     * Used by FlexibleAdapter to sort sections with Coverables
+     */
+    object SectionComparator : Comparator<IFlexible<RecyclerView.ViewHolder>> {
+        override fun compare(p0: IFlexible<RecyclerView.ViewHolder>?, p1: IFlexible<RecyclerView.ViewHolder>?): Int {
+            val types = mContentsMap.keys.map {key -> key.toLowerCase()}
+            val title0 = (p0 as? SectionHeaderItem)?.title ?: return 0
+            val title1 = (p1 as? SectionHeaderItem)?.title ?: return 0
+            return when {
+                types.indexOf(title0) < types.indexOf(title1) -> 1
+                types.indexOf(title0) == types.indexOf(title1) -> 0
+                else -> -1
+            }
+        }
+    }
 
     fun setup(activity: FragmentActivity) {
 

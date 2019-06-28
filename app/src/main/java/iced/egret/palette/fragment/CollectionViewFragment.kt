@@ -1,6 +1,7 @@
 package iced.egret.palette.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -31,6 +32,10 @@ class CollectionViewFragment :
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener {
 
+    companion object SaveDataKeys {
+        const val selectedHeaderPosition = "SHP"
+    }
+
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
 
     private var mRootView : View? = null
@@ -55,6 +60,8 @@ class CollectionViewFragment :
 
     private lateinit var mAdapter: CollectionViewAdapter
     lateinit var adapter: FlexibleAdapter<SectionHeaderItem>
+
+    private var selectedSectionHeader : SectionHeaderItem? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -151,15 +158,23 @@ class CollectionViewFragment :
         }.withDefaultMode(mode)
     }
 
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         return true
     }
 
-    override fun onCreateActionMode(mode: ActionMode, menu: Menu?): Boolean {
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         return true
     }
 
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    private fun isolateSection(toIsolateHeader: SectionHeaderItem) {
+        for (header in mHeaders) {
+            if (header != toIsolateHeader) {
+                adapter.removeSection(header)
+            }
+        }
+    }
+
+    override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
         return true
     }
 
@@ -167,6 +182,16 @@ class CollectionViewFragment :
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
         mContentItems.map {item -> item.setSelection(false)}
+        restoreAllSections()
+        selectedSectionHeader = null  // no selection active
+    }
+
+    private fun restoreAllSections() {
+        for (header in mHeaders) {
+            if (!adapter.contains(header)) {
+                adapter.addSection(header, CollectionManager.SectionComparator)
+            }
+        }
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
@@ -175,6 +200,7 @@ class CollectionViewFragment :
         if (clickedItem !is CoverableItem) return true
 
         val cardinalPosition = getCardinalPosition(absolutePosition)
+        Log.i("CLICK", "position is $absolutePosition, $cardinalPosition")
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, mContentItems[cardinalPosition])
         }
@@ -186,9 +212,31 @@ class CollectionViewFragment :
         }
     }
 
+    /**
+     * @param absolutePosition the actual position amongst all on-screen items
+     * cardinalPosition is absolutePosition while ignoring headers
+     * relativePosition is absolutePosition while ignoring all other sections (but keeping own header)
+     *
+     * All positions refer to arrangement before click handling.
+     */
     override fun onItemLongClick(absolutePosition: Int) {
         val cardinalPosition = getCardinalPosition(absolutePosition)
-        mActionModeHelper.onLongClick(mDefaultToolbar, absolutePosition, mContentItems[cardinalPosition])
+        val relativePosition : Int
+        Log.i("CLICK", "position long click is $absolutePosition, $cardinalPosition")
+
+        // Isolate the section BEFORE ActionMode is created, so that the correct
+        // section position can be noted by the ActionModeHelper (instead of global position,
+        // which unnecessarily accounts for temporarily remove sections)
+        if (selectedSectionHeader == null) {
+            selectedSectionHeader = adapter.getSectionHeader(absolutePosition) as SectionHeaderItem
+            isolateSection(selectedSectionHeader!!)
+            // adapter only has one section now, so global == relative
+            relativePosition = adapter.getGlobalPositionOf(mContentItems[cardinalPosition])
+        }
+        else {
+            relativePosition = absolutePosition
+        }
+        mActionModeHelper.onLongClick(mDefaultToolbar, relativePosition, mContentItems[cardinalPosition])
     }
 
     /**
@@ -199,6 +247,25 @@ class CollectionViewFragment :
         val header = adapter.getSectionHeader(position)
         val headerPosition = adapter.headerItems.indexOf(header)
         return position - headerPosition - 1
+    }
+
+    /**
+     * Given a relative position (as used by mActionModeHelper),
+     * figure out position that it would have taken BEFORE section isolation.
+     * @param relativePosition position in section (including header, whose position = 0)
+     */
+    private fun convertRelativePosition(relativePosition: Int) : Int? {
+        var oldPosition = 0
+        for (header in mHeaders) {
+            if (header == selectedSectionHeader) {
+                oldPosition += relativePosition
+                return oldPosition
+            }
+            else {
+                oldPosition += header.subItemsCount + 1
+            }
+        }
+        return null  // couldn't find selected section; should never happen
     }
 
     /**
@@ -296,6 +363,7 @@ class CollectionViewFragment :
 
     override fun onSaveInstanceState(outState: Bundle) {
         adapter.onSaveInstanceState(outState)
+        outState.putInt(selectedHeaderPosition, mHeaders.indexOf(selectedSectionHeader))
         super.onSaveInstanceState(outState)
     }
 
@@ -304,8 +372,12 @@ class CollectionViewFragment :
         if (savedInstanceState != null) {
             adapter.onRestoreInstanceState(savedInstanceState)
             mActionModeHelper.restoreSelection(mDefaultToolbar)
+            selectedSectionHeader = mHeaders[savedInstanceState.getInt(selectedHeaderPosition)]
+
+            // Re-select all previously selected items
+            // Gives up if can't calculate positions, which should never happen
             for (pos in adapter.selectedPositions) {
-                mContentItems[getCardinalPosition(pos)].setSelection(true)
+                mContentItems[getCardinalPosition(convertRelativePosition(pos) ?: return)].setSelection(true)
             }
         }
     }

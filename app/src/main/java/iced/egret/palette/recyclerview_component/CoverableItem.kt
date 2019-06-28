@@ -18,7 +18,7 @@ abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderIt
         AbstractSectionableItem<CoverViewHolder, SectionHeaderItem>(header) {
 
     var viewHolder: CoverViewHolder? = null
-    private var pendingSetSelectionOn = false
+    private var isSelected = false
 
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,
                                 holder: CoverViewHolder,
@@ -27,11 +27,14 @@ abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderIt
         viewHolder = holder
         obj.loadCoverInto(holder)
         holder.tvItem?.text = obj.name
-        if (pendingSetSelectionOn) setSelection(true)
+
+        // Update selection indicator on recycling or re-creation
+        setSelection(isSelected)
     }
 
     override fun equals(other: Any?): Boolean {
-        return this === other
+        if (other !is CoverableItem) return false
+        return this.obj == other.obj
     }
 
     override fun hashCode(): Int {
@@ -48,17 +51,16 @@ abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderIt
     }
 
     /**
-     * Turn indicator on or off, or flag to turn on on ViewHolder bind in the future.
-     * Flagging occurs after device rotation (i.e. onViewStateRestored() is called in fragment).
+     * Update isSelected property, and try to draw selection indicator.
+     * If can't draw (e.g. after rotation b/c Views not re-created yet),
+     * they will be drawn in onBindViewHolder()
      *
      * @param selected turn on (true) or off (false)
      */
     fun setSelection(selected: Boolean) {
+        isSelected = selected
         val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
-        if (statusView == null) {
-            pendingSetSelectionOn = true
-            return
-        }
+                ?: return
 
         if (selected) {
             statusView.visibility = View.VISIBLE

@@ -128,15 +128,13 @@ class CollectionViewFragment :
 
             fetchContents()
             val manager = GridLayoutManager(activity, 3)
-            adapter = FlexibleAdapter(mHeaders)
+            adapter = FlexibleAdapter(mHeaders, this, true).expandItemsAtStartUp()
             manager.spanSizeLookup = GridSectionSpanLookup(adapter, 3)
 
             mCollectionRecyclerView.layoutManager = manager
             mCollectionRecyclerView.adapter = adapter
 
             initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
-            adapter.addListener(this)
-            adapter.expandItemsAtStartUp()
 
         }
     }

@@ -174,7 +174,7 @@ class CollectionViewFragment :
     override fun onDestroyActionMode(mode: ActionMode) {
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
-        mContentItems.map {item -> item.clearSelection()}
+        mContentItems.map {item -> item.setSelection(false)}
     }
 
     override fun onItemClick(view: View, position: Int): Boolean {
@@ -284,6 +284,22 @@ class CollectionViewFragment :
      */
     override fun onBackPressed() : Boolean {
         return returnToParentCollection()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        adapter.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) {
+            adapter.onRestoreInstanceState(savedInstanceState)
+            mActionModeHelper.restoreSelection(mDefaultToolbar)
+            for (pos in adapter.selectedPositions) {
+                mContentItems[pos].setSelection(true)
+            }
+        }
     }
 
     /**

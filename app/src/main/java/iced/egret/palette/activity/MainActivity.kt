@@ -31,17 +31,21 @@ class MainActivity : AppCompatActivity() {
 
         buildApp()
 
+        // Don't build fragments again if rotating device, because they're automatically remade
+        if (savedInstanceState == null) {
+            buildFragments()
+        }
+
     }
 
     /**
-     * Setup up models, visuals, and fragments.
+     * Setup up models and auxiliary visuals.
      * If Storage is not set up before this, the app won't immediately crash, but it will
      * after some user input.
      */
     private fun buildApp() {
         CollectionManager.setup(this)
         Painter.color = ContextCompat.getColor(this, Painter.colorResource)
-        buildFragments()
     }
 
     private fun buildFragments() {
@@ -86,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     Storage.setup(this)
                     buildApp()
+                    buildFragments()
                 }
             }
         }

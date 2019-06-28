@@ -11,6 +11,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
+import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
@@ -168,20 +169,36 @@ class CollectionViewFragment :
         mContentItems.map {item -> item.setSelection(false)}
     }
 
-    override fun onItemClick(view: View, position: Int): Boolean {
+    override fun onItemClick(view: View, absolutePosition: Int): Boolean {
+        val clickedItem = adapter.getItem(absolutePosition) as IFlexible<*>
+
+        if (clickedItem !is CoverableItem) return true
+
+        val cardinalPosition = getCardinalPosition(absolutePosition)
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
-            mActionModeHelper.onClick(position, mContentItems[position])
+            mActionModeHelper.onClick(absolutePosition, mContentItems[cardinalPosition])
         }
         else {
-            val coverable = mContents[position]
-            val updates = CollectionManager.launch(coverable, position = position, c = this.context)
+            val coverable = mContents[cardinalPosition]
+            val updates = CollectionManager.launch(coverable, position = cardinalPosition, c = this.context)
             if (updates) refreshData()
             false
         }
     }
 
-    override fun onItemLongClick(position: Int) {
-        mActionModeHelper.onLongClick(mDefaultToolbar, position, mContentItems[position])
+    override fun onItemLongClick(absolutePosition: Int) {
+        val cardinalPosition = getCardinalPosition(absolutePosition)
+        mActionModeHelper.onLongClick(mDefaultToolbar, absolutePosition, mContentItems[cardinalPosition])
+    }
+
+    /**
+     * Given it's absolute position, get item's position ignoring headers.
+     * FlexibleAdapter's doesn't want to work, so making my own.
+     */
+    private fun getCardinalPosition(position: Int) : Int {
+        val header = adapter.getSectionHeader(position)
+        val headerPosition = adapter.headerItems.indexOf(header)
+        return position - headerPosition - 1
     }
 
     /**
@@ -288,7 +305,7 @@ class CollectionViewFragment :
             adapter.onRestoreInstanceState(savedInstanceState)
             mActionModeHelper.restoreSelection(mDefaultToolbar)
             for (pos in adapter.selectedPositions) {
-                mContentItems[pos].setSelection(true)
+                mContentItems[getCardinalPosition(pos)].setSelection(true)
             }
         }
     }

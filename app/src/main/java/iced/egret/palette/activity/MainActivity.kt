@@ -18,6 +18,10 @@ const val TAG = "VIEW"
 
 class MainActivity : AppCompatActivity() {
 
+    companion object SaveDataKeys {
+        const val onScreenCollection = "on-screen-collection"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -25,9 +29,7 @@ class MainActivity : AppCompatActivity() {
         if (!Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
-        else {
-            Storage.setup(this)
-        }
+        else Storage.setup(this)
 
         buildApp()
 
@@ -35,7 +37,17 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             buildFragments()
         }
+        // Try to restore Collection being viewed on rotation or activity restore
+        else {
+            val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
+            CollectionManager.unwindStack(navigateToPath)
+        }
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState?.putString(onScreenCollection, CollectionManager.currentCollection?.path)
+        super.onSaveInstanceState(outState)
     }
 
     /**

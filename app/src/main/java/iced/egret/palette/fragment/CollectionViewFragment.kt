@@ -83,6 +83,38 @@ class CollectionViewFragment :
     }
 
     /**
+     * Where all the save state loading is done.
+     * Must be done after MainActivity is finished creation,
+     * as fragment relies on it to load the correct viewing Collection
+     */
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (savedInstanceState != null) {
+
+            // If selected section saved, restore it, otherwise get out
+            val selectedSectionPosition = savedInstanceState.getInt(selectedHeaderPosition, -1)
+            if (selectedSectionPosition == -1) return
+            selectedSectionHeader = mHeaders[selectedSectionPosition]
+            isolateSection(selectedSectionHeader!!)
+
+            // Must restore adapter and helper AFTER section isolation to keep position ints consistent
+            adapter.onRestoreInstanceState(savedInstanceState)
+            mActionModeHelper.restoreSelection(mDefaultToolbar)
+
+            // Re-select all previously selected items
+            for (pos in adapter.selectedPositions) {
+                mContentItems[getCardinalPosition(pos)].setSelection(true)
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        adapter.onSaveInstanceState(outState)
+        outState.putInt(selectedHeaderPosition, mHeaders.indexOf(selectedSectionHeader))
+        super.onSaveInstanceState(outState)
+    }
+
+    /**
      * Makes default and edit toolbars and fills with items and titles
      */
     private fun buildToolbars() {
@@ -357,27 +389,6 @@ class CollectionViewFragment :
      */
     override fun onBackPressed() : Boolean {
         return returnToParentCollection()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        adapter.onSaveInstanceState(outState)
-        outState.putInt(selectedHeaderPosition, mHeaders.indexOf(selectedSectionHeader))
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        if (savedInstanceState != null) {
-            adapter.onRestoreInstanceState(savedInstanceState)
-            mActionModeHelper.restoreSelection(mDefaultToolbar)
-            selectedSectionHeader = mHeaders[savedInstanceState.getInt(selectedHeaderPosition)]
-
-            // Re-select all previously selected items
-            // Gives up if can't calculate positions, which should never happen
-            for (pos in adapter.selectedPositions) {
-                mContentItems[getCardinalPosition(convertRelativePosition(pos) ?: return)].setSelection(true)
-            }
-        }
     }
 
     /**

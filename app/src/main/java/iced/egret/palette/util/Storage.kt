@@ -32,42 +32,6 @@ object Storage {
     }
 
     /**
-     * @param root Root directory
-     * @param ignoreFolderNames Names of folders to not scan
-     */
-    fun getPictureFolder(root: File, ignoreFolderNames: ArrayList<String> = arrayListOf()) : Folder? {
-
-        var rootFolder : Folder? = Folder(root.name, root.path)
-        val rootObjects = root.listFiles().filter {
-            obj -> (obj.name.toLowerCase() !in ignoreFolderNames && !obj.name.startsWith("."))
-        }
-
-        for (obj: File in rootObjects) {
-            if (obj.isDirectory) {
-                val subfolder = getPictureFolder(obj)
-                if (subfolder != null) {
-                    rootFolder!!.addFolder(subfolder)
-                }
-            }
-            else {
-                if (obj.name.endsWith(".png")
-                        || obj.name.endsWith(".jpg")
-                        || obj.name.endsWith("jpeg")
-                        || obj.name.endsWith("gif")) {
-                    rootFolder!!.addPicture(Picture(obj.name, obj.path))
-                }
-            }
-        }
-
-        if (rootFolder!!.isEmpty()) {
-            rootFolder = null
-        }
-
-        return rootFolder
-
-    }
-
-    /**
      * Gets images from Android's default gallery API
      * API access stuff from https://stackoverflow.com/a/36815451
      */
@@ -99,7 +63,7 @@ object Storage {
             rootPath = pathLevels[rootLevelIndex]
 
             // check if root already created (in most cases, yes)
-            parentFolder = rootFolders.find { root -> root.path == rootPath }
+            parentFolder = rootFolders.find { root -> root.truePath == rootPath }
             if (parentFolder == null) {
                 parentFolder = Folder(rootPath, rootPath)
                 rootFolders.add(parentFolder)
@@ -111,7 +75,7 @@ object Storage {
 
                 folderPath = pathLevels.subList(0, levelInt + 1).joinToString("/")
 
-                childFolder = parentFolder!!.folders.find {folder -> folder.path == folderPath}
+                childFolder = parentFolder!!.folders.find {folder -> folder.truePath == folderPath}
                 if (childFolder == null) {
                     childFolder = Folder(level, folderPath)
                     parentFolder.addFolder(childFolder)

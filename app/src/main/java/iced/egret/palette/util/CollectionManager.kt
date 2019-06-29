@@ -84,8 +84,8 @@ object CollectionManager {
             mCollections.clear()
 
             for (folder in root.folders) {
-                val practicalRoot = getPracticalRoot(folder)
-                mCollections.add(practicalRoot)
+                //val practicalRoot = getPracticalRoot(folder)
+                mCollections.add(folder)
             }
 
             val externalStorage = mCollections.find {collection -> collection.name == originalExternalStorageName }
@@ -249,6 +249,28 @@ object CollectionManager {
 
     fun clearStack() {
         mCollectionStack.clear()
+    }
+
+    /**
+     * Given a real path to a Collection, use it to restore stack state.
+     * If can't unwind completely, do it as much as possible, then return.
+     */
+    fun unwindStack(path: String) {
+        val levels = path.split("/")
+        var levelIndex = 0
+        var collectionsOnLevel = mCollections.toList()
+
+        for (level in levels) {
+            // Use path to find Collection because those (unlike names) are immutable.
+            // If can't find Collection, move to next level,
+            // as Collections may have been merged during setup()
+            // via a function like getPracticalRoot().
+            currentCollection = collectionsOnLevel.find {
+                collection -> collection.path.split("/")[levelIndex] == level }
+                    ?: continue
+            collectionsOnLevel = (currentCollection as Collection).getContents().filterIsInstance<Collection>()
+            levelIndex += 1
+        }
     }
 
     fun getCurrentCollectionPictures() : List<Picture> {

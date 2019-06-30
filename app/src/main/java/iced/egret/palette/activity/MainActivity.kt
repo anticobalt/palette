@@ -33,15 +33,18 @@ class MainActivity : AppCompatActivity() {
 
         buildApp()
 
-        // Don't build fragments again if rotating device, because they're automatically remade
         if (savedInstanceState == null) {
-            buildFragments()
+            // Don't make fragments again if rotating device,
+            // because they're automatically remade
+            makeFragments()
         }
-        // Try to restore Collection being viewed on rotation or activity restore
         else {
+            // Try to restore Collection being viewed
             val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
             CollectionManager.unwindStack(navigateToPath)
         }
+
+        styleSlidingPane()
 
     }
 
@@ -60,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         Painter.color = ContextCompat.getColor(this, Painter.colorResource)
     }
 
-    private fun buildFragments() {
+    private fun makeFragments() {
         MainFragmentManager.setup(supportFragmentManager)
         MainFragmentManager.createFragments()
         val fragments = MainFragmentManager.fragments.toMutableList()
@@ -74,7 +77,9 @@ class MainActivity : AppCompatActivity() {
                 .beginTransaction()
                 .replace(R.id.contentsFragment, fragments[MainFragmentManager.COLLECTION_CONTENTS])
                 .commit()
+    }
 
+    private fun styleSlidingPane() {
         // convert dp to px: https://stackoverflow.com/a/4275969
         val dpParallax = 60
         val scale = resources.displayMetrics.density
@@ -83,7 +88,6 @@ class MainActivity : AppCompatActivity() {
         slidingPaneMain.parallaxDistance = pxParallax  // make left move when scrolling right
         slidingPaneMain.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
         slidingPaneMain.setShadowResourceLeft(R.drawable.shadow)
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -102,7 +106,8 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     Storage.setup(this)
                     buildApp()
-                    buildFragments()
+                    makeFragments()
+                    styleSlidingPane()
                 }
             }
         }

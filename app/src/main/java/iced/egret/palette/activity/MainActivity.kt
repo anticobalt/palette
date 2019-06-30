@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
             makeFragments()
         }
         else {
+            // Save the remade fragments (which are technically different)
+            MainFragmentManager.updateFragments(supportFragmentManager.fragments)
             // Try to restore Collection being viewed
             val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
             CollectionManager.unwindStack(navigateToPath)
@@ -51,6 +53,15 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle?) {
         outState?.putString(onScreenCollection, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onStop() {
+        // Restore fragment views so fragments can be rebuilt properly if activity is recreated.
+        // If only restarting and NOT recreating activity, fragments won't be re-isolated
+        // (which is expected behaviour, as any previously active ActionMode won't be reactivated
+        // either).
+        restoreAllFragments()
+        super.onStop()
     }
 
     /**

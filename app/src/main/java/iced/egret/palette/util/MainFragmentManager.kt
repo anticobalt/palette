@@ -24,6 +24,17 @@ object MainFragmentManager {
         fragments[COLLECTION_CONTENTS] = CollectionViewFragment()
     }
 
+    fun updateFragments(fragments: List<Fragment>) {
+        loop@ for (fragment in fragments) {
+            val index : Int = when (fragment) {
+                is PinnedCollectionsFragment -> PINNED_COLLECTIONS
+                is CollectionViewFragment -> COLLECTION_CONTENTS
+                else -> continue@loop
+            }
+            this.fragments[index] = fragment
+        }
+    }
+
     /**
      * A hack: https://stackoverflow.com/a/18611036
      * Good since 2013, so good enough for me

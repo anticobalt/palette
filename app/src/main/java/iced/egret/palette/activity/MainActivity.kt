@@ -127,4 +127,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Block click actions for all fragments except the given one.
+     */
+    fun isolateFragment(toIsolateFragment: MainFragment) {
+        for (fragment in MainFragmentManager.fragments) {
+            if (fragment != toIsolateFragment) {
+                (fragment as MainFragment).setClicksBlocked(true)
+            }
+        }
+    }
+
+    /**
+     * Undo isolateFragment()
+     */
+    fun restoreAllFragments() {
+        for (fragment in MainFragmentManager.fragments) {
+            (fragment as MainFragment).setClicksBlocked(false)
+        }
+    }
+
 }

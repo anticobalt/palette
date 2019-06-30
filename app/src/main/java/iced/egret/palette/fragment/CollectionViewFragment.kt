@@ -14,6 +14,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
+import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
@@ -24,6 +25,7 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
+import kotlinx.android.synthetic.main.fragment_view_collection.*
 
 
 class CollectionViewFragment :
@@ -193,6 +195,7 @@ class CollectionViewFragment :
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        (activity as MainActivity).isolateFragment(this)
         return true
     }
 
@@ -214,6 +217,7 @@ class CollectionViewFragment :
         mContentItems.map {item -> item.setSelection(false)}
         restoreAllSections()
         selectedSectionHeader = null  // no selection active
+        (activity as MainActivity).restoreAllFragments()
     }
 
     private fun restoreAllSections() {
@@ -296,6 +300,19 @@ class CollectionViewFragment :
             }
         }
         return null  // couldn't find selected section; should never happen
+    }
+
+    override fun setClicksBlocked(doBlock: Boolean) {
+        if (doBlock) {
+            rvCollectionItems.visibility = View.GONE
+            fab.hide()
+            blockerViewCollection.visibility = View.VISIBLE
+        }
+        else {
+            rvCollectionItems.visibility = View.VISIBLE
+            fab.show()
+            blockerViewCollection.visibility = View.GONE
+        }
     }
 
     /**

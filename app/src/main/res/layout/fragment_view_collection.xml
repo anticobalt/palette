@@ -48,4 +48,9 @@
         app:backgroundTint="@color/colorPrimaryDark"
         app:srcCompat="@android:drawable/ic_input_add" />
 
+    <include
+        layout="@layout/blocker"
+        android:id="@+id/blockerViewCollection"
+        />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

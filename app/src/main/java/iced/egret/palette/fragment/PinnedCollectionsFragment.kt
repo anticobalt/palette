@@ -39,8 +39,6 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         buildToolbar()  // edit menu needs activity
-        rvPinnedCollections.visibility = View.GONE
-        logoLayout.visibility = View.VISIBLE
     }
 
     private fun buildToolbar() {
@@ -82,6 +80,17 @@ class PinnedCollectionsFragment : MainFragment() {
         mSelectors.add(albumSection.selector)
 
         mRecyclerView.adapter = mAdapter
+    }
+
+    override fun setClicksBlocked(doBlock: Boolean) {
+        if (doBlock) {
+            rvPinnedCollections.visibility = View.GONE
+            blockerPinnedCollections.visibility = View.VISIBLE
+        }
+        else {
+            rvPinnedCollections.visibility = View.VISIBLE
+            blockerPinnedCollections.visibility = View.GONE
+        }
     }
 
     override fun onBackPressed(): Boolean {

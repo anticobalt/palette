@@ -16,6 +16,7 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
+import kotlinx.android.synthetic.main.fragment_pinned_collections.*
 
 class PinnedCollectionsFragment : MainFragment() {
 
@@ -38,6 +39,8 @@ class PinnedCollectionsFragment : MainFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         buildToolbar()  // edit menu needs activity
+        rvPinnedCollections.visibility = View.GONE
+        logoLayout.visibility = View.VISIBLE
     }
 
     private fun buildToolbar() {

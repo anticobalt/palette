@@ -8,4 +8,5 @@
     <color name="white">#FFF</color>
     <color name="silver">#C0C0C0</color>
     <color name="translucentGrey">#CC808080</color>
+    <color name="greyBlue">#2D343A</color>
 </resources>

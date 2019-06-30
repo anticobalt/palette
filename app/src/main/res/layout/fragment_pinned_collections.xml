@@ -38,4 +38,35 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/greyBlue"
+        android:id="@+id/logoLayout"
+        android:visibility="gone"
+        android:weightSum="4"
+        >
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_palette_long_yellow"
+            tools:ignore="ContentDescription" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

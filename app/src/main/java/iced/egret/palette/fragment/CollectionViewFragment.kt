@@ -1,7 +1,6 @@
 package iced.egret.palette.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -240,13 +239,14 @@ class CollectionViewFragment :
         if (clickedItem !is CoverableItem) return true
 
         val cardinalPosition = getCardinalPosition(absolutePosition)
-        Log.i("CLICK", "position is $absolutePosition, $cardinalPosition")
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, mContentItems[cardinalPosition])
         }
         else {
             val coverable = mContents[cardinalPosition]
-            val updates = CollectionManager.launch(coverable, position = cardinalPosition, c = this.context)
+            val positionInSection = (adapter.getSectionHeader(absolutePosition) as SectionHeaderItem)
+                    .getSubItemPosition(mContentItems[cardinalPosition])
+            val updates = CollectionManager.launch(coverable, position = positionInSection, c = this.context)
             if (updates) refreshData()
             false
         }
@@ -262,7 +262,6 @@ class CollectionViewFragment :
     override fun onItemLongClick(absolutePosition: Int) {
         val cardinalPosition = getCardinalPosition(absolutePosition)
         val relativePosition : Int
-        Log.i("CLICK", "position long click is $absolutePosition, $cardinalPosition")
 
         // Isolate the section BEFORE ActionMode is created, so that the correct
         // section position can be noted by the ActionModeHelper (instead of global position,

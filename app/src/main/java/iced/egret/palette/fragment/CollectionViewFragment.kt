@@ -204,14 +204,6 @@ class CollectionViewFragment :
         return true
     }
 
-    private fun isolateSection(toIsolateHeader: SectionHeaderItem) {
-        for (header in mHeaders) {
-            if (header != toIsolateHeader) {
-                adapter.removeSection(header)
-            }
-        }
-    }
-
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
         return true
     }
@@ -225,10 +217,25 @@ class CollectionViewFragment :
         (activity as MainActivity).restoreAllFragments()
     }
 
+    private fun isolateSection(toIsolateHeader: SectionHeaderItem) {
+        for (header in mHeaders) {
+            if (header != toIsolateHeader) {
+                // adapter.removeSection() does not work,
+                // because it collapses/removes the section's items,
+                // and then deletes section_items.size's worth of
+                // items AGAIN.
+                val position = adapter.getGlobalPositionOf(header)
+                adapter.collapse(position)
+                adapter.removeItem(position)
+            }
+        }
+    }
+
     private fun restoreAllSections() {
         for (header in mHeaders) {
             if (!adapter.contains(header)) {
                 adapter.addSection(header, CollectionManager.SectionComparator)
+                adapter.expand(header, true) // skipping init=true causes duplication
             }
         }
     }

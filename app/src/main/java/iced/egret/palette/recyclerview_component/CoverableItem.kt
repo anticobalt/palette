@@ -1,13 +1,9 @@
 package iced.egret.palette.recyclerview_component
 
-import android.graphics.Color
-import android.view.View
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractSectionableItem
 import eu.davidea.flexibleadapter.items.IFlexible
-import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 
 /**
@@ -18,7 +14,7 @@ abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderIt
         AbstractSectionableItem<CoverViewHolder, SectionHeaderItem>(header) {
 
     var viewHolder: CoverViewHolder? = null
-    private var isSelected = false
+    protected var isSelected = false
 
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,
                                 holder: CoverViewHolder,
@@ -44,11 +40,7 @@ abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderIt
     /**
      * Turn indicator on or off based on current visibility
      */
-    fun toggleSelection() {
-        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus) ?: return
-        if (statusView.visibility == View.GONE) setSelection(true)
-        else setSelection(false)
-    }
+    abstract fun toggleSelection()
 
     /**
      * Update isSelected property, and try to draw selection indicator.
@@ -57,21 +49,6 @@ abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderIt
      *
      * @param selected turn on (true) or off (false)
      */
-    fun setSelection(selected: Boolean) {
-        isSelected = selected
-        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
-                ?: return
-
-        if (selected) {
-            statusView.visibility = View.VISIBLE
-            viewHolder!!.ivItem?.setColorFilter(
-                    Color.rgb(200, 200, 200),
-                    android.graphics.PorterDuff.Mode.MULTIPLY
-            )
-        } else {
-            statusView.visibility = View.GONE
-            viewHolder!!.ivItem?.colorFilter = null
-        }
-    }
+    abstract fun setSelection(selected: Boolean)
 
 }

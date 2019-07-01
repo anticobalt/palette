@@ -35,7 +35,7 @@ class CollectionViewFragment :
         FlexibleAdapter.OnItemLongClickListener {
 
     companion object SaveDataKeys {
-        const val selectedHeaderPosition = "SHP"
+        const val selectedHeaderPosition = "CollectionViewFragment_SHP"
     }
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
@@ -91,6 +91,8 @@ class CollectionViewFragment :
      */
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        (activity as MainActivity).notifyFragmentCreationFinished(this)
+
         if (savedInstanceState != null) {
 
             // If selected section saved, restore it, otherwise get out
@@ -114,6 +116,10 @@ class CollectionViewFragment :
         adapter.onSaveInstanceState(outState)
         outState.putInt(selectedHeaderPosition, mHeaders.indexOf(selectedSectionHeader))
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onFragmentCreationFinished(fragment: MainFragment) {
+        // TODO
     }
 
     /**
@@ -473,7 +479,7 @@ class CollectionViewFragment :
     /**
      * Refresh the content shown in the recycler view.
      */
-    private fun refreshData() {
+    fun refreshData() {
         fetchContents()
         adapter.updateDataSet(mHeaders)
     }

@@ -65,6 +65,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Alert all other MainFragments that argument fragment has finished onCreateView(),
+     * and thus its views can be indirectly manipulated e.g. via isolateFragment().
+     */
+    fun notifyFragmentCreationFinished(finishedFragment: MainFragment) {
+        for (fragment in MainFragmentManager.fragments) {
+            (fragment as MainFragment).onFragmentCreationFinished(finishedFragment)
+        }
+    }
+
+    /**
      * Setup up models and auxiliary visuals.
      * If Storage is not set up before this, the app won't immediately crash, but it will
      * after some user input.

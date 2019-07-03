@@ -2,7 +2,6 @@ package iced.egret.palette.fragment
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,16 +13,10 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
-import iced.egret.palette.adapter.CollectionViewAdapter
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.recyclerview_component.*
-import iced.egret.palette.section.CollectionViewSection
 import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.DialogGenerator
-import iced.egret.palette.util.MainFragmentManager
-import iced.egret.palette.util.Painter
-import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 
 
@@ -41,27 +34,13 @@ class CollectionViewFragment :
 
     private var mRootView : View? = null
     private lateinit var mDefaultToolbar : Toolbar
-    private lateinit var mEditToolbar : Toolbar
     private lateinit var mCollectionRecyclerView : RecyclerView
     private lateinit var mFloatingActionButton : FloatingActionButton
-
-    // these two lists are parallel
-    private val mSelectors = mutableListOf<LongClickSelector>()
-    private val mSections = mutableListOf<CollectionViewSection>()
-
-    // relies on mSelectors and mSections being parallel
-    private val mActiveSelector: LongClickSelector?
-        get() = mSelectors.find { s -> s.active }
-    private val mActiveSection: CollectionViewSection
-        get() = mSections[mSelectors.indexOf(mActiveSelector)]
 
     private var mContents = mutableListOf<Coverable>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
     private var mHeaders = mutableListOf<SectionHeaderItem>()
-
-    private lateinit var mAdapter: CollectionViewAdapter
     lateinit var adapter: FlexibleAdapter<SectionHeaderItem>
-
     private var selectedSectionHeader : SectionHeaderItem? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -76,7 +55,7 @@ class CollectionViewFragment :
             onFabClick()
         }
 
-        buildToolbars()
+        buildToolbar()
         buildRecyclerView()
 
         return mRootView
@@ -124,29 +103,13 @@ class CollectionViewFragment :
     /**
      * Makes default and edit toolbars and fills with items and titles
      */
-    private fun buildToolbars() {
-
+    private fun buildToolbar() {
         mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarViewCollection)
-        mEditToolbar = mRootView!!.findViewById(R.id.toolbarViewCollectionEdit)
-
         mDefaultToolbar.title = CollectionManager.currentCollection?.name
         mDefaultToolbar.inflateMenu(R.menu.menu_view_collection)
         mDefaultToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
-
-        mEditToolbar.setTitle(R.string.app_name)
-        mEditToolbar.inflateMenu(R.menu.menu_view_collection_edit)
-        mEditToolbar.setOnMenuItemClickListener {
-            onOptionsItemSelected(it)
-        }
-        val back = activity?.getDrawable(R.drawable.ic_chevron_left_black_24dp)
-        Painter.paintDrawable(back)
-        mEditToolbar.navigationIcon = back
-        mEditToolbar.setNavigationOnClickListener {
-            onBackPressed()
-        }
-
     }
 
     /**
@@ -295,25 +258,6 @@ class CollectionViewFragment :
         return position - headerPosition - 1
     }
 
-    /**
-     * Given a relative position (as used by mActionModeHelper),
-     * figure out position that it would have taken BEFORE section isolation.
-     * @param relativePosition position in section (including header, whose position = 0)
-     */
-    private fun convertRelativePosition(relativePosition: Int) : Int? {
-        var oldPosition = 0
-        for (header in mHeaders) {
-            if (header == selectedSectionHeader) {
-                oldPosition += relativePosition
-                return oldPosition
-            }
-            else {
-                oldPosition += header.subItemsCount + 1
-            }
-        }
-        return null  // couldn't find selected section; should never happen
-    }
-
     override fun setClicksBlocked(doBlock: Boolean) {
         if (doBlock) {
             rvCollectionItems.visibility = View.GONE
@@ -333,7 +277,7 @@ class CollectionViewFragment :
     private fun onFabClick() {
         val collection = CollectionManager.currentCollection
         if (collection is Album) {
-            DialogGenerator.createAlbum(context!!, ::createNewAlbum)
+            //DialogGenerator.createAlbum(context!!, ::createNewAlbum)
         }
         else {
             Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -342,6 +286,7 @@ class CollectionViewFragment :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        /*
 
         // Get selected items, if applicable
         var coverables = listOf<Coverable>()
@@ -394,9 +339,12 @@ class CollectionViewFragment :
             }
             R.id.actionViewCollectionSettings -> true
             else -> super.onOptionsItemSelected(item)
-        }
+        } */
+
+        return super.onOptionsItemSelected(item)
     }
 
+    /*
     /**
      * Adds new album to current Collection
      */
@@ -404,61 +352,13 @@ class CollectionViewFragment :
         val pos = CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
         mAdapter.updateNewAlbum(listOf(pos))
     }
-
-    /**
-     * Gets all selected items.
-     */
-    private fun getSelectedCoverables() : List<Coverable>? {
-        val positions = mActiveSelector?.selectedItemIds?.toSet() ?: return null
-        return mActiveSection.items.filterIndexed { index, _ -> positions.contains(index.toLong()) }
-    }
+    */
 
     /**
      * @return handled here (true) or not (false)
      */
     override fun onBackPressed() : Boolean {
         return returnToParentCollection()
-    }
-
-    /**
-     * Called by LongClickSelector upon its activation
-     */
-    override fun onAlternateModeActivated(section: StatelessSection) {
-        mDefaultToolbar.visibility = Toolbar.GONE
-        mEditToolbar.visibility = Toolbar.VISIBLE
-
-        section as CollectionViewSection  // cast
-        val editMenu = mEditToolbar.menu
-        when (section.title.toLowerCase()) {
-            "folders", "pictures" -> {
-                editMenu.findItem(R.id.actionViewCollectionAlbumActions).isVisible = true
-                editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = true
-                editMenu.findItem(R.id.actionViewCollectionDelete).isVisible = true
-                if (CollectionManager.currentCollection is Album) {
-                    editMenu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = true
-                }
-            }
-            "albums" -> {
-                editMenu.findItem(R.id.actionViewCollectionDelete).isVisible = true
-            }
-        }
-    }
-
-    /**
-     * Called by LongClickSelector after it finishes cleaning up
-     */
-    override fun onAlternateModeDeactivated(section: StatelessSection) {
-        mEditToolbar.visibility = Toolbar.GONE
-        mDefaultToolbar.visibility = Toolbar.VISIBLE
-
-        val editMenu = mEditToolbar.menu
-        editMenu.findItem(R.id.actionViewCollectionAlbumActions).isVisible = false
-        editMenu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = false
-        editMenu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = false
-        editMenu.findItem(R.id.actionViewCollectionDelete).isVisible = false
-
-        // already notifies adapter, so don't do it again to reset views
-        mAdapter.showAllSections()
     }
 
     /**
@@ -473,13 +373,6 @@ class CollectionViewFragment :
         else {
             false
         }
-    }
-
-    /**
-     * Update everything to reflect changes
-     */
-    fun notifyChanges() {
-        mAdapter.update()
     }
 
     /**

@@ -35,19 +35,4 @@ object MainFragmentManager {
         }
     }
 
-    /**
-     * A hack: https://stackoverflow.com/a/18611036
-     * Good since 2013, so good enough for me
-     *//*
-    fun getFragmentByIndex(index: Int) : MainFragment {
-        val fragment = nativeFragmentManager.findFragmentByTag(
-                "android:switcher:" + R.id.viewpagerMainFragments + ":" + index
-        )
-        return fragment as MainFragment
-    }*/
-
-    fun notifyAlbumUpdateFromCollectionView() {
-        (fragments[PINNED_COLLECTIONS] as PinnedCollectionsFragment).notifyChanges()
-    }
-
 }

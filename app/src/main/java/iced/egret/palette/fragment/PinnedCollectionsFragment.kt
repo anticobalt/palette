@@ -1,6 +1,7 @@
 package iced.egret.palette.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
@@ -12,14 +13,13 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
-import iced.egret.palette.adapter.PinnedCollectionsAdapter
 import iced.egret.palette.model.Collection
-import iced.egret.palette.recyclerview_component.*
-import iced.egret.palette.section.PinnedCollectionsSection
+import iced.egret.palette.recyclerview_component.CoverableItem
+import iced.egret.palette.recyclerview_component.PinnedCollectionsItem
+import iced.egret.palette.recyclerview_component.SectionHeaderItem
+import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
-import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 import kotlinx.android.synthetic.main.fragment_pinned_collections.*
 
 class PinnedCollectionsFragment :
@@ -36,10 +36,6 @@ class PinnedCollectionsFragment :
     private lateinit var mRecyclerView : RecyclerView
 
     private lateinit var mDefaultToolbar : Toolbar
-    private lateinit var mEditToolbar : Toolbar
-
-    private lateinit var mAdapter : PinnedCollectionsAdapter
-    private var mSelectors = mutableListOf<LongClickSelector>()
 
     private var mCollections = mutableListOf<Collection>()
     private var mCollectionItems = mutableListOf<PinnedCollectionsItem>()
@@ -48,7 +44,6 @@ class PinnedCollectionsFragment :
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mBlockableFragments = mutableListOf<MainFragment>()
     private var selectedSectionHeader : SectionHeaderItem? = null
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
@@ -96,8 +91,6 @@ class PinnedCollectionsFragment :
     private fun buildToolbar() {
 
         mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
-        mEditToolbar = mRootView!!.findViewById(R.id.toolbarEditPinnedCollections)
-
         mDefaultToolbar.setTitle(R.string.app_name)
         mDefaultToolbar.inflateMenu(R.menu.menu_pinned_collections)
         mDefaultToolbar.setOnMenuItemClickListener {
@@ -161,6 +154,7 @@ class PinnedCollectionsFragment :
         if (clickedItem !is CoverableItem) return false
 
         val cardinalPosition = getCardinalPosition(absolutePosition)
+        Log.i("CLICK", "$absolutePosition is absolute, $cardinalPosition is cardinal")
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, mCollectionItems[cardinalPosition])
         }
@@ -249,15 +243,7 @@ class PinnedCollectionsFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        var handledBySelector = false
-        /**
-         * Try to find one selector to handle
-         */
-        for (selector in mSelectors) {
-            handledBySelector = handledBySelector || selector.onBackPressed()
-            if (handledBySelector) return true
-        }
-        return handledBySelector
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -269,16 +255,16 @@ class PinnedCollectionsFragment :
 
         when (item.itemId) {
             R.id.actionPinnedCollectionsCreateAlbum -> {
-                DialogGenerator.createAlbum(context, onConfirm = ::onCreateNewAlbum)
+                //DialogGenerator.createAlbum(context, onConfirm = ::onCreateNewAlbum)
             }
             R.id.actionPinnedCollectionsDeleteAlbum -> {
-                val callback = callback@ {
+                /*val callback = callback@ {
                     val activeSelector = mSelectors.find { s -> s.active } ?: return@callback
                     CollectionManager.deleteAlbumsByPosition(activeSelector.selectedItemIds)
                     activeSelector.deactivate()
                     mAdapter.updateCollections()
                 }
-                DialogGenerator.deleteAlbum(context, onConfirm = callback)
+                DialogGenerator.deleteAlbum(context, onConfirm = callback)*/
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -286,51 +272,11 @@ class PinnedCollectionsFragment :
         return true
     }
 
-    /**
-     * Called by LongClickSelector upon its activation
-     */
-    override fun onAlternateModeActivated(section: StatelessSection) {
-        mDefaultToolbar.visibility = Toolbar.GONE
-        mEditToolbar.visibility = Toolbar.VISIBLE
-
-        section as PinnedCollectionsSection  // cast
-        val editMenu = mEditToolbar.menu
-        when (section.title.toLowerCase()) {
-            "folders" -> {
-                editMenu.findItem(R.id.actionPinnedCollectionsHide).isVisible = true
-            }
-            "albums" -> {
-                editMenu.findItem(R.id.actionPinnedCollectionsDeleteAlbum).isVisible = true
-            }
-        }
-    }
-
-    /**
-     * Called by LongClickSelector after it finishes cleaning up
-     */
-    override fun onAlternateModeDeactivated(section: StatelessSection) {
-        mEditToolbar.visibility = Toolbar.GONE
-        mDefaultToolbar.visibility = Toolbar.VISIBLE
-
-        val editMenu = mEditToolbar.menu
-        editMenu.findItem(R.id.actionPinnedCollectionsHide).isVisible = false
-        editMenu.findItem(R.id.actionPinnedCollectionsDeleteAlbum).isVisible = false
-
-        // already does notifyDataSetChanged(), so don't call it again to reset views
-        mAdapter.showAllSections()
-    }
-
+    /*
     private fun onCreateNewAlbum(charSequence: CharSequence) {
         CollectionManager.createNewAlbum(charSequence.toString())
         mAdapter.updateCollections()
-    }
-
-    /**
-     * Update everything to reflect changes
-     */
-    fun notifyChanges() {
-        mAdapter.updateCollections()
-    }
+    } */
 
     /**
      * Get new data from Collection Manager.

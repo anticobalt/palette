@@ -10,7 +10,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
-import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.model.Album
@@ -87,8 +86,10 @@ class CollectionViewFragment :
             mActionModeHelper.restoreSelection(mDefaultToolbar)
 
             // Re-select all previously selected items
-            for (pos in adapter.selectedPositions) {
-                mContentItems[getCardinalPosition(pos)].setSelection(true)
+            for (i in 0 until adapter.currentItems.size) {
+                if (i in adapter.selectedPositionsAsSet) {
+                    adapter.currentItems[i].setSelection(true)
+                }
             }
         }
     }
@@ -220,13 +221,12 @@ class CollectionViewFragment :
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
-        val clickedItem = adapter.getItem(absolutePosition) as IFlexible<*>
-
-        if (clickedItem !is CoverableItem) return true
-
+        val clickedItem = adapter.getItem(absolutePosition) as? CoverableItem
+                ?: return true
         val cardinalPosition = getCardinalPosition(absolutePosition)
+
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
-            mActionModeHelper.onClick(absolutePosition, mContentItems[cardinalPosition])
+            mActionModeHelper.onClick(absolutePosition, clickedItem)
         }
         else {
             val coverable = mContents[cardinalPosition]

@@ -1,7 +1,6 @@
 package iced.egret.palette.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
@@ -10,7 +9,6 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
-import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.model.Album
@@ -75,8 +73,10 @@ class PinnedCollectionsFragment :
             mActionModeHelper.restoreSelection(mDefaultToolbar)
 
             // Re-select all previously selected items
-            for (pos in adapter.selectedPositions) {
-                mCollectionItems[getCardinalPosition(pos)].setSelection(true)
+            for (i in 0 until adapter.currentItems.size) {
+                if (i in adapter.selectedPositionsAsSet) {
+                    adapter.currentItems[i].setSelection(true)
+                }
             }
         }
     }
@@ -149,14 +149,12 @@ class PinnedCollectionsFragment :
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
-        val clickedItem = adapter.getItem(absolutePosition) as IFlexible<*>
-
-        if (clickedItem !is CoverableItem) return false
-
+        val clickedItem = adapter.getItem(absolutePosition) as? CoverableItem
+                ?: return false
         val cardinalPosition = getCardinalPosition(absolutePosition)
-        Log.i("CLICK", "$absolutePosition is absolute, $cardinalPosition is cardinal")
+
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
-            mActionModeHelper.onClick(absolutePosition, mCollectionItems[cardinalPosition])
+            mActionModeHelper.onClick(absolutePosition, clickedItem)
         }
         else {
             val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS

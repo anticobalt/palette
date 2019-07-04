@@ -8,7 +8,7 @@ import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 
-class PinnedCollectionsItem(obj: Coverable, header: SectionHeaderItem) : CoverableItem(obj, header) {
+class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
 
     override fun getLayoutRes(): Int {
         return R.layout.item_pinned_collections

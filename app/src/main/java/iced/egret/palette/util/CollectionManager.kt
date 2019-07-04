@@ -3,13 +3,10 @@ package iced.egret.palette.util
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
-import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import iced.egret.palette.recyclerview_component.CoverViewHolder
-import iced.egret.palette.recyclerview_component.CoverableItem
-import iced.egret.palette.recyclerview_component.SectionHeaderItem
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -39,6 +36,7 @@ object CollectionManager {
     /**
      * Used by FlexibleAdapter to sort sections with Coverables
      */
+    /*
     object SectionComparator : Comparator<IFlexible<*>> {
 
         // Sort by same order as in mContentsMap
@@ -71,6 +69,7 @@ object CollectionManager {
             }
         }
     }
+    */
 
     fun setup(activity: FragmentActivity) {
 

@@ -13,10 +13,11 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
+import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
+import iced.egret.palette.model.Folder
 import iced.egret.palette.recyclerview_component.CoverableItem
 import iced.egret.palette.recyclerview_component.PinnedCollectionsItem
-import iced.egret.palette.recyclerview_component.SectionHeaderItem
 import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.MainFragmentManager
@@ -34,16 +35,15 @@ class PinnedCollectionsFragment :
 
     private var mRootView : View? = null
     private lateinit var mRecyclerView : RecyclerView
-
+    private var mBlockableFragments = mutableListOf<MainFragment>()
     private lateinit var mDefaultToolbar : Toolbar
 
     private var mCollections = mutableListOf<Collection>()
     private var mCollectionItems = mutableListOf<PinnedCollectionsItem>()
-    private var mHeaders = mutableListOf<SectionHeaderItem>()
-    lateinit var adapter: FlexibleAdapter<SectionHeaderItem>
+
+    lateinit var adapter: FlexibleAdapter<PinnedCollectionsItem>
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
-    private var mBlockableFragments = mutableListOf<MainFragment>()
-    private var selectedSectionHeader : SectionHeaderItem? = null
+    private var mSelectedContentType : String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
@@ -56,7 +56,7 @@ class PinnedCollectionsFragment :
 
     override fun onSaveInstanceState(outState: Bundle) {
         adapter.onSaveInstanceState(outState)
-        outState.putInt(selectedHeaderPosition, mHeaders.indexOf(selectedSectionHeader))
+        outState.putString(selectedHeaderPosition, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
 
@@ -64,13 +64,13 @@ class PinnedCollectionsFragment :
         super.onViewStateRestored(savedInstanceState)
 
         if (savedInstanceState != null) {
-            // If selected section saved, restore it, otherwise get out
-            val selectedSectionPosition = savedInstanceState.getInt(selectedHeaderPosition, -1)
-            if (selectedSectionPosition == -1) return
-            selectedSectionHeader = mHeaders[selectedSectionPosition]
-            isolateSection(selectedSectionHeader!!)
+            // If selected content type is saved, restore it, otherwise get out
+            val contentType = savedInstanceState.getString(selectedHeaderPosition, "")
+            if (contentType.isEmpty()) return
+            mSelectedContentType = contentType
+            isolateContent(mSelectedContentType!!)
 
-            // Must restore adapter and helper AFTER section isolation to keep position ints consistent
+            // Must restore adapter and helper AFTER type isolation to keep position ints consistent
             adapter.onRestoreInstanceState(savedInstanceState)
             mActionModeHelper.restoreSelection(mDefaultToolbar)
 
@@ -102,7 +102,7 @@ class PinnedCollectionsFragment :
     private fun buildRecyclerView() {
         fetchContents()
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
-        adapter = FlexibleAdapter(mHeaders, this, true).expandItemsAtStartUp()
+        adapter = FlexibleAdapter(mCollectionItems, this, true)
         mRecyclerView.adapter = adapter
     }
 
@@ -143,8 +143,8 @@ class PinnedCollectionsFragment :
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
         mCollectionItems.map { item -> item.setSelection(false)}
-        restoreAllSections()
-        selectedSectionHeader = null  // no selection active
+        restoreAllContent()
+        mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
     }
 
@@ -174,49 +174,78 @@ class PinnedCollectionsFragment :
 
     /**
      * @param absolutePosition the actual position amongst all on-screen items
-     * cardinalPosition is absolutePosition while ignoring headers
-     * relativePosition is absolutePosition while ignoring all other sections (but keeping own header)
+     * relativePosition is absolutePosition while ignoring all other content types
      *
      * All positions refer to arrangement before click handling.
      */
     override fun onItemLongClick(absolutePosition: Int) {
-        val cardinalPosition = getCardinalPosition(absolutePosition)
         val relativePosition : Int
 
-        // Isolate the section BEFORE ActionMode is created, so that the correct
-        // section position can be noted by the ActionModeHelper (instead of global position,
-        // which unnecessarily accounts for temporarily remove sections)
-        if (selectedSectionHeader == null) {
-            selectedSectionHeader = adapter.getSectionHeader(absolutePosition) as SectionHeaderItem
-            isolateSection(selectedSectionHeader!!)
-            // adapter only has one section now, so global == relative
-            relativePosition = adapter.getGlobalPositionOf(mCollectionItems[cardinalPosition])
+        // Isolate the content type BEFORE ActionMode is created, so that the correct
+        // relative position can be noted by the ActionModeHelper (instead of global position,
+        // which unnecessarily accounts for temporarily remove types)
+        if (mSelectedContentType == null) {
+            mSelectedContentType = inferContentType(mCollections[absolutePosition]) ?: return
+            isolateContent(mSelectedContentType!!)
+            // adapter only holds one type now, so global == relative
+            relativePosition = adapter.getGlobalPositionOf(mCollectionItems[absolutePosition])
         }
         else {
             relativePosition = absolutePosition
         }
-        mActionModeHelper.onLongClick(mDefaultToolbar, relativePosition, mCollectionItems[cardinalPosition])
+        mActionModeHelper.onLongClick(mDefaultToolbar, relativePosition, mCollectionItems[absolutePosition])
     }
 
-    private fun isolateSection(toIsolateHeader: SectionHeaderItem) {
-        for (header in mHeaders) {
-            if (header != toIsolateHeader) {
-                // adapter.removeSection() does not work,
-                // because it collapses/removes the section's items,
-                // and then deletes section_items.size's worth of
-                // items AGAIN.
-                val position = adapter.getGlobalPositionOf(header)
-                adapter.collapse(position)
-                adapter.removeItem(position)
+    private fun inferContentType(collection: Collection) : String? {
+        return when (collection) {
+            is Folder -> "folders"
+            is Album -> "albums"
+            else -> null
+        }
+    }
+
+    /**
+     * Get one collection with type name provided, if one exists
+     */
+    private fun getInstanceOfType(typeName: String) : Collection? {
+        val type = when (typeName) {
+            "folders" -> Folder::class.java
+            "albums" -> Album::class.java
+            else -> return null
+        }
+        return mCollections.find {collection -> collection.javaClass == type }
+    }
+
+    /**
+     * Get all collections with same type as parameter, including the parameter
+     */
+    private fun getAllOfSameType(collection: Collection) : List<Collection> {
+        val typeList = mutableListOf<Collection>()
+        for (c in mCollections) {
+            if (c.javaClass == collection.javaClass) {
+                typeList.add(c)
+            }
+        }
+        return typeList
+    }
+
+    private fun isolateContent(isolateType: String) {
+        var shift = 0
+        val isolateTypeList = getAllOfSameType(getInstanceOfType(isolateType) ?: return)
+        for (i in 0 until mCollectionItems.size) {
+            if (mCollections[i] !in isolateTypeList) {
+                val removeTypeList = getAllOfSameType(mCollections[i])
+                adapter.removeRange(i+shift, removeTypeList.size)
+                shift += removeTypeList.size
             }
         }
     }
 
-    private fun restoreAllSections() {
-        for (header in mHeaders) {
-            if (!adapter.contains(header)) {
-                adapter.addSection(header, CollectionManager.SectionComparator)
-                adapter.expand(header, true) // skipping init=true causes duplication
+    private fun restoreAllContent() {
+        for (i in 0 until mCollectionItems.size) {
+            val item = mCollectionItems[i]
+            if (!adapter.contains(item)) {
+                adapter.addItem(i, item)
             }
         }
     }
@@ -226,9 +255,7 @@ class PinnedCollectionsFragment :
      * FlexibleAdapter's doesn't want to work, so making my own.
      */
     private fun getCardinalPosition(position: Int) : Int {
-        val header = adapter.getSectionHeader(position)
-        val headerPosition = adapter.headerItems.indexOf(header)
-        return position - headerPosition - 1
+        return position
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {
@@ -282,29 +309,21 @@ class PinnedCollectionsFragment :
      * Get new data from Collection Manager.
      */
     private fun fetchContents() {
-        var headerItem : SectionHeaderItem
         mCollections.clear()
         mCollectionItems.clear()
-        mHeaders.clear()
 
         // Fetch folders
-        headerItem = SectionHeaderItem("Folders")
-        mHeaders.add(headerItem)
         for (folder in CollectionManager.folders) {
             mCollections.add(folder)
-            val contentItem = PinnedCollectionsItem(folder, headerItem)
+            val contentItem = PinnedCollectionsItem(folder)
             mCollectionItems.add(contentItem)
-            headerItem.addSubItem(contentItem)
         }
 
         // Fetch albums
-        headerItem = SectionHeaderItem("Albums")
-        mHeaders.add(headerItem)
         for (album in CollectionManager.albums) {
             mCollections.add(album)
-            val contentItem = PinnedCollectionsItem(album, headerItem)
+            val contentItem = PinnedCollectionsItem(album)
             mCollectionItems.add(contentItem)
-            headerItem.addSubItem(contentItem)
         }
 
     }

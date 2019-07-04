@@ -9,7 +9,7 @@ import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 
-class CollectionViewItem(obj: Coverable, header: SectionHeaderItem) : CoverableItem(obj, header) {
+class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
 
     override fun getLayoutRes(): Int {
         return R.layout.item_view_collection

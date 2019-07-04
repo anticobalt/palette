@@ -15,7 +15,11 @@ import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
-import iced.egret.palette.recyclerview_component.*
+import iced.egret.palette.model.Folder
+import iced.egret.palette.model.Picture
+import iced.egret.palette.recyclerview_component.CollectionViewItem
+import iced.egret.palette.recyclerview_component.CoverableItem
+import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 
@@ -39,9 +43,8 @@ class CollectionViewFragment :
 
     private var mContents = mutableListOf<Coverable>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
-    private var mHeaders = mutableListOf<SectionHeaderItem>()
-    lateinit var adapter: FlexibleAdapter<SectionHeaderItem>
-    private var selectedSectionHeader : SectionHeaderItem? = null
+    lateinit var adapter: FlexibleAdapter<CollectionViewItem>
+    private var mSelectedContentType : String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -73,13 +76,13 @@ class CollectionViewFragment :
 
         if (savedInstanceState != null) {
 
-            // If selected section saved, restore it, otherwise get out
-            val selectedSectionPosition = savedInstanceState.getInt(selectedHeaderPosition, -1)
-            if (selectedSectionPosition == -1) return
-            selectedSectionHeader = mHeaders[selectedSectionPosition]
-            isolateSection(selectedSectionHeader!!)
+            // If selected content type is saved, restore it, otherwise get out
+            val contentType = savedInstanceState.getString(selectedHeaderPosition, "")
+            if (contentType.isEmpty()) return
+            mSelectedContentType = contentType
+            isolateContent(mSelectedContentType!!)
 
-            // Must restore adapter and helper AFTER section isolation to keep position ints consistent
+            // Must restore adapter and helper AFTER type isolation to keep position ints consistent
             adapter.onRestoreInstanceState(savedInstanceState)
             mActionModeHelper.restoreSelection(mDefaultToolbar)
 
@@ -92,7 +95,7 @@ class CollectionViewFragment :
 
     override fun onSaveInstanceState(outState: Bundle) {
         adapter.onSaveInstanceState(outState)
-        outState.putInt(selectedHeaderPosition, mHeaders.indexOf(selectedSectionHeader))
+        outState.putString(selectedHeaderPosition, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
 
@@ -130,8 +133,7 @@ class CollectionViewFragment :
 
             fetchContents()
             val manager = GridLayoutManager(activity, 3)
-            adapter = FlexibleAdapter(mHeaders, this, true).expandItemsAtStartUp()
-            manager.spanSizeLookup = GridSectionSpanLookup(adapter, 3)
+            adapter = FlexibleAdapter(mContentItems, this, true)
 
             mCollectionRecyclerView.layoutManager = manager
             mCollectionRecyclerView.adapter = adapter
@@ -175,30 +177,44 @@ class CollectionViewFragment :
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
         mContentItems.map {item -> item.setSelection(false)}
-        restoreAllSections()
-        selectedSectionHeader = null  // no selection active
+        restoreAllContent()
+        mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
     }
 
-    private fun isolateSection(toIsolateHeader: SectionHeaderItem) {
-        for (header in mHeaders) {
-            if (header != toIsolateHeader) {
-                // adapter.removeSection() does not work,
-                // because it collapses/removes the section's items,
-                // and then deletes section_items.size's worth of
-                // items AGAIN.
-                val position = adapter.getGlobalPositionOf(header)
-                adapter.collapse(position)
-                adapter.removeItem(position)
+    private fun inferContentType(content: Coverable) : String? {
+        return when (content) {
+            is Folder -> "folders"
+            is Album -> "albums"
+            is Picture -> "pictures"
+            else -> null
+        }
+    }
+
+    private fun isolateContent(isolateType: String) {
+        // sanity check
+        for (item in mContents) {
+            inferContentType(item) ?: return
+        }
+
+        // should never fail because of above sanity check
+        var shift = 0
+        val isolateTypeList = CollectionManager.getContentsMap()[isolateType]!!
+        for (i in 0 until mContentItems.size) {
+            if (mContents[i] !in isolateTypeList) {
+                val removeType: String = inferContentType(mContents[i]) ?: return
+                val removeTypeList = CollectionManager.getContentsMap()[removeType]!!
+                adapter.removeRange(i+shift, removeTypeList.size)
+                shift += removeTypeList.size
             }
         }
     }
 
-    private fun restoreAllSections() {
-        for (header in mHeaders) {
-            if (!adapter.contains(header)) {
-                adapter.addSection(header, CollectionManager.SectionComparator)
-                adapter.expand(header, true) // skipping init=true causes duplication
+    private fun restoreAllContent() {
+        for (i in 0 until mContentItems.size) {
+            val item = mContentItems[i]
+            if (!adapter.contains(item)) {
+                adapter.addItem(i, item)
             }
         }
     }
@@ -214,9 +230,10 @@ class CollectionViewFragment :
         }
         else {
             val coverable = mContents[cardinalPosition]
-            val positionInSection = (adapter.getSectionHeader(absolutePosition) as SectionHeaderItem)
-                    .getSubItemPosition(mContentItems[cardinalPosition])
-            val updates = CollectionManager.launch(coverable, position = positionInSection, c = this.context)
+            val relativePosition =
+                    CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
+                            ?: return false
+            val updates = CollectionManager.launch(coverable, position = relativePosition, c = this.context)
             if (updates) refreshData()
             false
         }
@@ -224,8 +241,7 @@ class CollectionViewFragment :
 
     /**
      * @param absolutePosition the actual position amongst all on-screen items
-     * cardinalPosition is absolutePosition while ignoring headers
-     * relativePosition is absolutePosition while ignoring all other sections (but keeping own header)
+     * relativePosition is absolutePosition while ignoring all other types
      *
      * All positions refer to arrangement before click handling.
      */
@@ -233,13 +249,13 @@ class CollectionViewFragment :
         val cardinalPosition = getCardinalPosition(absolutePosition)
         val relativePosition : Int
 
-        // Isolate the section BEFORE ActionMode is created, so that the correct
-        // section position can be noted by the ActionModeHelper (instead of global position,
-        // which unnecessarily accounts for temporarily remove sections)
-        if (selectedSectionHeader == null) {
-            selectedSectionHeader = adapter.getSectionHeader(absolutePosition) as SectionHeaderItem
-            isolateSection(selectedSectionHeader!!)
-            // adapter only has one section now, so global == relative
+        // Isolate the content type BEFORE ActionMode is created, so that the correct
+        // relative position can be noted by the ActionModeHelper (instead of global position,
+        // which unnecessarily accounts for temporarily remove types)
+        if (mSelectedContentType == null) {
+            mSelectedContentType = inferContentType(mContents[absolutePosition]) ?: return
+            isolateContent(mSelectedContentType!!)
+            // adapter only holds one type now, so global == relative
             relativePosition = adapter.getGlobalPositionOf(mContentItems[cardinalPosition])
         }
         else {
@@ -253,9 +269,7 @@ class CollectionViewFragment :
      * FlexibleAdapter's doesn't want to work, so making my own.
      */
     private fun getCardinalPosition(position: Int) : Int {
-        val header = adapter.getSectionHeader(position)
-        val headerPosition = adapter.headerItems.indexOf(header)
-        return position - headerPosition - 1
+        return position
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {
@@ -380,7 +394,7 @@ class CollectionViewFragment :
      */
     fun refreshData() {
         fetchContents()
-        adapter.updateDataSet(mHeaders)
+        adapter.updateDataSet(mContentItems)
     }
 
     /**
@@ -389,16 +403,10 @@ class CollectionViewFragment :
     private fun fetchContents() {
         mContents.clear()
         mContentItems.clear()
-        mHeaders.clear()
 
         val contentsMap = CollectionManager.getContentsMap()
         for ((type, coverables) in contentsMap) {
-            val header = SectionHeaderItem(type)
-            val coverableItems = coverables.map {content -> CollectionViewItem(content, header)}
-            for (item in coverableItems) {
-                header.addSubItem(item)
-            }
-            mHeaders.add(header)
+            val coverableItems = coverables.map {content -> CollectionViewItem(content)}
             mContents.addAll(coverables)
             mContentItems.addAll(coverableItems)
         }

@@ -2,7 +2,7 @@ package iced.egret.palette.recyclerview_component
 
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
-import eu.davidea.flexibleadapter.items.AbstractSectionableItem
+import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.model.Coverable
 
@@ -10,8 +10,8 @@ import iced.egret.palette.model.Coverable
  * An item for an expandable section.
  * Has IFlexible and ISectionable functionality.
  */
-abstract class CoverableItem(private val obj: Coverable, header: SectionHeaderItem) :
-        AbstractSectionableItem<CoverViewHolder, SectionHeaderItem>(header) {
+abstract class CoverableItem(private val obj: Coverable) :
+        AbstractFlexibleItem<CoverViewHolder>() {
 
     var viewHolder: CoverViewHolder? = null
     protected var isSelected = false

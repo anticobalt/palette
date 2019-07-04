@@ -30,7 +30,7 @@ class CollectionViewFragment :
         FlexibleAdapter.OnItemLongClickListener {
 
     companion object SaveDataKeys {
-        const val selectedHeaderPosition = "CollectionViewFragment_SHP"
+        const val selectedType = "CollectionViewFragment_ST"
     }
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
@@ -76,7 +76,7 @@ class CollectionViewFragment :
         if (savedInstanceState != null) {
 
             // If selected content type is saved, restore it, otherwise get out
-            val contentType = savedInstanceState.getString(selectedHeaderPosition, "")
+            val contentType = savedInstanceState.getString(selectedType, "")
             if (contentType.isEmpty()) return
             mSelectedContentType = contentType
             isolateContent(mSelectedContentType!!)
@@ -96,7 +96,7 @@ class CollectionViewFragment :
 
     override fun onSaveInstanceState(outState: Bundle) {
         adapter.onSaveInstanceState(outState)
-        outState.putString(selectedHeaderPosition, mSelectedContentType)
+        outState.putString(selectedType, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
 
@@ -223,13 +223,12 @@ class CollectionViewFragment :
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
         val clickedItem = adapter.getItem(absolutePosition) as? CoverableItem
                 ?: return true
-        val cardinalPosition = getCardinalPosition(absolutePosition)
 
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, clickedItem)
         }
         else {
-            val coverable = mContents[cardinalPosition]
+            val coverable = mContents[absolutePosition]
             val relativePosition =
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
@@ -246,7 +245,6 @@ class CollectionViewFragment :
      * All positions refer to arrangement before click handling.
      */
     override fun onItemLongClick(absolutePosition: Int) {
-        val cardinalPosition = getCardinalPosition(absolutePosition)
         val relativePosition : Int
 
         // Isolate the content type BEFORE ActionMode is created, so that the correct
@@ -256,20 +254,12 @@ class CollectionViewFragment :
             mSelectedContentType = inferContentType(mContents[absolutePosition]) ?: return
             isolateContent(mSelectedContentType!!)
             // adapter only holds one type now, so global == relative
-            relativePosition = adapter.getGlobalPositionOf(mContentItems[cardinalPosition])
+            relativePosition = adapter.getGlobalPositionOf(mContentItems[absolutePosition])
         }
         else {
             relativePosition = absolutePosition
         }
-        mActionModeHelper.onLongClick(mDefaultToolbar, relativePosition, mContentItems[cardinalPosition])
-    }
-
-    /**
-     * Given it's absolute position, get item's position ignoring headers.
-     * FlexibleAdapter's doesn't want to work, so making my own.
-     */
-    private fun getCardinalPosition(position: Int) : Int {
-        return position
+        mActionModeHelper.onLongClick(mDefaultToolbar, relativePosition, mContentItems[absolutePosition])
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {

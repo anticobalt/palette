@@ -28,7 +28,7 @@ class PinnedCollectionsFragment :
         FlexibleAdapter.OnItemLongClickListener {
 
     companion object SaveDataKeys {
-        const val selectedHeaderPosition = "PinnedCollectionFragment_SHP"
+        const val selectedType = "PinnedCollectionFragment_ST"
     }
 
     private var mRootView : View? = null
@@ -54,7 +54,7 @@ class PinnedCollectionsFragment :
 
     override fun onSaveInstanceState(outState: Bundle) {
         adapter.onSaveInstanceState(outState)
-        outState.putString(selectedHeaderPosition, mSelectedContentType)
+        outState.putString(selectedType, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
 
@@ -63,7 +63,7 @@ class PinnedCollectionsFragment :
 
         if (savedInstanceState != null) {
             // If selected content type is saved, restore it, otherwise get out
-            val contentType = savedInstanceState.getString(selectedHeaderPosition, "")
+            val contentType = savedInstanceState.getString(selectedType, "")
             if (contentType.isEmpty()) return
             mSelectedContentType = contentType
             isolateContent(mSelectedContentType!!)
@@ -151,7 +151,6 @@ class PinnedCollectionsFragment :
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
         val clickedItem = adapter.getItem(absolutePosition) as? CoverableItem
                 ?: return false
-        val cardinalPosition = getCardinalPosition(absolutePosition)
 
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, clickedItem)
@@ -161,7 +160,7 @@ class PinnedCollectionsFragment :
             val fragment = MainFragmentManager.fragments[fragmentIndex] as CollectionViewFragment
             fragment.activity?.findViewById<SlidingPaneLayout>(R.id.slidingPaneMain)?.closePane()
 
-            val coverable = mCollections[cardinalPosition]
+            val coverable = mCollections[absolutePosition]
             CollectionManager.clearStack()
             CollectionManager.launch(coverable)  // == true
             fragment.setDefaultToolbarTitle()
@@ -246,14 +245,6 @@ class PinnedCollectionsFragment :
                 adapter.addItem(i, item)
             }
         }
-    }
-
-    /**
-     * Given it's absolute position, get item's position ignoring headers.
-     * FlexibleAdapter's doesn't want to work, so making my own.
-     */
-    private fun getCardinalPosition(position: Int) : Int {
-        return position
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {

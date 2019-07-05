@@ -24,19 +24,28 @@ object MainFragmentManager {
         fragments[COLLECTION_CONTENTS] = CollectionViewFragment()
     }
 
-    /**
-     * A hack: https://stackoverflow.com/a/18611036
-     * Good since 2013, so good enough for me
-     *//*
-    fun getFragmentByIndex(index: Int) : MainFragment {
-        val fragment = nativeFragmentManager.findFragmentByTag(
-                "android:switcher:" + R.id.viewpagerMainFragments + ":" + index
-        )
-        return fragment as MainFragment
-    }*/
+    fun updateFragments(fragments: List<Fragment>) {
+        loop@ for (fragment in fragments) {
+            val index : Int = when (fragment) {
+                is PinnedCollectionsFragment -> PINNED_COLLECTIONS
+                is CollectionViewFragment -> COLLECTION_CONTENTS
+                else -> continue@loop
+            }
+            this.fragments[index] = fragment
+        }
+    }
 
     fun notifyAlbumUpdateFromCollectionView() {
-        (fragments[PINNED_COLLECTIONS] as PinnedCollectionsFragment).notifyChanges()
+        (fragments[PINNED_COLLECTIONS] as PinnedCollectionsFragment).refreshFragment()
+    }
+
+    fun notifyAlbumDeletedFromPinnedCollections() {
+        val current = CollectionManager.currentCollection
+        val allCollections = CollectionManager.getCollections()
+        if (current != null && !allCollections.contains(current)) {
+            CollectionManager.resetStack()
+        }
+        (fragments[COLLECTION_CONTENTS] as CollectionViewFragment).refreshFragment()
     }
 
 }

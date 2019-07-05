@@ -13,13 +13,16 @@ import kotlin.collections.ArrayList
 object CollectionManager {
 
     private const val originalExternalStorageName = "emulated"
+    const val FOLDER_KEY = "folders"
+    const val ALBUM_KEY = "albums"
+    const val PICTURE_KEY = "pictures"
 
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
     private val mContentsMap = linkedMapOf<String, List<Coverable>>(
-            "folders" to listOf(),
-            "albums" to listOf(),
-            "pictures" to listOf()
+            FOLDER_KEY to listOf(),
+            ALBUM_KEY to listOf(),
+            PICTURE_KEY to listOf()
     )
 
     val albums: List<Album>
@@ -33,6 +36,44 @@ object CollectionManager {
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
+    /**
+     * Used by FlexibleAdapter to sort sections with Coverables
+     */
+    /*
+    object SectionComparator : Comparator<IFlexible<*>> {
+
+        // Sort by same order as in mContentsMap
+        override fun compare(p0: IFlexible<*>, p1: IFlexible<*>): Int {
+            val types = mContentsMap.keys.map {key -> key.toLowerCase()}
+            var title0 = ""
+            var title1 = ""
+
+            if (p0 is SectionHeaderItem && p1 is SectionHeaderItem) {
+                title0 = p0.title.toLowerCase()
+                title1 = p1.title.toLowerCase()
+            }
+            else if (p0 is CoverableItem && p1 is CoverableItem) {
+                title0 = p0.header.title.toLowerCase()
+                title1 = p1.header.title.toLowerCase()
+            }
+            else if (p0 is SectionHeaderItem && p1 is CoverableItem){
+                title0 = p0.title.toLowerCase()
+                title1 = p1.header.title.toLowerCase()
+            }
+            else if (p0 is CoverableItem && p1 is SectionHeaderItem){
+                title0 = p0.header.title.toLowerCase()
+                title1 = p1.title.toLowerCase()
+            }
+
+            return when {
+                types.indexOf(title0) < types.indexOf(title1) -> -1
+                types.indexOf(title0) == types.indexOf(title1) -> 0
+                else -> 1
+            }
+        }
+    }
+    */
+
     fun setup(activity: FragmentActivity) {
 
         val root = Storage.retrievedFolders.firstOrNull()
@@ -45,8 +86,8 @@ object CollectionManager {
             mCollections.clear()
 
             for (folder in root.folders) {
-                val practicalRoot = getPracticalRoot(folder)
-                mCollections.add(practicalRoot)
+                //val practicalRoot = getPracticalRoot(folder)
+                mCollections.add(folder)
             }
 
             val externalStorage = mCollections.find {collection -> collection.name == originalExternalStorageName }
@@ -58,7 +99,6 @@ object CollectionManager {
             }
         }
 
-        mCollectionStack.push(mCollections[0])
         mCollections.addAll(Storage.retrievedAlbums)
 
     }
@@ -97,7 +137,7 @@ object CollectionManager {
     fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Int {
         val newAlbum : Album
         val position : Int
-        if (addToCurrent && currentCollection is Album) {
+        if (addToCurrent && currentCollection is Album) {  // only albums can have albums
             val currentAlbum = currentCollection as Album
             newAlbum = Album(name, path = "${currentAlbum.path}/$name")
             position = currentAlbum.albums.size
@@ -112,11 +152,14 @@ object CollectionManager {
         return position
     }
 
-    fun deleteAlbumsByPosition(positions: ArrayList<Long>) {
+    /**
+     * @param positions relative positions of albums within albums list
+     */
+    fun deleteAlbumsByRelativePosition(positions: List<Int>) {
         val indices = positions.toSet()
         val remainingCollections : MutableList<Collection> = folders.toMutableList()
         for (i in 0 until albums.size) {
-            if (!indices.contains(i.toLong())) {
+            if (!indices.contains(i)) {
                 remainingCollections.add(albums[i])
             }
         }
@@ -177,7 +220,9 @@ object CollectionManager {
      *
      * @return Adapter needs to be updated (true) or not (false)
      */
-    fun launch(item: Coverable, holder: CoverViewHolder, position: Int = -1) : Boolean {
+    fun launch(item: Coverable, holder: CoverViewHolder? = null, position: Int = -1, c: Context? = null) : Boolean {
+        var context = c  // TODO: remove backwards compatibility
+
         if (!item.terminal) {
             if (item as? Collection != null) {
                 currentCollection = item
@@ -186,7 +231,8 @@ object CollectionManager {
         }
         else {
             if (item as? TerminalCoverable != null) {
-                val context : Context? = holder.ivItem?.context
+                if (holder != null) context = holder.ivItem?.context
+
                 val intent = Intent(context, item.activity)
                 val key = context?.getString(R.string.intent_item_key)
                 intent.putExtra(key, position)
@@ -208,6 +254,33 @@ object CollectionManager {
 
     fun clearStack() {
         mCollectionStack.clear()
+    }
+
+    fun resetStack() {
+        mCollectionStack.clear()
+        currentCollection = mCollections.firstOrNull()
+    }
+
+    /**
+     * Given a real path to a Collection, use it to restore stack state.
+     * If can't unwind completely, do it as much as possible, then return.
+     */
+    fun unwindStack(path: String) {
+        val levels = path.split("/")
+        var levelIndex = 0
+        var collectionsOnLevel = mCollections.toList()
+
+        for (level in levels) {
+            // Use path to find Collection because those (unlike names) are immutable.
+            // If can't find Collection, move to next level,
+            // as Collections may have been merged during setup()
+            // via a function like getPracticalRoot().
+            currentCollection = collectionsOnLevel.find {
+                collection -> collection.path.split("/")[levelIndex] == level }
+                    ?: continue
+            collectionsOnLevel = (currentCollection as Collection).getContents().filterIsInstance<Collection>()
+            levelIndex += 1
+        }
     }
 
     fun getCurrentCollectionPictures() : List<Picture> {

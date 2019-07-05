@@ -4,8 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
 import iced.egret.palette.fragment.MainFragment
@@ -16,7 +16,11 @@ const val READ_EXTERNAL_CODE = 100
 const val WRITE_EXTERNAL_CODE = 101
 const val TAG = "VIEW"
 
-class MainActivity : FragmentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    companion object SaveDataKeys {
+        const val onScreenCollection = "on-screen-collection"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,12 +29,86 @@ class MainActivity : FragmentActivity() {
         if (!Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
-        else {
-            Storage.setup(this)
-        }
+        else Storage.setup(this)
 
         buildApp()
 
+        if (savedInstanceState == null) {
+            // Don't make fragments again if rotating device,
+            // because they're automatically remade
+            makeFragments()
+        }
+        else {
+            // Save the remade fragments (which are technically different)
+            MainFragmentManager.updateFragments(supportFragmentManager.fragments)
+            // Try to restore Collection being viewed
+            val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
+            CollectionManager.unwindStack(navigateToPath)
+        }
+
+        styleSlidingPane()
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState?.putString(onScreenCollection, CollectionManager.currentCollection?.path)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onStop() {
+        // Restore fragment views so fragments can be rebuilt properly if activity is recreated.
+        // If only restarting and NOT recreating activity, fragments won't be re-isolated
+        // (which is expected behaviour, as any previously active ActionMode won't be reactivated
+        // either).
+        restoreAllFragments()
+        super.onStop()
+    }
+
+    /**
+     * Alert all other MainFragments that argument fragment has finished onCreateView(),
+     * and thus its views can be indirectly manipulated e.g. via isolateFragment().
+     */
+    fun notifyFragmentCreationFinished(finishedFragment: MainFragment) {
+        for (fragment in MainFragmentManager.fragments) {
+            (fragment as MainFragment).onFragmentCreationFinished(finishedFragment)
+        }
+    }
+
+    /**
+     * Setup up models and auxiliary visuals.
+     * If Storage is not set up before this, the app won't immediately crash, but it will
+     * after some user input.
+     */
+    private fun buildApp() {
+        CollectionManager.setup(this)
+        Painter.color = ContextCompat.getColor(this, Painter.colorResource)
+    }
+
+    private fun makeFragments() {
+        MainFragmentManager.setup(supportFragmentManager)
+        MainFragmentManager.createFragments()
+        val fragments = MainFragmentManager.fragments.toMutableList()
+
+        // bind fragments
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.linksFragment, fragments[MainFragmentManager.PINNED_COLLECTIONS])
+                .commit()
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.contentsFragment, fragments[MainFragmentManager.COLLECTION_CONTENTS])
+                .commit()
+    }
+
+    private fun styleSlidingPane() {
+        // convert dp to px: https://stackoverflow.com/a/4275969
+        val dpParallax = 60
+        val scale = resources.displayMetrics.density
+        val pxParallax = (dpParallax * scale + 0.5f).toInt()
+
+        slidingPaneMain.parallaxDistance = pxParallax  // make left move when scrolling right
+        slidingPaneMain.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
+        slidingPaneMain.setShadowResourceLeft(R.drawable.shadow)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -49,6 +127,8 @@ class MainActivity : FragmentActivity() {
                 } else {
                     Storage.setup(this)
                     buildApp()
+                    makeFragments()
+                    styleSlidingPane()
                 }
             }
         }
@@ -69,40 +149,23 @@ class MainActivity : FragmentActivity() {
     }
 
     /**
-     * Setup up models, visuals, and fragments.
-     * If Storage is not set up before this, the app won't immediately crash, but it will
-     * after some user input.
+     * Block click actions for all fragments except the given one.
      */
-    private fun buildApp() {
-        CollectionManager.setup(this)
-        Painter.color = ContextCompat.getColor(this, Painter.colorResource)
-        buildFragments()
+    fun isolateFragment(toIsolateFragment: MainFragment) {
+        for (fragment in MainFragmentManager.fragments) {
+            if (fragment != toIsolateFragment) {
+                (fragment as MainFragment).setClicksBlocked(true)
+            }
+        }
     }
 
-    private fun buildFragments() {
-        MainFragmentManager.setup(supportFragmentManager)
-        MainFragmentManager.createFragments()
-        val fragments = MainFragmentManager.fragments.toMutableList()
-
-        // bind fragments
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.linksFragment, fragments[MainFragmentManager.PINNED_COLLECTIONS])
-                .commit()
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.contentsFragment, fragments[MainFragmentManager.COLLECTION_CONTENTS])
-                .commit()
-
-        // convert dp to px: https://stackoverflow.com/a/4275969
-        val dpParallax = 60
-        val scale = resources.displayMetrics.density
-        val pxParallax = (dpParallax * scale + 0.5f).toInt()
-
-        slidingPaneMain.parallaxDistance = pxParallax  // make left move when scrolling right
-        slidingPaneMain.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
-        slidingPaneMain.setShadowResourceLeft(R.drawable.shadow)
-
+    /**
+     * Undo isolateFragment()
+     */
+    fun restoreAllFragments() {
+        for (fragment in MainFragmentManager.fragments) {
+            (fragment as MainFragment).setClicksBlocked(false)
+        }
     }
 
 }

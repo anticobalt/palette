@@ -17,7 +17,7 @@ import java.io.Serializable
  * - size
  * - totalSize
  */
-abstract class Collection(override var name: String) : Coverable {
+abstract class Collection(override var name: String, val path: String) : Coverable {
 
     override val terminal = false
     override val cover = mutableMapOf<String, Any>(
@@ -95,6 +95,7 @@ abstract class Collection(override var name: String) : Coverable {
  * Properties:
  * - name
  * - path
+ * - truePath
  * - terminal
  * - deletable
  * - cover
@@ -105,7 +106,8 @@ abstract class Collection(override var name: String) : Coverable {
  *
  * Backing fields _folders and _pictures only used when adding/deleting internally.
  */
-class Folder(name: String, val path: String, subFolders: MutableList<Folder> = mutableListOf()) : Collection(name) {
+class Folder(name: String, val truePath: String, subFolders: MutableList<Folder> = mutableListOf())
+    : Collection(name, CollectionConstructorHelper.simplifyFilesystemPath(truePath)) {
 
     override var _pictures : MutableList<Picture> = ArrayList()
     override val pictures : List<Picture>
@@ -205,7 +207,7 @@ data class FolderData(val name: String,
  *
  * Backing fields _folders, _albums, and _pictures only used when adding/deleting internally.
  */
-class Album(name: String, val path: String) : Collection(name) {
+class Album(name: String, path: String) : Collection(name, path) {
 
     companion object {
         const val NAME_MAX_LENGTH = 25
@@ -341,4 +343,28 @@ data class AlbumData(val name: String,
         album.addPictures(pictures)
         return album
     }
+}
+
+object CollectionConstructorHelper {
+
+    /**
+     * Manually remove unnecessarily levels from path.
+     * Such levels unnecessary because they're always empty.
+     */
+    fun simplifyFilesystemPath(path: String) : String {
+        val levels = path.split("/")
+        var levelIndex = 0
+        val banned = listOf("", "storage")
+        val newLevels = mutableListOf<String>()
+
+        for (level in levels) {
+            if (level != banned.getOrNull(levelIndex)) {
+                newLevels.add(level)
+            }
+            levelIndex += 1
+        }
+
+        return newLevels.joinToString("/")
+    }
+
 }

@@ -13,6 +13,7 @@ object Painter {
     var color: Int? = null  // set by getColor() in an activity or fragment, using colorResource
 
     fun paintDrawable(drawable: Drawable?) {
+        drawable?.mutate()  // make drawable not share state with others
         drawable?.setTint(color as Int)
     }
 

@@ -258,13 +258,24 @@ class PinnedCollectionsFragment :
     }
 
     private fun isolateContent(isolateType: String) {
-        var shift = 0
+        var index = 0
+        var adapterOffset = 0
         val isolateTypeList = getAllOfSameType(getInstanceOfType(isolateType) ?: return)
-        for (i in 0 until mCollectionItems.size) {
-            if (mCollections[i] !in isolateTypeList) {
-                val removeTypeList = getAllOfSameType(mCollections[i])
-                adapter.removeRange(i+shift, removeTypeList.size)
-                shift += removeTypeList.size
+
+        // Jump to this first item of each type and batch remove all of its type if required.
+        // This only works because items of the same type are guaranteed to be successive
+        // inside mContents, since it is copied from CollectionManager.
+        while (index < mCollections.size) {
+            if (mCollections[index] in isolateTypeList) {
+                // keeping this type
+                index += isolateTypeList.size
+                adapterOffset += isolateTypeList.size
+            } else {
+                // removing this type
+                val removeTypeList = getAllOfSameType(mCollections[index])
+                adapter.removeRange(adapterOffset, removeTypeList.size)
+                // next type is now at position adapterOffset after remove, so don't increment
+                index += removeTypeList.size
             }
         }
     }

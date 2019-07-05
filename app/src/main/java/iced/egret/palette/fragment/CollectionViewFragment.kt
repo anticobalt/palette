@@ -276,20 +276,30 @@ class CollectionViewFragment :
     }
 
     private fun isolateContent(isolateType: String) {
-        // sanity check
+        // sanity check; all code after should never fail
         for (item in mContents) {
             inferContentType(item) ?: return
         }
 
-        // should never fail because of above sanity check
-        var shift = 0
+        var index = 0
+        var adapterOffset = 0
         val isolateTypeList = CollectionManager.getContentsMap()[isolateType]!!
-        for (i in 0 until mContentItems.size) {
-            if (mContents[i] !in isolateTypeList) {
-                val removeType: String = inferContentType(mContents[i]) ?: return
+
+        // Jump to this first item of each type and batch remove all of its type if required.
+        // This only works because items of the same type are guaranteed to be successive
+        // inside mContents, since it is copied from CollectionManager.
+        while (index < mContents.size) {
+            if (mContents[index] in isolateTypeList) {
+                // keeping this type
+                index += isolateTypeList.size
+                adapterOffset += isolateTypeList.size
+            } else {
+                // removing this type
+                val removeType: String = inferContentType(mContents[index])!!
                 val removeTypeList = CollectionManager.getContentsMap()[removeType]!!
-                adapter.removeRange(i+shift, removeTypeList.size)
-                shift += removeTypeList.size
+                adapter.removeRange(adapterOffset, removeTypeList.size)
+                // next type is now at position adapterOffset after remove, so don't increment
+                index += removeTypeList.size
             }
         }
     }

@@ -315,6 +315,10 @@ class Album(name: String, path: String) : Collection(name, path) {
         size -= 1
     }
 
+    fun removeAlbums(albums: List<Album>) {
+        albums.map {album -> removeAlbum(album) }
+    }
+
 }
 
 data class AlbumData(val name: String,

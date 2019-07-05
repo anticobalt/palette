@@ -155,15 +155,26 @@ object CollectionManager {
     /**
      * @param positions relative positions of albums within albums list
      */
-    fun deleteAlbumsByRelativePosition(positions: List<Int>) {
+    fun deleteAlbumsByRelativePosition(positions: List<Int>, deleteFromCurrent: Boolean = false) {
         val indices = positions.toSet()
-        val remainingCollections : MutableList<Collection> = folders.toMutableList()
-        for (i in 0 until albums.size) {
-            if (!indices.contains(i)) {
-                remainingCollections.add(albums[i])
+
+        if (deleteFromCurrent) {
+            val toDeleteAlbums = mutableListOf<Album>()
+            val currentAlbum = (currentCollection as? Album) ?: return  // should always succeed
+            for (position in positions) {
+                toDeleteAlbums.add(currentAlbum.albums[position])
             }
+            currentAlbum.removeAlbums(toDeleteAlbums)
         }
-        mCollections = remainingCollections
+        else {
+            val remainingCollections : MutableList<Collection> = folders.toMutableList()
+            for (i in 0 until albums.size) {
+                if (!indices.contains(i)) {
+                    remainingCollections.add(albums[i])
+                }
+            }
+            mCollections = remainingCollections
+        }
         Storage.saveAlbumsToDisk(albums)
     }
 

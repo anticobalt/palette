@@ -194,6 +194,15 @@ class CollectionViewFragment :
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
 
+        fun refresh() {
+            refreshFragment()
+            MainFragmentManager.notifyAlbumUpdateFromCollectionView()  // to update cover
+        }
+
+        fun toast(message: String) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+
         // sanity check that selected type is valid
         CollectionManager.getContentsMap()[mSelectedContentType] ?: return false
 
@@ -205,43 +214,38 @@ class CollectionViewFragment :
         val typeSingular = typePlural.dropLast(1)  // only works on s-appending plurals
         val typeString = if (coverables.size > 1) typePlural else typeSingular
 
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.actionViewCollectionAlbumActions -> {
-                true  // must return true for submenu to popup
+                // No changes, don't refresh, so exit immediately.
+                // Must return true for submenus to popup.
+                return true
             }
             R.id.actionViewCollectionAddToAlbum -> {
                 DialogGenerator.addToAlbum(context!!) { indices, albums ->
                     val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
                     val albumString = if (destinations.size > 1) "albums" else "album"
                     CollectionManager.addContentToAllAlbums(coverables, destinations)
-                    Toast.makeText(
-                            context,
-                            "Added ${coverables.size} $typeString to ${destinations.size} $albumString.",
-                            Toast.LENGTH_SHORT
-                    ).show()
-                    refreshFragment()
-                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()  // to update cover
+                    toast("Added ${coverables.size} $typeString to ${destinations.size} $albumString.")
+                    refresh()
                 }
-                true
             }
             R.id.actionViewCollectionRemoveFromAlbum -> {
                 DialogGenerator.removeFromAlbum(context!!, typeString) {
                     CollectionManager.removeContentFromCurrentAlbum(coverables)
-                    Toast.makeText(
-                            context,
-                            "Removed ${coverables.size} $typeString.",
-                            Toast.LENGTH_SHORT
-                    ).show()
-                    refreshFragment()
-                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()  // to update cover
+                    toast("Removed ${coverables.size} $typeString.")
+                    refresh()
                 }
-                true
             }
             R.id.actionViewCollectionDelete -> {
-                true
+                DialogGenerator.deleteAlbum(context!!) {
+                    CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions, deleteFromCurrent = true)
+                    toast("Deleted ${adapter.selectedItemCount} $typeString")
+                    refresh()
+                }
             }
-            else -> false
+            else -> {}
         }
+        return true
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {

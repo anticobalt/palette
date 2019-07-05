@@ -1,5 +1,6 @@
 package iced.egret.palette.recyclerview_component
 
+import android.graphics.Color
 import android.view.View
 import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +17,22 @@ class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
 
     override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>): CoverViewHolder {
         return CoverViewHolder(view, adapter, imageViewId = R.id.ivPinnedCollectionCover, textViewId = R.id.tvPinnedCollectionLabel)
+    }
+
+    override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,
+                                holder: CoverViewHolder,
+                                position: Int,
+                                payloads: MutableList<Any>?) {
+
+        // bind holder as normal
+        super.bindViewHolder(adapter, holder, position, payloads)
+
+        // Darken a little, so that white text is readable
+        // https://stackoverflow.com/a/15896811
+        holder.ivItem?.setColorFilter(
+                Color.rgb(200, 200, 200),
+                android.graphics.PorterDuff.Mode.MULTIPLY
+        )
     }
 
     /**

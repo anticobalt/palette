@@ -155,6 +155,7 @@ class PinnedCollectionsFragment :
                 val callback = callback@{
                     CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions)
                     refreshFragment()
+                    MainFragmentManager.notifyAlbumDeletedFromPinnedCollections()
                 }
                 DialogGenerator.deleteAlbum(context ?: return false, onConfirm = callback)
             }

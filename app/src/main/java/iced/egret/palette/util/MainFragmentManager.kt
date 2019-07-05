@@ -39,4 +39,13 @@ object MainFragmentManager {
         (fragments[PINNED_COLLECTIONS] as PinnedCollectionsFragment).refreshFragment()
     }
 
+    fun notifyAlbumDeletedFromPinnedCollections() {
+        val current = CollectionManager.currentCollection
+        val allCollections = CollectionManager.getCollections()
+        if (current != null && !allCollections.contains(current)) {
+            CollectionManager.resetStack()
+        }
+        (fragments[COLLECTION_CONTENTS] as CollectionViewFragment).refreshFragment()
+    }
+
 }

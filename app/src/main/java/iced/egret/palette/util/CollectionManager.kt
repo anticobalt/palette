@@ -256,6 +256,11 @@ object CollectionManager {
         mCollectionStack.clear()
     }
 
+    fun resetStack() {
+        mCollectionStack.clear()
+        currentCollection = mCollections.firstOrNull()
+    }
+
     /**
      * Given a real path to a Collection, use it to restore stack state.
      * If can't unwind completely, do it as much as possible, then return.

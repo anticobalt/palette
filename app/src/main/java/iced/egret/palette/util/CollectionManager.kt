@@ -13,13 +13,16 @@ import kotlin.collections.ArrayList
 object CollectionManager {
 
     private const val originalExternalStorageName = "emulated"
+    const val FOLDER_KEY = "folders"
+    const val ALBUM_KEY = "albums"
+    const val PICTURE_KEY = "pictures"
 
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
     private val mContentsMap = linkedMapOf<String, List<Coverable>>(
-            "folders" to listOf(),
-            "albums" to listOf(),
-            "pictures" to listOf()
+            FOLDER_KEY to listOf(),
+            ALBUM_KEY to listOf(),
+            PICTURE_KEY to listOf()
     )
 
     val albums: List<Album>
@@ -134,7 +137,7 @@ object CollectionManager {
     fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Int {
         val newAlbum : Album
         val position : Int
-        if (addToCurrent && currentCollection is Album) {
+        if (addToCurrent && currentCollection is Album) {  // only albums can have albums
             val currentAlbum = currentCollection as Album
             newAlbum = Album(name, path = "${currentAlbum.path}/$name")
             position = currentAlbum.albums.size
@@ -149,11 +152,14 @@ object CollectionManager {
         return position
     }
 
-    fun deleteAlbumsByPosition(positions: ArrayList<Long>) {
+    /**
+     * @param positions relative positions of albums within albums list
+     */
+    fun deleteAlbumsByRelativePosition(positions: List<Int>) {
         val indices = positions.toSet()
         val remainingCollections : MutableList<Collection> = folders.toMutableList()
         for (i in 0 until albums.size) {
-            if (!indices.contains(i.toLong())) {
+            if (!indices.contains(i)) {
                 remainingCollections.add(albums[i])
             }
         }

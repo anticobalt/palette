@@ -2,6 +2,7 @@ package iced.egret.palette.fragment
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +21,9 @@ import iced.egret.palette.recyclerview_component.CollectionViewItem
 import iced.egret.palette.recyclerview_component.CoverableItem
 import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.MainFragmentManager
+import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 
 
@@ -161,13 +165,83 @@ class CollectionViewFragment :
         }.withDefaultMode(mode)
     }
 
-    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        (activity as MainActivity).isolateFragment(this)
+
+        val albumActions = menu.findItem(R.id.actionViewCollectionAlbumActions)
+        val addToAlbum = menu.findItem(R.id.actionViewCollectionAddToAlbum)
+        val delete = menu.findItem(R.id.actionViewCollectionDelete)
+        val removeFromAlbum = menu.findItem(R.id.actionViewCollectionRemoveFromAlbum)
+
+        // Make items visible depending on selected content.
+        // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.
+        when (mSelectedContentType) {
+            CollectionManager.FOLDER_KEY,
+            CollectionManager.PICTURE_KEY -> {
+                albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
+                addToAlbum.isVisible = true; Painter.paintDrawable(addToAlbum.icon)
+                delete.isVisible = true; Painter.paintDrawable(delete.icon)
+                if (CollectionManager.currentCollection is Album) {
+                    removeFromAlbum.isVisible = true; Painter.paintDrawable(removeFromAlbum.icon)
+                }
+            }
+            CollectionManager.ALBUM_KEY -> {
+                delete.isVisible = true; Painter.paintDrawable(delete.icon)
+            }
+        }
         return true
     }
 
-    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-        (activity as MainActivity).isolateFragment(this)
-        return true
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+
+        // sanity check that selected type is valid
+        CollectionManager.getContentsMap()[mSelectedContentType] ?: return false
+
+        val coverables = adapter.selectedPositions.map {
+            index -> CollectionManager.getContentsMap()[mSelectedContentType]!![index]
+        }
+
+        val typePlural = mSelectedContentType!!.toLowerCase()
+        val typeSingular = typePlural.dropLast(1)  // only works on s-appending plurals
+        val typeString = if (coverables.size > 1) typePlural else typeSingular
+
+        return when (item.itemId) {
+            R.id.actionViewCollectionAlbumActions -> {
+                true  // must return true for submenu to popup
+            }
+            R.id.actionViewCollectionAddToAlbum -> {
+                DialogGenerator.addToAlbum(context!!) { indices, albums ->
+                    val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
+                    val albumString = if (destinations.size > 1) "albums" else "album"
+                    CollectionManager.addContentToAllAlbums(coverables, destinations)
+                    Toast.makeText(
+                            context,
+                            "Added ${coverables.size} $typeString to ${destinations.size} $albumString.",
+                            Toast.LENGTH_SHORT
+                    ).show()
+                    refreshFragment()
+                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()  // to update cover
+                }
+                true
+            }
+            R.id.actionViewCollectionRemoveFromAlbum -> {
+                DialogGenerator.removeFromAlbum(context!!, typeString) {
+                    CollectionManager.removeContentFromCurrentAlbum(coverables)
+                    Toast.makeText(
+                            context,
+                            "Removed ${coverables.size} $typeString.",
+                            Toast.LENGTH_SHORT
+                    ).show()
+                    refreshFragment()
+                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()  // to update cover
+                }
+                true
+            }
+            R.id.actionViewCollectionDelete -> {
+                true
+            }
+            else -> false
+        }
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -181,13 +255,18 @@ class CollectionViewFragment :
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
+
+        mode.menu.findItem(R.id.actionViewCollectionAlbumActions).isVisible = false
+        mode.menu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = false
+        mode.menu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = false
+        mode.menu.findItem(R.id.actionViewCollectionDelete).isVisible = false
     }
 
     private fun inferContentType(content: Coverable) : String? {
         return when (content) {
-            is Folder -> "folders"
-            is Album -> "albums"
-            is Picture -> "pictures"
+            is Folder -> CollectionManager.FOLDER_KEY
+            is Album -> CollectionManager.ALBUM_KEY
+            is Picture -> CollectionManager.PICTURE_KEY
             else -> null
         }
     }
@@ -233,7 +312,7 @@ class CollectionViewFragment :
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
             val updates = CollectionManager.launch(coverable, position = relativePosition, c = this.context)
-            if (updates) refreshData()
+            if (updates) refreshFragment()
             false
         }
     }
@@ -281,7 +360,7 @@ class CollectionViewFragment :
     private fun onFabClick() {
         val collection = CollectionManager.currentCollection
         if (collection is Album) {
-            //DialogGenerator.createAlbum(context!!, ::createNewAlbum)
+            DialogGenerator.createAlbum(context!!, ::createNewAlbum)
         }
         else {
             Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -290,73 +369,20 @@ class CollectionViewFragment :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        /*
-
-        // Get selected items, if applicable
-        var coverables = listOf<Coverable>()
-        val typePlural = mActiveSection.title.toLowerCase()
-        val typeSingular = typePlural.dropLast(1)  // only works on s-appending plurals
-        var typeString = typePlural  // temp so that it compiles
-        when (item.itemId) {
-            R.id.actionViewCollectionAddToAlbum,
-            R.id.actionViewCollectionRemoveFromAlbum,
-            R.id.actionViewCollectionDelete -> {
-                // null if no active selector, which should never happen
-                coverables = getSelectedCoverables() ?: return false
-                typeString = if (coverables.size > 1) typePlural else typeSingular
-            }
-        }
-
-        // reaching here assumes (if applicable) active selector exists and coverables is not empty
         return when (item.itemId) {
-            R.id.actionViewCollectionAddToAlbum -> {
-                DialogGenerator.addToAlbum(context!!) { indices, albums ->
-                    val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
-                    val albumString = if (destinations.size > 1) "albums" else "album"
-                    CollectionManager.addContentToAllAlbums(coverables, destinations)
-                    Toast.makeText(
-                            context,
-                            "Added ${coverables.size} $typeString to ${destinations.size} $albumString.",
-                            Toast.LENGTH_SHORT
-                    ).show()
-                    mActiveSelector!!.deactivate()
-                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()
-                }
-                true
-            }
-            R.id.actionViewCollectionRemoveFromAlbum -> {
-                DialogGenerator.removeFromAlbum(context!!, typeString) {
-                    CollectionManager.removeContentFromCurrentAlbum(coverables)
-                    Toast.makeText(
-                            context,
-                            "Removed ${coverables.size} $typeString.",
-                            Toast.LENGTH_SHORT
-                    ).show()
-                    mActiveSelector!!.deactivate()
-                    mAdapter.update()
-                    MainFragmentManager.notifyAlbumUpdateFromCollectionView()
-                }
-                true
-            }
-            R.id.actionViewCollectionDelete -> {
-                true
-            }
             R.id.actionViewCollectionSettings -> true
             else -> super.onOptionsItemSelected(item)
-        } */
-
-        return super.onOptionsItemSelected(item)
+        }
     }
 
-    /*
+
     /**
      * Adds new album to current Collection
      */
     private fun createNewAlbum(name: CharSequence) {
         val pos = CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
-        mAdapter.updateNewAlbum(listOf(pos))
+        refreshFragment()
     }
-    */
 
     /**
      * @return handled here (true) or not (false)
@@ -371,7 +397,7 @@ class CollectionViewFragment :
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null){
-            refreshData()
+            refreshFragment()
             true
         }
         else {
@@ -379,12 +405,10 @@ class CollectionViewFragment :
         }
     }
 
-    /**
-     * Refresh the content shown in the recycler view.
-     */
-    fun refreshData() {
+    fun refreshFragment() {
         fetchContents()
         adapter.updateDataSet(mContentItems)
+        mActionModeHelper.destroyActionModeIfCan()
     }
 
     /**

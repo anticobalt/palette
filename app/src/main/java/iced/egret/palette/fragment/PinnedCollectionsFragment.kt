@@ -18,7 +18,9 @@ import iced.egret.palette.recyclerview_component.CoverableItem
 import iced.egret.palette.recyclerview_component.PinnedCollectionsItem
 import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
+import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.fragment_pinned_collections.*
 
 class PinnedCollectionsFragment :
@@ -110,8 +112,8 @@ class PinnedCollectionsFragment :
      * Straight from https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper
      */
     private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
-        //this = ActionMode.Callback instance
-        mActionModeHelper = object : ToolbarActionModeHelper(adapter, R.menu.menu_pinned_collections_edit, this as ActionMode.Callback) {
+        // this = ActionMode.Callback instance
+        mActionModeHelper = object : ToolbarActionModeHelper(adapter, R.menu.menu_pinned_collections_edit, this) {
             // Override to customize the title
             override fun updateContextTitle(count: Int) {
                 // You can use the internal mActionMode instance
@@ -123,14 +125,39 @@ class PinnedCollectionsFragment :
         }.withDefaultMode(mode)
     }
 
-    override fun onActionItemClicked(p0: ActionMode, p1: MenuItem): Boolean {
-        return true
-    }
-
-    override fun onCreateActionMode(p0: ActionMode, p1: Menu): Boolean {
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         // Will re-block some fragments, depending on the order they were built in.
         for (fragment in mBlockableFragments) {
             fragment.setClicksBlocked(true)
+        }
+
+        // Make items visible depending on selected content.
+        // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.
+        when (mSelectedContentType) {
+            CollectionManager.FOLDER_KEY -> {
+                val item = menu.findItem(R.id.actionPinnedCollectionsHide)
+                item.isVisible = true
+                Painter.paintDrawable(item.icon)
+            }
+            CollectionManager.ALBUM_KEY -> {
+                val item = menu.findItem(R.id.actionPinnedCollectionsDeleteAlbum)
+                item.isVisible = true
+                Painter.paintDrawable(item.icon)
+            }
+        }
+
+        return true
+    }
+
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.actionPinnedCollectionsDeleteAlbum -> {
+                val callback = callback@{
+                    CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions)
+                    refreshFragment()
+                }
+                DialogGenerator.deleteAlbum(context ?: return false, onConfirm = callback)
+            }
         }
         return true
     }
@@ -139,13 +166,16 @@ class PinnedCollectionsFragment :
         return true
     }
 
-    override fun onDestroyActionMode(p0: ActionMode) {
+    override fun onDestroyActionMode(mode: ActionMode) {
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
         mCollectionItems.map { item -> item.setSelection(false)}
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
+
+        mode.menu.findItem(R.id.actionPinnedCollectionsHide).isVisible = false
+        mode.menu.findItem(R.id.actionPinnedCollectionsDeleteAlbum).isVisible = false
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
@@ -164,7 +194,7 @@ class PinnedCollectionsFragment :
             CollectionManager.clearStack()
             CollectionManager.launch(coverable)  // == true
             fragment.setDefaultToolbarTitle()
-            fragment.refreshData()
+            fragment.refreshFragment()
             false
         }
     }
@@ -195,8 +225,8 @@ class PinnedCollectionsFragment :
 
     private fun inferContentType(collection: Collection) : String? {
         return when (collection) {
-            is Folder -> "folders"
-            is Album -> "albums"
+            is Folder -> CollectionManager.FOLDER_KEY
+            is Album -> CollectionManager.ALBUM_KEY
             else -> null
         }
     }
@@ -206,8 +236,8 @@ class PinnedCollectionsFragment :
      */
     private fun getInstanceOfType(typeName: String) : Collection? {
         val type = when (typeName) {
-            "folders" -> Folder::class.java
-            "albums" -> Album::class.java
+            CollectionManager.FOLDER_KEY -> Folder::class.java
+            CollectionManager.ALBUM_KEY -> Album::class.java
             else -> return null
         }
         return mCollections.find {collection -> collection.javaClass == type }
@@ -271,16 +301,7 @@ class PinnedCollectionsFragment :
 
         when (item.itemId) {
             R.id.actionPinnedCollectionsCreateAlbum -> {
-                //DialogGenerator.createAlbum(context, onConfirm = ::onCreateNewAlbum)
-            }
-            R.id.actionPinnedCollectionsDeleteAlbum -> {
-                /*val callback = callback@ {
-                    val activeSelector = mSelectors.find { s -> s.active } ?: return@callback
-                    CollectionManager.deleteAlbumsByPosition(activeSelector.selectedItemIds)
-                    activeSelector.deactivate()
-                    mAdapter.updateCollections()
-                }
-                DialogGenerator.deleteAlbum(context, onConfirm = callback)*/
+                DialogGenerator.createAlbum(context, onConfirm = ::onCreateNewAlbum)
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -288,11 +309,17 @@ class PinnedCollectionsFragment :
         return true
     }
 
-    /*
+
     private fun onCreateNewAlbum(charSequence: CharSequence) {
         CollectionManager.createNewAlbum(charSequence.toString())
-        mAdapter.updateCollections()
-    } */
+        refreshFragment()
+    }
+
+    fun refreshFragment() {
+        fetchContents()
+        adapter.updateDataSet(mCollectionItems)
+        mActionModeHelper.destroyActionModeIfCan()
+    }
 
     /**
      * Get new data from Collection Manager.

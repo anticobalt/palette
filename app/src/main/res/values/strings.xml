@@ -20,7 +20,9 @@
     <string name="action_add_to_album">Add to Album</string>
     <string name="action_remove_from_album">Remove from this Album</string>
 
+    <!-- Strings indicate what buttons or objects represent -->
     <string name="label_album_actions">Album Actions</string>
+    <string name="label_collection_type">Collection Type</string>
 
     <string name="title_permission_error">Permission Request Failed!</string>
     <string name="message_permission_error">

@@ -10,7 +10,7 @@ import iced.egret.palette.model.Coverable
  * An item for an expandable section.
  * Has IFlexible and ISectionable functionality.
  */
-abstract class CoverableItem(private val obj: Coverable) :
+abstract class CoverableItem(protected val obj: Coverable) :
         AbstractFlexibleItem<CoverViewHolder>() {
 
     var viewHolder: CoverViewHolder? = null
@@ -23,6 +23,9 @@ abstract class CoverableItem(private val obj: Coverable) :
         viewHolder = holder
         obj.loadCoverInto(holder)
         holder.tvItem?.text = obj.name
+
+        // set the icon to discern type
+        setIcon()
 
         // Update selection indicator on recycling or re-creation
         setSelection(isSelected)
@@ -50,5 +53,7 @@ abstract class CoverableItem(private val obj: Coverable) :
      * @param selected turn on (true) or off (false)
      */
     abstract fun setSelection(selected: Boolean)
+
+    protected abstract fun setIcon()
 
 }

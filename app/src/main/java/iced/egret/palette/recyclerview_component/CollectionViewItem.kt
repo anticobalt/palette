@@ -49,4 +49,15 @@ class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
         }
     }
 
+    override fun setIcon() {
+        val typeView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivCollectionItemType)
+                ?: return
+        if (obj.icon == null) {
+            typeView.setImageDrawable(null)
+        } else {
+            typeView.setImageResource(obj.icon ?: return)
+        }
+    }
+
+
 }

@@ -19,6 +19,7 @@ class Picture(override var name: String, val path: String) : TerminalCoverable {
     override val cover = mutableMapOf(
         "uri" to uri
     )
+    override val icon: Nothing? = null
     override val activity = PictureViewActivity::class.java
 
     override fun toString(): String {

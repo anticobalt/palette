@@ -60,4 +60,17 @@ class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
         }
     }
 
+    /**
+     * Set the little icon that indicates the type of the Coverable.
+     */
+    override fun setIcon() {
+        val typeView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivPinnedCollectionType)
+                ?: return
+        if (obj.icon == null) {
+            typeView.setImageDrawable(null)
+        } else {
+            typeView.setImageResource(obj.icon ?: return)
+        }
+    }
+
 }

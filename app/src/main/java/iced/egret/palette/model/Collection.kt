@@ -109,6 +109,8 @@ abstract class Collection(override var name: String, val path: String) : Coverab
 class Folder(name: String, val truePath: String, subFolders: MutableList<Folder> = mutableListOf())
     : Collection(name, CollectionConstructorHelper.simplifyFilesystemPath(truePath)) {
 
+    override val icon = R.drawable.ic_folder_black_24dp
+
     override var _pictures : MutableList<Picture> = ArrayList()
     override val pictures : List<Picture>
         get() = _pictures
@@ -212,6 +214,8 @@ class Album(name: String, path: String) : Collection(name, path) {
     companion object {
         const val NAME_MAX_LENGTH = 25
     }
+
+    override val icon = R.drawable.ic_photo_album_black_24dp
 
     override var _pictures : MutableList<Picture> = ArrayList()
     override val pictures : List<Picture>

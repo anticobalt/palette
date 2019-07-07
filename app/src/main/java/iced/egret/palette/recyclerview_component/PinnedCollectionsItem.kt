@@ -1,13 +1,13 @@
 package iced.egret.palette.recyclerview_component
 
-import android.graphics.Color
 import android.view.View
-import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.util.Painter
 
 class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
 
@@ -28,19 +28,15 @@ class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
         super.bindViewHolder(adapter, holder, position, payloads)
 
         // Darken a little, so that white text is readable
-        // https://stackoverflow.com/a/15896811
-        holder.ivItem?.setColorFilter(
-                Color.rgb(200, 200, 200),
-                android.graphics.PorterDuff.Mode.MULTIPLY
-        )
+        Painter.darken(holder.ivItem ?: return, Painter.DARKEN_SLIGHT)
     }
 
     /**
      * Turn indicator on or off based on current visibility
      */
     override fun toggleSelection() {
-        val button = viewHolder?.itemView?.findViewById<ImageButton>(R.id.btnSelect) ?: return
-        if (button.visibility == View.INVISIBLE) setSelection(true)
+        val selectView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivPinnedCollectionSelectStatus) ?: return
+        if (selectView.visibility == View.INVISIBLE) setSelection(true)
         else setSelection(false)
     }
 
@@ -53,12 +49,14 @@ class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
      */
     override fun setSelection(selected: Boolean) {
         isSelected = selected
-        val button = viewHolder?.itemView?.findViewById<ImageButton>(R.id.btnSelect) ?: return
+        val selectView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivPinnedCollectionSelectStatus) ?: return
 
         if (selected) {
-            button.visibility = View.VISIBLE
+            selectView.visibility = View.VISIBLE
+            Painter.darken(viewHolder?.ivItem ?: return, Painter.DARKEN_MODERATE)
         } else {
-            button.visibility = View.INVISIBLE
+            selectView.visibility = View.INVISIBLE
+            Painter.darken(viewHolder?.ivItem ?: return, Painter.DARKEN_SLIGHT)
         }
     }
 

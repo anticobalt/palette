@@ -1,6 +1,5 @@
 package iced.egret.palette.recyclerview_component
 
-import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
@@ -8,6 +7,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.util.Painter
 
 class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
 
@@ -42,13 +42,10 @@ class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
 
         if (selected) {
             statusView.visibility = View.VISIBLE
-            viewHolder!!.ivItem?.setColorFilter(
-                    Color.rgb(200, 200, 200),
-                    android.graphics.PorterDuff.Mode.MULTIPLY
-            )
+            Painter.darken(viewHolder?.ivItem ?: return, Painter.DARKEN_MODERATE)
         } else {
             statusView.visibility = View.GONE
-            viewHolder!!.ivItem?.colorFilter = null
+            Painter.darken(viewHolder?.ivItem ?: return, null)
         }
     }
 

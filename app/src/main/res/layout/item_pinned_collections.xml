@@ -33,16 +33,19 @@
             android:singleLine="true"
             />
 
-        <ImageButton
-            android:id="@+id/btnSelect"
+        <ImageView
+            android:id="@+id/ivPinnedCollectionSelectStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/ivPinnedCollectionCover"
-            app:layout_constraintRight_toRightOf="@id/ivPinnedCollectionCover"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ivPinnedCollectionCover"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="@color/white"
-            android:backgroundTint="@color/greyBlue"
-            android:visibility="invisible"
+            android:visibility="gone"
             android:contentDescription="@string/action_select"
             />
 

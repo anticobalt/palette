@@ -13,6 +13,7 @@ import java.io.Serializable
  * - terminal
  * - deletable
  * - cover
+ * - icon
  * - pictures
  * - size
  * - totalSize
@@ -99,6 +100,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
  * - terminal
  * - deletable
  * - cover
+ * - icon
  * - pictures
  * - folders
  * - size
@@ -201,6 +203,7 @@ data class FolderData(val name: String,
  * - terminal
  * - deletable
  * - cover
+ * - icon
  * - albums
  * - folders
  * - pictures

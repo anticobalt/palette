@@ -19,6 +19,7 @@ const val TAG = "VIEW"
 class MainActivity : AppCompatActivity() {
 
     var hasPermission = false
+    private val finishedFragments = mutableListOf<MainFragment>()
 
     companion object SaveDataKeys {
         const val onScreenCollection = "on-screen-collection"
@@ -54,12 +55,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Alert all other MainFragments that argument fragment has finished onCreateView(),
+     * Note that argument fragment has finished onCreateView(),
      * and thus its views can be indirectly manipulated e.g. via isolateFragment().
      */
     fun notifyFragmentCreationFinished(finishedFragment: MainFragment) {
-        for (fragment in MainFragmentManager.fragments) {
-            (fragment as MainFragment).onFragmentCreationFinished(finishedFragment)
+        finishedFragments.add(finishedFragment)
+        if (finishedFragments.toSet() == MainFragmentManager.fragments.toSet()) {
+            for (fragment in finishedFragments) {
+                fragment.onAllFragmentsCreated()
+            }
         }
     }
 
@@ -146,12 +150,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Block click actions for all fragments except the given one.
+     * Block click actions for all manipulable fragments except the given one.
      */
     fun isolateFragment(toIsolateFragment: MainFragment) {
-        for (fragment in MainFragmentManager.fragments) {
+        for (fragment in finishedFragments) {
             if (fragment != toIsolateFragment) {
-                (fragment as MainFragment).setClicksBlocked(true)
+                fragment.setClicksBlocked(true)
             }
         }
     }
@@ -160,8 +164,8 @@ class MainActivity : AppCompatActivity() {
      * Undo isolateFragment()
      */
     fun restoreAllFragments() {
-        for (fragment in MainFragmentManager.fragments) {
-            (fragment as MainFragment).setClicksBlocked(false)
+        for (fragment in finishedFragments) {
+            fragment.setClicksBlocked(false)
         }
     }
 

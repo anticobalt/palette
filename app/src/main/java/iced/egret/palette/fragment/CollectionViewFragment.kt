@@ -104,8 +104,8 @@ class CollectionViewFragment :
         super.onSaveInstanceState(outState)
     }
 
-    override fun onFragmentCreationFinished(fragment: MainFragment) {
-        // TODO
+    override fun onAllFragmentsCreated() {
+        // This fragment is always created last, so this function is not required.
     }
 
     /**

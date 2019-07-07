@@ -35,7 +35,6 @@ class PinnedCollectionsFragment :
 
     private var mRootView : View? = null
     private lateinit var mRecyclerView : RecyclerView
-    private var mBlockableFragments = mutableListOf<MainFragment>()
     private lateinit var mDefaultToolbar : Toolbar
 
     private var mCollections = mutableListOf<Collection>()
@@ -83,11 +82,17 @@ class PinnedCollectionsFragment :
         }
     }
 
-    override fun onFragmentCreationFinished(fragment: MainFragment) {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        (activity as MainActivity).notifyFragmentCreationFinished(this)
+    }
+
+    override fun onAllFragmentsCreated() {
+        // Handles blocking in the case where ActionMode is created before other fragments created.
+        // See onCreateActionMode() for other case.
         if (mActionModeHelper.getActionMode() != null) {
-            (fragment).setClicksBlocked(true)
+            (activity as MainActivity).isolateFragment(this)
         }
-        mBlockableFragments.add(fragment)
     }
 
     private fun buildToolbar() {
@@ -126,10 +131,8 @@ class PinnedCollectionsFragment :
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-        // Will re-block some fragments, depending on the order they were built in.
-        for (fragment in mBlockableFragments) {
-            fragment.setClicksBlocked(true)
-        }
+        // Handles blocking in the case where ActionMode is created after other fragments created.
+        (activity as MainActivity).isolateFragment(this)
 
         // Make items visible depending on selected content.
         // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.

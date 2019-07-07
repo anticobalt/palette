@@ -18,6 +18,8 @@ const val TAG = "VIEW"
 
 class MainActivity : AppCompatActivity() {
 
+    var hasPermission = false
+
     companion object SaveDataKeys {
         const val onScreenCollection = "on-screen-collection"
     }
@@ -26,27 +28,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (!Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        hasPermission = Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+
+        if (!hasPermission) {
             Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
         }
-        else Storage.setup(this)
-
-        buildApp()
-
-        if (savedInstanceState == null) {
-            // Don't make fragments again if rotating device,
-            // because they're automatically remade
-            makeFragments()
-        }
         else {
-            // Save the remade fragments (which are technically different)
-            MainFragmentManager.updateFragments(supportFragmentManager.fragments)
-            // Try to restore Collection being viewed
-            val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
-            CollectionManager.unwindStack(navigateToPath)
+            buildApp(savedInstanceState)
         }
-
-        styleSlidingPane()
 
     }
 
@@ -60,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         // If only restarting and NOT recreating activity, fragments won't be re-isolated
         // (which is expected behaviour, as any previously active ActionMode won't be reactivated
         // either).
-        restoreAllFragments()
+        if (hasPermission) restoreAllFragments()
         super.onStop()
     }
 
@@ -74,14 +63,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Setup up models and auxiliary visuals.
-     * If Storage is not set up before this, the app won't immediately crash, but it will
-     * after some user input.
-     */
-    private fun buildApp() {
+    private fun buildApp(savedInstanceState: Bundle?) {
+        Storage.setup(this)
         CollectionManager.setup(this)
         Painter.color = ContextCompat.getColor(this, Painter.colorResource)
+
+        if (savedInstanceState == null) {
+            // Don't make fragments again if rotating device,
+            // because they're automatically remade
+            makeFragments()
+        } else {
+            // Save the remade fragments (which are technically different)
+            MainFragmentManager.updateFragments(supportFragmentManager.fragments)
+            // Try to restore Collection being viewed
+            val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
+            CollectionManager.unwindStack(navigateToPath)
+        }
+        styleSlidingPane()
     }
 
     private fun makeFragments() {
@@ -125,10 +123,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    Storage.setup(this)
-                    buildApp()
-                    makeFragments()
-                    styleSlidingPane()
+                    buildApp(null)
                 }
             }
         }
@@ -136,15 +131,17 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-        var index = MainFragmentManager.COLLECTION_CONTENTS
-        if (slidingPaneMain.isOpen) {
-            index = MainFragmentManager.PINNED_COLLECTIONS
-        }
+        if (hasPermission) {
+            var index = MainFragmentManager.COLLECTION_CONTENTS
+            if (slidingPaneMain.isOpen) {
+                index = MainFragmentManager.PINNED_COLLECTIONS
+            }
 
-        val currentFragment = MainFragmentManager.fragments[index] as MainFragment
-        val success = (currentFragment).onBackPressed()
-        if (!success) {
-            moveTaskToBack(true)  // don't destroy
+            val currentFragment = MainFragmentManager.fragments[index] as MainFragment
+            val success = (currentFragment).onBackPressed()
+            if (!success) {
+                moveTaskToBack(true)  // don't destroy
+            }
         }
     }
 

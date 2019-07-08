@@ -35,7 +35,7 @@ class PinnedCollectionsFragment :
 
     private var mRootView : View? = null
     private lateinit var mRecyclerView : RecyclerView
-    private lateinit var mDefaultToolbar : Toolbar
+    private lateinit var mToolbar : Toolbar
 
     private var mCollections = mutableListOf<Collection>()
     private var mCollectionItems = mutableListOf<PinnedCollectionsItem>()
@@ -71,7 +71,7 @@ class PinnedCollectionsFragment :
 
             // Must restore adapter and helper AFTER type isolation to keep position ints consistent
             adapter.onRestoreInstanceState(savedInstanceState)
-            mActionModeHelper.restoreSelection(mDefaultToolbar)
+            mActionModeHelper.restoreSelection(mToolbar)
 
             // Re-select all previously selected items
             for (i in 0 until adapter.currentItems.size) {
@@ -97,10 +97,10 @@ class PinnedCollectionsFragment :
 
     private fun buildToolbar() {
 
-        mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
-        mDefaultToolbar.setTitle(R.string.app_name)
-        mDefaultToolbar.inflateMenu(R.menu.menu_pinned_collections)
-        mDefaultToolbar.setOnMenuItemClickListener {
+        mToolbar = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
+        mToolbar.setTitle(R.string.app_name)
+        mToolbar.inflateMenu(R.menu.menu_pinned_collections)
+        mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
 
@@ -224,7 +224,7 @@ class PinnedCollectionsFragment :
         else {
             relativePosition = absolutePosition
         }
-        mActionModeHelper.onLongClick(mDefaultToolbar, relativePosition, mCollectionItems[absolutePosition])
+        mActionModeHelper.onLongClick(mToolbar, relativePosition, mCollectionItems[absolutePosition])
     }
 
     private fun inferContentType(collection: Collection) : String? {

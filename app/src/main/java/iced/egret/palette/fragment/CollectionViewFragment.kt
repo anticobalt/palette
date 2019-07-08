@@ -41,7 +41,7 @@ class CollectionViewFragment :
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
 
     private var mRootView : View? = null
-    private lateinit var mDefaultToolbar : Toolbar
+    private lateinit var mToolbar : Toolbar
     private lateinit var mCollectionRecyclerView : RecyclerView
     private lateinit var mFloatingActionButton : FloatingActionButton
 
@@ -88,7 +88,7 @@ class CollectionViewFragment :
 
             // Must restore adapter and helper AFTER type isolation to keep position ints consistent
             adapter.onRestoreInstanceState(savedInstanceState)
-            mActionModeHelper.restoreSelection(mDefaultToolbar)
+            mActionModeHelper.restoreSelection(mToolbar)
 
             // Re-select all previously selected items
             for (i in 0 until adapter.currentItems.size) {
@@ -113,13 +113,13 @@ class CollectionViewFragment :
      * Makes default toolbar and fills with items and title
      */
     private fun buildToolbar() {
-        mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarViewCollection)
-        mDefaultToolbar.inflateMenu(R.menu.menu_view_collection)
-        mDefaultToolbar.setOnMenuItemClickListener {
+        mToolbar = mRootView!!.findViewById(R.id.toolbarViewCollection)
+        mToolbar.inflateMenu(R.menu.menu_view_collection)
+        mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
         setToolbarTitle()
-        mDefaultToolbar.tvToolbarTitle.setOnLongClickListener {
+        mToolbar.tvToolbarTitle.setOnLongClickListener {
             if (CollectionManager.currentCollection != null) {
                 DialogGenerator.showCollectionDetails(context!!, CollectionManager.currentCollection!!)
             }
@@ -131,7 +131,7 @@ class CollectionViewFragment :
      * Sets toolbar's title to current Collection name
      */
     fun setToolbarTitle(title: String = "") {
-        mDefaultToolbar.tvToolbarTitle.text = if (title.isEmpty()) {
+        mToolbar.tvToolbarTitle.text = if (title.isEmpty()) {
             val collection = CollectionManager.currentCollection
             collection?.path?.split("/")?.joinToString(" / ") ?: ""
         }
@@ -361,7 +361,7 @@ class CollectionViewFragment :
         else {
             relativePosition = absolutePosition
         }
-        mActionModeHelper.onLongClick(mDefaultToolbar, relativePosition, mContentItems[absolutePosition])
+        mActionModeHelper.onLongClick(mToolbar, relativePosition, mContentItems[absolutePosition])
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {

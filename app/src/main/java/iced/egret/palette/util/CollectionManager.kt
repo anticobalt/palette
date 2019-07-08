@@ -37,44 +37,6 @@ object CollectionManager {
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
-    /**
-     * Used by FlexibleAdapter to sort sections with Coverables
-     */
-    /*
-    object SectionComparator : Comparator<IFlexible<*>> {
-
-        // Sort by same order as in mContentsMap
-        override fun compare(p0: IFlexible<*>, p1: IFlexible<*>): Int {
-            val types = mContentsMap.keys.map {key -> key.toLowerCase()}
-            var title0 = ""
-            var title1 = ""
-
-            if (p0 is SectionHeaderItem && p1 is SectionHeaderItem) {
-                title0 = p0.title.toLowerCase()
-                title1 = p1.title.toLowerCase()
-            }
-            else if (p0 is CoverableItem && p1 is CoverableItem) {
-                title0 = p0.header.title.toLowerCase()
-                title1 = p1.header.title.toLowerCase()
-            }
-            else if (p0 is SectionHeaderItem && p1 is CoverableItem){
-                title0 = p0.title.toLowerCase()
-                title1 = p1.header.title.toLowerCase()
-            }
-            else if (p0 is CoverableItem && p1 is SectionHeaderItem){
-                title0 = p0.header.title.toLowerCase()
-                title1 = p1.title.toLowerCase()
-            }
-
-            return when {
-                types.indexOf(title0) < types.indexOf(title1) -> -1
-                types.indexOf(title0) == types.indexOf(title1) -> 0
-                else -> 1
-            }
-        }
-    }
-    */
-
     fun setup(activity: FragmentActivity) {
 
         val root = Storage.retrievedFolders.firstOrNull()

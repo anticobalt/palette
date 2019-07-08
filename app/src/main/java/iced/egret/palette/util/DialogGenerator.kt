@@ -64,7 +64,10 @@ object DialogGenerator {
     fun showCollectionDetails(context: Context, collection: Collection) {
         val path = if (collection is Folder) collection.truePath else collection.path
         MaterialDialog(context).show {
-            message(text = path)
+            message(text =
+            "Location: $path\n" +
+                    "Number of pictures: ${collection.totalSize}"
+            )
         }
     }
 

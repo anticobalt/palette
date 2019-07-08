@@ -316,26 +316,27 @@ class PinnedCollectionsFragment :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
 
         val context = context!!
 
+        fun albumExists(name: CharSequence) : Boolean {
+            val found = CollectionManager.albums.find {album -> album.name == name.toString() }
+            return found != null
+        }
+
+        fun onCreateNewAlbum(charSequence: CharSequence) {
+            CollectionManager.createNewAlbum(charSequence.toString())
+            refreshFragment()
+        }
+
         when (item.itemId) {
             R.id.actionPinnedCollectionsCreateAlbum -> {
-                DialogGenerator.createAlbum(context, onConfirm = ::onCreateNewAlbum)
+                DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
             }
             else -> super.onOptionsItemSelected(item)
         }
 
         return true
-    }
-
-
-    private fun onCreateNewAlbum(charSequence: CharSequence) {
-        CollectionManager.createNewAlbum(charSequence.toString())
-        refreshFragment()
     }
 
     fun refreshFragment() {

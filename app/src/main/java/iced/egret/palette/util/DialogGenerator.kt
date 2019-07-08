@@ -2,6 +2,9 @@ package iced.egret.palette.util
 
 import android.content.Context
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.setActionButtonEnabled
+import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
@@ -14,14 +17,22 @@ import iced.egret.palette.model.Folder
  */
 object DialogGenerator {
 
-    fun createAlbum(context: Context, onConfirm: (CharSequence) -> Unit) {
+    fun createAlbum(context: Context, albumExists: (CharSequence) -> Boolean, onConfirm: (CharSequence) -> Unit) {
         MaterialDialog(context).show {
             title(R.string.title_album_form)
-            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH) {
-                _, charSequence ->
-                onConfirm(charSequence)
+            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH, waitForPositiveButton = false) {
+                dialog, text ->
+                    val isValid = !albumExists(text)
+                    dialog.getInputField().error = if (isValid) {
+                        null
+                    } else {
+                        "Album with name already exists"
+                    }
+                    dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
             }
-            positiveButton(R.string.action_create_album)
+            positiveButton(R.string.action_create_album) {
+                onConfirm(this.getInputField().text)
+            }
             negativeButton()
         }
     }

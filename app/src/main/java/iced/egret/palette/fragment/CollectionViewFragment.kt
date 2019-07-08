@@ -381,9 +381,20 @@ class CollectionViewFragment :
      * Adds new Coverables to current Collection
      */
     private fun onFabClick() {
+
+        fun albumExists(name: CharSequence) : Boolean {
+            val found = mContents.find {coverable -> coverable is Album && coverable.name == name.toString() }
+            return found != null
+        }
+
+        fun createNewAlbum(name: CharSequence) {
+            CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
+            refreshFragment()
+        }
+
         val collection = CollectionManager.currentCollection
         if (collection is Album) {
-            DialogGenerator.createAlbum(context!!, ::createNewAlbum)
+            DialogGenerator.createAlbum(context!!, ::albumExists, ::createNewAlbum)
         }
         else {
             Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -398,14 +409,6 @@ class CollectionViewFragment :
         }
     }
 
-
-    /**
-     * Adds new album to current Collection
-     */
-    private fun createNewAlbum(name: CharSequence) {
-        val pos = CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
-        refreshFragment()
-    }
 
     /**
      * @return handled here (true) or not (false)

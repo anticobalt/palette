@@ -335,7 +335,6 @@ class CollectionViewFragment :
                             ?: return false
             val updates = CollectionManager.launch(coverable, position = relativePosition, c = this.context)
             if (updates) {
-                setToolbarTitle()
                 refreshFragment()
             }
             false
@@ -422,7 +421,6 @@ class CollectionViewFragment :
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null){
-            setToolbarTitle()
             refreshFragment()
             true
         }
@@ -433,6 +431,7 @@ class CollectionViewFragment :
 
     fun refreshFragment() {
         fetchContents()
+        setToolbarTitle()
         adapter.updateDataSet(mContentItems)
         mActionModeHelper.destroyActionModeIfCan()
     }

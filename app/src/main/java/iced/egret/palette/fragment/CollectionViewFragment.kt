@@ -25,6 +25,7 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.fragment_view_collection.*
+import kotlinx.android.synthetic.main.fragment_view_collection.view.*
 
 
 class CollectionViewFragment :
@@ -109,23 +110,30 @@ class CollectionViewFragment :
     }
 
     /**
-     * Makes default and edit toolbars and fills with items and titles
+     * Makes default toolbar and fills with items and title
      */
     private fun buildToolbar() {
         mDefaultToolbar = mRootView!!.findViewById(R.id.toolbarViewCollection)
-        mDefaultToolbar.title = CollectionManager.currentCollection?.name
         mDefaultToolbar.inflateMenu(R.menu.menu_view_collection)
         mDefaultToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
+        setToolbarTitle()
+        mDefaultToolbar.tvToolbarTitle.setOnLongClickListener {
+            if (CollectionManager.currentCollection != null) {
+                DialogGenerator.showCollectionDetails(context!!, CollectionManager.currentCollection!!)
+            }
+            true
+        }
     }
 
     /**
-     * Sets default toolbar's title to current Collection name
+     * Sets toolbar's title to current Collection name
      */
-    fun setDefaultToolbarTitle(title: String = "") {
-        mDefaultToolbar.title = if (title.isEmpty()) {
-            CollectionManager.currentCollection?.name
+    fun setToolbarTitle(title: String = "") {
+        mDefaultToolbar.tvToolbarTitle.text = if (title.isEmpty()) {
+            val collection = CollectionManager.currentCollection
+            collection?.path?.split("/")?.joinToString(" / ") ?: ""
         }
         else title
     }
@@ -326,7 +334,10 @@ class CollectionViewFragment :
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
             val updates = CollectionManager.launch(coverable, position = relativePosition, c = this.context)
-            if (updates) refreshFragment()
+            if (updates) {
+                setToolbarTitle()
+                refreshFragment()
+            }
             false
         }
     }
@@ -411,6 +422,7 @@ class CollectionViewFragment :
     private fun returnToParentCollection() : Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null){
+            setToolbarTitle()
             refreshFragment()
             true
         }

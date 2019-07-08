@@ -197,7 +197,7 @@ class PinnedCollectionsFragment :
             val coverable = mCollections[absolutePosition]
             CollectionManager.clearStack()
             CollectionManager.launch(coverable)  // == true
-            fragment.setDefaultToolbarTitle()
+            fragment.setToolbarTitle()
             fragment.refreshFragment()
             false
         }

@@ -13,6 +13,7 @@ import kotlin.collections.ArrayList
 object CollectionManager {
 
     private const val originalExternalStorageName = "emulated"
+    const val BASE_STORAGE_NAME = "Main Storage"
     const val FOLDER_KEY = "folders"
     const val ALBUM_KEY = "albums"
     const val PICTURE_KEY = "pictures"
@@ -77,8 +78,6 @@ object CollectionManager {
     fun setup(activity: FragmentActivity) {
 
         val root = Storage.retrievedFolders.firstOrNull()
-        val newExternalStorageName = activity.getString(R.string.external_storage_name)
-
         if (root != null) {
 
             // defensive
@@ -92,7 +91,7 @@ object CollectionManager {
 
             val externalStorage = mCollections.find {collection -> collection.name == originalExternalStorageName }
             if (externalStorage != null) {  // should always be true
-                externalStorage.name = newExternalStorageName
+                externalStorage.name = BASE_STORAGE_NAME
                 mCollections.remove(externalStorage)
                 mCollections.add(0, externalStorage)
                 mCollectionStack.push(externalStorage)

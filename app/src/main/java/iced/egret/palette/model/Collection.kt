@@ -5,6 +5,7 @@ import android.view.View
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.util.CollectionManager
 import java.io.Serializable
 
 /***
@@ -359,7 +360,7 @@ data class AlbumData(val name: String,
 object CollectionConstructorHelper {
 
     /**
-     * Manually remove unnecessarily levels from path.
+     * Prettify path string: manually rename "emulated" and remove unnecessarily levels from path.
      * Such levels unnecessary because they're always empty.
      */
     fun simplifyFilesystemPath(path: String) : String {
@@ -370,7 +371,12 @@ object CollectionConstructorHelper {
 
         for (level in levels) {
             if (level != banned.getOrNull(levelIndex)) {
-                newLevels.add(level)
+                if (levelIndex == 2 && level == "emulated") {
+                    newLevels.add(CollectionManager.BASE_STORAGE_NAME)
+                }
+                else {
+                    newLevels.add(level)
+                }
             }
             levelIndex += 1
         }

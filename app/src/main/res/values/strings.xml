@@ -6,7 +6,6 @@
 <resources>
 
     <string name="app_name">&app_name;</string>
-    <string name="external_storage_name">Main Storage</string>
 
     <string name="folders">Folders</string>
     <string name="albums">Albums</string>

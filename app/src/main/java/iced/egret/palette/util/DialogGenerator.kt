@@ -6,6 +6,7 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
+import iced.egret.palette.model.Collection
 
 /**
  * Shows MaterialDialogs with custom actions on confirmation.
@@ -56,6 +57,12 @@ object DialogGenerator {
             positiveButton {
                 onConfirm()
             }
+        }
+    }
+
+    fun showCollectionDetails(context: Context, collection: Collection) {
+        MaterialDialog(context).show {
+            message(text = collection.path)
         }
     }
 

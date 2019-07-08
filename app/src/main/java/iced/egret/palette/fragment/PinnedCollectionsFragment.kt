@@ -196,7 +196,15 @@ class PinnedCollectionsFragment :
 
             val coverable = mCollections[absolutePosition]
             CollectionManager.clearStack()
-            CollectionManager.launch(coverable)  // == true
+
+            if (coverable.name == CollectionManager.BASE_STORAGE_NAME) {
+                // skip the empty sub-folders
+                CollectionManager.unwindStack(CollectionManager.PRACTICAL_BASE_STORAGE_PATH)
+            }
+            else {
+                CollectionManager.launch(coverable)
+            }
+
             fragment.setToolbarTitle()
             fragment.refreshFragment()
             false

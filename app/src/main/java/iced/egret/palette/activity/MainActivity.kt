@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun buildApp(savedInstanceState: Bundle?) {
         Storage.setup(this)
-        CollectionManager.setup(this)
+        CollectionManager.setup()
         Painter.color = ContextCompat.getColor(this, Painter.colorResource)
 
         if (savedInstanceState == null) {

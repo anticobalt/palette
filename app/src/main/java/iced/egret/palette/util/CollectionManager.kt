@@ -2,7 +2,6 @@ package iced.egret.palette.util
 
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.FragmentActivity
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
@@ -12,7 +11,8 @@ import kotlin.collections.ArrayList
 
 object CollectionManager {
 
-    private const val originalExternalStorageName = "emulated"
+    const val BASE_STORAGE_PATH = "emulated"
+    const val PRACTICAL_BASE_STORAGE_PATH = "$BASE_STORAGE_PATH/0"
     const val BASE_STORAGE_NAME = "Main Storage"
     const val FOLDER_KEY = "folders"
     const val ALBUM_KEY = "albums"
@@ -37,7 +37,7 @@ object CollectionManager {
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
-    fun setup(activity: FragmentActivity) {
+    fun setup() {
 
         val root = Storage.retrievedFolders.firstOrNull()
         if (root != null) {
@@ -47,16 +47,15 @@ object CollectionManager {
             mCollections.clear()
 
             for (folder in root.folders) {
-                //val practicalRoot = getPracticalRoot(folder)
                 mCollections.add(folder)
             }
 
-            val externalStorage = mCollections.find {collection -> collection.name == originalExternalStorageName }
-            if (externalStorage != null) {  // should always be true
-                externalStorage.name = BASE_STORAGE_NAME
-                mCollections.remove(externalStorage)
-                mCollections.add(0, externalStorage)
-                mCollectionStack.push(externalStorage)
+            val baseStorage = mCollections.find { collection -> collection.path == BASE_STORAGE_PATH }
+            if (baseStorage != null) {  // should always be true
+                baseStorage.name = BASE_STORAGE_NAME
+                mCollections.remove(baseStorage)
+                mCollections.add(0, baseStorage)
+                unwindStack(PRACTICAL_BASE_STORAGE_PATH)
             }
         }
 
@@ -81,7 +80,7 @@ object CollectionManager {
      */
     fun getContentsMap() : LinkedHashMap<String, List<Coverable>> {
 
-        val currentMap = (currentCollection?.contentsMap ?: mapOf())
+        val currentMap = (currentCollection?.contentsMap ?: mutableMapOf())
                 as MutableMap<String, List<Coverable>>
 
         for (type in mContentsMap.keys)
@@ -243,13 +242,10 @@ object CollectionManager {
         var collectionsOnLevel = mCollections.toList()
 
         for (level in levels) {
-            // Use path to find Collection because those (unlike names) are immutable.
-            // If can't find Collection, move to next level,
-            // as Collections may have been merged during setup()
-            // via a function like getPracticalRoot().
+            // Use path to find Collection because those (unlike names) are immutable
             currentCollection = collectionsOnLevel.find {
                 collection -> collection.path.split("/")[levelIndex] == level }
-                    ?: continue
+                    ?: return
             collectionsOnLevel = (currentCollection as Collection).getContents().filterIsInstance<Collection>()
             levelIndex += 1
         }
@@ -262,20 +258,6 @@ object CollectionManager {
             pictures = collection.pictures
         }
         return pictures
-    }
-
-    /**
-     * Given a folder in /storage/, return folder with path
-     * /storage/emulated/0 or /storage/<SD-CARD ID>,
-     * since emulated is always empty anyways
-     */
-    private fun getPracticalRoot(folder: Folder) : Folder {
-        var f = folder
-        if (f.name == originalExternalStorageName) {
-            f = f.folders.first()
-            f.name = originalExternalStorageName
-        }
-        return f
     }
 
 }

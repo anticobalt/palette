@@ -7,6 +7,7 @@ import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
+import iced.egret.palette.model.Folder
 
 /**
  * Shows MaterialDialogs with custom actions on confirmation.
@@ -61,8 +62,9 @@ object DialogGenerator {
     }
 
     fun showCollectionDetails(context: Context, collection: Collection) {
+        val path = if (collection is Folder) collection.truePath else collection.path
         MaterialDialog(context).show {
-            message(text = collection.path)
+            message(text = path)
         }
     }
 

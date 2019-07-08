@@ -178,7 +178,7 @@ class CollectionViewFragment :
 
         val albumActions = menu.findItem(R.id.actionViewCollectionAlbumActions)
         val addToAlbum = menu.findItem(R.id.actionViewCollectionAddToAlbum)
-        val delete = menu.findItem(R.id.actionViewCollectionDelete)
+        val deleteAlbum = menu.findItem(R.id.actionViewCollectionDeleteAlbum)
         val removeFromAlbum = menu.findItem(R.id.actionViewCollectionRemoveFromAlbum)
 
         // Make items visible depending on selected content.
@@ -188,13 +188,12 @@ class CollectionViewFragment :
             CollectionManager.PICTURE_KEY -> {
                 albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
                 addToAlbum.isVisible = true; Painter.paintDrawable(addToAlbum.icon)
-                delete.isVisible = true; Painter.paintDrawable(delete.icon)
                 if (CollectionManager.currentCollection is Album) {
                     removeFromAlbum.isVisible = true; Painter.paintDrawable(removeFromAlbum.icon)
                 }
             }
             CollectionManager.ALBUM_KEY -> {
-                delete.isVisible = true; Painter.paintDrawable(delete.icon)
+                deleteAlbum.isVisible = true; Painter.paintDrawable(deleteAlbum.icon)
             }
         }
         return true
@@ -244,7 +243,7 @@ class CollectionViewFragment :
                     refresh()
                 }
             }
-            R.id.actionViewCollectionDelete -> {
+            R.id.actionViewCollectionDeleteAlbum -> {
                 DialogGenerator.deleteAlbum(context!!) {
                     CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions, deleteFromCurrent = true)
                     toast("Deleted ${adapter.selectedItemCount} $typeString")
@@ -271,7 +270,7 @@ class CollectionViewFragment :
         mode.menu.findItem(R.id.actionViewCollectionAlbumActions).isVisible = false
         mode.menu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = false
         mode.menu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = false
-        mode.menu.findItem(R.id.actionViewCollectionDelete).isVisible = false
+        mode.menu.findItem(R.id.actionViewCollectionDeleteAlbum).isVisible = false
     }
 
     private fun inferContentType(content: Coverable) : String? {

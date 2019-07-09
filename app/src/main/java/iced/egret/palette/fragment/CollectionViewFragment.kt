@@ -119,7 +119,7 @@ class CollectionViewFragment :
             onOptionsItemSelected(it)
         }
         setToolbarTitle()
-        mToolbar.tvToolbarTitle.setOnLongClickListener {
+        mToolbar.tvToolbarTitleViewCollection.setOnLongClickListener {
             if (CollectionManager.currentCollection != null) {
                 DialogGenerator.showCollectionDetails(context!!, CollectionManager.currentCollection!!)
             }
@@ -131,7 +131,7 @@ class CollectionViewFragment :
      * Sets toolbar's title to current Collection name
      */
     fun setToolbarTitle(title: String = "") {
-        mToolbar.tvToolbarTitle.text = if (title.isEmpty()) {
+        mToolbar.tvToolbarTitleViewCollection.text = if (title.isEmpty()) {
             val collection = CollectionManager.currentCollection
             collection?.path?.split("/")?.joinToString(" / ") ?: ""
         }

@@ -22,6 +22,7 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.fragment_pinned_collections.*
+import kotlinx.android.synthetic.main.fragment_pinned_collections.view.*
 
 class PinnedCollectionsFragment :
         MainFragment(),
@@ -98,7 +99,7 @@ class PinnedCollectionsFragment :
     private fun buildToolbar() {
 
         mToolbar = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
-        mToolbar.setTitle(R.string.app_name)
+        mToolbar.tvToolbarTitlePinnedCollections.text = getString(R.string.app_name)
         mToolbar.inflateMenu(R.menu.menu_pinned_collections)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)

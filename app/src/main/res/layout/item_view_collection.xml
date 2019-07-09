@@ -16,7 +16,7 @@
         <ImageView
             android:id="@+id/ivCollectionItemImage"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/cover_height"
+            android:layout_height="@dimen/tile_height"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
             />

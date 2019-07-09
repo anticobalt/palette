@@ -14,7 +14,7 @@
         <!-- Would prefer width to be percentage based, but setting layout_weight
             prevents pagination and puts everything on one screen. -->
         <FrameLayout
-            android:layout_width="@dimen/cover_width"
+            android:layout_width="@dimen/banner_width"
             android:layout_height="match_parent"
             android:id="@+id/linksFragment" />
 

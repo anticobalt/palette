@@ -24,7 +24,7 @@ class PicturePagerAdapter(private val pictures: List<Picture>) : PagerAdapter() 
         val layoutItem = LayoutInflater
                             .from(container.context)
                             .inflate(R.layout.item_view_picture, container, false)
-        val imageView = layoutItem.findViewById<BigImageView>(R.id.bivPicture)
+        val imageView = layoutItem.findViewById<BigImageView>(R.id.bigImageView)
 
         imageView.showImage(pictures[position].uri)
         container.addView(layoutItem)

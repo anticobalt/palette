@@ -108,9 +108,9 @@ class MainActivity : AppCompatActivity() {
         val scale = resources.displayMetrics.density
         val pxParallax = (dpParallax * scale + 0.5f).toInt()
 
-        slidingPaneMain.parallaxDistance = pxParallax  // make left move when scrolling right
-        slidingPaneMain.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
-        slidingPaneMain.setShadowResourceLeft(R.drawable.shadow)
+        slidingPaneLayout.parallaxDistance = pxParallax  // make left move when scrolling right
+        slidingPaneLayout.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
+        slidingPaneLayout.setShadowResourceLeft(R.drawable.shadow)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (hasPermission) {
             var index = MainFragmentManager.COLLECTION_CONTENTS
-            if (slidingPaneMain.isOpen) {
+            if (slidingPaneLayout.isOpen) {
                 index = MainFragmentManager.PINNED_COLLECTIONS
             }
 

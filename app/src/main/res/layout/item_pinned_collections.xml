@@ -13,7 +13,7 @@
         >
 
         <ImageView
-            android:id="@+id/ivPinnedCollectionCover"
+            android:id="@+id/cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:ignore="ContentDescription"
@@ -21,10 +21,10 @@
             />
 
         <TextView
-            android:id="@+id/tvPinnedCollectionLabel"
+            android:id="@+id/label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/ivPinnedCollectionCover"
+            app:layout_constraintTop_toTopOf="@id/cover"
             android:gravity="start"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
@@ -37,7 +37,7 @@
             />
 
         <ImageView
-            android:id="@+id/ivPinnedCollectionSelectStatus"
+            android:id="@+id/selectCheckmark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -45,7 +45,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/ivPinnedCollectionCover"
+            app:layout_constraintTop_toTopOf="@+id/cover"
             android:src="@drawable/ic_check_black_24dp"
             android:tint="@color/white"
             android:visibility="gone"
@@ -53,7 +53,7 @@
             />
 
         <ImageView
-            android:id="@+id/ivPinnedCollectionType"
+            android:id="@+id/typeIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

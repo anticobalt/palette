@@ -21,8 +21,8 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
+import kotlinx.android.synthetic.main.appbar.view.*
 import kotlinx.android.synthetic.main.fragment_pinned_collections.*
-import kotlinx.android.synthetic.main.fragment_pinned_collections.view.*
 
 class PinnedCollectionsFragment :
         MainFragment(),
@@ -47,7 +47,7 @@ class PinnedCollectionsFragment :
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
-        mRecyclerView = mRootView!!.findViewById(R.id.rvPinnedCollections)
+        mRecyclerView = mRootView!!.findViewById(R.id.recyclerView)
         buildToolbar()
         buildRecyclerView()
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
@@ -98,8 +98,8 @@ class PinnedCollectionsFragment :
 
     private fun buildToolbar() {
 
-        mToolbar = mRootView!!.findViewById(R.id.toolbarPinnedCollections)
-        mToolbar.tvToolbarTitlePinnedCollections.text = getString(R.string.app_name)
+        mToolbar = mRootView!!.findViewById(R.id.toolbar)
+        mToolbar.toolbarTitle.text = getString(R.string.app_name)
         mToolbar.inflateMenu(R.menu.menu_pinned_collections)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
@@ -193,7 +193,7 @@ class PinnedCollectionsFragment :
         else {
             val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
             val fragment = MainFragmentManager.fragments[fragmentIndex] as CollectionViewFragment
-            fragment.activity?.findViewById<SlidingPaneLayout>(R.id.slidingPaneMain)?.closePane()
+            fragment.activity?.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
 
             val coverable = mCollections[absolutePosition]
             CollectionManager.clearStack()
@@ -303,12 +303,12 @@ class PinnedCollectionsFragment :
 
     override fun setClicksBlocked(doBlock: Boolean) {
         if (doBlock) {
-            rvPinnedCollections.visibility = View.GONE
-            blockerPinnedCollections.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+            blocker.visibility = View.VISIBLE
         }
         else {
-            rvPinnedCollections.visibility = View.VISIBLE
-            blockerPinnedCollections.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+            blocker.visibility = View.GONE
         }
     }
 

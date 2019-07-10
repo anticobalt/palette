@@ -25,8 +25,8 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
+import kotlinx.android.synthetic.main.appbar.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
-import kotlinx.android.synthetic.main.fragment_view_collection.view.*
 
 
 class CollectionViewFragment :
@@ -114,13 +114,13 @@ class CollectionViewFragment :
      * Makes default toolbar and fills with items and title
      */
     private fun buildToolbar() {
-        mToolbar = mRootView!!.findViewById(R.id.toolbarViewCollection)
+        mToolbar = mRootView!!.findViewById(R.id.toolbar)
         mToolbar.inflateMenu(R.menu.menu_view_collection)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
         setToolbarTitle()
-        mToolbar.tvToolbarTitleViewCollection.setOnLongClickListener {
+        mToolbar.toolbarTitle.setOnLongClickListener {
             if (CollectionManager.currentCollection != null) {
                 DialogGenerator.showCollectionDetails(context!!, CollectionManager.currentCollection!!)
             }
@@ -132,7 +132,7 @@ class CollectionViewFragment :
      * Sets toolbar's title to current Collection name
      */
     fun setToolbarTitle(title: String = "") {
-        mToolbar.tvToolbarTitleViewCollection.text = if (title.isEmpty()) {
+        mToolbar.toolbarTitle.text = if (title.isEmpty()) {
             val collection = CollectionManager.currentCollection
             collection?.path?.split("/")?.joinToString(" / ") ?: ""
         }
@@ -371,12 +371,12 @@ class CollectionViewFragment :
         if (doBlock) {
             rvCollectionItems.visibility = View.GONE
             fab.hide()
-            blockerViewCollection.visibility = View.VISIBLE
+            blocker.visibility = View.VISIBLE
         }
         else {
             rvCollectionItems.visibility = View.VISIBLE
             fab.show()
-            blockerViewCollection.visibility = View.GONE
+            blocker.visibility = View.GONE
         }
     }
 

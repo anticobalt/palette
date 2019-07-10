@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <com.github.piasy.biv.view.BigImageView
-        android:id="@+id/bivPicture"
+        android:id="@+id/bigImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:optimizeDisplay="false"

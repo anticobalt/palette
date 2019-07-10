@@ -16,14 +16,14 @@ class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
     }
 
     override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>): CoverViewHolder {
-        return CoverViewHolder(view, adapter, imageViewId = R.id.ivCollectionItemImage, textViewId = R.id.tvCollectionItemText)
+        return CoverViewHolder(view, adapter, imageViewId = R.id.cover, textViewId = R.id.label)
     }
 
     /**
      * Turn indicator on or off based on current visibility
      */
     override fun toggleSelection() {
-        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus) ?: return
+        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark) ?: return
         if (statusView.visibility == View.GONE) setSelection(true)
         else setSelection(false)
     }
@@ -37,7 +37,7 @@ class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
      */
     override fun setSelection(selected: Boolean) {
         isSelected = selected
-        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivCollectionItemSelectStatus)
+        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark)
                 ?: return
 
         if (selected) {
@@ -50,7 +50,7 @@ class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
     }
 
     override fun setIcon() {
-        val typeView = viewHolder?.itemView?.findViewById<ImageView>(R.id.ivCollectionItemType)
+        val typeView = viewHolder?.itemView?.findViewById<ImageView>(R.id.typeIcon)
                 ?: return
         if (obj.icon == null) {
             typeView.setImageDrawable(null)

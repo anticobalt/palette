@@ -335,7 +335,7 @@ class CollectionViewFragment :
             val relativePosition =
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
-            val updates = CollectionManager.launch(coverable, position = relativePosition, c = this.context)
+            val updates = CollectionManager.launch(coverable, relativePosition, this.context)
             if (updates) {
                 refreshFragment()
             }

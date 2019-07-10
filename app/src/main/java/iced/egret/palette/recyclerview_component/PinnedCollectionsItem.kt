@@ -16,7 +16,7 @@ class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
     }
 
     override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>): CoverViewHolder {
-        return CoverViewHolder(view, adapter, imageViewId = R.id.cover, textViewId = R.id.label)
+        return CoverViewHolder(view, adapter)
     }
 
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,

@@ -5,7 +5,6 @@ import android.content.Intent
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
-import iced.egret.palette.recyclerview_component.CoverViewHolder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -188,12 +187,11 @@ object CollectionManager {
 
     /**
      * Launch an item by updating current collection, or creating activity.
+     * Context required to create new activity.
      *
      * @return Adapter needs to be updated (true) or not (false)
      */
-    fun launch(item: Coverable, holder: CoverViewHolder? = null, position: Int = -1, c: Context? = null) : Boolean {
-        var context = c  // TODO: remove backwards compatibility
-
+    fun launch(item: Coverable, position: Int = -1, context: Context? = null) : Boolean {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 currentCollection = item
@@ -202,8 +200,6 @@ object CollectionManager {
         }
         else {
             if (item as? TerminalCoverable != null) {
-                if (holder != null) context = holder.ivItem?.context
-
                 val intent = Intent(context, item.activity)
                 val key = context?.getString(R.string.intent_item_key)
                 intent.putExtra(key, position)

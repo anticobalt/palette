@@ -7,14 +7,13 @@ import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import eu.davidea.viewholders.FlexibleViewHolder
+import iced.egret.palette.R
 
-// TODO: remove default value
 class CoverViewHolder(view : View,
-                      adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>> = FlexibleAdapter(null),
-                      textViewId : Int,
-                      imageViewId : Int) : FlexibleViewHolder(view, adapter) {
+                      adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>)
+    : FlexibleViewHolder(view, adapter) {
 
-    val tvItem : TextView? = view.findViewById(textViewId)
-    val ivItem : ImageView? = view.findViewById(imageViewId)
+    val tvItem : TextView? = view.findViewById(R.id.label)
+    val ivItem : ImageView? = view.findViewById(R.id.cover)
 
 }

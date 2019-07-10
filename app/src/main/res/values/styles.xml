@@ -2,17 +2,32 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="windowActionModeOverlay">true</item>
-    </style>
 
-    <style name="AppTheme.NoActionBar">
+        <!-- Background colors -->
+        <item name="android:windowBackground">@color/grey</item>
+
+        <!-- Hide action bar -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
     </style>
+
+    <style name="MainView" parent="AppTheme">
+
+        <!-- Make ActionMode toolbar overlap existing toolbars -->
+        <item name="windowActionModeOverlay">true</item>
+
+    </style>
+
+    <style name="PictureView" parent="AppTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

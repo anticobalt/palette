@@ -16,14 +16,6 @@ class PictureViewActivity : AppCompatActivity() {
 
     private var uiHidden = false
 
-    /**
-     * Hides and restores UI when activity focused and unfocused
-     */
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) hideSystemUI()
-    }
-
     private fun hideSystemUI() {
         // For regular immersive mode, add SYSTEM_UI_FLAG_IMMERSIVE.
         // For "sticky immersive," add SYSTEM_UI_FLAG_IMMERSIVE_STICKY instead.
@@ -66,6 +58,9 @@ class PictureViewActivity : AppCompatActivity() {
         val adapter = PicturePagerAdapter(pictures, this)
         viewpager.adapter = adapter
         viewpager.currentItem = position
+
+        // prevent propagation of touch events on bottom action bar
+        bottomActions.setOnTouchListener { _, _ -> true }
 
     }
 

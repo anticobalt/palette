@@ -1,5 +1,6 @@
 package iced.egret.palette.fragment
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -144,14 +145,16 @@ class CollectionViewFragment :
     private fun buildRecyclerView() {
         if (mContents.isNotEmpty()) {
 
+            val orientation = resources.configuration.orientation
+            val numColumns = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 5 else 3
+            val manager = GridLayoutManager(activity, numColumns)
+
             fetchContents()
-            val manager = GridLayoutManager(activity, 3)
             adapter = FlexibleAdapter(mContentItems, this, true)
+            initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
 
             mCollectionRecyclerView.layoutManager = manager
             mCollectionRecyclerView.adapter = adapter
-
-            initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
 
         }
     }

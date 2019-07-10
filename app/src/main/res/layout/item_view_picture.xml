@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.alexvasilkov.gestures.views.GestureFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/gestureFrameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.github.piasy.biv.view.BigImageView
-        android:id="@+id/bigImageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:optimizeDisplay="false"
-        />
+    <!-- GestureFrameLayout can contain only one child -->
 
-</LinearLayout>
+    <FrameLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/normalImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.github.piasy.biv.view.BigImageView
+            android:id="@+id/bigImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:optimizeDisplay="false"
+            />
+
+    </FrameLayout>
+
+</com.alexvasilkov.gestures.views.GestureFrameLayout>

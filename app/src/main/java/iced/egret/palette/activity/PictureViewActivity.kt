@@ -2,7 +2,6 @@ package iced.egret.palette.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.GestureDetector
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +14,11 @@ import kotlinx.android.synthetic.main.activity_view_picture.*
 
 class PictureViewActivity : AppCompatActivity() {
 
+    private var uiHidden = false
+
+    /**
+     * Hides and restores UI when activity focused and unfocused
+     */
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideSystemUI()
@@ -24,6 +28,7 @@ class PictureViewActivity : AppCompatActivity() {
         // For regular immersive mode, add SYSTEM_UI_FLAG_IMMERSIVE.
         // For "sticky immersive," add SYSTEM_UI_FLAG_IMMERSIVE_STICKY instead.
         // For "lean back" mode, have neither.
+        uiHidden = true
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 // Set the content to appear under the system bars so that the
                 // content doesn't resize when the system bars hide and show.
@@ -38,6 +43,7 @@ class PictureViewActivity : AppCompatActivity() {
     // Shows the system bars by removing all the flags
     // except for the ones that make the content appear under the system bars.
     private fun showSystemUI() {
+        uiHidden = false
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
@@ -47,15 +53,8 @@ class PictureViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        hideSystemUI()
         BigImageViewer.initialize(GlideImageLoader.with(applicationContext))
         setContentView(R.layout.activity_view_picture)
-
-        lateinit var gestureDetector: GestureDetector
-
-        //imageView.setOnTouchListener { _, event ->
-        //    gestureDetector.onTouchEvent(event)
-        //}
 
         val position = intent.getIntExtra(getString(R.string.intent_item_key), -1)
         if (position == -1) {
@@ -64,10 +63,21 @@ class PictureViewActivity : AppCompatActivity() {
         }
 
         val pictures = CollectionManager.getCurrentCollectionPictures()
-        val adapter = PicturePagerAdapter(pictures)
+        val adapter = PicturePagerAdapter(pictures, this)
         viewpager.adapter = adapter
         viewpager.currentItem = position
 
+    }
+
+    fun toggleUIs() {
+        if (uiHidden) {
+            showSystemUI()
+            bottomActions.visibility = View.VISIBLE
+        }
+        else {
+            hideSystemUI()
+            bottomActions.visibility = View.GONE
+        }
     }
 
 }

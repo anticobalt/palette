@@ -18,6 +18,9 @@
     <string name="action_create_album">Create Album</string>
     <string name="action_add_to_album">Add to Album</string>
     <string name="action_remove_from_album">Remove from this Album</string>
+    <string name="action_view_details">View Details</string>
+    <string name="action_crop">Crop</string>
+    <string name="action_share">Share</string>
 
     <!-- Strings indicate what buttons or objects represent -->
     <string name="label_album_actions">Album Actions</string>

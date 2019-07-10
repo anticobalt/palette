@@ -1,18 +1,24 @@
 package iced.egret.palette.adapter
 
-import androidx.viewpager.widget.PagerAdapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import com.github.piasy.biv.view.BigImageView
+import androidx.viewpager.widget.PagerAdapter
+import com.alexvasilkov.gestures.views.GestureFrameLayout
+import com.bumptech.glide.Glide
 import iced.egret.palette.R
+import iced.egret.palette.activity.PictureViewActivity
 import iced.egret.palette.model.Picture
+import kotlinx.android.synthetic.main.activity_view_picture.*
+import kotlinx.android.synthetic.main.item_view_picture.view.*
+import java.lang.ref.WeakReference
 
-class PicturePagerAdapter(private val pictures: List<Picture>) : PagerAdapter() {
+class PicturePagerAdapter(private val pictures: List<Picture>, activity: PictureViewActivity) : PagerAdapter() {
+
+    private val activityReference = WeakReference(activity)
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
-        return view == `object` as LinearLayout
+        return view == `object` as GestureFrameLayout
     }
 
     override fun getCount(): Int {
@@ -24,9 +30,28 @@ class PicturePagerAdapter(private val pictures: List<Picture>) : PagerAdapter() 
         val layoutItem = LayoutInflater
                             .from(container.context)
                             .inflate(R.layout.item_view_picture, container, false)
-        val imageView = layoutItem.findViewById<BigImageView>(R.id.bigImageView)
 
-        imageView.showImage(pictures[position].uri)
+        val bigImageView = layoutItem.bigImageView
+        val normalImageView = layoutItem.normalImageView
+        val gestureView = layoutItem.gestureFrameLayout
+
+        // BigImageViews (or SSIVs) are not compatible with GestureViews, so use both
+        // ImageView and BigImageView, depending on whether deep zoom is required or not
+        Glide.with(normalImageView.context).load(pictures[position].uri).into(normalImageView)
+        bigImageView.showImage(pictures[position].uri)
+        bigImageView.visibility = View.GONE
+
+        gestureView.controller.settings.isRotationEnabled = true
+        gestureView.controller.settings.isRestrictRotation = true
+
+        // Allow scrolling when zoomed in
+        gestureView.controller.enableScrollInViewPager(activityReference.get()?.viewpager)
+
+        // Handle clicks
+        layoutItem.setOnClickListener {
+            activityReference.get()?.toggleUIs()
+        }
+
         container.addView(layoutItem)
         return layoutItem
 

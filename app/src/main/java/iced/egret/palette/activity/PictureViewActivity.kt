@@ -27,7 +27,7 @@ class PictureViewActivity : AppCompatActivity() {
 
         if (!getStartPosition()) return
 
-        buildToolbar()
+        buildActionBar()
         buildViewPager()
         buildBottomActions()
     }
@@ -47,25 +47,15 @@ class PictureViewActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildToolbar() {
+    private fun buildActionBar() {
         val backgroundColor = ContextCompat.getColor(this, R.color.translucentBlack)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setBackgroundDrawable(ColorDrawable(backgroundColor))
         setToolbarTitle()
-
-        /*
-        setToolbarTitle()
-        val back = this.getDrawable(R.drawable.ic_arrow_back_black_24dp) ?: return
-        Painter.paintDrawable(back)
-        toolbar.navigationIcon = back
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }*/
     }
 
     private fun setToolbarTitle() {
         supportActionBar?.title = CollectionManager.getCurrentCollectionPictures()[position].name
-        //toolbar.toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[position].name
     }
 
     private fun buildViewPager() {
@@ -121,13 +111,11 @@ class PictureViewActivity : AppCompatActivity() {
         if (uiHidden) {
             showSystemUI()
             bottomActions.visibility = View.VISIBLE
-            //toolbar.visibility = View.VISIBLE
             supportActionBar?.show()
         }
         else {
             hideSystemUI()
             bottomActions.visibility = View.GONE
-            //toolbar.visibility = View.GONE
             supportActionBar?.hide()
         }
     }

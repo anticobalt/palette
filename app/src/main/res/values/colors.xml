@@ -15,6 +15,7 @@
     <color name="lightBlue">#00AABB</color>
     <color name="greyBlue">#2D343A</color>
 
-    <color name="translucentBlack">#80000000</color>
+    <!-- Same color as translucent status bars -->
+    <color name="translucentBlack">#66000000</color>
 
 </resources>

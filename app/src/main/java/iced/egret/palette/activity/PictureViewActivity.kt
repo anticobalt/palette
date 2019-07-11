@@ -1,10 +1,13 @@
 package iced.egret.palette.activity
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.viewpager.widget.ViewPager
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.glide.GlideImageLoader
 import iced.egret.palette.R
@@ -15,27 +18,69 @@ import kotlinx.android.synthetic.main.activity_view_picture.*
 class PictureViewActivity : AppCompatActivity() {
 
     private var uiHidden = false
+    private var position = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         BigImageViewer.initialize(GlideImageLoader.with(applicationContext))
         setContentView(R.layout.activity_view_picture)
 
+        if (!getStartPosition()) return
+
+        buildToolbar()
         buildViewPager()
         buildBottomActions()
     }
 
-    private fun buildViewPager() {
-        val position = intent.getIntExtra(getString(R.string.intent_item_key), -1)
-        if (position == -1) {
+    /**
+     * Get the starting position of the ViewPager i.e. index of picture
+     * @return Success (true) or failure (false)
+     */
+    private fun getStartPosition() : Boolean {
+        position = intent.getIntExtra(getString(R.string.intent_item_key), -1)
+        return if (position == -1) {
             Toast.makeText(this, R.string.error_intent_extra, Toast.LENGTH_SHORT).show()
-            return
+            false
         }
+        else {
+            true
+        }
+    }
 
+    private fun buildToolbar() {
+        val backgroundColor = ContextCompat.getColor(this, R.color.translucentBlack)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(backgroundColor))
+        setToolbarTitle()
+
+        /*
+        setToolbarTitle()
+        val back = this.getDrawable(R.drawable.ic_arrow_back_black_24dp) ?: return
+        Painter.paintDrawable(back)
+        toolbar.navigationIcon = back
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }*/
+    }
+
+    private fun setToolbarTitle() {
+        supportActionBar?.title = CollectionManager.getCurrentCollectionPictures()[position].name
+        //toolbar.toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[position].name
+    }
+
+    private fun buildViewPager() {
         val pictures = CollectionManager.getCurrentCollectionPictures()
         val adapter = PicturePagerAdapter(pictures, this)
         viewpager.adapter = adapter
         viewpager.currentItem = position
+        viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {}
+            override fun onPageSelected(position: Int) {}
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                this@PictureViewActivity.position = position
+                setToolbarTitle()
+            }
+        })
     }
 
     private fun buildBottomActions() {
@@ -76,10 +121,14 @@ class PictureViewActivity : AppCompatActivity() {
         if (uiHidden) {
             showSystemUI()
             bottomActions.visibility = View.VISIBLE
+            //toolbar.visibility = View.VISIBLE
+            supportActionBar?.show()
         }
         else {
             hideSystemUI()
             bottomActions.visibility = View.GONE
+            //toolbar.visibility = View.GONE
+            supportActionBar?.hide()
         }
     }
 

@@ -39,7 +39,6 @@ class PicturePagerAdapter(private val pictures: List<Picture>, activity: Picture
         // ImageView and BigImageView, depending on whether deep zoom is required or not
         Glide.with(normalImageView.context).load(pictures[position].uri).into(normalImageView)
         bigImageView.showImage(pictures[position].uri)
-        bigImageView.visibility = View.GONE
 
         gestureView.controller.settings.isRotationEnabled = true
         gestureView.controller.settings.isRestrictRotation = true

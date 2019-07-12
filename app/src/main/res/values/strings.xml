@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE resources [
-    <!ENTITY app_name "Palette">
-    ]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY app_name "Palette">]>
 
 <resources>
 
@@ -26,11 +23,13 @@
     <string name="label_album_actions">Album Actions</string>
     <string name="label_collection_type">Collection Type</string>
 
+    <!-- Errors -->
     <string name="title_permission_error">Permission Request Failed!</string>
     <string name="message_permission_error">
         You have not given &app_name; permission to access your photos,
         which is required for it to work.
     </string>
+    <string name="edit_fail_error">Failed to save changes!</string>
 
     <string name="title_album_form">New Album</string>
     <string name="hint_set_name">Name goes here</string>
@@ -46,5 +45,11 @@
     <string name="confirm">Okay</string>
 
     <string name="intent_item_key">item</string>
+
+    <!-- Crop ratio buttons -->
+    <string name="ratio_1x1">1:1</string>
+    <string name="ratio_4x3">4:3</string>
+    <string name="ratio_16x9">16:9</string>
+    <string name="ratio_free">Free</string>
 
 </resources>

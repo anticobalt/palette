@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/translucentBlack"
+    android:layout_gravity="bottom"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Button
+        android:id="@+id/ratio_1x1"
+        android:text="@string/ratio_1x1"
+        android:textColor="@color/white"
+        android:background="?android:selectableItemBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/action_view_details"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ratio_4x3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/ratio_4x3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground"
+        android:contentDescription="@string/action_view_details"
+        android:text="@string/ratio_4x3"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@id/ratio_16x9"
+        app:layout_constraintStart_toEndOf="@+id/ratio_1x1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/ratio_16x9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground"
+        android:contentDescription="@string/action_view_details"
+        android:text="@string/ratio_16x9"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/ratio_free"
+        app:layout_constraintStart_toEndOf="@id/ratio_4x3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/ratio_free"
+        android:text="@string/ratio_free"
+        android:textColor="@color/white"
+        android:background="?android:selectableItemBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/ratio_16x9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/action_view_details"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

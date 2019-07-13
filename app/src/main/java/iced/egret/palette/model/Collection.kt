@@ -65,8 +65,9 @@ abstract class Collection(override var name: String, val path: String) : Coverab
 
     abstract fun getContents() : List<Coverable>
 
-    open fun addPicture(newPicture: Picture) {
-        _pictures.add(newPicture)
+    open fun addPicture(newPicture: Picture, toFront: Boolean = false) {
+        if (toFront) _pictures.add(0, newPicture)
+        else _pictures.add(newPicture)
         size += 1
     }
     open fun addPictures(newPictures: MutableList<Picture>) {

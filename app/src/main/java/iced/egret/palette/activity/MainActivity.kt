@@ -12,13 +12,16 @@ import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-const val READ_EXTERNAL_CODE = 100
-const val WRITE_EXTERNAL_CODE = 101
-const val TAG = "VIEW"
+const val EXTERNAL_CODE = 100
 
 class MainActivity : AppCompatActivity() {
 
-    var hasPermission = false
+    private var hasPermission = false
+    private val permissions = arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+
     private val finishedFragments = mutableListOf<MainFragment>()
 
     companion object SaveDataKeys {
@@ -29,10 +32,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        hasPermission = Permission.isAccepted(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        hasPermission = permissions
+                .map {permission -> Permission.isAccepted(this, permission)}
+                .all { accepted -> accepted }
 
         if (!hasPermission) {
-            Permission.request(this, Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_CODE)
+            Permission.request(this, permissions, EXTERNAL_CODE)
         }
         else {
             buildApp(savedInstanceState)
@@ -115,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
-            READ_EXTERNAL_CODE -> {
+            EXTERNAL_CODE -> {
                 if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     val dialog = MaterialDialog(this)
                     dialog.cancelable(false)

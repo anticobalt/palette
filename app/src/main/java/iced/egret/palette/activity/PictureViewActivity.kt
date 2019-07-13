@@ -1,5 +1,7 @@
 package iced.egret.palette.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
@@ -11,6 +13,7 @@ import com.github.piasy.biv.loader.glide.GlideImageLoader
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
+import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
 import kotlinx.android.synthetic.main.activity_view_picture.*
 import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
@@ -19,6 +22,9 @@ class PictureViewActivity : BottomActionsActivity() {
 
     private var uiHidden = false
     private var position = -1
+    private var hasPictureChanges = false
+
+    private val mPictures = mutableListOf<Picture>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,9 +66,8 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun buildViewPager() {
-        val pictures = CollectionManager.getCurrentCollectionPictures()
-        val adapter = PicturePagerAdapter(pictures, this)
-        viewpager.adapter = adapter
+        fetchPictures()
+        viewpager.adapter = PicturePagerAdapter(mPictures, this)
         viewpager.currentItem = position
         viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
@@ -85,6 +90,16 @@ class PictureViewActivity : BottomActionsActivity() {
         }
     }
 
+    private fun fetchPictures() {
+        mPictures.clear()
+        mPictures.addAll(CollectionManager.getCurrentCollectionPictures())
+    }
+
+    private fun updatePictures() {
+        fetchPictures()
+        viewpager.adapter?.notifyDataSetChanged()
+    }
+
     private fun startCropActivity() {
         val imageUri = CollectionManager.getCurrentCollectionPictures()[position].uri
         // setting initial crop padding doesn't working in XML for whatever reason
@@ -93,6 +108,19 @@ class PictureViewActivity : BottomActionsActivity() {
                 .start(this, CropActivity::class.java)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            Toast.makeText(this, R.string.file_save_success, Toast.LENGTH_SHORT).show()
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
+    }
+
+    override fun onBackPressed() {
+        if (hasPictureChanges) setResult(Activity.RESULT_OK)
+        finish()
+    }
 
     private fun hideSystemUI() {
         // For regular immersive mode, add SYSTEM_UI_FLAG_IMMERSIVE.

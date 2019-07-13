@@ -2,9 +2,11 @@ package iced.egret.palette.util
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -254,6 +256,16 @@ object CollectionManager {
             pictures = collection.pictures
         }
         return pictures
+    }
+
+    /**
+     * Make a picture, save it to disk, and add to current collection.
+     */
+    fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String) : File {
+        val file = Storage.saveBitmapToDisk(bitmap, name, location)
+        val newPicture = Picture(name, file.path)
+        currentCollection?.addPicture(newPicture, toFront = true)
+        return file
     }
 
 }

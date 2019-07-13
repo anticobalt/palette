@@ -12,8 +12,8 @@ object Permission {
         return (status == PackageManager.PERMISSION_GRANTED)
     }
 
-    fun request(activity: Activity, permission: String, requestCode: Int) {
-        ActivityCompat.requestPermissions(activity, arrayOf(permission), requestCode)
+    fun request(activity: Activity, permissions: Array<String>, requestCode: Int) {
+        ActivityCompat.requestPermissions(activity, permissions, requestCode)
     }
 
 }

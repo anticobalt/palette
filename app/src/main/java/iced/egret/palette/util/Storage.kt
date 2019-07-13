@@ -2,6 +2,7 @@ package iced.egret.palette.util
 
 import android.app.Activity
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns
@@ -11,6 +12,7 @@ import com.google.gson.reflect.TypeToken
 import iced.egret.palette.model.*
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 
 
 object Storage {
@@ -154,6 +156,26 @@ object Storage {
             Log.i("collection-manager", "couldn't find $fileName when trying to read")
             null
         }
+    }
+
+    fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String) : File {
+        val extension = name.split(".").last()
+        val path = location + name
+        val file = File(path)
+
+        val compressionFormat = when (extension) {
+            "png" -> Bitmap.CompressFormat.PNG
+            "webp" -> Bitmap.CompressFormat.WEBP
+            else -> Bitmap.CompressFormat.JPEG
+        }
+
+        // save as max quality
+        val outStream = FileOutputStream(file)
+        bitmap.compress(compressionFormat, 100, outStream)
+        outStream.close()
+
+        return file
+
     }
 
 }

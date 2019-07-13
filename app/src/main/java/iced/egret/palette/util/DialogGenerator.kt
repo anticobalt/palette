@@ -82,4 +82,28 @@ object DialogGenerator {
         }
     }
 
+    fun nameFile(context: Context, name: String?, onConfirm: (CharSequence) -> Unit) {
+
+        var nameWithoutExtension : String? = null
+        var extension : String? = null
+        val parts = name?.split(".")
+
+        // names with periods are fair game
+        if (parts != null && parts.size > 1) {
+            extension = parts.last()
+            nameWithoutExtension = parts.dropLast(1).joinToString(".")
+        }
+
+        MaterialDialog(context).show {
+            title(R.string.action_save_file)
+            // TODO: custom view to separate extension and name fields
+            input(prefill = "$nameWithoutExtension-1.$extension")
+            negativeButton()
+            positiveButton {
+                onConfirm(this.getInputField().text)
+            }
+        }
+
+    }
+
 }

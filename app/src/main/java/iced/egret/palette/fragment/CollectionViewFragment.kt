@@ -1,9 +1,11 @@
 package iced.egret.palette.fragment
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -453,6 +455,15 @@ class CollectionViewFragment :
             val coverableItems = coverables.map {content -> CollectionViewItem(content)}
             mContents.addAll(coverables)
             mContentItems.addAll(coverableItems)
+        }
+    }
+
+    // FIXME: doesn't work b/c CollectionManager launch uses startActivity()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == AppCompatActivity.RESULT_OK) {
+            // Changes occurred: update
+            refreshFragment()
         }
     }
 

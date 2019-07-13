@@ -1,5 +1,7 @@
 package iced.egret.palette.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +12,8 @@ import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import com.theartofdev.edmodo.cropper.CropImageView
 import iced.egret.palette.R
+import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
 import java.io.File
 import java.io.IOException
 
@@ -27,11 +31,17 @@ class CropActivity : BottomActionsActivity() {
         mImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE)
         mOptions = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS)
 
-        mImageView = findViewById(R.id.cropImageView)
-        mImageView.setImageUriAsync(mImageUri)
-
+        buildCropView()
         buildActionBar()
         buildBottomActions()
+    }
+
+    private fun buildCropView() {
+        mImageView = findViewById(R.id.cropImageView)
+        mImageView.setImageUriAsync(mImageUri)
+        mImageView.setOnCropImageCompleteListener { _, result ->
+            saveCroppedBitmap(mImageView.croppedImage)
+        }
     }
 
     private fun buildActionBar() {
@@ -83,6 +93,24 @@ class CropActivity : BottomActionsActivity() {
         return true
     }
 
+    private fun saveCroppedBitmap(bitmap: Bitmap) {
+        val oldName = mImageUri.lastPathSegment
+        val location = mImageUri.path?.removeSuffix(oldName as CharSequence)
+
+        if (location == null) {
+            showFailToast()
+            return
+        }
+
+        DialogGenerator.nameFile(this, oldName) {
+            val file = CollectionManager.createPictureFromBitmap(bitmap, it.toString(), location)
+            broadcastNewMedia(file)
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
+
+    }
+
     /**
      * Copied from CropImageActivity.
      * https://github.com/ArthurHub/Android-Image-Cropper
@@ -103,6 +131,17 @@ class CropActivity : BottomActionsActivity() {
 
         }
         return outputUri
+    }
+
+    /**
+     * Broadcast changes so that show up immediately whenever MediaStore is accessed.
+     * https://stackoverflow.com/a/39241495
+     */
+    private fun broadcastNewMedia(file: File) {
+        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        val uri = Uri.fromFile(file)
+        mediaScanIntent.data = uri
+        sendBroadcast(mediaScanIntent)
     }
 
     private fun showFailToast() {

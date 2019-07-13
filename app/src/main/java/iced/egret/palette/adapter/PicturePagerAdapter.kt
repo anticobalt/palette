@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.activity_view_picture.*
 import kotlinx.android.synthetic.main.item_view_picture.view.*
 import java.lang.ref.WeakReference
 
-class PicturePagerAdapter(private val pictures: List<Picture>, activity: PictureViewActivity) : PagerAdapter() {
+class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: PictureViewActivity) : PagerAdapter() {
 
     private val activityReference = WeakReference(activity)
 

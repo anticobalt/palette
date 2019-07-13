@@ -16,6 +16,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
+import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.model.Folder
@@ -337,7 +338,8 @@ class CollectionViewFragment :
             val relativePosition =
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
-            val updates = CollectionManager.launch(coverable, relativePosition, this.context)
+            // May start activity for result if required
+            val updates = CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
             if (updates) {
                 refreshFragment()
             }
@@ -458,12 +460,14 @@ class CollectionViewFragment :
         }
     }
 
-    // FIXME: doesn't work b/c CollectionManager launch uses startActivity()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == AppCompatActivity.RESULT_OK) {
-            // Changes occurred: update
-            refreshFragment()
+        if (requestCode == PICTURE_ACTIVITY_REQUEST) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                // Changes occurred: update
+                refreshFragment()
+                MainFragmentManager.notifyAlbumUpdateFromCollectionView()
+            }
         }
     }
 

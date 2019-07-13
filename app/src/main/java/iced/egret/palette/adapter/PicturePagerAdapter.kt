@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import com.alexvasilkov.gestures.views.GestureFrameLayout
-import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
 import iced.egret.palette.model.Picture
@@ -37,7 +36,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
 
         // BigImageViews (or SSIVs) are not compatible with GestureViews, so use both
         // ImageView and BigImageView, depending on whether deep zoom is required or not
-        Glide.with(normalImageView.context).load(pictures[position].uri).into(normalImageView)
+        pictures[position].loadPictureInto(normalImageView)
         bigImageView.showImage(pictures[position].uri)
 
         gestureView.controller.settings.isRotationEnabled = true

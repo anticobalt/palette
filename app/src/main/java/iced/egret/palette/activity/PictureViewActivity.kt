@@ -22,7 +22,6 @@ class PictureViewActivity : BottomActionsActivity() {
 
     private var uiHidden = false
     private var position = -1
-    private var hasPictureChanges = false
 
     private val mPictures = mutableListOf<Picture>()
 
@@ -115,11 +114,6 @@ class PictureViewActivity : BottomActionsActivity() {
             setResult(Activity.RESULT_OK)
             finish()
         }
-    }
-
-    override fun onBackPressed() {
-        if (hasPictureChanges) setResult(Activity.RESULT_OK)
-        finish()
     }
 
     private fun hideSystemUI() {

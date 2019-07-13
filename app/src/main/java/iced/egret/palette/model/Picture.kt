@@ -3,6 +3,7 @@ package iced.egret.palette.model
 import android.net.Uri
 import android.os.Parcelable
 import android.view.View
+import android.widget.ImageView
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
@@ -32,19 +33,25 @@ class Picture(override var name: String, val path: String) : TerminalCoverable {
         val imageView = holder.ivItem
         val textView = holder.tvItem
 
-        // FIXME: loading is slow because the covers are large (e.g. set to 24dp and its fine)
         if (imageView != null) {
-            Glide.with(holder.itemView.context)
-                    .load(cover["uri"])
-                    .centerCrop()
-                    .error(R.drawable.ic_broken_image_black_128dp)
-                    .into(imageView)
+            val glide =
+                    Glide.with(holder.itemView.context)
+                            .load(cover["uri"])
+                            .centerCrop()
+                            .error(R.drawable.ic_broken_image_black_128dp)
+            // Build image with signature if possible
+            buildGlideImage(glide, imageView, cover["uri"])
         }
 
         if (textView != null) {
             holder.tvItem.visibility = View.INVISIBLE
         }
 
+    }
+
+    fun loadPictureInto(imageView: ImageView) {
+        val glide = Glide.with(imageView.context).load(uri)
+        buildGlideImage(glide, imageView, uri)
     }
 
 }

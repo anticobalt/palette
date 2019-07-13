@@ -1,8 +1,8 @@
 package iced.egret.palette.util
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import androidx.fragment.app.Fragment
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
@@ -189,11 +189,10 @@ object CollectionManager {
 
     /**
      * Launch an item by updating current collection, or creating activity.
-     * Context required to create new activity.
      *
      * @return Adapter needs to be updated (true) or not (false)
      */
-    fun launch(item: Coverable, position: Int = -1, context: Context? = null) : Boolean {
+    fun launch(item: Coverable, position: Int = -1, callingFragment: Fragment? = null, requestCode : Int = -1) : Boolean {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 currentCollection = item
@@ -202,10 +201,10 @@ object CollectionManager {
         }
         else {
             if (item as? TerminalCoverable != null) {
-                val intent = Intent(context, item.activity)
-                val key = context?.getString(R.string.intent_item_key)
+                val intent = Intent(callingFragment?.context, item.activity)
+                val key = callingFragment?.getString(R.string.intent_item_key)
                 intent.putExtra(key, position)
-                context?.startActivity(intent)
+                callingFragment?.startActivityForResult(intent, requestCode)
             }
         }
         return false

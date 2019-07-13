@@ -48,20 +48,25 @@ abstract class Collection(override var name: String, val path: String) : Coverab
     override fun loadCoverInto(holder: CoverViewHolder) {
         if (holder.ivItem != null) {
             setCoverUri()
-            val image : Any? = if (cover["uri"] != null) {
+            val imageReference : Any? = if (cover["uri"] != null) {
                 cover["uri"]
             } else {
                 cover["id"]
             }
-            Glide.with(holder.itemView.context)
-                    .load(image)
-                    .centerCrop()
-                    .into(holder.ivItem)
+
+            val glide =
+                    Glide.with(holder.itemView.context)
+                            .load(imageReference)
+                            .centerCrop()
+
+            // Load image with signature if possible
+            buildGlideImage(glide, holder.ivItem, imageReference)
         }
         if (holder.tvItem != null) {
             holder.tvItem.visibility = View.VISIBLE
         }
     }
+
 
     abstract fun getContents() : List<Coverable>
 

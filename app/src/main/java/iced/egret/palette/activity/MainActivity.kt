@@ -13,6 +13,7 @@ import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val EXTERNAL_CODE = 100
+const val PICTURE_ACTIVITY_REQUEST = 1
 
 class MainActivity : AppCompatActivity() {
 

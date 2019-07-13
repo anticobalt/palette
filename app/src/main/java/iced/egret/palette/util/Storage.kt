@@ -43,7 +43,7 @@ object Storage {
         val cursor: Cursor?
         val columnIndexData: Int
         val projection = arrayOf(MediaColumns.DATA)
-        val sortBy = MediaStore.Images.ImageColumns.DATE_ADDED + " DESC"
+        val sortBy = MediaStore.Images.ImageColumns.DATE_MODIFIED + " DESC"
         val rootFolders = ArrayList<Folder>()
 
         cursor = activity.contentResolver.query(uri, projection, null, null, sortBy)
@@ -176,6 +176,15 @@ object Storage {
 
         return file
 
+    }
+
+    /**
+     * @param name The filename (e.g. myImage.png) or whole path (e.g. /path/to/myImage.png)
+     * @param location The folder the file sits in (e.g. /path/to)
+     */
+    fun fileExists(name: String, location: String = "") : Boolean {
+        val file = File(location + name)
+        return file.exists()
     }
 
 }

@@ -95,15 +95,29 @@ object DialogGenerator {
         }
 
         MaterialDialog(context).show {
+            noAutoDismiss()
             title(R.string.action_save_file)
             // TODO: custom view to separate extension and name fields
             input(prefill = "$nameWithoutExtension-1.$extension")
-            negativeButton()
+            negativeButton {
+                dismiss()
+            }
             positiveButton {
                 onConfirm(this.getInputField().text)
             }
         }
 
+    }
+
+    fun confirmReplaceFile(context: Context, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(R.string.action_replace_file)
+            message(R.string.message_replace_file)
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
+        }
     }
 
 }

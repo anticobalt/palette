@@ -14,6 +14,7 @@ import com.theartofdev.edmodo.cropper.CropImageView
 import iced.egret.palette.R
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.Storage
 import java.io.File
 import java.io.IOException
 
@@ -94,6 +95,14 @@ class CropActivity : BottomActionsActivity() {
     }
 
     private fun saveCroppedBitmap(bitmap: Bitmap) {
+
+        fun save(name: String, location: String, isNewFile: Boolean) {
+            val file = CollectionManager.createPictureFromBitmap(bitmap, name, location, isNewFile)
+            broadcastNewMedia(file)
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
+
         val oldName = mImageUri.lastPathSegment
         val location = mImageUri.path?.removeSuffix(oldName as CharSequence)
 
@@ -102,11 +111,18 @@ class CropActivity : BottomActionsActivity() {
             return
         }
 
+        // Nested dialogs is a QoL feature; makes it easy to change filenames if you
+        // don't want to overwrite existing file b/c first dialog won't close after OK pressed
         DialogGenerator.nameFile(this, oldName) {
-            val file = CollectionManager.createPictureFromBitmap(bitmap, it.toString(), location)
-            broadcastNewMedia(file)
-            setResult(Activity.RESULT_OK)
-            finish()
+            val name = it.toString()
+            if (Storage.fileExists(name, location)) {
+                DialogGenerator.confirmReplaceFile(this) {
+                    save(name, location, isNewFile = false)
+                }
+            }
+            else {
+                save(name, location, isNewFile = true)
+            }
         }
 
     }

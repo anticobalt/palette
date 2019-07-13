@@ -70,6 +70,10 @@ abstract class Collection(override var name: String, val path: String) : Coverab
 
     abstract fun getContents() : List<Coverable>
 
+    fun getPictureByPath(path: String) : Picture? {
+        return _pictures.find {picture -> picture.path == path}
+    }
+
     open fun addPicture(newPicture: Picture, toFront: Boolean = false) {
         if (toFront) _pictures.add(0, newPicture)
         else _pictures.add(newPicture)

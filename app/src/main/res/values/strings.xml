@@ -19,6 +19,7 @@
     <string name="action_crop">Crop</string>
     <string name="action_share">Share</string>
     <string name="action_save_file">Save File</string>
+    <string name="action_replace_file">Replace File</string>
 
     <!-- Strings indicate what buttons or objects represent -->
     <string name="label_album_actions">Album Actions</string>
@@ -40,6 +41,7 @@
     <string name="title_delete_album_confirm">Delete Albums?</string>
     <string name="message_delete_album_confirm">This action is irreversible. You are NOT deleting pictures.</string>
     <string name="title_remove">Remove</string>
+    <string name="message_replace_file">File with this name already exists. Are you sure you want to replace it?</string>
 
     <string name="action_selected_one">%1$d item selected</string>
     <string name="action_selected_many">%1$d items selected</string>

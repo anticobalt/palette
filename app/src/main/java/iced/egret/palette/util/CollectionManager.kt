@@ -258,12 +258,22 @@ object CollectionManager {
     }
 
     /**
-     * Make a picture, save it to disk, and add to current collection.
+     * Save a Picture to disk, and add to current Collection if it is brand new.
      */
-    fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String) : File {
+    fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String, isNew: Boolean) : File {
+
         val file = Storage.saveBitmapToDisk(bitmap, name, location)
-        val newPicture = Picture(name, file.path)
-        currentCollection?.addPicture(newPicture, toFront = true)
+        val picture : Picture
+
+        if (isNew) {
+            picture = Picture(name, file.path)
+        } else {
+            // Move Picture to front to reflect changes
+            picture = currentCollection?.getPictureByPath(file.path) ?: return file  // should never return
+            currentCollection?.removePicture(picture)
+        }
+
+        currentCollection?.addPicture(picture, toFront = true)
         return file
     }
 

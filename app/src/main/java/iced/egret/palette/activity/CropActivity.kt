@@ -52,6 +52,10 @@ class CropActivity : BottomActionsActivity() {
 
     override fun buildBottomActions() {
         super.buildBottomActions()
+        bottomActions.ratio_free.setOnClickListener {
+            // FIXME: side-effect: crop window fills whole screen if set from true to false
+            cropImageView.setFixedAspectRatio(false)
+        }
         bottomActions.ratio_1x1.setOnClickListener {
             cropImageView.setAspectRatio(1, 1)
         }
@@ -69,9 +73,9 @@ class CropActivity : BottomActionsActivity() {
                 cropImageView.setAspectRatio(16, 9)
             }
         }
-        bottomActions.ratio_free.setOnClickListener {
+        bottomActions.ratio_reset.setOnClickListener {
             cropImageView.clearAspectRatio()
-            cropImageView.resetCropRect()  // expand to starting size
+            cropImageView.resetCropRect()  // expand to fill whole image
         }
     }
 

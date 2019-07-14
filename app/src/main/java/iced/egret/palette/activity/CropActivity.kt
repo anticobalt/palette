@@ -5,22 +5,24 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.util.Pair
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
-import com.theartofdev.edmodo.cropper.CropImageView
 import iced.egret.palette.R
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Storage
+import kotlinx.android.synthetic.main.activity_crop.*
+import kotlinx.android.synthetic.main.activity_view_picture.bottomActions
+import kotlinx.android.synthetic.main.bottom_actions_crop.view.*
 import java.io.File
 import java.io.IOException
 
 class CropActivity : BottomActionsActivity() {
 
-    private lateinit var mImageView : CropImageView
     private lateinit var mImageUri : Uri
     private lateinit var mOptions : CropImageOptions
 
@@ -38,10 +40,9 @@ class CropActivity : BottomActionsActivity() {
     }
 
     private fun buildCropView() {
-        mImageView = findViewById(R.id.cropImageView)
-        mImageView.setImageUriAsync(mImageUri)
-        mImageView.setOnCropImageCompleteListener { _, result ->
-            saveCroppedBitmap(mImageView.croppedImage)
+        cropImageView.setImageUriAsync(mImageUri)
+        cropImageView.setOnCropImageCompleteListener { _, _ ->
+            saveCroppedBitmap(cropImageView.croppedImage)
         }
     }
 
@@ -51,6 +52,27 @@ class CropActivity : BottomActionsActivity() {
 
     override fun buildBottomActions() {
         super.buildBottomActions()
+        bottomActions.ratio_1x1.setOnClickListener {
+            cropImageView.setAspectRatio(1, 1)
+        }
+        bottomActions.ratio_4x3.setOnClickListener {
+            if (cropImageView.aspectRatio == Pair(4, 3)) {
+                cropImageView.setAspectRatio(3, 4)
+            } else {
+                cropImageView.setAspectRatio(4, 3)
+            }
+        }
+        bottomActions.ratio_16x9.setOnClickListener {
+            if (cropImageView.aspectRatio == Pair(16, 9)) {
+                cropImageView.setAspectRatio(9, 16)
+            } else {
+                cropImageView.setAspectRatio(16, 9)
+            }
+        }
+        bottomActions.ratio_free.setOnClickListener {
+            cropImageView.clearAspectRatio()
+            cropImageView.resetCropRect()  // expand to starting size
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -67,19 +89,19 @@ class CropActivity : BottomActionsActivity() {
                 true
             }
             R.id.crop_image_menu_rotate_left -> {
-                mImageView.rotateImage(-mOptions.rotationDegrees)
+                cropImageView.rotateImage(-mOptions.rotationDegrees)
                 true
             }
             R.id.crop_image_menu_rotate_right -> {
-                mImageView.rotateImage(mOptions.rotationDegrees)
+                cropImageView.rotateImage(mOptions.rotationDegrees)
                 true
             }
             R.id.crop_image_menu_flip_horizontally -> {
-                mImageView.flipImageHorizontally()
+                cropImageView.flipImageHorizontally()
                 true
             }
             R.id.crop_image_menu_flip_vertically -> {
-                mImageView.flipImageVertically()
+                cropImageView.flipImageVertically()
                 true
             }
             else -> false
@@ -90,7 +112,7 @@ class CropActivity : BottomActionsActivity() {
 
     private fun cropImage() : Boolean {
         val newUri : Uri = getOutputUri() ?: return false
-        mImageView.saveCroppedImageAsync(newUri)
+        cropImageView.saveCroppedImageAsync(newUri)
         return true
     }
 

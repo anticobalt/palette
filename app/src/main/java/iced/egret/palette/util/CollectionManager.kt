@@ -230,7 +230,7 @@ object CollectionManager {
     }
 
     /**
-     * Given a real path to a Collection, use it to restore stack state.
+     * Given a path to a Collection, use it to restore stack state.
      * If can't unwind completely, do it as much as possible, then return.
      */
     fun unwindStack(path: String) {
@@ -248,6 +248,24 @@ object CollectionManager {
         }
     }
 
+    /**
+     * Keeping it simple and using a recursive search.
+     * Traversing Folders that are organized pseudo-hierarchically is difficult.
+     */
+    fun getFolderByTruePath(truePath: String, startFolders : List<Folder> = folders) : Folder? {
+        val cleanPath = truePath.trim { char -> char == '/'}
+        var matchedFolder : Folder? = null
+
+        for (folder in startFolders) {
+            val folderCleanPath = folder.truePath.trim { char -> char == '/' }
+            matchedFolder = if (folderCleanPath == cleanPath) folder
+            else getFolderByTruePath(truePath, folder.folders)
+            // stop if match found
+            if (matchedFolder != null) break
+        }
+        return matchedFolder
+    }
+
     fun getCurrentCollectionPictures() : List<Picture> {
         val collection = currentCollection
         var pictures : List<Picture> = listOf()
@@ -258,22 +276,29 @@ object CollectionManager {
     }
 
     /**
-     * Save a Picture to disk, and add to current Collection if it is brand new.
+     * Save a Picture to disk and update Collections as required.
      */
     fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String, isNew: Boolean) : File {
 
         val file = Storage.saveBitmapToDisk(bitmap, name, location)
         val picture : Picture
+        val folder : Folder
 
-        if (isNew) {
-            picture = Picture(name, file.path)
-        } else {
-            // Move Picture to front to reflect changes
-            picture = currentCollection?.getPictureByPath(file.path) ?: return file  // should never return
-            currentCollection?.removePicture(picture)
+        // Get Picture from Folder, as it's guaranteed to reside in there if it exists, unlike in Album
+        folder = getFolderByTruePath(location) ?: return file  // should never return
+        picture = folder.getPictureByPath(file.path) ?: Picture(name, file.path)
+
+        // Update Folder
+        if (!isNew) folder.removePicture(picture)  // move Picture
+        folder.addPicture(picture, toFront = true)
+
+        // Update current Collection if it's an Album, otherwise another update would be redundant
+        if (currentCollection is Album) {
+            if (!isNew) currentCollection?.removePicture(picture)  // move Picture
+            currentCollection?.addPicture(picture, toFront = true)
+            Storage.saveAlbumsToDisk(albums)
         }
 
-        currentCollection?.addPicture(picture, toFront = true)
         return file
     }
 

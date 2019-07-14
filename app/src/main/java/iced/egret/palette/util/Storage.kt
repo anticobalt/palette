@@ -116,7 +116,9 @@ object Storage {
             val albumsData = gson.fromJson<ArrayList<AlbumData>>(json, type)
             val albums  = ArrayList<Album>()
             for (data in albumsData) {
-                albums.add(data.toFullClass(existingPictures = retrievedPictures))
+                val album = data.toFullClass(existingPictures = retrievedPictures)
+                albums.add(album)
+                cleanAlbum(album)
             }
             return albums
         }
@@ -185,6 +187,18 @@ object Storage {
     fun fileExists(name: String, location: String = "") : Boolean {
         val file = File(location + name)
         return file.exists()
+    }
+
+    /**
+     * Ensure all Pictures in album exist on disk. If they don't, remove them.
+     */
+    private fun cleanAlbum(album: Album) {
+        val pictures = album.pictures.toList()  // a copy to avoid concurrency error
+        for (picture in pictures) {
+            if (!fileExists(picture.path)) {
+                album.removePicture(picture)
+            }
+        }
     }
 
 }

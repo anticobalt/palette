@@ -5,8 +5,6 @@
     android:layout_height="wrap_content"
     android:background="@color/translucentBlack"
     android:layout_gravity="bottom"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <ImageButton
@@ -16,6 +14,7 @@
         android:background="?android:selectableItemBackground"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="20dp"
         android:contentDescription="@string/action_view_details"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/share"
@@ -28,9 +27,22 @@
         android:background="?android:selectableItemBackground"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:contentDescription="@string/action_view_details"
+        android:padding="20dp"
+        android:contentDescription="@string/action_share"
         app:layout_constraintStart_toEndOf="@+id/details"
+        app:layout_constraintEnd_toStartOf="@id/folder"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/folder"
+        android:src="@drawable/ic_folder_open_black_24dp"
+        android:tint="@color/white"
+        android:background="?android:selectableItemBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:contentDescription="@string/action_go_to_folder"
+        app:layout_constraintStart_toEndOf="@+id/share"
         app:layout_constraintEnd_toStartOf="@id/crop"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,9 +53,9 @@
         android:background="?android:selectableItemBackground"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="@string/action_view_details"
-        app:layout_constraintStart_toEndOf="@id/share"
+        android:padding="20dp"
+        android:contentDescription="@string/action_crop"
+        app:layout_constraintStart_toEndOf="@id/folder"
         app:layout_constraintEnd_toStartOf="@+id/delete"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -54,9 +66,10 @@
         android:background="?android:selectableItemBackground"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="20dp"
         app:layout_constraintStart_toEndOf="@id/crop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/action_view_details"/>
+        android:contentDescription="@string/action_delete"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

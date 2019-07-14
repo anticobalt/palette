@@ -18,6 +18,7 @@
     <string name="action_view_details">View Details</string>
     <string name="action_crop">Crop</string>
     <string name="action_share">Share</string>
+    <string name="action_go_to_folder">Go To Folder</string>
     <string name="action_save_file">Save File</string>
     <string name="action_replace_file">Replace File</string>
 

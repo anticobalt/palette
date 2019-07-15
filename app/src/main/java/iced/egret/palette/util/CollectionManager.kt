@@ -1,7 +1,9 @@
 package iced.egret.palette.util
 
+import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.Bitmap
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import iced.egret.palette.R
 import iced.egret.palette.model.*
@@ -278,9 +280,10 @@ object CollectionManager {
     /**
      * Save a Picture to disk and update Collections as required.
      */
-    fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String, isNew: Boolean) : File {
+    fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String, isNew: Boolean,
+                                sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
 
-        val file = Storage.saveBitmapToDisk(bitmap, name, location)
+        val file = Storage.saveBitmapToDisk(bitmap, name, location, sdCardFile, contentResolver) ?: return null
         val picture : Picture
         val folder : Folder
 

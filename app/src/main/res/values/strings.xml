@@ -4,6 +4,9 @@
 
     <string name="app_name">&app_name;</string>
 
+    <string name="preference_file_key">com.iced.egret.palette.PREFERENCES_KEY</string>
+    <string name="sd_card_uri_key">com.iced.egret.palette.SD_CARD_URI_KEY</string>
+
     <string name="folders">Folders</string>
     <string name="albums">Albums</string>
     <string name="pictures">Pictures</string>
@@ -36,6 +39,7 @@
         which is required for it to work.
     </string>
     <string name="edit_fail_error">Failed to save changes!</string>
+    <string name="access_denied_error">Access to storage was denied. Make sure access to this SD card is enabled in Settings.</string>
 
     <string name="title_album_form">New Album</string>
     <string name="hint_set_name">Name goes here</string>

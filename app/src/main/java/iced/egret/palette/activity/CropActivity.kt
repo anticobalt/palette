@@ -1,6 +1,7 @@
 package iced.egret.palette.activity
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -9,6 +10,7 @@ import android.util.Pair
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.documentfile.provider.DocumentFile
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import iced.egret.palette.R
@@ -123,7 +125,14 @@ class CropActivity : BottomActionsActivity() {
     private fun saveCroppedBitmap(bitmap: Bitmap) {
 
         fun save(name: String, location: String, isNewFile: Boolean) {
-            val file = CollectionManager.createPictureFromBitmap(bitmap, name, location, isNewFile)
+            val sdCardFile = getSdCardDocumentFile()
+            val file = CollectionManager
+                    .createPictureFromBitmap(bitmap, name, location, isNewFile,
+                            sdCardFile, contentResolver)
+            if (file == null) {
+                showAccessDeniedToast()
+                return
+            }
             broadcastNewMedia(file)
             setResult(Activity.RESULT_OK)
             finish()
@@ -186,8 +195,23 @@ class CropActivity : BottomActionsActivity() {
         sendBroadcast(mediaScanIntent)
     }
 
+    private fun getSdCardDocumentFile() : DocumentFile? {
+        val preferences = getSharedPreferences(
+                getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE
+        )
+        val uriAsString = preferences
+                .getString(getString(R.string.sd_card_uri_key), null) ?: return null
+        val uri = Uri.parse(uriAsString)
+        return DocumentFile.fromTreeUri(this, uri)
+    }
+
     private fun showFailToast() {
         Toast.makeText(this, R.string.edit_fail_error, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showAccessDeniedToast() {
+        Toast.makeText(this, R.string.access_denied_error, Toast.LENGTH_SHORT).show()
     }
 
 }

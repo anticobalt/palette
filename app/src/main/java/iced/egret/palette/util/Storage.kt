@@ -1,18 +1,22 @@
 package iced.egret.palette.util
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns
 import android.util.Log
+import android.webkit.MimeTypeMap
+import androidx.documentfile.provider.DocumentFile
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import iced.egret.palette.model.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.OutputStream
 
 
 object Storage {
@@ -160,10 +164,14 @@ object Storage {
         }
     }
 
-    fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String) : File {
-        val extension = name.split(".").last()
+    fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String,
+                         sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
+
+        val extension = name.split(".").last().toLowerCase()
         val path = location + name
         val file = File(path)
+        val locationOnSdCard = pathOnSdCard(location)
+        val outStream : OutputStream
 
         val compressionFormat = when (extension) {
             "png" -> Bitmap.CompressFormat.PNG
@@ -171,8 +179,23 @@ object Storage {
             else -> Bitmap.CompressFormat.JPEG
         }
 
+        // If saving to SD card and can do it, do it. Otherwise try to save normally.
+        // https://stackoverflow.com/a/43317703
+        if (locationOnSdCard != null && sdCardFile != null) {
+            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "image/webp"
+            val subFolderFile = getFileInside(sdCardFile, locationOnSdCard) ?: return null
+            val imageFile = getImageFile(subFolderFile, mimeType, name) ?: return null
+            outStream = contentResolver.openOutputStream(imageFile.uri) ?: return null
+        }
+        else {
+            try {
+                outStream = FileOutputStream(file)
+            } catch (accessDenied: FileNotFoundException) {
+                return null
+            }
+        }
+
         // save as max quality
-        val outStream = FileOutputStream(file)
         bitmap.compress(compressionFormat, 100, outStream)
         outStream.close()
 
@@ -187,6 +210,36 @@ object Storage {
     fun fileExists(name: String, location: String = "") : Boolean {
         val file = File(location + name)
         return file.exists()
+    }
+
+    private fun pathOnSdCard(path: String) : String? {
+        // At start of string, match "/storage/" + any 4 alphanumerics + a dash + any 4 alphanumerics + "/"
+        val regex = Regex("^/storage/[a-zA-z0-9]{4}-[a-zA-z0-9]{4}/")
+        val sdCardLocation = regex.find(path)?.value ?: return null
+        return path.removePrefix(sdCardLocation).removeSuffix("/")
+    }
+
+    /**
+     * Get the DocumentFile for some folder/file somewhere inside given root DocumentFile.
+     *
+     * @return The desired DocumentFile, or null if nnot found.
+     */
+    private fun getFileInside(rootFile: DocumentFile, relativePath: String) : DocumentFile? {
+        val levels = relativePath.split("/")
+        var currentFile = rootFile
+        for (level in levels) {
+            currentFile = currentFile.findFile(level) ?: return null
+        }
+        return currentFile
+    }
+
+    /**
+     * Find or make the DocumentFile with given name inside given DocumentFile.
+     *
+     * @return The desired DocumentFile, or null if it doesn't exist and couldn't be created.
+     */
+    private fun getImageFile(subFolderFile: DocumentFile, mimeType: String, name: String) : DocumentFile? {
+        return subFolderFile.findFile(name) ?: subFolderFile.createFile(mimeType, name)
     }
 
     /**

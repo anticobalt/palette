@@ -52,8 +52,6 @@ class MainActivity : AppCompatActivity() {
             buildApp(savedInstanceState)
         }
 
-        checkSdWriteAccess()
-
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -101,6 +99,7 @@ class MainActivity : AppCompatActivity() {
             CollectionManager.unwindStack(navigateToPath)
         }
         styleSlidingPane()
+        checkSdWriteAccess()
     }
 
     private fun makeFragments() {

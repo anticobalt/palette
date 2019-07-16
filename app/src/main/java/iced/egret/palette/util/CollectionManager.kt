@@ -197,7 +197,10 @@ object CollectionManager {
     fun launch(item: Coverable, position: Int = -1, callingFragment: Fragment? = null, requestCode : Int = -1) : Boolean {
         if (!item.terminal) {
             if (item as? Collection != null) {
-                currentCollection = item
+                when (item.name) {
+                    BASE_STORAGE_NAME -> unwindStack(PRACTICAL_BASE_STORAGE_PATH) // skip the empty sub-folders
+                    else -> currentCollection = item
+                }
                 return true
             }
         }

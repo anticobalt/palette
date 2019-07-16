@@ -60,7 +60,16 @@ abstract class Collection(override var name: String, val path: String) : Coverab
                             .centerCrop()
 
             // Load image with signature if possible
-            buildGlideImage(glide, holder.ivItem, imageReference)
+            //try {
+                buildGlideImage(glide, holder.ivItem, imageReference)
+            /*}
+            catch (e: Exception) {
+                if (imageReference is Uri) {
+                    val i = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                    i.data = imageReference
+                    holder.itemView.context.sendBroadcast(i)
+                }
+            }*/
         }
         if (holder.tvItem != null) {
             holder.tvItem.visibility = View.VISIBLE
@@ -74,9 +83,12 @@ abstract class Collection(override var name: String, val path: String) : Coverab
         return _pictures.find {picture -> picture.path == path}
     }
 
-    open fun addPicture(newPicture: Picture, toFront: Boolean = false) {
-        if (toFront) _pictures.add(0, newPicture)
-        else _pictures.add(newPicture)
+    open fun addPicture(newPicture: Picture, toFront: Boolean = false, position: Int? = null) {
+        when {
+            toFront -> _pictures.add(0, newPicture)
+            position != null -> _pictures.add(position, newPicture)
+            else -> _pictures.add(newPicture)
+        }
         size += 1
     }
     open fun addPictures(newPictures: MutableList<Picture>) {

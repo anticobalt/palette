@@ -38,6 +38,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.afollestad.material-dialogs:core:3.0.0-rc3'
     implementation 'com.afollestad.material-dialogs:input:3.0.0-rc3'
+    implementation 'com.afollestad.material-dialogs:files:3.1.0'
     implementation 'eu.davidea:flexible-adapter-ui:1.0.0'
     implementation 'eu.davidea:flexible-adapter:5.1.0'
     implementation 'com.alexvasilkov:gesture-views:2.5.2'

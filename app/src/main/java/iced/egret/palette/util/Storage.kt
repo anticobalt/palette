@@ -13,10 +13,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import iced.egret.palette.model.*
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.OutputStream
+import java.io.*
 
 
 object Storage {
@@ -182,10 +179,8 @@ object Storage {
         // If saving to SD card and can do it, do it. Otherwise try to save normally.
         // https://stackoverflow.com/a/43317703
         if (locationOnSdCard != null && sdCardFile != null) {
-            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "image/webp"
-            val subFolderFile = getFileInside(sdCardFile, locationOnSdCard) ?: return null
-            val imageFile = getImageFile(subFolderFile, mimeType, name) ?: return null
-            outStream = contentResolver.openOutputStream(imageFile.uri) ?: return null
+            outStream = getSdOutputStream(name, locationOnSdCard, "image/webp", sdCardFile, contentResolver)
+                    ?: return null
         }
         else {
             try {
@@ -203,6 +198,63 @@ object Storage {
 
     }
 
+    fun moveFile(sourcePath: String, destinationParent: File,
+                 sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
+        val sourceFile = File(sourcePath)
+        val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver)
+        deleteFile(sourceFile, sdCardFile, contentResolver)
+        return newFile
+    }
+
+    /**
+     * If copying to SD card (and can access SD card), do so using DocumentFiles.
+     * Otherwise, try to copy as normal.
+     *
+     * @return The copy of the File, or null if failed.
+     */
+    fun copyFile(sourceFile: File, destinationParent: File,
+                 sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
+
+        val name = sourceFile.name
+        val destinationLocation = destinationParent.path.removeSuffix("/") + "/"
+        val destinationOnSdCard = pathOnSdCard(destinationLocation)
+        val inStream = FileInputStream(sourceFile)
+        val outStream: OutputStream
+        val copy = File(destinationLocation + name)
+
+        if (destinationOnSdCard != null && sdCardFile != null) {
+            outStream = getSdOutputStream(name, destinationOnSdCard, "image/webp", sdCardFile, contentResolver)
+                    ?: return null
+        }
+        else {
+            try {
+                outStream = FileOutputStream(copy)
+            } catch (accessDenied: FileNotFoundException) {
+                return null
+            }
+        }
+
+        copyStreams(inStream, outStream)
+        return copy
+    }
+
+    /**
+     * If file is on SD card, and have access to SD card, use DocumentFiles to delete.
+     * Otherwise, try to delete as normal.
+     *
+     * @return True if deleted, false if not.
+     */
+    fun deleteFile(sourceFile: File, sdCardFile: DocumentFile?, contentResolver: ContentResolver) : Boolean {
+        val pathOnSdCard = pathOnSdCard(sourceFile.path)
+        if (pathOnSdCard != null && sdCardFile != null) {
+            val sourceDocumentFile = findFileInsideRecursive(sdCardFile, pathOnSdCard) ?: return false
+            return sourceDocumentFile.delete()
+        }
+        else {
+            return sourceFile.delete()
+        }
+    }
+
     /**
      * @param name The filename (e.g. myImage.png) or whole path (e.g. /path/to/myImage.png)
      * @param location The folder the file sits in (e.g. /path/to)
@@ -212,6 +264,16 @@ object Storage {
         return file.exists()
     }
 
+    private fun copyStreams(inputStream: InputStream, outputStream: OutputStream) {
+        inputStream.copyTo(outputStream)
+        inputStream.close()
+        outputStream.close()
+    }
+
+    private fun isPathOnSdCard(path: String) : Boolean {
+        return pathOnSdCard(path) != null
+    }
+
     private fun pathOnSdCard(path: String) : String? {
         // At start of string, match "/storage/" + any 4 alphanumerics + a dash + any 4 alphanumerics + "/"
         val regex = Regex("^/storage/[a-zA-z0-9]{4}-[a-zA-z0-9]{4}/")
@@ -219,12 +281,27 @@ object Storage {
         return path.removePrefix(sdCardLocation).removeSuffix("/")
     }
 
+    private fun getSdOutputStream(name: String, locationOnSdCard: String, defaultMimeType : String,
+                                  sdCardFile: DocumentFile, contentResolver: ContentResolver) : OutputStream? {
+        val extension = name.split(".").last().toLowerCase()
+        val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: defaultMimeType
+        val subFolderFile = findFileInsideRecursive(sdCardFile, locationOnSdCard) ?: return null
+        val imageFile = getChildFile(subFolderFile, mimeType, name) ?: return null
+        return contentResolver.openOutputStream(imageFile.uri) ?: return null
+    }
+
     /**
      * Get the DocumentFile for some folder/file somewhere inside given root DocumentFile.
      *
-     * @return The desired DocumentFile, or null if nnot found.
+     * @return The desired DocumentFile, or null if not found.
      */
-    private fun getFileInside(rootFile: DocumentFile, relativePath: String) : DocumentFile? {
+    private fun findFileInsideRecursive(rootFile: DocumentFile, relativePath: String) : DocumentFile? {
+
+        // splitting empty string will still produce list with one element
+        if (relativePath.isEmpty()) {
+            return rootFile
+        }
+
         val levels = relativePath.split("/")
         var currentFile = rootFile
         for (level in levels) {
@@ -238,7 +315,7 @@ object Storage {
      *
      * @return The desired DocumentFile, or null if it doesn't exist and couldn't be created.
      */
-    private fun getImageFile(subFolderFile: DocumentFile, mimeType: String, name: String) : DocumentFile? {
+    private fun getChildFile(subFolderFile: DocumentFile, mimeType: String, name: String) : DocumentFile? {
         return subFolderFile.findFile(name) ?: subFolderFile.createFile(mimeType, name)
     }
 

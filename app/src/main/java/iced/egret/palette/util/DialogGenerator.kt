@@ -4,6 +4,8 @@ import android.content.Context
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
+import com.afollestad.materialdialogs.files.FileFilter
+import com.afollestad.materialdialogs.files.folderChooser
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
@@ -11,6 +13,7 @@ import iced.egret.palette.R
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
+import java.io.File
 
 /**
  * Shows MaterialDialogs with custom actions on confirmation.
@@ -117,6 +120,16 @@ object DialogGenerator {
             positiveButton {
                 onConfirm()
             }
+        }
+    }
+
+    fun moveFile(context: Context, onConfirm: (File) -> Unit) {
+        val filter: FileFilter = {it.path.startsWith("/storage")}
+        MaterialDialog(context).show {
+            folderChooser(emptyTextRes = R.string.folder_empty, filter = filter) {
+                dialog, file -> onConfirm(file)
+            }
+            negativeButton()
         }
     }
 

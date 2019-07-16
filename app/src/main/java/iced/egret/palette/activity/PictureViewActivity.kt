@@ -1,12 +1,16 @@
 package iced.egret.palette.activity
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.viewpager.widget.ViewPager
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.glide.GlideImageLoader
@@ -15,8 +19,10 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.activity_view_picture.*
 import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
+import java.io.File
 
 class PictureViewActivity : BottomActionsActivity() {
 
@@ -89,6 +95,23 @@ class PictureViewActivity : BottomActionsActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_picture, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val retVal = when (item?.itemId) {
+            R.id.actionMove -> {
+                initiateMove()
+                true
+            }
+            else -> false
+        }
+        return if (retVal) true  // consume action
+        else super.onOptionsItemSelected(item)
+    }
+
     private fun fetchPictures() {
         mPictures.clear()
         mPictures.addAll(CollectionManager.getCurrentCollectionPictures())
@@ -111,8 +134,31 @@ class PictureViewActivity : BottomActionsActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             Toast.makeText(this, R.string.file_save_success, Toast.LENGTH_SHORT).show()
-            setResult(Activity.RESULT_OK)
+            setResult(RESULT_OK)
             finish()
+        }
+    }
+
+    private fun initiateMove(){
+        DialogGenerator.moveFile(this) {
+            val destination = it
+            val oldPicture = CollectionManager.getCurrentCollectionPictures()[position]
+
+            if (oldPicture.fileLocation == destination.path) {
+                Toast.makeText(this, R.string.already_exists_error, Toast.LENGTH_SHORT).show()
+                return@moveFile
+            }
+
+            val files = CollectionManager.movePicture(position, destination, getSdCardDocumentFile(), contentResolver)
+            if (files != null) {
+                broadcastNewMedia(files.first)
+                broadcastNewMedia(files.second)
+                setResult(RESULT_OK)
+                finish()
+            }
+            else {
+                Toast.makeText(this, R.string.move_fail_error, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -154,6 +200,28 @@ class PictureViewActivity : BottomActionsActivity() {
             bottomActions.visibility = View.GONE
             supportActionBar?.hide()
         }
+    }
+
+    private fun getSdCardDocumentFile() : DocumentFile? {
+        val preferences = getSharedPreferences(
+                getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE
+        )
+        val uriAsString = preferences
+                .getString(getString(R.string.sd_card_uri_key), null) ?: return null
+        val uri = Uri.parse(uriAsString)
+        return DocumentFile.fromTreeUri(this, uri)
+    }
+
+    /**
+     * Broadcast changes so that show up immediately whenever MediaStore is accessed.
+     * https://stackoverflow.com/a/39241495
+     */
+    private fun broadcastNewMedia(file: File) {
+        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        val uri = Uri.fromFile(file)
+        mediaScanIntent.data = uri
+        sendBroadcast(mediaScanIntent)
     }
 
 }

@@ -305,4 +305,34 @@ object CollectionManager {
         return file
     }
 
+    /**
+     * Moves picture on disk, and updates Folders. If Folder updating fails (which should
+     * never happen), the moved file is still returned.
+     *
+     * @return The old and new Files, or null if move fails.
+     */
+    fun movePicture(position: Int, folderFile: File,
+                    sdCardFile: DocumentFile?, contentResolver: ContentResolver) : Pair<File, File>? {
+
+        val picture = currentCollection?.pictures?.get(position) ?: return null
+        val oldFile = File(picture.path)
+        val newFile = Storage.moveFile(picture.path, folderFile, sdCardFile, contentResolver)
+                ?: return null
+        val files = Pair(oldFile, newFile)
+
+        // These should never return
+        val oldFolder = getFolderByTruePath(picture.fileLocation) ?: return files
+        val newFolder = getFolderByTruePath(folderFile.path) ?: return files
+
+        // Move Picture in Folders
+        oldFolder.removePicture(picture)
+        newFolder.addPicture(picture, toFront = true)
+
+        // Update Picture's path
+        picture.path = newFile.path
+        Storage.saveAlbumsToDisk(albums)
+
+        return files
+    }
+
 }

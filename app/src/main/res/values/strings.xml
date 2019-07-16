@@ -24,6 +24,7 @@
     <string name="action_go_to_home_folder">Go To Home Folder</string>
     <string name="action_save_file">Save File</string>
     <string name="action_replace_file">Replace File</string>
+    <string name="action_move">Move</string>
 
     <!-- Strings indicate what buttons or objects represent -->
     <string name="label_album_actions">Album Actions</string>
@@ -39,14 +40,18 @@
         which is required for it to work.
     </string>
     <string name="edit_fail_error">Failed to save changes!</string>
+    <string name="move_fail_error">Failed to move file! If moving from/to SD card, make sure access is enabled in Settings.</string>
+    <string name="already_exists_error">File already exists at this location!</string>
     <string name="access_denied_error">Access to storage was denied. Make sure access to this SD card is enabled in Settings.</string>
 
+    <!-- For dialogs -->
     <string name="title_album_form">New Album</string>
     <string name="hint_set_name">Name goes here</string>
     <string name="title_delete_album_confirm">Delete Albums?</string>
     <string name="message_delete_album_confirm">This action is irreversible. You are NOT deleting pictures.</string>
     <string name="title_remove">Remove</string>
     <string name="message_replace_file">File with this name already exists. Are you sure you want to replace it?</string>
+    <string name="folder_empty">Folder is empty!</string>
 
     <string name="action_selected_one">%1$d item selected</string>
     <string name="action_selected_many">%1$d items selected</string>

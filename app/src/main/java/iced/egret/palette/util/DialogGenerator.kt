@@ -76,7 +76,7 @@ object DialogGenerator {
     }
 
     fun showCollectionDetails(context: Context, collection: Collection) {
-        val path = if (collection is Folder) collection.truePath else collection.path
+        val path = if (collection is Folder) collection.filePath else collection.path
         MaterialDialog(context).show {
             message(text =
             "Location: $path\n" +

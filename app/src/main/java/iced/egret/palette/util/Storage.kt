@@ -66,19 +66,22 @@ object Storage {
             rootPath = pathLevels[rootLevelIndex]
 
             // check if root already created (in most cases, yes)
-            parentFolder = rootFolders.find { root -> root.truePath == rootPath }
+            parentFolder = rootFolders.find { root -> root.filePath == rootPath }
             if (parentFolder == null) {
                 parentFolder = Folder(rootPath, rootPath)
                 rootFolders.add(parentFolder)
             }
 
             // add additional folders as required, in linked-list-like fashion
+            //rootedPath = pathLevels.drop(1).joinToString("/")
+            //rootFolder = getParentFolderInside(rootFolder, rootedPath)
+
             var levelInt = rootLevelIndex + 1
             for (level in pathLevels.subList(rootLevelIndex + 1, pathLevels.size - 1)) {
 
                 folderPath = pathLevels.subList(0, levelInt + 1).joinToString("/")
 
-                childFolder = parentFolder!!.folders.find {folder -> folder.truePath == folderPath}
+                childFolder = parentFolder!!.folders.find {folder -> folder.filePath == folderPath}
                 if (childFolder == null) {
                     childFolder = Folder(level, folderPath)
                     parentFolder.addFolder(childFolder)
@@ -100,6 +103,58 @@ object Storage {
         return rootFolders
 
     }
+
+    /**
+     * Gets the direct parent folder of the file specified by given path.
+     * If such a folder doesn't exist, it (and all of it's ancestors) are made as required.
+     *
+     * @param startingFolder The Folder that the path is in
+     * @param path
+     */
+    /*
+    private fun getParentFolderInside(startingFolder: Folder, path: String) : Folder? {
+
+        var folderPath : String
+        var parentFolder : Folder? = startingFolder
+        var childFolder : Folder?
+        val pathLevels = path.split("/")
+
+        val positionOfStart = getLevelInPath(startingFolder, path)
+        var levelInt = positionOfStart + 1
+
+        // Skip start because already have it
+        for (level in pathLevels.subList(positionOfStart + 1, pathLevels.size - 1)) {
+
+            folderPath = pathLevels.subList(0, levelInt + 1).joinToString("/")
+
+            childFolder = parentFolder!!.folders.find {folder -> folder.truePath == folderPath}
+            if (childFolder == null) {
+                childFolder = Folder(level, folderPath)
+                parentFolder.addFolder(childFolder)
+            }
+            parentFolder = childFolder
+
+            levelInt++
+
+        }
+    }*/
+
+    /**
+     * Get the 0-indexed level that the supplied folder resides in relative to the whole file path.
+     * e.g. Folder with path "/storage/3456-3456/Music/" would be in level 3 of path
+     *      "/storage/3456-3456/Music/R.mp3". Note that the first "/" represents level 0.
+     */
+    /*
+    private fun getLevelInPath(folder: Folder, path: String) : Int {
+        val cleanedCheckingPath = path.removeSuffix("/")
+        val cleanedFolderPath = folder.truePath.removeSuffix("/")
+        val numLevels = cleanedCheckingPath.split("/").size
+        if (cleanedCheckingPath.startsWith(folder.truePath)) {
+            val numLeftovers = cleanedCheckingPath.removePrefix(cleanedFolderPath).split("/").size
+            // TODO
+        }
+    }
+    */
 
     fun saveAlbumsToDisk(albums: List<Album>) {
         val albumsData = ArrayList<AlbumData>()
@@ -325,7 +380,7 @@ object Storage {
     private fun cleanAlbum(album: Album) {
         val pictures = album.pictures.toList()  // a copy to avoid concurrency error
         for (picture in pictures) {
-            if (!fileExists(picture.path)) {
+            if (!fileExists(picture.filePath)) {
                 album.removePicture(picture)
             }
         }

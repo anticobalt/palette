@@ -11,15 +11,28 @@ import iced.egret.palette.recyclerview_component.CoverViewHolder
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 
-class Picture(override var name: String, var path: String) : TerminalCoverable {
+/***
+ * Properties:
+ * - name
+ * - filePath
+ * - uri
+ * - fileLocation
+ * - parent
+ * - deletable
+ * - terminal
+ * - cover
+ * - icon
+ * - activity
+ */
+class Picture(override var name: String, override var filePath: String) : TerminalCoverable, FileObject {
 
     // Getters computed lazily, so that changing path doesn't break everything
     private val file : File
-        get() = File(path)
+        get() = File(filePath)
     val uri : Uri
         get() = Uri.fromFile(file)
     val fileLocation
-        get() = path.removeSuffix(name).removeSuffix("/")
+        get() = filePath.removeSuffix(name).removeSuffix("/")
 
     override val terminal = true
     override val cover : MutableMap<String, Uri>
@@ -29,11 +42,11 @@ class Picture(override var name: String, var path: String) : TerminalCoverable {
 
     override val icon: Nothing? = null
     override val activity = PictureViewActivity::class.java
+    override var parent: FileObject? = null
+    override val deletable = true
 
-    override fun toString(): String {
-        return name
-    }
-    override fun toDataClass() = PictureData(name, path)
+    override fun toString() = name
+    override fun toDataClass() = PictureData(name, filePath)
 
     override fun loadCoverInto(holder: CoverViewHolder) {
 

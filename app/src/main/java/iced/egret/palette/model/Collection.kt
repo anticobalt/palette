@@ -11,7 +11,6 @@ import java.io.Serializable
  * Properties:
  * - name
  * - terminal
- * - deletable
  * - cover
  * - icon
  * - pictures
@@ -80,7 +79,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
     abstract fun getContents() : List<Coverable>
 
     fun getPictureByPath(path: String) : Picture? {
-        return _pictures.find {picture -> picture.path == path}
+        return _pictures.find {picture -> picture.filePath == path}
     }
 
     open fun addPicture(newPicture: Picture, toFront: Boolean = false, position: Int? = null) {
@@ -118,10 +117,11 @@ abstract class Collection(override var name: String, val path: String) : Coverab
  * Properties:
  * - name
  * - path
- * - truePath
- * - terminal
+ * - filePath
+ * - parent
  * - deletable
  * - cover
+ * - terminal
  * - icon
  * - pictures
  * - folders
@@ -130,10 +130,13 @@ abstract class Collection(override var name: String, val path: String) : Coverab
  *
  * Backing fields _folders and _pictures only used when adding/deleting internally.
  */
-class Folder(name: String, val truePath: String, subFolders: MutableList<Folder> = mutableListOf())
-    : Collection(name, CollectionConstructorHelper.simplifyFilesystemPath(truePath)) {
+class Folder(name: String, override var filePath: String, subFolders: MutableList<Folder> = mutableListOf())
+    : Collection(name, CollectionConstructorHelper.simplifyFilesystemPath(filePath)), FileObject {
 
     override val icon = R.drawable.ic_folder_black_24dp
+    override var parent: FileObject? = null
+    override val deletable : Boolean
+        get() = _folders.size + _pictures.size == 0
 
     override var _pictures : MutableList<Picture> = ArrayList()
     override val pictures : List<Picture>
@@ -165,7 +168,7 @@ class Folder(name: String, val truePath: String, subFolders: MutableList<Folder>
     }
 
     fun toDataClass() : FolderData {
-        val picturePaths = pictures.map { picture -> picture.path }
+        val picturePaths = pictures.map { picture -> picture.filePath }
         val subFolders = folders.map { folder -> folder.toDataClass() }
         return FolderData(name, path, subFolders, picturePaths)
     }
@@ -276,7 +279,7 @@ class Album(name: String, path: String) : Collection(name, path) {
         }
 
     fun toDataClass() : AlbumData {
-        val picturePaths = pictures.map { picture -> picture.path }
+        val picturePaths = pictures.map { picture -> picture.filePath }
         val foldersData = folders.map { folder -> folder.toDataClass() }
         val albumsData = albums.map { album -> album.toDataClass() }
         return AlbumData(name, path, picturePaths, foldersData, albumsData)

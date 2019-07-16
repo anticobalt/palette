@@ -262,7 +262,7 @@ object CollectionManager {
         var matchedFolder : Folder? = null
 
         for (folder in startFolders) {
-            val folderCleanPath = folder.truePath.trim { char -> char == '/' }
+            val folderCleanPath = folder.filePath.trim { char -> char == '/' }
             matchedFolder = if (folderCleanPath == cleanPath) folder
             else getFolderByTruePath(truePath, folder.folders)
             // stop if match found
@@ -318,8 +318,8 @@ object CollectionManager {
                     sdCardFile: DocumentFile?, contentResolver: ContentResolver) : Pair<File, File>? {
 
         val picture = currentCollection?.pictures?.get(position) ?: return null
-        val oldFile = File(picture.path)
-        val newFile = Storage.moveFile(picture.path, folderFile, sdCardFile, contentResolver)
+        val oldFile = File(picture.filePath)
+        val newFile = Storage.moveFile(picture.filePath, folderFile, sdCardFile, contentResolver)
                 ?: return null
         val files = Pair(oldFile, newFile)
 
@@ -332,7 +332,7 @@ object CollectionManager {
         newFolder.addPicture(picture, toFront = true)
 
         // Update Picture's path
-        picture.path = newFile.path
+        picture.filePath = newFile.path
         Storage.saveAlbumsToDisk(albums)
 
         return files

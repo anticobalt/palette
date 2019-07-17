@@ -262,28 +262,24 @@ object CollectionManager {
     private fun findFolderByPath(path: String, startFolder: Folder? = null,
                                  onMissing: (Folder, List<String>, Int) -> Folder? = { _, _, _ -> null} ): Folder? {
 
-        var folder = startFolder ?: root
-        val cleanWorkingPath = cleanPath(path)
-        val cleanStartPath = cleanPath(folder.filePath)
-        val levels = cleanWorkingPath.split("/")
+        var currentFolder = startFolder ?: root
+        val destinationPath = path.removeSuffix("/")
+        val startPath = currentFolder.filePath.removeSuffix("/")
+        val levels = destinationPath.split("/")
 
         // start at children level, not own level
-        var index = getDepthOfPath(cleanStartPath, cleanWorkingPath)
+        var index = getDepthOfPath(startPath, destinationPath)
         if (index == 0) return null
 
-        while (folder.folders.isNotEmpty() && index < levels.size) {
-            folder = folder.folders.find {child -> child.filePath.split("/")[index] == levels[index]}
-                    ?: return onMissing(folder, levels, index)
+        while (currentFolder.folders.isNotEmpty() && index < levels.size) {
+            currentFolder = currentFolder.folders.find { child -> child.filePath.split("/")[index] == levels[index]}
+                    ?: return onMissing(currentFolder, levels, index)
             index += 1
         }
 
-        return if (cleanPath(folder.filePath) == cleanWorkingPath) folder
+        return if (currentFolder.filePath.removeSuffix("/") == destinationPath) currentFolder
         else null
 
-    }
-
-    private fun cleanPath(path: String) : String {
-        return path.trimEnd { char -> char == '/'}
     }
 
     /**

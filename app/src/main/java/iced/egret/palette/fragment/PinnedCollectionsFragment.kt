@@ -139,12 +139,12 @@ class PinnedCollectionsFragment :
         // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.
         when (mSelectedContentType) {
             CollectionManager.FOLDER_KEY -> {
-                val item = menu.findItem(R.id.actionPinnedCollectionsHide)
+                val item = menu.findItem(R.id.actionHide)
                 item.isVisible = true
                 Painter.paintDrawable(item.icon)
             }
             CollectionManager.ALBUM_KEY -> {
-                val item = menu.findItem(R.id.actionPinnedCollectionsDeleteAlbum)
+                val item = menu.findItem(R.id.actionDeleteAlbum)
                 item.isVisible = true
                 Painter.paintDrawable(item.icon)
             }
@@ -155,7 +155,7 @@ class PinnedCollectionsFragment :
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.actionPinnedCollectionsDeleteAlbum -> {
+            R.id.actionDeleteAlbum -> {
                 val callback = callback@{
                     CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions)
                     refreshFragment()
@@ -179,8 +179,8 @@ class PinnedCollectionsFragment :
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
 
-        mode.menu.findItem(R.id.actionPinnedCollectionsHide).isVisible = false
-        mode.menu.findItem(R.id.actionPinnedCollectionsDeleteAlbum).isVisible = false
+        mode.menu.findItem(R.id.actionHide).isVisible = false
+        mode.menu.findItem(R.id.actionDeleteAlbum).isVisible = false
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
@@ -334,7 +334,7 @@ class PinnedCollectionsFragment :
         }
 
         when (item.itemId) {
-            R.id.actionPinnedCollectionsCreateAlbum -> {
+            R.id.actionCreateAlbum -> {
                 DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
             }
             else -> super.onOptionsItemSelected(item)

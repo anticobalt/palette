@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/restore"
+        android:id="@+id/actionRestore"
         android:title="@string/action_restore"
         android:icon="@drawable/ic_restore_black_24dp"
         app:showAsAction="ifRoom"
@@ -11,7 +11,7 @@
         />
 
     <item
-        android:id="@+id/delete"
+        android:id="@+id/actionDelete"
         android:title="@string/action_delete"
         android:icon="@drawable/ic_delete_black_24dp"
         app:showAsAction="ifRoom"

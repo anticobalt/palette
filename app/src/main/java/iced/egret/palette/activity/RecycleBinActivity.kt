@@ -48,7 +48,7 @@ class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
     }
 
     private fun paintMenuItems(menu: Menu) {
-        Painter.paintDrawable(menu.findItem(R.id.empty).icon)
+        Painter.paintDrawable(menu.findItem(R.id.actionEmpty).icon)
     }
 
     private fun fetchContents() {

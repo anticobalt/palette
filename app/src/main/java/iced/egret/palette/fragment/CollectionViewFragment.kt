@@ -187,10 +187,10 @@ class CollectionViewFragment :
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         (activity as MainActivity).isolateFragment(this)
 
-        val albumActions = menu.findItem(R.id.actionViewCollectionAlbumActions)
-        val addToAlbum = menu.findItem(R.id.actionViewCollectionAddToAlbum)
-        val deleteAlbum = menu.findItem(R.id.actionViewCollectionDeleteAlbum)
-        val removeFromAlbum = menu.findItem(R.id.actionViewCollectionRemoveFromAlbum)
+        val albumActions = menu.findItem(R.id.albumActions)
+        val addToAlbum = menu.findItem(R.id.actionAddToAlbum)
+        val deleteAlbum = menu.findItem(R.id.actionDelete)
+        val removeFromAlbum = menu.findItem(R.id.actionRemoveFromAlbum)
 
         // Make items visible depending on selected content.
         // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.
@@ -233,12 +233,12 @@ class CollectionViewFragment :
         val typeString = if (coverables.size > 1) typePlural else typeSingular
 
         when (item.itemId) {
-            R.id.actionViewCollectionAlbumActions -> {
+            R.id.albumActions -> {
                 // No changes, don't refresh, so exit immediately.
                 // Must return true for submenus to popup.
                 return true
             }
-            R.id.actionViewCollectionAddToAlbum -> {
+            R.id.actionAddToAlbum -> {
                 DialogGenerator.addToAlbum(context!!) { indices, albums ->
                     val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
                     val albumString = if (destinations.size > 1) "albums" else "album"
@@ -247,14 +247,14 @@ class CollectionViewFragment :
                     refresh()
                 }
             }
-            R.id.actionViewCollectionRemoveFromAlbum -> {
+            R.id.actionRemoveFromAlbum -> {
                 DialogGenerator.removeFromAlbum(context!!, typeString) {
                     CollectionManager.removeContentFromCurrentAlbum(coverables)
                     toast("Removed ${coverables.size} $typeString.")
                     refresh()
                 }
             }
-            R.id.actionViewCollectionDeleteAlbum -> {
+            R.id.actionDelete -> {
                 DialogGenerator.deleteAlbum(context!!) {
                     CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions, deleteFromCurrent = true)
                     toast("Deleted ${adapter.selectedItemCount} $typeString")
@@ -278,10 +278,10 @@ class CollectionViewFragment :
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
 
-        mode.menu.findItem(R.id.actionViewCollectionAlbumActions).isVisible = false
-        mode.menu.findItem(R.id.actionViewCollectionAddToAlbum).isVisible = false
-        mode.menu.findItem(R.id.actionViewCollectionRemoveFromAlbum).isVisible = false
-        mode.menu.findItem(R.id.actionViewCollectionDeleteAlbum).isVisible = false
+        mode.menu.findItem(R.id.albumActions).isVisible = false
+        mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
+        mode.menu.findItem(R.id.actionRemoveFromAlbum).isVisible = false
+        mode.menu.findItem(R.id.actionDelete).isVisible = false
     }
 
     private fun inferContentType(content: Coverable) : String? {
@@ -420,7 +420,7 @@ class CollectionViewFragment :
                 startActivity(Intent(this.context, RecycleBinActivity::class.java))
                 true
             }
-            R.id.actionViewCollectionSettings -> true
+            R.id.gotoSettings -> true
             else -> super.onOptionsItemSelected(item)
         }
     }

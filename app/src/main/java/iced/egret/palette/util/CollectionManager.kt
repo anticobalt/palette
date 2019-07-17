@@ -45,7 +45,8 @@ object CollectionManager {
     fun setup() {
 
         root = Storage.retrievedFolders.firstOrNull() ?: return
-        val displayedFolders = findFolderByPath(STORAGE_PATH)?.folders ?: listOf()
+        val displayedFolders = findFolderByPath(STORAGE_PATH)?.folders
+                ?: root.folders  // uncharted territory
 
         // defensive
         mCollectionStack.clear()
@@ -54,7 +55,7 @@ object CollectionManager {
         // Add Folders
         mCollections.addAll(displayedFolders)
         val baseStorage = mCollections.find { collection -> collection.path == MAIN_STORAGE_PATH }
-        if (baseStorage != null) {  // should always be true
+        if (baseStorage != null) {  // should be true if displayedFolders initialized as normal
             baseStorage.name = MAIN_STORAGE_NAME
             mCollections.remove(baseStorage)
             mCollections.add(0, baseStorage)
@@ -86,8 +87,7 @@ object CollectionManager {
         val currentMap = (currentCollection?.contentsMap ?: mutableMapOf())
                 as MutableMap<String, List<Coverable>>
 
-        for (type in mContentsMap.keys)
-        {
+        for (type in mContentsMap.keys) {
             val contentsOfType = currentMap[type] ?: listOf()
             mContentsMap[type] = contentsOfType
         }
@@ -380,7 +380,7 @@ object CollectionManager {
         val files = Pair(oldFile, newFile)
 
         // Remove from old Folder
-        val oldFolder = findFolderByPath(picture.fileLocation)
+        val oldFolder = findFolderByPath(picture.fileLocation)  // looks for existing Folder
                 ?: return files  // should never return here
         oldFolder.removePicture(picture)
 
@@ -388,8 +388,7 @@ object CollectionManager {
         picture.filePath = newFile.path
 
         // Add to new Folder
-        val newFolder = findFolderByPath(folderFile.path)
-                ?: getParentFolder(picture)  // returns direct parent
+        val newFolder = getParentFolder(picture)  // looks for Folder or makes it
                 ?: return files  // should never return here
         newFolder.addPicture(picture, toFront = true)
 

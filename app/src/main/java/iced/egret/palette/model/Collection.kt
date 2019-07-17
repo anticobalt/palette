@@ -77,7 +77,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
 
     abstract fun getContents() : List<Coverable>
 
-    fun getPictureByPath(path: String) : Picture? {
+    fun findPictureByPath(path: String) : Picture? {
         return _pictures.find {picture -> picture.filePath == path}
     }
 

@@ -348,7 +348,7 @@ object CollectionManager {
 
         // Get Picture from Folder, as it's guaranteed to reside in there if it exists, unlike in Album
         folder = findFolderByPath(location) ?: return file  // should never return
-        picture = folder.getPictureByPath(file.path) ?: Picture(name, file.path)
+        picture = folder.findPictureByPath(file.path) ?: Picture(name, file.path)
 
         // Update Folder
         if (!isNew) folder.removePicture(picture)  // move Picture

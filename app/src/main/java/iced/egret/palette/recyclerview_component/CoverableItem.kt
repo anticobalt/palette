@@ -7,8 +7,7 @@ import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.model.Coverable
 
 /**
- * An item for an expandable section.
- * Has IFlexible and ISectionable functionality.
+ * An item with IFlexible functionality.
  */
 abstract class CoverableItem(protected val obj: Coverable) :
         AbstractFlexibleItem<CoverViewHolder>() {

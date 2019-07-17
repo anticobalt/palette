@@ -42,6 +42,8 @@ object CollectionManager {
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
+    val recycleBin = mutableListOf<Picture>()
+
     fun setup() {
 
         root = Storage.retrievedFolders.firstOrNull() ?: return
@@ -64,6 +66,9 @@ object CollectionManager {
 
         // Add Albums
         mCollections.addAll(Storage.retrievedAlbums)
+
+        // Add Pictures in recycle bin
+        recycleBin.addAll(Storage.getRecycleBinContents())
 
     }
 

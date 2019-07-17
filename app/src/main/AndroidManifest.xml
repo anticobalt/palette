@@ -14,27 +14,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/MainView">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.PictureViewActivity"
-            android:theme="@style/PictureView" />
-
+            android:theme="@style/PictureView"
+            />
         <activity
             android:name=".activity.CropActivity"
             android:theme="@style/AppTheme"
             />
-
+        <activity
+            android:name=".activity.RecycleBinActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/recycle_bin"
+            />
     </application>
 
 </manifest>

@@ -20,7 +20,10 @@ object Storage {
 
     private const val rootCacheFileName = "root-cache.json"
     private const val albumsFileName = "albums.json"
+    private const val recycleBinName = "recycle-bin"
+
     private lateinit var fileDirectory : File
+    private lateinit var recycleBin : File
 
     var retrievedFolders = mutableListOf<Folder>()
     var retrievedAlbums = mutableListOf<Album>()
@@ -30,6 +33,7 @@ object Storage {
 
     fun setup(activity: Activity) {
         fileDirectory = activity.filesDir
+        recycleBin = File(fileDirectory, recycleBinName)
         retrievedFolders = getPictureFoldersMediaStore(activity)
         retrievedAlbums = getAlbumsFromDisk()
     }
@@ -101,6 +105,11 @@ object Storage {
 
     }
 
+    fun getRecycleBinContents() : List<Picture> {
+        if (!recycleBin.isDirectory || !recycleBin.canRead()) return listOf()
+        return recycleBin.listFiles().map {file -> Picture(file.path.split("/").last(), file.path) }
+    }
+
     fun saveAlbumsToDisk(albums: List<Album>) {
         val albumsData = ArrayList<AlbumData>()
         for (album in albums) {
@@ -140,6 +149,23 @@ object Storage {
         }
         return null
     }
+
+    /*
+    private fun saveRecycledToDisk(recycled: List<Picture>) {
+        val paths = recycled.map {picture -> picture.filePath }
+        val json = gson.toJson(paths)
+        saveJsonToDisk(json, recycleFileName)
+    }
+
+    private fun getRecycledFromDisk() : List<Picture> {
+        val json = readJsonFromDisk(recycleFileName)
+        val type = object : TypeToken<List<String>>() {}.type
+        if (json == null) return listOf()
+
+        val paths = gson.fromJson<List<String>>(json, type)
+        return paths.map { path -> Picture(path.split("/").last(), path)}
+                .filter { picture -> fileExists(picture.filePath) }
+    }*/
 
     private fun saveJsonToDisk(json: String, fileName: String) {
         try {

@@ -311,19 +311,26 @@ object CollectionManager {
         return initial - final
     }
 
-    /**
-     * Start with FileObject, build parent Folders until you reach a Folder that already exists.
-     */
     private fun buildAncestorFolders(fileObject: FileObject) : Folder? {
         val pathToParent = fileObject.parentFilePath
+
         val parent = betterGetFolderByTruePath(pathToParent) { folder, levels, i ->
-            var index = i + 1
+            // Folders from levels[i] onwards don't exist, so make them
+            var index = i
             var workingFolder = folder
             var path = workingFolder.filePath.removeSuffix("/")
+
             while (index < levels.size) {
+
                 val name = levels[index]
-                path += "$/name"
-                workingFolder = Folder(name, path, parent = workingFolder)
+                path += "/$name"
+                val childFolder = Folder(name, path)
+
+                // Link the parent and child
+                workingFolder.addFolder(childFolder)
+                childFolder.parent = workingFolder
+
+                workingFolder = childFolder
                 index += 1
             }
             workingFolder

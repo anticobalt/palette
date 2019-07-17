@@ -135,7 +135,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
  */
 class Folder(name: String, override var filePath: String, subFolders: MutableList<Folder> = mutableListOf(),
              override var parent: FileObject? = null)
-    : Collection(name, CollectionConstructorHelper.simplifyFilesystemPath(filePath)), FileObject {
+    : Collection(name, filePath), FileObject {
 
     override val icon = R.drawable.ic_folder_black_24dp
     override val deletable : Boolean

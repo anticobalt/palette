@@ -50,7 +50,7 @@ object Storage {
         cursor = activity.contentResolver.query(uri, projection, null, null, sortBy)
         columnIndexData = cursor!!.getColumnIndexOrThrow(MediaColumns.DATA)
 
-        val rootLevelIndex = 1  // level 0 is empty due to /path/to/file syntax
+        val rootLevelIndex = 0
         var absolutePathOfImage: String
         var pathLevels : List<String>
         var rootPath : String

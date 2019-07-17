@@ -14,14 +14,15 @@ import kotlin.collections.ArrayList
 
 object CollectionManager {
 
-    const val BASE_STORAGE_PATH = "emulated"
-    const val PRACTICAL_BASE_STORAGE_PATH = "$BASE_STORAGE_PATH/0"
-    const val BASE_STORAGE_NAME = "Main Storage"
+    private const val STORAGE_PATH = "/storage"
+    private const val MAIN_STORAGE_PATH = "$STORAGE_PATH/emulated"
+    private const val PRACTICAL_MAIN_STORAGE_PATH = "$MAIN_STORAGE_PATH/0"
+    private const val MAIN_STORAGE_NAME = "Main Storage"
     const val FOLDER_KEY = "folders"
     const val ALBUM_KEY = "albums"
     const val PICTURE_KEY = "pictures"
 
-    private var storageRoot : Folder? = null
+    private lateinit var root : Folder
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
     private val mContentsMap = linkedMapOf<String, List<Coverable>>(
@@ -43,8 +44,8 @@ object CollectionManager {
 
     fun setup() {
 
-        storageRoot = Storage.retrievedFolders.firstOrNull()
-        val displayedFolders = storageRoot?.folders ?: emptyList()
+        root = Storage.retrievedFolders.firstOrNull() ?: return
+        val displayedFolders = betterGetFolderByTruePath(STORAGE_PATH) { _, _, _ -> null }?.folders ?: listOf()
 
         // defensive
         mCollectionStack.clear()
@@ -52,12 +53,12 @@ object CollectionManager {
 
         // Add Folders
         mCollections.addAll(displayedFolders)
-        val baseStorage = mCollections.find { collection -> collection.path == BASE_STORAGE_PATH }
+        val baseStorage = mCollections.find { collection -> collection.path == MAIN_STORAGE_PATH }
         if (baseStorage != null) {  // should always be true
-            baseStorage.name = BASE_STORAGE_NAME
+            baseStorage.name = MAIN_STORAGE_NAME
             mCollections.remove(baseStorage)
             mCollections.add(0, baseStorage)
-            unwindStack(PRACTICAL_BASE_STORAGE_PATH)
+            unwindStack(PRACTICAL_MAIN_STORAGE_PATH)
         }
 
         // Add Albums
@@ -197,7 +198,7 @@ object CollectionManager {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 when (item.name) {
-                    BASE_STORAGE_NAME -> unwindStack(PRACTICAL_BASE_STORAGE_PATH) // skip the empty sub-folders
+                    MAIN_STORAGE_NAME -> unwindStack(PRACTICAL_MAIN_STORAGE_PATH) // skip the empty sub-folders
                     else -> currentCollection = item
                 }
                 return true
@@ -240,7 +241,7 @@ object CollectionManager {
     fun unwindStack(path: String) {
         val levels = path.split("/")
         var levelIndex = 0
-        var collectionsOnLevel = mCollections.toList()
+        var collectionsOnLevel = (albums as List<Collection>) + root
 
         for (level in levels) {
             // Use path to find Collection because those (unlike names) are immutable
@@ -271,20 +272,21 @@ object CollectionManager {
     }
 
     private fun betterGetFolderByTruePath(truePath: String, startFolder: Folder? = null,
-                                          onMissing : (Folder, List<String>, Int) -> Folder ) : Folder? {
+                                          onMissing : (Folder, List<String>, Int) -> Folder? ) : Folder? {
 
-        var folder = startFolder ?: storageRoot ?: return null
+        var folder = startFolder ?: root
         val cleanWorkingPath = cleanPath(truePath)
         val cleanStartPath = cleanPath(folder.filePath)
         val levels = cleanWorkingPath.split("/")
 
         // start at children level, not own level
-        val index = getDepthOfPath(cleanStartPath, cleanWorkingPath)
+        var index = getDepthOfPath(cleanStartPath, cleanWorkingPath)
         if (index == 0) return null
 
-        while (folder.folders.isNotEmpty()) {
+        while (folder.folders.isNotEmpty() && index < levels.size) {
             folder = folder.folders.find {child -> child.filePath.split("/")[index] == levels[index]}
                     ?: return onMissing(folder, levels, index)
+            index += 1
         }
 
         return if (cleanPath(folder.filePath) == cleanWorkingPath) folder
@@ -293,7 +295,7 @@ object CollectionManager {
     }
 
     private fun cleanPath(path: String) : String {
-        return path.trim { char -> char == '/'}
+        return path.trimEnd { char -> char == '/'}
     }
 
     /**

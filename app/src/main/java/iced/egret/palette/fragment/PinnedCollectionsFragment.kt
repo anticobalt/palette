@@ -306,7 +306,7 @@ class PinnedCollectionsFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        return true
+        return false  // not handled here
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

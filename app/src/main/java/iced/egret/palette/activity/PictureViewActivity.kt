@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -123,7 +122,6 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun setPage(position: Int) {
-        Log.i("PPP", position.toString())
         itemPosition = position
         setToolbarTitle()
     }
@@ -146,6 +144,10 @@ class PictureViewActivity : BottomActionsActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retVal = when (item?.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
             R.id.actionMove -> {
                 initiateMove()
                 true

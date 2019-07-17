@@ -5,10 +5,14 @@ import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.viewpager.widget.ViewPager
@@ -27,7 +31,7 @@ import java.io.File
 class PictureViewActivity : BottomActionsActivity() {
 
     private var uiHidden = false
-    private var position = -1
+    private var itemPosition = -1
 
     private val mPictures = mutableListOf<Picture>()
 
@@ -49,8 +53,8 @@ class PictureViewActivity : BottomActionsActivity() {
      * @return Success (true) or failure (false)
      */
     private fun getStartPosition() : Boolean {
-        position = intent.getIntExtra(getString(R.string.intent_item_key), -1)
-        return if (position == -1) {
+        itemPosition = intent.getIntExtra(getString(R.string.intent_item_key), -1)
+        return if (itemPosition == -1) {
             Toast.makeText(this, R.string.error_intent_extra, Toast.LENGTH_SHORT).show()
             false
         }
@@ -63,25 +67,65 @@ class PictureViewActivity : BottomActionsActivity() {
         val backgroundColor = ContextCompat.getColor(this, R.color.translucentBlack)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setBackgroundDrawable(ColorDrawable(backgroundColor))
-        setToolbarTitle()
+        setActionBarEllipsize(TextUtils.TruncateAt.MIDDLE)
+    }
+
+    /**
+     * Set ellipse location for overflow text in default action bar.
+     * Getting action_bar_title directly or via resources do not work.
+     * https://stackoverflow.com/a/34933846
+     *
+     * Default action bar is used because custom one is buggy when trying to animate it alongside
+     * system status bar.
+     */
+    private fun setActionBarEllipsize(location: TextUtils.TruncateAt) {
+        val toolbar = findViewById<Toolbar>(R.id.action_bar)
+        for (child in 0 until toolbar.childCount) {
+            if (toolbar.getChildAt(child) is TextView) {
+                (toolbar.getChildAt(child) as TextView).ellipsize = location
+            }
+        }
     }
 
     private fun setToolbarTitle() {
-        supportActionBar?.title = CollectionManager.getCurrentCollectionPictures()[position].name
+        supportActionBar?.title = CollectionManager.getCurrentCollectionPictures()[itemPosition].name
     }
 
     private fun buildViewPager() {
         fetchPictures()
         viewpager.adapter = PicturePagerAdapter(mPictures, this)
-        viewpager.currentItem = position
+        viewpager.currentItem = itemPosition
         viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
+            /**
+             * If this is called without scrolling (e.g. button press),
+             * make sure to call setPage().
+             */
             override fun onPageSelected(position: Int) {}
+            /**
+             * Keep title and position if doing less than half-scroll back;
+             * change if doing more than half scroll forward.
+             * https://stackoverflow.com/a/29095096
+             */
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                this@PictureViewActivity.position = position
-                setToolbarTitle()
+                // If moving right
+                if (itemPosition == position) {
+                    if (positionOffset > 0.5) setPage(position + 1)
+                    else setPage(position)
+                }
+                // If moving left
+                else {
+                    if (positionOffset < 0.5) setPage(position)
+                    else setPage(position + 1)
+                }
             }
         })
+    }
+
+    private fun setPage(position: Int) {
+        Log.i("PPP", position.toString())
+        itemPosition = position
+        setToolbarTitle()
     }
 
     override fun buildBottomActions() {
@@ -123,7 +167,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun startCropActivity() {
-        val imageUri = CollectionManager.getCurrentCollectionPictures()[position].uri
+        val imageUri = CollectionManager.getCurrentCollectionPictures()[itemPosition].uri
         // setting initial crop padding doesn't working in XML for whatever reason
         CropImage.activity(imageUri)
                 .setInitialCropWindowPaddingRatio(0f)
@@ -142,14 +186,14 @@ class PictureViewActivity : BottomActionsActivity() {
     private fun initiateMove(){
         DialogGenerator.moveFile(this) {
             val destination = it
-            val oldPicture = CollectionManager.getCurrentCollectionPictures()[position]
+            val oldPicture = CollectionManager.getCurrentCollectionPictures()[itemPosition]
 
             if (oldPicture.fileLocation == destination.path) {
                 Toast.makeText(this, R.string.already_exists_error, Toast.LENGTH_SHORT).show()
                 return@moveFile
             }
 
-            val files = CollectionManager.movePicture(position, destination, getSdCardDocumentFile(), contentResolver)
+            val files = CollectionManager.movePicture(itemPosition, destination, getSdCardDocumentFile(), contentResolver)
             if (files != null) {
                 broadcastNewMedia(files.first)
                 broadcastNewMedia(files.second)

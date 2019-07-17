@@ -45,7 +45,7 @@ object CollectionManager {
     fun setup() {
 
         root = Storage.retrievedFolders.firstOrNull() ?: return
-        val displayedFolders = betterGetFolderByTruePath(STORAGE_PATH) { _, _, _ -> null }?.folders ?: listOf()
+        val displayedFolders = findFolderByPath(STORAGE_PATH)?.folders ?: listOf()
 
         // defensive
         mCollectionStack.clear()
@@ -254,28 +254,16 @@ object CollectionManager {
     }
 
     /**
-     * Keeping it simple and using a recursive search.
-     * Traversing Folders that are organized pseudo-hierarchically is difficult.
+     * Tries to find a Folder by given path and optional starting ancestor Folder.
+     * By default, returns null on failure. onMissing() function can be supplied
+     * to handle failure and return something else.
+     *
      */
-    fun getFolderByTruePath(truePath: String, startFolders : List<Folder> = folders) : Folder? {
-        val cleanPath = cleanPath(truePath)
-        var matchedFolder : Folder? = null
-
-        for (folder in startFolders) {
-            val folderCleanPath = cleanPath(folder.filePath)
-            matchedFolder = if (folderCleanPath == cleanPath) folder
-            else getFolderByTruePath(truePath, folder.folders)
-            // stop if match found
-            if (matchedFolder != null) break
-        }
-        return matchedFolder
-    }
-
-    private fun betterGetFolderByTruePath(truePath: String, startFolder: Folder? = null,
-                                          onMissing : (Folder, List<String>, Int) -> Folder? ) : Folder? {
+    private fun findFolderByPath(path: String, startFolder: Folder? = null,
+                                 onMissing: (Folder, List<String>, Int) -> Folder? = { _, _, _ -> null} ): Folder? {
 
         var folder = startFolder ?: root
-        val cleanWorkingPath = cleanPath(truePath)
+        val cleanWorkingPath = cleanPath(path)
         val cleanStartPath = cleanPath(folder.filePath)
         val levels = cleanWorkingPath.split("/")
 
@@ -311,10 +299,14 @@ object CollectionManager {
         return initial - final
     }
 
-    private fun buildAncestorFolders(fileObject: FileObject) : Folder? {
+    /**
+     * Finds the parent Folder of the FileObject, or makes it (and all required ancestors)
+     * with proper linking.
+     */
+    private fun getParentFolder(fileObject: FileObject) : Folder? {
         val pathToParent = fileObject.parentFilePath
 
-        val parent = betterGetFolderByTruePath(pathToParent) { folder, levels, i ->
+        val parent = findFolderByPath(pathToParent) { folder, levels, i ->
             // Folders from levels[i] onwards don't exist, so make them
             var index = i
             var workingFolder = folder
@@ -359,7 +351,7 @@ object CollectionManager {
         val folder : Folder
 
         // Get Picture from Folder, as it's guaranteed to reside in there if it exists, unlike in Album
-        folder = getFolderByTruePath(location) ?: return file  // should never return
+        folder = findFolderByPath(location) ?: return file  // should never return
         picture = folder.getPictureByPath(file.path) ?: Picture(name, file.path)
 
         // Update Folder
@@ -392,7 +384,7 @@ object CollectionManager {
         val files = Pair(oldFile, newFile)
 
         // Remove from old Folder
-        val oldFolder = getFolderByTruePath(picture.fileLocation)
+        val oldFolder = findFolderByPath(picture.fileLocation)
                 ?: return files  // should never return here
         oldFolder.removePicture(picture)
 
@@ -400,8 +392,8 @@ object CollectionManager {
         picture.filePath = newFile.path
 
         // Add to new Folder
-        val newFolder = getFolderByTruePath(folderFile.path)
-                ?: buildAncestorFolders(picture)  // returns direct parent
+        val newFolder = findFolderByPath(folderFile.path)
+                ?: getParentFolder(picture)  // returns direct parent
                 ?: return files  // should never return here
         newFolder.addPicture(picture, toFront = true)
 

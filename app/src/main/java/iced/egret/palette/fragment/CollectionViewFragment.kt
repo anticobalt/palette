@@ -135,11 +135,15 @@ class CollectionViewFragment :
      * Sets toolbar's title to current Collection name
      */
     fun setToolbarTitle(title: String = "") {
-        mToolbar.toolbarTitle.text = if (title.isEmpty()) {
+        var text: String
+        if (title.isEmpty()) {
             val collection = CollectionManager.currentCollection
-            collection?.path?.split("/")?.joinToString(" / ") ?: ""
+            text = collection?.path?.split("/")?.joinToString(" / ") ?: getString(R.string.app_name)
+            if (text.isEmpty()) text = getString(R.string.root_name)
         }
-        else title
+        else text = title
+
+        mToolbar.toolbarTitle.text = text
     }
 
     /**

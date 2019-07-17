@@ -1,14 +1,12 @@
 package iced.egret.palette.model
 
 import android.net.Uri
-import android.os.Parcelable
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
 import iced.egret.palette.recyclerview_component.CoverViewHolder
-import kotlinx.android.parcel.Parcelize
 import java.io.File
 
 /***
@@ -46,7 +44,6 @@ class Picture(override var name: String, override var filePath: String) : Termin
     override val deletable = true
 
     override fun toString() = name
-    override fun toDataClass() = PictureData(name, filePath)
 
     override fun loadCoverInto(holder: CoverViewHolder) {
 
@@ -74,9 +71,4 @@ class Picture(override var name: String, override var filePath: String) : Termin
         buildGlideImage(glide, imageView, uri)
     }
 
-}
-
-@Parcelize
-data class PictureData(private val name: String, private val path: String) : Parcelable {
-    fun toFullClass() = Picture(name, path)
 }

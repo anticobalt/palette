@@ -3,10 +3,9 @@ package iced.egret.palette.model
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.media.ExifInterface
 import android.net.Uri
-import android.os.Parcelable
 import android.widget.ImageView
+import androidx.exifinterface.media.ExifInterface
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.signature.MediaStoreSignature
 import iced.egret.palette.recyclerview_component.CoverViewHolder
@@ -58,5 +57,4 @@ interface TerminalCoverable : Coverable {
     override val terminal: Boolean
         get() = true
     val activity: Class<out Activity>
-    fun toDataClass() : Parcelable
 }

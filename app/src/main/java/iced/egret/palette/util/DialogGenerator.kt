@@ -12,7 +12,6 @@ import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
-import iced.egret.palette.model.Folder
 import java.io.File
 
 /**
@@ -76,7 +75,7 @@ object DialogGenerator {
     }
 
     fun showCollectionDetails(context: Context, collection: Collection) {
-        val path = if (collection is Folder) collection.filePath else collection.path
+        val path = collection.path
         MaterialDialog(context).show {
             message(text =
             "Location: $path\n" +

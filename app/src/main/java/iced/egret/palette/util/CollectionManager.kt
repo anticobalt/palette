@@ -21,6 +21,7 @@ object CollectionManager {
     const val ALBUM_KEY = "albums"
     const val PICTURE_KEY = "pictures"
 
+    private var storageRoot : Folder? = null
     private var mCollections : MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
     private val mContentsMap = linkedMapOf<String, List<Coverable>>(
@@ -42,26 +43,24 @@ object CollectionManager {
 
     fun setup() {
 
-        val root = Storage.retrievedFolders.firstOrNull()
-        if (root != null) {
+        storageRoot = Storage.retrievedFolders.firstOrNull()
+        val displayedFolders = storageRoot?.folders ?: emptyList()
 
-            // defensive
-            mCollectionStack.clear()
-            mCollections.clear()
+        // defensive
+        mCollectionStack.clear()
+        mCollections.clear()
 
-            for (folder in root.folders) {
-                mCollections.add(folder)
-            }
-
-            val baseStorage = mCollections.find { collection -> collection.path == BASE_STORAGE_PATH }
-            if (baseStorage != null) {  // should always be true
-                baseStorage.name = BASE_STORAGE_NAME
-                mCollections.remove(baseStorage)
-                mCollections.add(0, baseStorage)
-                unwindStack(PRACTICAL_BASE_STORAGE_PATH)
-            }
+        // Add Folders
+        mCollections.addAll(displayedFolders)
+        val baseStorage = mCollections.find { collection -> collection.path == BASE_STORAGE_PATH }
+        if (baseStorage != null) {  // should always be true
+            baseStorage.name = BASE_STORAGE_NAME
+            mCollections.remove(baseStorage)
+            mCollections.add(0, baseStorage)
+            unwindStack(PRACTICAL_BASE_STORAGE_PATH)
         }
 
+        // Add Albums
         mCollections.addAll(Storage.retrievedAlbums)
 
     }
@@ -258,17 +257,77 @@ object CollectionManager {
      * Traversing Folders that are organized pseudo-hierarchically is difficult.
      */
     fun getFolderByTruePath(truePath: String, startFolders : List<Folder> = folders) : Folder? {
-        val cleanPath = truePath.trim { char -> char == '/'}
+        val cleanPath = cleanPath(truePath)
         var matchedFolder : Folder? = null
 
         for (folder in startFolders) {
-            val folderCleanPath = folder.filePath.trim { char -> char == '/' }
+            val folderCleanPath = cleanPath(folder.filePath)
             matchedFolder = if (folderCleanPath == cleanPath) folder
             else getFolderByTruePath(truePath, folder.folders)
             // stop if match found
             if (matchedFolder != null) break
         }
         return matchedFolder
+    }
+
+    private fun betterGetFolderByTruePath(truePath: String, startFolder: Folder? = null,
+                                          onMissing : (Folder, List<String>, Int) -> Folder ) : Folder? {
+
+        var folder = startFolder ?: storageRoot ?: return null
+        val cleanWorkingPath = cleanPath(truePath)
+        val cleanStartPath = cleanPath(folder.filePath)
+        val levels = cleanWorkingPath.split("/")
+
+        // start at children level, not own level
+        val index = getDepthOfPath(cleanStartPath, cleanWorkingPath)
+        if (index == 0) return null
+
+        while (folder.folders.isNotEmpty()) {
+            folder = folder.folders.find {child -> child.filePath.split("/")[index] == levels[index]}
+                    ?: return onMissing(folder, levels, index)
+        }
+
+        return if (cleanPath(folder.filePath) == cleanWorkingPath) folder
+        else null
+
+    }
+
+    private fun cleanPath(path: String) : String {
+        return path.trim { char -> char == '/'}
+    }
+
+    /**
+     * Assumes either both OR neither paths have trailing backslash.
+     * If not the case, there will be off-by-one error.
+     *
+     *  Result example: path "files/music" has depth of 2 relative to path "files/music/r.mp3"
+     */
+    private fun getDepthOfPath(pathToCheck: String, referencePath: String) : Int {
+        if (!referencePath.startsWith(pathToCheck)) return 0
+        val initial = referencePath.split("/").size
+        val final = referencePath.removePrefix("$pathToCheck/").split("/").size
+        return initial - final
+    }
+
+    /**
+     * Start with FileObject, build parent Folders until you reach a Folder that already exists.
+     */
+    private fun buildAncestorFolders(fileObject: FileObject) : Folder? {
+        val pathToParent = fileObject.parentFilePath
+        val parent = betterGetFolderByTruePath(pathToParent) { folder, levels, i ->
+            var index = i + 1
+            var workingFolder = folder
+            var path = workingFolder.filePath.removeSuffix("/")
+            while (index < levels.size) {
+                val name = levels[index]
+                path += "$/name"
+                workingFolder = Folder(name, path, parent = workingFolder)
+                index += 1
+            }
+            workingFolder
+        }
+        fileObject.parent = parent
+        return parent
     }
 
     fun getCurrentCollectionPictures() : List<Picture> {
@@ -323,16 +382,21 @@ object CollectionManager {
                 ?: return null
         val files = Pair(oldFile, newFile)
 
-        // These should never return
-        val oldFolder = getFolderByTruePath(picture.fileLocation) ?: return files
-        val newFolder = getFolderByTruePath(folderFile.path) ?: return files
-
-        // Move Picture in Folders
+        // Remove from old Folder
+        val oldFolder = getFolderByTruePath(picture.fileLocation)
+                ?: return files  // should never return here
         oldFolder.removePicture(picture)
-        newFolder.addPicture(picture, toFront = true)
 
         // Update Picture's path
         picture.filePath = newFile.path
+
+        // Add to new Folder
+        val newFolder = getFolderByTruePath(folderFile.path)
+                ?: buildAncestorFolders(picture)  // returns direct parent
+                ?: return files  // should never return here
+        newFolder.addPicture(picture, toFront = true)
+
+        // Save changes
         Storage.saveAlbumsToDisk(albums)
 
         return files

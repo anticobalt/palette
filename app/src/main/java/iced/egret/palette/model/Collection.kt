@@ -90,7 +90,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
         }
         size += 1
     }
-    open fun addPictures(newPictures: MutableList<Picture>) {
+    open fun addPictures(newPictures: List<Picture>) {
         _pictures.addAll(newPictures)
         size += newPictures.size
     }
@@ -129,12 +129,15 @@ abstract class Collection(override var name: String, val path: String) : Coverab
  * - totalSize
  *
  * Backing fields _folders and _pictures only used when adding/deleting internally.
+ * TODO: make Folder's parent's type Folder, while not restricting other FileObject's parents, somehow.
+ *  If this done, all remove functions need to be adjusted.
+ *
  */
-class Folder(name: String, override var filePath: String, subFolders: MutableList<Folder> = mutableListOf())
+class Folder(name: String, override var filePath: String, subFolders: MutableList<Folder> = mutableListOf(),
+             override var parent: FileObject? = null)
     : Collection(name, CollectionConstructorHelper.simplifyFilesystemPath(filePath)), FileObject {
 
     override val icon = R.drawable.ic_folder_black_24dp
-    override var parent: FileObject? = null
     override val deletable : Boolean
         get() = _folders.size + _pictures.size == 0
 
@@ -194,7 +197,7 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
         size += 1
     }
 
-    fun addFolders(newFolders: MutableList<Folder>) {
+    fun addFolders(newFolders: List<Folder>) {
         _folders.addAll(newFolders)
         size += newFolders.size
     }
@@ -202,19 +205,46 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
     fun removeFolder(folder: Folder) {
         _folders.remove(folder)
         size -= 1
+        deleteIfShould()
+    }
+
+    /**
+     * Remove Picture and delete self if required.
+     */
+    override fun removePicture(picture: Picture) {
+        super.removePicture(picture)
+        deleteIfShould()
+    }
+
+    private fun deleteIfShould() {
+        if (deletable) delete()
+    }
+
+    /**
+     * Deletes self by removing own reference to parent and parent's reference to self,
+     * in doubly-linked list fashion.
+     *
+     * @return Success or failure. Fails if object initialized with non-Folder parent.
+     */
+    private fun delete() : Boolean {
+        val parentAsFolder = parent as? Folder ?: return false
+        parentAsFolder.removeFolder(this)
+        parent = null
+        return true
     }
 
 }
 
 data class FolderData(val name: String,
                       val path: String,
-                      val subFolders: List<FolderData> = mutableListOf(),
+                      val subFolderDataList: List<FolderData> = mutableListOf(),
                       val picturePaths : List<String> = mutableListOf()) : Serializable {
 
-    fun toFullClass() : Folder {
-        val fullSubFolders = subFolders.map {folder -> folder.toFullClass() } as MutableList<Folder>
-        val pictures = picturePaths.map {path -> Picture(path.split("/").last(), path) } as MutableList<Picture>
-        val folder = Folder(name, path, fullSubFolders)
+    fun toFullClass(parent: Folder? = null) : Folder {
+        val folder = Folder(name, path, parent = parent)
+        val subFolders = subFolderDataList.map { subFolderData -> subFolderData.toFullClass(folder) }
+        val pictures = picturePaths.map {path -> Picture(path.split("/").last(), path) }
+        folder.addFolders(subFolders)
         folder.addPictures(pictures)
         return folder
     }

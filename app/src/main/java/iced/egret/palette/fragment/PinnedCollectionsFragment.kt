@@ -191,18 +191,28 @@ class PinnedCollectionsFragment :
             mActionModeHelper.onClick(absolutePosition, clickedItem)
         }
         else {
-            val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
-            val fragment = MainFragmentManager.fragments[fragmentIndex] as CollectionViewFragment
-            fragment.activity?.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
-
-            val coverable = mCollections[absolutePosition]
-            CollectionManager.clearStack()
-            CollectionManager.launch(coverable)
-
-            fragment.setToolbarTitle()
-            fragment.refreshFragment()
+            openCollectionViewPanel(absolutePosition)
             false
         }
+    }
+
+    /**
+     * Set up and slide open right panel.
+     *
+     * @param referencePosition Index of Collection to open with
+     */
+    private fun openCollectionViewPanel(referencePosition: Int) {
+        val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
+        val fragment = MainFragmentManager.fragments[fragmentIndex] as CollectionViewFragment
+        fragment.activity?.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
+
+        val coverable = mCollections[referencePosition]
+        CollectionManager.clearStack()
+        if (coverable is Folder) CollectionManager.launchAsShortcut(coverable)
+        else CollectionManager.launch(coverable)
+
+        fragment.setToolbarTitle()
+        fragment.refreshFragment()
     }
 
     /**

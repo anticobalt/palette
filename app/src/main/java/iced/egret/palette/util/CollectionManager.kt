@@ -197,10 +197,7 @@ object CollectionManager {
     fun launch(item: Coverable, position: Int = -1, callingFragment: Fragment? = null, requestCode : Int = -1) : Boolean {
         if (!item.terminal) {
             if (item as? Collection != null) {
-                when (item.name) {
-                    MAIN_STORAGE_NAME -> unwindStack(PRACTICAL_MAIN_STORAGE_PATH) // skip the empty sub-folders
-                    else -> currentCollection = item
-                }
+                currentCollection = item
                 return true
             }
         }
@@ -213,6 +210,16 @@ object CollectionManager {
             }
         }
         return false
+    }
+
+    /**
+     * Similar behaviour to launch(), but unwinds with some specific configurations to improve QoL.
+     */
+    fun launchAsShortcut(item: Folder) {
+        when (item.name) {
+            MAIN_STORAGE_NAME -> unwindStack(PRACTICAL_MAIN_STORAGE_PATH) // skip the empty sub-folders
+            else -> unwindStack(item.path)
+        }
     }
 
     fun revertToParent() : List<Coverable>? {
@@ -235,7 +242,7 @@ object CollectionManager {
     }
 
     /**
-     * Given a path to a Collection, use it to restore stack state.
+     * Given a path to a Collection, use it to set a stack state.
      * If can't unwind completely, do it as much as possible, then return.
      */
     fun unwindStack(path: String) {

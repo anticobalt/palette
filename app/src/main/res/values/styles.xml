@@ -9,17 +9,18 @@
         <item name="android:windowBackground">@color/grey</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="AppTheme">
+    <style name="AppTheme.NoDefaultActionBar" parent="AppTheme">
+        <!-- Disables default action bar, allowing you to specify your own toolbar in the layout. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="MainView" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.NoDefaultActionBar.ActionMode" parent="AppTheme.NoDefaultActionBar">
         <!-- Make ActionMode toolbar overlap existing toolbars -->
         <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="PictureView" parent="AppTheme">
+    <style name="AppTheme.TranslucentUI" parent="AppTheme">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>

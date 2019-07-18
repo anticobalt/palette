@@ -59,6 +59,7 @@ class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
     }
 
     private fun buildActionBar() {
+        setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 

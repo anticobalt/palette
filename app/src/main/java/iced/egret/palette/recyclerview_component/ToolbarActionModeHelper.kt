@@ -19,6 +19,8 @@ import eu.davidea.flexibleadapter.utils.Log
  * Literally copy-pasted the original class, converted to Kotlin,
  * changed the classes of some return objects and properties.
  *
+ * ActionModes created with Toolbar.startActionMode() are the non-appcompat version.
+ *
  * Also modified behaviour of onClick(), onLongClick() and toggleSelection() to handle
  * more advanced visual selection than the ones provided by FlexibleUtils.
  */

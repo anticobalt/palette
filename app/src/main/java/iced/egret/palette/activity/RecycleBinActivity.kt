@@ -2,28 +2,30 @@ package iced.egret.palette.activity
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.view.ActionMode
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
-import eu.davidea.flexibleadapter.helpers.ActionModeHelper
 import iced.egret.palette.R
 import iced.egret.palette.model.Picture
 import iced.egret.palette.recyclerview_component.CollectionViewItem
+import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Storage
 
 class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
-    private lateinit var mActionModeHelper: ActionModeHelper
+    private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: FlexibleAdapter<CollectionViewItem>
+    private lateinit var mToolbar: Toolbar
 
     private var mContents = mutableListOf<Picture>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
@@ -58,7 +60,8 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
     }
 
     private fun buildActionBar() {
-        setSupportActionBar(findViewById(R.id.toolbar))
+        mToolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(mToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -91,7 +94,7 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
      * Straight from https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper
      */
     private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
-        mActionModeHelper = object : ActionModeHelper(mAdapter, R.menu.menu_recycle_bin_edit, this as ActionMode.Callback) {
+        mActionModeHelper = object : ToolbarActionModeHelper(mAdapter, R.menu.menu_recycle_bin_edit, this as ActionMode.Callback) {
             override fun updateContextTitle(count: Int) {
                 mActionMode?.title = if (count == 1) getString(R.string.action_selected_one, count)
                 else getString(R.string.action_selected_many, count)
@@ -104,7 +107,9 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
         return true
     }
 
-    override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        Painter.paintDrawable(menu.findItem(R.id.actionRestore).icon)
+        Painter.paintDrawable(menu.findItem(R.id.actionDelete).icon)
         return true
     }
 
@@ -118,11 +123,11 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
      * @return True if click should be handled by selection mode, false otherwise.
      */
     override fun onItemClick(view: View?, position: Int): Boolean {
-        return mActionModeHelper.onClick(position)
+        return mActionModeHelper.onClick(position, mContentItems[position])
     }
 
     override fun onItemLongClick(position: Int) {
-        mActionModeHelper.onLongClick(this, position)
+        mActionModeHelper.onLongClick(mToolbar, position, mContentItems[position])
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

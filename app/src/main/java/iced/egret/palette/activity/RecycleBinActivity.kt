@@ -117,7 +117,9 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
         return true
     }
 
-    override fun onDestroyActionMode(p0: ActionMode?) {}
+    override fun onDestroyActionMode(mode: ActionMode?) {
+        mContentItems.map { item -> item.setSelection(false) }
+    }
 
     /**
      * @return True if click should be handled by selection mode, false otherwise.
@@ -138,6 +140,14 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
         mAdapter.onRestoreInstanceState(savedInstanceState)
+        mActionModeHelper.restoreSelection(mToolbar)
+
+        // Re-select all previously selected items
+        for (i in 0 until mAdapter.currentItems.size) {
+            if (i in mAdapter.selectedPositionsAsSet) {
+                mAdapter.currentItems[i].setSelection(true)
+            }
+        }
     }
 
 }

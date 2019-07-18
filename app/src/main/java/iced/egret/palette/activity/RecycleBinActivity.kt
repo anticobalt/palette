@@ -16,8 +16,8 @@ import eu.davidea.flexibleadapter.helpers.ActionModeHelper
 import iced.egret.palette.R
 import iced.egret.palette.model.Picture
 import iced.egret.palette.recyclerview_component.CollectionViewItem
-import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter
+import iced.egret.palette.util.Storage
 
 class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
@@ -54,7 +54,7 @@ class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
     private fun fetchContents() {
         mContents.clear()
         mContentItems.clear()
-        mContents.addAll(CollectionManager.recycleBin)
+        mContents.addAll(Storage.recycleBin.contents)
         mContentItems.addAll(mContents.map {content -> CollectionViewItem(content)})
     }
 
@@ -71,6 +71,7 @@ class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
 
         mAdapter = FlexibleAdapter(mContentItems, this, true)
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
+        mRecyclerView = findViewById(R.id.recyclerView)
         mRecyclerView.layoutManager = manager
         mRecyclerView.adapter = mAdapter
     }

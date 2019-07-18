@@ -58,16 +58,8 @@ abstract class Collection(override var name: String, val path: String) : Coverab
                             .centerCrop()
 
             // Load image with signature if possible
-            //try {
-                buildGlideImage(glide, holder.ivItem, imageReference)
-            /*}
-            catch (e: Exception) {
-                if (imageReference is Uri) {
-                    val i = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-                    i.data = imageReference
-                    holder.itemView.context.sendBroadcast(i)
-                }
-            }*/
+            buildGlideImage(glide, holder.ivItem, imageReference)
+
         }
         if (holder.tvItem != null) {
             holder.tvItem.visibility = View.VISIBLE

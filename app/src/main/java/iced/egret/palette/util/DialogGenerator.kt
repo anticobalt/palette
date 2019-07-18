@@ -74,6 +74,17 @@ object DialogGenerator {
         }
     }
 
+    fun delete(context: Context, type: String, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(R.string.action_delete)
+            message(text = "Move the selected $type to the recycle bin?")
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
+        }
+    }
+
     fun showCollectionDetails(context: Context, collection: Collection) {
         val path = collection.path
         MaterialDialog(context).show {

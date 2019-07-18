@@ -1,12 +1,15 @@
 package iced.egret.palette.fragment
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Visibility
@@ -31,6 +34,7 @@ import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
+import java.io.File
 
 
 class CollectionViewFragment :
@@ -189,22 +193,30 @@ class CollectionViewFragment :
 
         val albumActions = menu.findItem(R.id.albumActions)
         val addToAlbum = menu.findItem(R.id.actionAddToAlbum)
-        val deleteAlbum = menu.findItem(R.id.actionDelete)
+        val delete = menu.findItem(R.id.actionDelete)
         val removeFromAlbum = menu.findItem(R.id.actionRemoveFromAlbum)
+
+        // Display settings common to Folders and Pictures
+        fun setFolderOrPicture() {
+            albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
+            addToAlbum.isVisible = true; Painter.paintDrawable(addToAlbum.icon)
+            if (CollectionManager.currentCollection is Album) {
+                removeFromAlbum.isVisible = true; Painter.paintDrawable(removeFromAlbum.icon)
+            }
+        }
 
         // Make items visible depending on selected content.
         // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.
         when (mSelectedContentType) {
-            CollectionManager.FOLDER_KEY,
+            CollectionManager.FOLDER_KEY -> {
+                setFolderOrPicture()
+            }
             CollectionManager.PICTURE_KEY -> {
-                albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
-                addToAlbum.isVisible = true; Painter.paintDrawable(addToAlbum.icon)
-                if (CollectionManager.currentCollection is Album) {
-                    removeFromAlbum.isVisible = true; Painter.paintDrawable(removeFromAlbum.icon)
-                }
+                setFolderOrPicture()
+                delete.isVisible = true; Painter.paintDrawable(delete.icon)
             }
             CollectionManager.ALBUM_KEY -> {
-                deleteAlbum.isVisible = true; Painter.paintDrawable(deleteAlbum.icon)
+                delete.isVisible = true; Painter.paintDrawable(delete.icon)
             }
         }
         return true
@@ -215,10 +227,6 @@ class CollectionViewFragment :
         fun refresh() {
             refreshFragment()
             MainFragmentManager.notifyAlbumUpdateFromCollectionView()  // to update cover
-        }
-
-        fun toast(message: String) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
 
         // sanity check that selected type is valid
@@ -255,11 +263,24 @@ class CollectionViewFragment :
                 }
             }
             R.id.actionDelete -> {
-                DialogGenerator.deleteAlbum(context!!) {
-                    CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions, deleteFromCurrent = true)
-                    toast("Deleted ${adapter.selectedItemCount} $typeString")
-                    refresh()
+                when (mSelectedContentType) {
+                    CollectionManager.PICTURE_KEY -> {
+                        DialogGenerator.delete(context!!, typeString) {
+                            @Suppress("UNCHECKED_CAST")  // assume internal consistency
+                            recyclePictures(coverables as List<Picture>, typeString)
+                            refresh()
+                        }
+                    }
+                    CollectionManager.FOLDER_KEY -> {
+                        DialogGenerator.deleteAlbum(context!!) {
+                            CollectionManager.deleteAlbumsByRelativePosition(
+                                    adapter.selectedPositions, deleteFromCurrent = true)
+                            toast("Deleted ${adapter.selectedItemCount} $typeString")
+                            refresh()
+                        }
+                    }
                 }
+
             }
             else -> {}
         }
@@ -469,6 +490,15 @@ class CollectionViewFragment :
         }
     }
 
+    private fun recyclePictures(pictures: List<Picture>, typeString: String) {
+        val failedCounter = CollectionManager.movePicturesToRecycleBin(pictures, getSdCardDocumentFile()) {
+            // If moved a Picture successfully, broadcast change
+            broadcastNewMedia(it)
+        }
+        if (failedCounter > 0) toast("Failed to move $failedCounter $typeString to recycle bin!")
+        else toast("${pictures.size} ${typeString.capitalize()} moved to recycle bin")
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICTURE_ACTIVITY_REQUEST) {
@@ -478,6 +508,32 @@ class CollectionViewFragment :
                 MainFragmentManager.notifyAlbumUpdateFromCollectionView()
             }
         }
+    }
+
+    private fun getSdCardDocumentFile() : DocumentFile? {
+        val preferences = activity!!.getSharedPreferences(
+                getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE
+        )
+        val uriAsString = preferences
+                .getString(getString(R.string.sd_card_uri_key), null) ?: return null
+        val uri = Uri.parse(uriAsString)
+        return DocumentFile.fromTreeUri(this.context!!, uri)
+    }
+
+    /**
+     * Broadcast changes so that show up immediately whenever MediaStore is accessed.
+     * https://stackoverflow.com/a/39241495
+     */
+    private fun broadcastNewMedia(file: File) {
+        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        val uri = Uri.fromFile(file)
+        mediaScanIntent.data = uri
+        activity!!.sendBroadcast(mediaScanIntent)
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
 }

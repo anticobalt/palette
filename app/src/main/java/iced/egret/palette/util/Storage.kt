@@ -2,6 +2,7 @@ package iced.egret.palette.util
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
@@ -20,22 +21,50 @@ object Storage {
 
     private const val rootCacheFileName = "root-cache.json"
     private const val albumsFileName = "albums.json"
-    private const val recycleBinName = "recycle-bin"
 
     private lateinit var fileDirectory : File
-    private lateinit var recycleBin : File
+    lateinit var recycleBin : RecycleBin
+        private set
 
-    var retrievedFolders = mutableListOf<Folder>()
-    var retrievedAlbums = mutableListOf<Album>()
+    val retrievedFolders = mutableListOf<Folder>()
+    val retrievedAlbums = mutableListOf<Album>()
     val retrievedPictures = mutableMapOf<String, Picture>()
 
     private var gson = Gson()
 
+    class RecycleBin(directory: File) {
+        val name = "recycle-bin"
+        private val locationsName = "recycle-restore-locations"
+        val file = File(directory, name)
+        val valid : Boolean
+            get() = file.isDirectory && file.canRead()
+        val contents : List<Picture>
+            get() = file.listFiles().map {file -> Picture(file.path.split("/").last(), file.path) }
+        val oldLocations = mutableMapOf<String, String>()
+
+        init {
+            file.mkdir()
+        }
+
+        fun saveLocationsToDisk() {
+            saveJsonToDisk(gson.toJson(oldLocations), locationsName)
+        }
+        fun loadLocationsFromDisk() {
+            val json = readJsonFromDisk(locationsName) ?: return
+            val type = object : TypeToken<HashMap<String, String>>() {}.type
+            oldLocations.clear()
+            oldLocations.putAll(gson.fromJson<HashMap<String, String>>(json, type))
+        }
+    }
+
     fun setup(activity: Activity) {
         fileDirectory = activity.filesDir
-        recycleBin = File(fileDirectory, recycleBinName)
-        retrievedFolders = getPictureFoldersMediaStore(activity)
-        retrievedAlbums = getAlbumsFromDisk()
+        retrievedFolders.clear()
+        retrievedAlbums.clear()
+        retrievedFolders.addAll(getPictureFoldersMediaStore(activity))
+        retrievedAlbums.addAll(getAlbumsFromDisk())
+        recycleBin = RecycleBin(fileDirectory)
+        recycleBin.loadLocationsFromDisk()
     }
 
     /**
@@ -93,6 +122,15 @@ object Storage {
 
             }
 
+            // Ensure file exists on disk.
+            // MediaStore will return non-existent images if removal was not broadcasted correctly.
+            val file = File(absolutePathOfImage)
+            if (!file.exists()) {
+                val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                intent.data = Uri.fromFile(file)
+                activity.sendBroadcast(intent)
+            }
+
             // add picture, parentFolder guaranteed to exist
             val picture = Picture(pathLevels[pathLevels.size - 1], absolutePathOfImage)
             parentFolder!!.addPicture(picture)
@@ -103,11 +141,6 @@ object Storage {
         cursor.close()
         return rootFolders
 
-    }
-
-    fun getRecycleBinContents() : List<Picture> {
-        if (!recycleBin.isDirectory || !recycleBin.canRead()) return listOf()
-        return recycleBin.listFiles().map {file -> Picture(file.path.split("/").last(), file.path) }
     }
 
     fun saveAlbumsToDisk(albums: List<Album>) {
@@ -224,12 +257,30 @@ object Storage {
 
     }
 
-    fun moveFile(sourcePath: String, destinationParent: File,
-                 sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
+    /**
+     * Try to copy to destination, then delete original. Abort if copy fails.
+     * @return Old and new file if successfully moved, null otherwise
+     */
+    fun moveFile(sourcePath: String, destinationParent: File, sdCardFile: DocumentFile?,
+                 contentResolver: ContentResolver?, newName: String? = null) : Pair<File, File>? {
         val sourceFile = File(sourcePath)
-        val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver)
-        deleteFile(sourceFile, sdCardFile, contentResolver)
-        return newFile
+        val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver, newName)
+                ?: return null
+        deleteFile(sourceFile, sdCardFile)
+        return Pair(sourceFile, newFile)
+    }
+
+    /**
+     * Try to move to recycle bin. Abort if move fails.
+     * @return Old and new file if successfully moved, null otherwise
+     */
+    fun moveFileToRecycleBin(sourcePath: String, sdCardFile: DocumentFile?) : Pair<File, File>? {
+        val newName = getUniqueNameInRecycleBin(sourcePath.split("/").last())
+        // Pair<Original, New>
+        val files = moveFile(sourcePath, recycleBin.file, sdCardFile, null, newName)
+                ?: return null
+        recycleBin.oldLocations[newName] = files.first.path
+        return files
     }
 
     /**
@@ -238,17 +289,17 @@ object Storage {
      *
      * @return The copy of the File, or null if failed.
      */
-    fun copyFile(sourceFile: File, destinationParent: File,
-                 sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
+    fun copyFile(sourceFile: File, destinationParent: File, sdCardFile: DocumentFile?,
+                 contentResolver: ContentResolver?, newName: String? = null) : File? {
 
-        val name = sourceFile.name
+        val name = newName ?: sourceFile.name
         val destinationLocation = destinationParent.path.removeSuffix("/") + "/"
         val destinationOnSdCard = pathOnSdCard(destinationLocation)
         val inStream = FileInputStream(sourceFile)
         val outStream: OutputStream
         val copy = File(destinationLocation + name)
 
-        if (destinationOnSdCard != null && sdCardFile != null) {
+        if (destinationOnSdCard != null && sdCardFile != null && contentResolver != null) {
             outStream = getSdOutputStream(name, destinationOnSdCard, "image/webp", sdCardFile, contentResolver)
                     ?: return null
         }
@@ -270,7 +321,7 @@ object Storage {
      *
      * @return True if deleted, false if not.
      */
-    fun deleteFile(sourceFile: File, sdCardFile: DocumentFile?, contentResolver: ContentResolver) : Boolean {
+    fun deleteFile(sourceFile: File, sdCardFile: DocumentFile?) : Boolean {
         val pathOnSdCard = pathOnSdCard(sourceFile.path)
         if (pathOnSdCard != null && sdCardFile != null) {
             val sourceDocumentFile = findFileInsideRecursive(sdCardFile, pathOnSdCard) ?: return false
@@ -288,6 +339,19 @@ object Storage {
     fun fileExists(name: String, location: String = "") : Boolean {
         val file = File(location + name)
         return file.exists()
+    }
+
+    /**
+     * Make unique name in case two files with same name in recycle bin.
+     */
+    private fun getUniqueNameInRecycleBin(originalName: String) : String {
+        var name = originalName
+        var counter = 1
+        while (fileExists(name, recycleBin.file.path)) {
+            name = "$originalName-$counter"
+            counter += 1
+        }
+        return name
     }
 
     private fun copyStreams(inputStream: InputStream, outputStream: OutputStream) {
@@ -348,7 +412,7 @@ object Storage {
     /**
      * Ensure all Pictures in album exist on disk. If they don't, remove them.
      */
-    private fun cleanAlbum(album: Album) {
+    fun cleanAlbum(album: Album) {
         val pictures = album.pictures.toList()  // a copy to avoid concurrency error
         for (picture in pictures) {
             if (!fileExists(picture.filePath)) {

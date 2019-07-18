@@ -42,8 +42,6 @@ object CollectionManager {
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
-    val recycleBin = mutableListOf<Picture>()
-
     fun setup() {
 
         root = Storage.retrievedFolders.firstOrNull() ?: return
@@ -66,9 +64,6 @@ object CollectionManager {
 
         // Add Albums
         mCollections.addAll(Storage.retrievedAlbums)
-
-        // Add Pictures in recycle bin
-        recycleBin.addAll(Storage.getRecycleBinContents())
 
     }
 
@@ -386,10 +381,8 @@ object CollectionManager {
                     sdCardFile: DocumentFile?, contentResolver: ContentResolver) : Pair<File, File>? {
 
         val picture = currentCollection?.pictures?.get(position) ?: return null
-        val oldFile = File(picture.filePath)
-        val newFile = Storage.moveFile(picture.filePath, folderFile, sdCardFile, contentResolver)
+        val files = Storage.moveFile(picture.filePath, folderFile, sdCardFile, contentResolver)
                 ?: return null
-        val files = Pair(oldFile, newFile)
 
         // Remove from old Folder
         val oldFolder = findFolderByPath(picture.fileLocation)  // looks for existing Folder
@@ -397,7 +390,7 @@ object CollectionManager {
         oldFolder.removePicture(picture)
 
         // Update Picture's path
-        picture.filePath = newFile.path
+        picture.filePath = files.second.path
 
         // Add to new Folder
         val newFolder = getParentFolder(picture)  // looks for Folder or makes it
@@ -408,6 +401,54 @@ object CollectionManager {
         Storage.saveAlbumsToDisk(albums)
 
         return files
+    }
+
+    /**
+     * Different from movePicture() because a) destination Folder is not updated (since Recycle Bin
+     * is not a Folder), and b) new moved File doesn't need post-processing
+     * @return The recycled file, or null if failed
+     */
+    private fun movePictureToRecycleBin(picture: Picture, sdCardFile: DocumentFile?) : File? {
+        // Pair<Original, New>
+        val files = Storage.moveFileToRecycleBin(picture.filePath, sdCardFile)
+                ?: return null
+        findFolderByPath(picture.fileLocation)?.removePicture(picture)
+        return files.first
+    }
+
+    fun movePicturesToRecycleBin(pictures: List<Picture>, sdCardFile: DocumentFile?,
+                                 afterEachMoved : (File) -> Unit) : Int {
+        var failCounter = 0
+        for (picture in pictures) {
+            val originalFile = movePictureToRecycleBin(picture, sdCardFile)
+            if (originalFile == null) failCounter += 1
+            else afterEachMoved(originalFile)
+        }
+
+        if (failCounter != pictures.size) {
+            cleanAlbums()
+            Storage.saveAlbumsToDisk(albums)
+            Storage.recycleBin.saveLocationsToDisk()
+        }
+
+        return failCounter
+    }
+
+    /**
+     * Remove all Pictures that don't exist on device from all albums.
+     */
+    private fun cleanAlbums(start: Album? = null) {
+        val toCheck : List<Album>
+        if (start != null) {
+            Storage.cleanAlbum(start)
+            toCheck = start.albums
+        }
+        else {
+            toCheck = albums
+        }
+        for (album in toCheck) {
+            cleanAlbums(album)
+        }
     }
 
 }

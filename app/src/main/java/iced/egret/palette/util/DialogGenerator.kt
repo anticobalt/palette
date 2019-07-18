@@ -74,7 +74,7 @@ object DialogGenerator {
         }
     }
 
-    fun delete(context: Context, type: String, onConfirm: () -> Unit) {
+    fun moveToRecycleBin(context: Context, type: String, onConfirm: () -> Unit) {
         MaterialDialog(context).show {
             title(R.string.action_delete)
             message(text = "Move the selected $type to the recycle bin?")
@@ -140,6 +140,28 @@ object DialogGenerator {
                 dialog, file -> onConfirm(file)
             }
             negativeButton()
+        }
+    }
+
+    fun restore(context: Context, typeString: String, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(R.string.action_restore)
+            message(text = "Restore the selected $typeString?")
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
+        }
+    }
+
+    fun delete(context: Context, typeString: String, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(R.string.action_delete)
+            message(text = "Permanently delete the selected $typeString? This action is irreversible.")
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
         }
     }
 

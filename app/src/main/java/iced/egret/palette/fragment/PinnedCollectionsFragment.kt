@@ -96,6 +96,11 @@ class PinnedCollectionsFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshFragment()
+    }
+
     private fun buildToolbar() {
 
         mToolbar = mRootView!!.findViewById(R.id.toolbar)

@@ -106,6 +106,11 @@ class CollectionViewFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshFragment()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         adapter.onSaveInstanceState(outState)
         outState.putString(selectedType, mSelectedContentType)
@@ -262,7 +267,7 @@ class CollectionViewFragment :
             R.id.actionDelete -> {
                 when (mSelectedContentType) {
                     CollectionManager.PICTURE_KEY -> {
-                        DialogGenerator.delete(context!!, typeString) {
+                        DialogGenerator.moveToRecycleBin(context!!, typeString) {
                             @Suppress("UNCHECKED_CAST")  // assume internal consistency
                             recyclePictures(coverables as List<Picture>, typeString)
                             refresh()

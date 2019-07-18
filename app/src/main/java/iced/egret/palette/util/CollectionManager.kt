@@ -22,8 +22,8 @@ object CollectionManager {
     const val ALBUM_KEY = "albums"
     const val PICTURE_KEY = "pictures"
 
-    private lateinit var root : Folder
-    private var mCollections : MutableList<Collection> = ArrayList()
+    private lateinit var root: Folder
+    private var mCollections: MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
     private val mContentsMap = linkedMapOf<String, List<Coverable>>(
             FOLDER_KEY to listOf(),
@@ -67,11 +67,11 @@ object CollectionManager {
 
     }
 
-    fun getCollections() : MutableList<Collection> {
+    fun getCollections(): MutableList<Collection> {
         return mCollections
     }
 
-    fun getNestedAlbums(albums : List<Album> = this.albums, runningList: MutableList<Album> = mutableListOf()) : MutableList<Album> {
+    fun getNestedAlbums(albums: List<Album> = this.albums, runningList: MutableList<Album> = mutableListOf()): MutableList<Album> {
         for (album in albums) {
             runningList.add(album)
             getNestedAlbums(album.albums, runningList)
@@ -82,7 +82,7 @@ object CollectionManager {
     /**
      * Lazily create ordered contents map
      */
-    fun getContentsMap() : LinkedHashMap<String, List<Coverable>> {
+    fun getContentsMap(): LinkedHashMap<String, List<Coverable>> {
 
         val currentMap = (currentCollection?.contentsMap ?: mutableMapOf())
                 as MutableMap<String, List<Coverable>>
@@ -97,16 +97,15 @@ object CollectionManager {
     /**
      * @return Relative position of new album amongst other albums
      */
-    fun createNewAlbum(name: String, addToCurrent: Boolean = false) : Int {
-        val newAlbum : Album
-        val position : Int
+    fun createNewAlbum(name: String, addToCurrent: Boolean = false): Int {
+        val newAlbum: Album
+        val position: Int
         if (addToCurrent && currentCollection is Album) {  // only albums can have albums
             val currentAlbum = currentCollection as Album
             newAlbum = Album(name, path = "${currentAlbum.path}/$name")
             position = currentAlbum.albums.size
             currentAlbum.addAlbum(newAlbum)
-        }
-        else {
+        } else {
             newAlbum = Album(name, path = name)
             position = mCollections.size
             mCollections.add(newAlbum)
@@ -128,9 +127,8 @@ object CollectionManager {
                 toDeleteAlbums.add(currentAlbum.albums[position])
             }
             currentAlbum.removeAlbums(toDeleteAlbums)
-        }
-        else {
-            val remainingCollections : MutableList<Collection> = folders.toMutableList()
+        } else {
+            val remainingCollections: MutableList<Collection> = folders.toMutableList()
             for (i in 0 until albums.size) {
                 if (!indices.contains(i)) {
                     remainingCollections.add(albums[i])
@@ -194,14 +192,13 @@ object CollectionManager {
      *
      * @return Adapter needs to be updated (true) or not (false)
      */
-    fun launch(item: Coverable, position: Int = -1, callingFragment: Fragment? = null, requestCode : Int = -1) : Boolean {
+    fun launch(item: Coverable, position: Int = -1, callingFragment: Fragment? = null, requestCode: Int = -1): Boolean {
         if (!item.terminal) {
             if (item as? Collection != null) {
                 currentCollection = item
                 return true
             }
-        }
-        else {
+        } else {
             if (item as? TerminalCoverable != null) {
                 val intent = Intent(callingFragment?.context, item.activity)
                 val key = callingFragment?.getString(R.string.intent_item_key)
@@ -222,12 +219,11 @@ object CollectionManager {
         }
     }
 
-    fun revertToParent() : List<Coverable>? {
+    fun revertToParent(): List<Coverable>? {
         return if (mCollectionStack.size > 1) {
             mCollectionStack.pop()
             contents
-        }
-        else {
+        } else {
             null
         }
     }
@@ -252,8 +248,7 @@ object CollectionManager {
 
         for (level in levels) {
             // Use path to find Collection because those (unlike names) are immutable
-            currentCollection = collectionsOnLevel.find {
-                collection -> collection.path.split("/")[levelIndex] == level }
+            currentCollection = collectionsOnLevel.find { collection -> collection.path.split("/")[levelIndex] == level }
                     ?: return
             collectionsOnLevel = (currentCollection as Collection).getContents().filterIsInstance<Collection>()
             levelIndex += 1
@@ -267,7 +262,7 @@ object CollectionManager {
      *
      */
     private fun findFolderByPath(path: String, startFolder: Folder? = null,
-                                 onMissing: (Folder, List<String>, Int) -> Folder? = { _, _, _ -> null} ): Folder? {
+                                 onMissing: (Folder, List<String>, Int) -> Folder? = { _, _, _ -> null }): Folder? {
 
         var currentFolder = startFolder ?: root
         val destinationPath = path.removeSuffix("/")
@@ -279,7 +274,7 @@ object CollectionManager {
         if (index == 0) return null
 
         while (currentFolder.folders.isNotEmpty() && index < levels.size) {
-            currentFolder = currentFolder.folders.find { child -> child.filePath.split("/")[index] == levels[index]}
+            currentFolder = currentFolder.folders.find { child -> child.filePath.split("/")[index] == levels[index] }
                     ?: return onMissing(currentFolder, levels, index)
             index += 1
         }
@@ -295,7 +290,7 @@ object CollectionManager {
      *
      *  Result example: path "files/music" has depth of 2 relative to path "files/music/r.mp3"
      */
-    private fun getDepthOfPath(pathToCheck: String, referencePath: String) : Int {
+    private fun getDepthOfPath(pathToCheck: String, referencePath: String): Int {
         if (!referencePath.startsWith(pathToCheck)) return 0
         val initial = referencePath.split("/").size
         val final = referencePath.removePrefix("$pathToCheck/").split("/").size
@@ -306,7 +301,7 @@ object CollectionManager {
      * Finds the parent Folder of the FileObject, or makes it (and all required ancestors)
      * with proper linking.
      */
-    private fun getParentFolder(fileObject: FileObject) : Folder? {
+    private fun getParentFolder(fileObject: FileObject): Folder? {
         val pathToParent = fileObject.parentFilePath
 
         val parent = findFolderByPath(pathToParent) { folder, levels, i ->
@@ -334,9 +329,9 @@ object CollectionManager {
         return parent
     }
 
-    fun getCurrentCollectionPictures() : List<Picture> {
+    fun getCurrentCollectionPictures(): List<Picture> {
         val collection = currentCollection
-        var pictures : List<Picture> = listOf()
+        var pictures: List<Picture> = listOf()
         if (collection != null) {
             pictures = collection.pictures
         }
@@ -347,11 +342,12 @@ object CollectionManager {
      * Save a Picture to disk and update Collections as required.
      */
     fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String, isNew: Boolean,
-                                sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
+                                sdCardFile: DocumentFile?, contentResolver: ContentResolver): File? {
 
-        val file = Storage.saveBitmapToDisk(bitmap, name, location, sdCardFile, contentResolver) ?: return null
-        val picture : Picture
-        val folder : Folder
+        val file = Storage.saveBitmapToDisk(bitmap, name, location, sdCardFile, contentResolver)
+                ?: return null
+        val picture: Picture
+        val folder: Folder
 
         // Get Picture from Folder, as it's guaranteed to reside in there if it exists, unlike in Album
         folder = findFolderByPath(location) ?: return file  // should never return
@@ -378,7 +374,7 @@ object CollectionManager {
      * @return The old and new Files, or null if move fails.
      */
     fun movePicture(position: Int, folderFile: File,
-                    sdCardFile: DocumentFile?, contentResolver: ContentResolver) : Pair<File, File>? {
+                    sdCardFile: DocumentFile?, contentResolver: ContentResolver): Pair<File, File>? {
 
         val picture = currentCollection?.pictures?.get(position) ?: return null
         val files = Storage.moveFile(picture.filePath, folderFile, sdCardFile, contentResolver)
@@ -408,7 +404,7 @@ object CollectionManager {
      * is not a Folder), and b) new moved File doesn't need post-processing
      * @return The recycled file, or null if failed
      */
-    private fun movePictureToRecycleBin(picture: Picture, sdCardFile: DocumentFile?) : File? {
+    private fun movePictureToRecycleBin(picture: Picture, sdCardFile: DocumentFile?): File? {
         // Pair<Original, New>
         val files = Storage.moveFileToRecycleBin(picture.filePath, sdCardFile)
                 ?: return null
@@ -417,7 +413,7 @@ object CollectionManager {
     }
 
     fun movePicturesToRecycleBin(pictures: List<Picture>, sdCardFile: DocumentFile?,
-                                 afterEachMoved : (File) -> Unit) : Int {
+                                 afterEachMoved: (File) -> Unit): Int {
         var failCounter = 0
         for (picture in pictures) {
             val originalFile = movePictureToRecycleBin(picture, sdCardFile)
@@ -434,16 +430,49 @@ object CollectionManager {
         return failCounter
     }
 
+    private fun restorePictureFromRecycleBin(picture: Picture, sdCardFile: DocumentFile?,
+                                             contentResolver: ContentResolver): File? {
+
+        // Pair<RecycleBin File, Original File>
+        val files = Storage.restoreFileFromRecycleBin(picture.filePath, sdCardFile, contentResolver)
+                ?: return null
+        picture.filePath = files.second.path
+        getParentFolder(picture)?.addPicture(picture, toFront = true)
+        return files.second
+    }
+
+    fun restorePicturesFromRecycleBin(pictures: List<Picture>, sdCardFile: DocumentFile?, contentResolver: ContentResolver,
+                                      afterEachRestored: (File) -> Unit): Int {
+        var failCounter = 0
+        for (picture in pictures) {
+            val restoredFile = restorePictureFromRecycleBin(picture, sdCardFile, contentResolver)
+            if (restoredFile == null) failCounter += 1
+            else afterEachRestored(restoredFile)
+        }
+
+        if (failCounter != pictures.size) Storage.recycleBin.saveLocationsToDisk()
+        return failCounter
+    }
+
+    fun deletePictures(pictures: List<Picture>) : Int {
+        var failCounter = 0
+        for (picture in pictures) {
+            if (!Storage.deleteFileFromRecycleBin(picture.filePath, null)) failCounter += 1
+        }
+
+        if (failCounter != pictures.size) Storage.recycleBin.saveLocationsToDisk()
+        return failCounter
+    }
+
     /**
      * Remove all Pictures that don't exist on device from all albums.
      */
     private fun cleanAlbums(start: Album? = null) {
-        val toCheck : List<Album>
+        val toCheck: List<Album>
         if (start != null) {
             Storage.cleanAlbum(start)
             toCheck = start.albums
-        }
-        else {
+        } else {
             toCheck = albums
         }
         for (album in toCheck) {

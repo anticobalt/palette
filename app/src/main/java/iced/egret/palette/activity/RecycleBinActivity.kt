@@ -16,6 +16,8 @@ import iced.egret.palette.R
 import iced.egret.palette.model.Picture
 import iced.egret.palette.recyclerview_component.CollectionViewItem
 import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
+import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Storage
 
@@ -57,6 +59,34 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
         mContentItems.clear()
         mContents.addAll(Storage.recycleBin.contents)
         mContentItems.addAll(mContents.map { content -> CollectionViewItem(content) })
+    }
+
+    /**
+     * Get RecycleBin contents from storage, compare them with current contents,
+     * and discard those not found in storage.
+     */
+    private fun discardOutdatedContents() {
+        val freshUris = Storage.recycleBin.contents.map{ c -> c.uri}.toSet()
+        val toDiscardItems = mutableListOf<CollectionViewItem>()
+        val toDiscardContents = mutableListOf<Picture>()
+
+        for (i in 0 until mContents.size) {
+            if (mContents[i].uri !in freshUris) {
+                toDiscardItems.add(mContentItems[i])
+                toDiscardContents.add(mContents[i])
+            }
+        }
+        mContentItems.removeAll(toDiscardItems)
+        mContents.removeAll(toDiscardContents)
+    }
+
+    private fun refresh() {
+        // Getting contents again from RecycleBin is more taxing than just tracking
+        // removed items inside the activity, but keeps the storage as the single source
+        // of truth, and prevents potential sync errors.
+        discardOutdatedContents()
+        mAdapter.updateDataSet(mContentItems)
+        mActionModeHelper.destroyActionModeIfCan()
     }
 
     private fun buildActionBar() {
@@ -103,7 +133,28 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
     }
 
     // Return true to continue with Action Mode
-    override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+
+        val selected = mAdapter.selectedPositions.map {i -> mContents[i]}
+
+        val typePlural = CollectionManager.PICTURE_KEY.toLowerCase()
+        val typeSingular = typePlural.dropLast(1)  // only works on s-appending plurals
+        val typeString = if (selected.size > 1) typePlural else typeSingular
+
+        when (item.itemId) {
+            R.id.actionRestore -> {
+                DialogGenerator.restore(this, typeString) {
+                    restorePictures(selected, typeString)
+                    refresh()
+                }
+            }
+            R.id.actionDelete -> {
+                DialogGenerator.delete(this, typeString) {
+                    deletePictures(selected, typeString)
+                    refresh()
+                }
+            }
+        }
         return true
     }
 
@@ -150,4 +201,18 @@ class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
         }
     }
 
+    private fun restorePictures(pictures: List<Picture>, typeString: String) {
+        val failCounter = CollectionManager.restorePicturesFromRecycleBin(
+                pictures, getSdCardDocumentFile(), contentResolver) {
+            broadcastNewMedia(it)
+        }
+        if (failCounter > 0) toast("Failed to restore $failCounter $typeString!")
+        else toast("${pictures.size} ${typeString.capitalize()} restored")
+    }
+
+    private fun deletePictures(pictures: List<Picture>, typeString: String) {
+        val failCounter = CollectionManager.deletePictures(pictures)
+        if (failCounter > 0) toast("Failed to delete $failCounter $typeString!")
+        else toast("${pictures.size} ${typeString.capitalize()} permanently deleted")
+    }
 }

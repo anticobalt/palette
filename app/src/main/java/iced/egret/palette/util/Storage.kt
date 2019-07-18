@@ -47,6 +47,7 @@ object Storage {
         }
 
         fun saveLocationsToDisk() {
+            cleanLocations()
             saveJsonToDisk(gson.toJson(oldLocations), locationsName)
         }
         fun loadLocationsFromDisk() {
@@ -54,6 +55,10 @@ object Storage {
             val type = object : TypeToken<HashMap<String, String>>() {}.type
             oldLocations.clear()
             oldLocations.putAll(gson.fromJson<HashMap<String, String>>(json, type))
+        }
+
+        private fun cleanLocations() {
+            if (file.listFiles().isEmpty()) oldLocations.clear()
         }
     }
 
@@ -183,23 +188,6 @@ object Storage {
         return null
     }
 
-    /*
-    private fun saveRecycledToDisk(recycled: List<Picture>) {
-        val paths = recycled.map {picture -> picture.filePath }
-        val json = gson.toJson(paths)
-        saveJsonToDisk(json, recycleFileName)
-    }
-
-    private fun getRecycledFromDisk() : List<Picture> {
-        val json = readJsonFromDisk(recycleFileName)
-        val type = object : TypeToken<List<String>>() {}.type
-        if (json == null) return listOf()
-
-        val paths = gson.fromJson<List<String>>(json, type)
-        return paths.map { path -> Picture(path.split("/").last(), path)}
-                .filter { picture -> fileExists(picture.filePath) }
-    }*/
-
     private fun saveJsonToDisk(json: String, fileName: String) {
         try {
             File(fileDirectory, fileName).writeText(json)
@@ -271,19 +259,6 @@ object Storage {
     }
 
     /**
-     * Try to move to recycle bin. Abort if move fails.
-     * @return Old and new file if successfully moved, null otherwise
-     */
-    fun moveFileToRecycleBin(sourcePath: String, sdCardFile: DocumentFile?) : Pair<File, File>? {
-        val newName = getUniqueNameInRecycleBin(sourcePath.split("/").last())
-        // Pair<Original, New>
-        val files = moveFile(sourcePath, recycleBin.file, sdCardFile, null, newName)
-                ?: return null
-        recycleBin.oldLocations[newName] = files.first.path
-        return files
-    }
-
-    /**
      * If copying to SD card (and can access SD card), do so using DocumentFiles.
      * Otherwise, try to copy as normal.
      *
@@ -321,7 +296,7 @@ object Storage {
      *
      * @return True if deleted, false if not.
      */
-    fun deleteFile(sourceFile: File, sdCardFile: DocumentFile?) : Boolean {
+    private fun deleteFile(sourceFile: File, sdCardFile: DocumentFile?) : Boolean {
         val pathOnSdCard = pathOnSdCard(sourceFile.path)
         if (pathOnSdCard != null && sdCardFile != null) {
             val sourceDocumentFile = findFileInsideRecursive(sdCardFile, pathOnSdCard) ?: return false
@@ -330,6 +305,49 @@ object Storage {
         else {
             return sourceFile.delete()
         }
+    }
+
+    /**
+     * Try to move to recycle bin. Abort if move fails.
+     * @return Old and new file if successfully moved, null otherwise
+     */
+    fun moveFileToRecycleBin(sourcePath: String, sdCardFile: DocumentFile?) : Pair<File, File>? {
+        val newName = getUniqueNameInRecycleBin(sourcePath.split("/").last())
+        // Pair<Original, New>
+        val files = moveFile(sourcePath, recycleBin.file, sdCardFile, null, newName)
+                ?: return null
+        recycleBin.oldLocations[newName] = files.first.path
+        return files
+    }
+
+    fun restoreFileFromRecycleBin(pathInBin: String, sdCardFile: DocumentFile?,
+                                  contentResolver: ContentResolver) : Pair<File, File>? {
+
+        val nameInBin = pathInBin.split("/").last()
+        val oldPath = recycleBin.oldLocations[nameInBin] ?: return null
+
+        // Get old name and location's File
+        val temp = oldPath.split("/")
+        val oldName = temp.last()
+        val oldLocation = temp.dropLast(1).joinToString("/")
+        val destination = File(oldLocation)
+
+        // Pair<RecycleBin File, Original File>
+        val files = moveFile(pathInBin, destination, sdCardFile, contentResolver, oldName)
+                ?: return null
+
+        recycleBin.oldLocations.remove(nameInBin)
+        return files
+    }
+
+    /**
+     * @return True if deleted, false if not.
+     */
+    fun deleteFileFromRecycleBin(path: String, sdCardFile: DocumentFile?) : Boolean {
+        val file = File(path)
+        val success = deleteFile(file, sdCardFile)
+        recycleBin.oldLocations.remove(file.name)
+        return success
     }
 
     /**

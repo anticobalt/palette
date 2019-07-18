@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,7 +18,7 @@ import iced.egret.palette.recyclerview_component.CollectionViewItem
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Storage
 
-class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
+class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
     private lateinit var mActionModeHelper: ActionModeHelper
@@ -55,7 +54,7 @@ class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
         mContents.clear()
         mContentItems.clear()
         mContents.addAll(Storage.recycleBin.contents)
-        mContentItems.addAll(mContents.map {content -> CollectionViewItem(content)})
+        mContentItems.addAll(mContents.map { content -> CollectionViewItem(content) })
     }
 
     private fun buildActionBar() {
@@ -63,7 +62,7 @@ class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun buildRecyclerView(){
+    private fun buildRecyclerView() {
         if (mContents.isEmpty()) return
 
         val orientation = resources.configuration.orientation
@@ -104,9 +103,11 @@ class RecycleBinActivity : AppCompatActivity(), ActionMode.Callback,
     override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
         return true
     }
+
     override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
         return true
     }
+
     override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {
         return true
     }

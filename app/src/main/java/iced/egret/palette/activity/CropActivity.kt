@@ -1,16 +1,12 @@
 package iced.egret.palette.activity
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Pair
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-import androidx.documentfile.provider.DocumentFile
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import iced.egret.palette.R
@@ -25,8 +21,8 @@ import java.io.IOException
 
 class CropActivity : BottomActionsActivity() {
 
-    private lateinit var mImageUri : Uri
-    private lateinit var mOptions : CropImageOptions
+    private lateinit var mImageUri: Uri
+    private lateinit var mOptions: CropImageOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,8 +116,8 @@ class CropActivity : BottomActionsActivity() {
         else super.onOptionsItemSelected(item)
     }
 
-    private fun cropImage() : Boolean {
-        val newUri : Uri = getOutputUri() ?: return false
+    private fun cropImage(): Boolean {
+        val newUri: Uri = getOutputUri() ?: return false
         cropImageView.saveCroppedImageAsync(newUri)
         return true
     }
@@ -158,8 +154,7 @@ class CropActivity : BottomActionsActivity() {
                 DialogGenerator.confirmReplaceFile(this) {
                     save(name, location, isNewFile = false)
                 }
-            }
-            else {
+            } else {
                 save(name, location, isNewFile = true)
             }
         }
@@ -170,7 +165,7 @@ class CropActivity : BottomActionsActivity() {
      * Copied from CropImageActivity.
      * https://github.com/ArthurHub/Android-Image-Cropper
      */
-    private fun getOutputUri() : Uri? {
+    private fun getOutputUri(): Uri? {
         var outputUri: Uri? = mOptions.outputUri
         if (outputUri == null || outputUri == Uri.EMPTY) {
             try {
@@ -188,34 +183,12 @@ class CropActivity : BottomActionsActivity() {
         return outputUri
     }
 
-    /**
-     * Broadcast changes so that show up immediately whenever MediaStore is accessed.
-     * https://stackoverflow.com/a/39241495
-     */
-    private fun broadcastNewMedia(file: File) {
-        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-        val uri = Uri.fromFile(file)
-        mediaScanIntent.data = uri
-        sendBroadcast(mediaScanIntent)
-    }
-
-    private fun getSdCardDocumentFile() : DocumentFile? {
-        val preferences = getSharedPreferences(
-                getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE
-        )
-        val uriAsString = preferences
-                .getString(getString(R.string.sd_card_uri_key), null) ?: return null
-        val uri = Uri.parse(uriAsString)
-        return DocumentFile.fromTreeUri(this, uri)
-    }
-
     private fun showFailToast() {
-        Toast.makeText(this, R.string.edit_fail_error, Toast.LENGTH_SHORT).show()
+        toast(R.string.edit_fail_error)
     }
 
     private fun showAccessDeniedToast() {
-        Toast.makeText(this, R.string.access_denied_error, Toast.LENGTH_SHORT).show()
+        toast(R.string.access_denied_error)
     }
 
 }

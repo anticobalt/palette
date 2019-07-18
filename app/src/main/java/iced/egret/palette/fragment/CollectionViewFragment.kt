@@ -1,12 +1,9 @@
 package iced.egret.palette.fragment
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.documentfile.provider.DocumentFile
@@ -18,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
+import iced.egret.palette.activity.BaseActivity
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.activity.RecycleBinActivity
@@ -49,15 +47,15 @@ class CollectionViewFragment :
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
 
-    private var mRootView : View? = null
-    private lateinit var mToolbar : Toolbar
-    private lateinit var mCollectionRecyclerView : RecyclerView
-    private lateinit var mFloatingActionButton : FloatingActionButton
+    private var mRootView: View? = null
+    private lateinit var mToolbar: Toolbar
+    private lateinit var mCollectionRecyclerView: RecyclerView
+    private lateinit var mFloatingActionButton: FloatingActionButton
 
     private var mContents = mutableListOf<Coverable>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
     lateinit var adapter: FlexibleAdapter<CollectionViewItem>
-    private var mSelectedContentType : String? = null
+    private var mSelectedContentType: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -145,8 +143,7 @@ class CollectionViewFragment :
             val collection = CollectionManager.currentCollection
             text = collection?.path?.split("/")?.joinToString(" / ") ?: getString(R.string.app_name)
             if (text.isEmpty()) text = getString(R.string.root_name)
-        }
-        else text = title
+        } else text = title
 
         mToolbar.toolbarTitle.text = text
     }
@@ -232,8 +229,8 @@ class CollectionViewFragment :
         // sanity check that selected type is valid
         CollectionManager.getContentsMap()[mSelectedContentType] ?: return false
 
-        val coverables = adapter.selectedPositions.map {
-            index -> CollectionManager.getContentsMap()[mSelectedContentType]!![index]
+        val coverables = adapter.selectedPositions.map { index ->
+            CollectionManager.getContentsMap()[mSelectedContentType]!![index]
         }
 
         val typePlural = mSelectedContentType!!.toLowerCase()
@@ -282,7 +279,8 @@ class CollectionViewFragment :
                 }
 
             }
-            else -> {}
+            else -> {
+            }
         }
         return true
     }
@@ -294,7 +292,7 @@ class CollectionViewFragment :
     override fun onDestroyActionMode(mode: ActionMode) {
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
-        mContentItems.map {item -> item.setSelection(false)}
+        mContentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
@@ -305,7 +303,7 @@ class CollectionViewFragment :
         mode.menu.findItem(R.id.actionDelete).isVisible = false
     }
 
-    private fun inferContentType(content: Coverable) : String? {
+    private fun inferContentType(content: Coverable): String? {
         return when (content) {
             is Folder -> CollectionManager.FOLDER_KEY
             is Album -> CollectionManager.ALBUM_KEY
@@ -358,8 +356,7 @@ class CollectionViewFragment :
 
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, clickedItem)
-        }
-        else {
+        } else {
             val coverable = mContents[absolutePosition]
             val relativePosition =
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
@@ -380,7 +377,7 @@ class CollectionViewFragment :
      * All positions refer to arrangement before click handling.
      */
     override fun onItemLongClick(absolutePosition: Int) {
-        val relativePosition : Int
+        val relativePosition: Int
 
         // Isolate the content type BEFORE ActionMode is created, so that the correct
         // relative position can be noted by the ActionModeHelper (instead of global position,
@@ -390,8 +387,7 @@ class CollectionViewFragment :
             isolateContent(mSelectedContentType!!)
             // adapter only holds one type now, so global == relative
             relativePosition = adapter.getGlobalPositionOf(mContentItems[absolutePosition])
-        }
-        else {
+        } else {
             relativePosition = absolutePosition
         }
         mActionModeHelper.onLongClick(mToolbar, relativePosition, mContentItems[absolutePosition])
@@ -402,8 +398,7 @@ class CollectionViewFragment :
             rvCollectionItems.visibility = View.GONE
             fab.hide()
             blocker.visibility = View.VISIBLE
-        }
-        else {
+        } else {
             rvCollectionItems.visibility = View.VISIBLE
             fab.show()
             blocker.visibility = View.GONE
@@ -415,8 +410,8 @@ class CollectionViewFragment :
      */
     private fun onFabClick() {
 
-        fun albumExists(name: CharSequence) : Boolean {
-            val found = mContents.find {coverable -> coverable is Album && coverable.name == name.toString() }
+        fun albumExists(name: CharSequence): Boolean {
+            val found = mContents.find { coverable -> coverable is Album && coverable.name == name.toString() }
             return found != null
         }
 
@@ -428,8 +423,7 @@ class CollectionViewFragment :
         val collection = CollectionManager.currentCollection
         if (collection is Album) {
             DialogGenerator.createAlbum(context!!, ::albumExists, ::createNewAlbum)
-        }
-        else {
+        } else {
             Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
@@ -450,20 +444,19 @@ class CollectionViewFragment :
     /**
      * @return handled here (true) or not (false)
      */
-    override fun onBackPressed() : Boolean {
+    override fun onBackPressed(): Boolean {
         return returnToParentCollection()
     }
 
     /**
      * Decide if parent exists and can be returned to
      */
-    private fun returnToParentCollection() : Boolean {
+    private fun returnToParentCollection(): Boolean {
         val newContents = CollectionManager.revertToParent()
-        return if (newContents != null){
+        return if (newContents != null) {
             refreshFragment()
             true
-        }
-        else {
+        } else {
             false
         }
     }
@@ -484,7 +477,7 @@ class CollectionViewFragment :
 
         val contentsMap = CollectionManager.getContentsMap()
         for ((type, coverables) in contentsMap) {
-            val coverableItems = coverables.map {content -> CollectionViewItem(content)}
+            val coverableItems = coverables.map { content -> CollectionViewItem(content) }
             mContents.addAll(coverables)
             mContentItems.addAll(coverableItems)
         }
@@ -510,30 +503,16 @@ class CollectionViewFragment :
         }
     }
 
-    private fun getSdCardDocumentFile() : DocumentFile? {
-        val preferences = activity!!.getSharedPreferences(
-                getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE
-        )
-        val uriAsString = preferences
-                .getString(getString(R.string.sd_card_uri_key), null) ?: return null
-        val uri = Uri.parse(uriAsString)
-        return DocumentFile.fromTreeUri(this.context!!, uri)
+    private fun getSdCardDocumentFile(): DocumentFile? {
+        return (activity as BaseActivity).getSdCardDocumentFile()
     }
 
-    /**
-     * Broadcast changes so that show up immediately whenever MediaStore is accessed.
-     * https://stackoverflow.com/a/39241495
-     */
     private fun broadcastNewMedia(file: File) {
-        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-        val uri = Uri.fromFile(file)
-        mediaScanIntent.data = uri
-        activity!!.sendBroadcast(mediaScanIntent)
+        (activity as BaseActivity).broadcastNewMedia(file)
     }
 
     private fun toast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        (activity as BaseActivity).toast(message)
     }
 
 }

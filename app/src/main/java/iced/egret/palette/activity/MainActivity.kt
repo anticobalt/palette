@@ -8,8 +8,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import com.afollestad.materialdialogs.MaterialDialog
@@ -22,16 +20,16 @@ const val EXTERNAL_CODE = 100
 const val PICTURE_ACTIVITY_REQUEST = 1
 const val SD_CARD_WRITE_REQUEST = 2
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private var hasPermission = false
     private val permissions = arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
+    )
 
     private val finishedFragments = mutableListOf<MainFragment>()
-    private lateinit var sharedPrefs : SharedPreferences
+    private lateinit var sharedPrefs: SharedPreferences
 
     companion object SaveDataKeys {
         const val onScreenCollection = "on-screen-collection"
@@ -42,13 +40,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         hasPermission = permissions
-                .map {permission -> Permission.isAccepted(this, permission)}
+                .map { permission -> Permission.isAccepted(this, permission) }
                 .all { accepted -> accepted }
 
         if (!hasPermission) {
             Permission.request(this, permissions, EXTERNAL_CODE)
-        }
-        else {
+        } else {
             buildApp(savedInstanceState)
         }
 
@@ -183,7 +180,7 @@ class MainActivity : AppCompatActivity() {
                     grantUriPermission(packageName, sdTreeUri, modeFlags)
                     contentResolver.takePersistableUriPermission(sdTreeUri, modeFlags)
 
-                    with (sharedPrefs.edit()) {
+                    with(sharedPrefs.edit()) {
                         putString(getString(R.string.sd_card_uri_key), sdTreeUri.toString())
                         apply()
                     }
@@ -226,10 +223,6 @@ class MainActivity : AppCompatActivity() {
         for (fragment in finishedFragments) {
             fragment.setClicksBlocked(false)
         }
-    }
-
-    private fun toast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
 }

@@ -1,19 +1,15 @@
 package iced.egret.palette.activity
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.viewpager.widget.ViewPager
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.glide.GlideImageLoader
@@ -25,7 +21,6 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.activity_view_picture.*
 import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
-import java.io.File
 
 class PictureViewActivity : BottomActionsActivity() {
 
@@ -51,13 +46,12 @@ class PictureViewActivity : BottomActionsActivity() {
      * Get the starting position of the ViewPager i.e. index of picture
      * @return Success (true) or failure (false)
      */
-    private fun getStartPosition() : Boolean {
+    private fun getStartPosition(): Boolean {
         itemPosition = intent.getIntExtra(getString(R.string.intent_item_key), -1)
         return if (itemPosition == -1) {
-            Toast.makeText(this, R.string.error_intent_extra, Toast.LENGTH_SHORT).show()
+            toast(R.string.error_intent_extra)
             false
-        }
-        else {
+        } else {
             true
         }
     }
@@ -101,6 +95,7 @@ class PictureViewActivity : BottomActionsActivity() {
              * make sure to call setPage().
              */
             override fun onPageSelected(position: Int) {}
+
             /**
              * Keep title and position if doing less than half-scroll back;
              * change if doing more than half scroll forward.
@@ -179,19 +174,19 @@ class PictureViewActivity : BottomActionsActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            Toast.makeText(this, R.string.file_save_success, Toast.LENGTH_SHORT).show()
+            toast(R.string.file_save_success)
             setResult(RESULT_OK)
             finish()
         }
     }
 
-    private fun initiateMove(){
+    private fun initiateMove() {
         DialogGenerator.moveFile(this) {
             val destination = it
             val oldPicture = CollectionManager.getCurrentCollectionPictures()[itemPosition]
 
             if (oldPicture.fileLocation == destination.path) {
-                Toast.makeText(this, R.string.already_exists_error, Toast.LENGTH_SHORT).show()
+                toast(R.string.already_exists_error)
                 return@moveFile
             }
 
@@ -201,9 +196,8 @@ class PictureViewActivity : BottomActionsActivity() {
                 broadcastNewMedia(files.second)
                 setResult(RESULT_OK)
                 finish()
-            }
-            else {
-                Toast.makeText(this, R.string.move_fail_error, Toast.LENGTH_SHORT).show()
+            } else {
+                toast(R.string.move_fail_error)
             }
         }
     }
@@ -240,34 +234,11 @@ class PictureViewActivity : BottomActionsActivity() {
             showSystemUI()
             bottomActions.visibility = View.VISIBLE
             supportActionBar?.show()
-        }
-        else {
+        } else {
             hideSystemUI()
             bottomActions.visibility = View.GONE
             supportActionBar?.hide()
         }
-    }
-
-    private fun getSdCardDocumentFile() : DocumentFile? {
-        val preferences = getSharedPreferences(
-                getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE
-        )
-        val uriAsString = preferences
-                .getString(getString(R.string.sd_card_uri_key), null) ?: return null
-        val uri = Uri.parse(uriAsString)
-        return DocumentFile.fromTreeUri(this, uri)
-    }
-
-    /**
-     * Broadcast changes so that show up immediately whenever MediaStore is accessed.
-     * https://stackoverflow.com/a/39241495
-     */
-    private fun broadcastNewMedia(file: File) {
-        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-        val uri = Uri.fromFile(file)
-        mediaScanIntent.data = uri
-        sendBroadcast(mediaScanIntent)
     }
 
 }

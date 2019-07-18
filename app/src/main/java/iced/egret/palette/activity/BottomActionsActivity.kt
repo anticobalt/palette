@@ -1,14 +1,13 @@
 package iced.egret.palette.activity
 
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_view_picture.*
 
 /**
  * An activity with a bar at the bottom for various actions.
  * The bar will sit above any existing system navigation bar.
  */
-abstract class BottomActionsActivity : AppCompatActivity() {
+abstract class BottomActionsActivity : BaseActivity() {
 
     /**
      * Should be extended. Bottom action bar MUST be have id "bottomActions".

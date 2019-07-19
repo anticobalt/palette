@@ -2,21 +2,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/actionHide"
+        android:id="@+id/actionToggleSelectAll"
+        android:icon="@drawable/ic_select_all_black_24dp"
         android:orderInCategory="1"
+        android:title="@string/action_toggle_select_all"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/actionHide"
         android:icon="@drawable/ic_visibility_off_black_24dp"
+        android:orderInCategory="2"
         android:title="@string/action_hide"
-        app:showAsAction="ifRoom"
         android:visible="false"
-        />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/actionDeleteAlbum"
         android:icon="@drawable/ic_delete_black_24dp"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         android:title="@string/action_delete"
-        app:showAsAction="ifRoom"
         android:visible="false"
-        />
+        app:showAsAction="ifRoom" />
 
 </menu>

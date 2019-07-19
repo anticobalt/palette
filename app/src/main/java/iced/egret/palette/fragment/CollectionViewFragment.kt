@@ -193,10 +193,15 @@ class CollectionViewFragment :
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         (activity as MainActivity).isolateFragment(this)
 
+        // Always visible
+        val selectAll = menu.findItem(R.id.actionToggleSelectAll)
+
+        // Conditional
         val albumActions = menu.findItem(R.id.albumActions)
         val addToAlbum = menu.findItem(R.id.actionAddToAlbum)
-        val delete = menu.findItem(R.id.actionDelete)
         val removeFromAlbum = menu.findItem(R.id.actionRemoveFromAlbum)
+        val move = menu.findItem(R.id.actionMove)
+        val delete = menu.findItem(R.id.actionDelete)
 
         // Display settings common to Folders and Pictures
         fun setFolderOrPicture() {
@@ -208,19 +213,23 @@ class CollectionViewFragment :
         }
 
         // Make items visible depending on selected content.
-        // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.
+        // Painting has to be done here for ActionMode icons, because XML app:iconTint
+        // doesn't work on items not visible on activity start.
         when (mSelectedContentType) {
             CollectionManager.FOLDER_KEY -> {
                 setFolderOrPicture()
             }
             CollectionManager.PICTURE_KEY -> {
                 setFolderOrPicture()
+                move.isVisible = true; Painter.paintDrawable(move.icon)
                 delete.isVisible = true; Painter.paintDrawable(delete.icon)
             }
             CollectionManager.ALBUM_KEY -> {
                 delete.isVisible = true; Painter.paintDrawable(delete.icon)
             }
         }
+        Painter.paintDrawable(selectAll.icon)
+
         return true
     }
 
@@ -305,6 +314,7 @@ class CollectionViewFragment :
         mode.menu.findItem(R.id.albumActions).isVisible = false
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
         mode.menu.findItem(R.id.actionRemoveFromAlbum).isVisible = false
+        mode.menu.findItem(R.id.actionMove).isVisible = false
         mode.menu.findItem(R.id.actionDelete).isVisible = false
     }
 

@@ -101,15 +101,46 @@ class PinnedCollectionsFragment :
         refreshFragment()
     }
 
-    private fun buildToolbar() {
+    override fun onBackPressed(): Boolean {
+        return false  // not handled here
+    }
 
+    private fun buildToolbar() {
         mToolbar = mRootView!!.findViewById(R.id.toolbar)
         mToolbar.toolbarTitle.text = getString(R.string.app_name)
         mToolbar.inflateMenu(R.menu.menu_pinned_collections)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
+        paintToolbar()
+    }
 
+    private fun paintToolbar() {
+        Painter.paintDrawable(mToolbar.menu.findItem(R.id.actionCreateAlbum).icon)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val context = context!!
+
+        fun albumExists(name: CharSequence) : Boolean {
+            val found = CollectionManager.albums.find {album -> album.name == name.toString() }
+            return found != null
+        }
+
+        fun onCreateNewAlbum(charSequence: CharSequence) {
+            CollectionManager.createNewAlbum(charSequence.toString())
+            refreshFragment()
+        }
+
+        when (item.itemId) {
+            R.id.actionCreateAlbum -> {
+                DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+
+        return true
     }
 
     private fun buildRecyclerView() {
@@ -141,7 +172,8 @@ class PinnedCollectionsFragment :
         (activity as MainActivity).isolateFragment(this)
 
         // Make items visible depending on selected content.
-        // Painting has to be done here for ActionMode icons, because XML app:iconTint doesn't work.
+        // Painting has to be done here for ActionMode icons, because XML app:iconTint
+        // doesn't work on items not visible on activity start.
         when (mSelectedContentType) {
             CollectionManager.FOLDER_KEY -> {
                 val item = menu.findItem(R.id.actionHide)
@@ -154,6 +186,8 @@ class PinnedCollectionsFragment :
                 Painter.paintDrawable(item.icon)
             }
         }
+        val selectAll = menu.findItem(R.id.actionToggleSelectAll)
+        Painter.paintDrawable(selectAll.icon)
 
         return true
     }
@@ -318,34 +352,6 @@ class PinnedCollectionsFragment :
             recyclerView.visibility = View.VISIBLE
             blocker.visibility = View.GONE
         }
-    }
-
-    override fun onBackPressed(): Boolean {
-        return false  // not handled here
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        val context = context!!
-
-        fun albumExists(name: CharSequence) : Boolean {
-            val found = CollectionManager.albums.find {album -> album.name == name.toString() }
-            return found != null
-        }
-
-        fun onCreateNewAlbum(charSequence: CharSequence) {
-            CollectionManager.createNewAlbum(charSequence.toString())
-            refreshFragment()
-        }
-
-        when (item.itemId) {
-            R.id.actionCreateAlbum -> {
-                DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-
-        return true
     }
 
     fun refreshFragment() {

@@ -7,4 +7,9 @@
         android:title="@string/action_move"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/actionRename"
+        android:title="@string/action_rename"
+        app:showAsAction="never" />
+
 </menu>

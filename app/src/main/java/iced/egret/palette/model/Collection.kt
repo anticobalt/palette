@@ -20,7 +20,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
 
     override val terminal = false
     override val cover = mutableMapOf<String, Any>(
-            "id" to R.drawable.ic_default_collection_cover
+            "id" to R.drawable.default_collection_cover
     )
 
     abstract var _pictures: MutableList<Picture>  // internal

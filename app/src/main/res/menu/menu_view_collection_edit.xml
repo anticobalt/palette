@@ -3,11 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/actionToggleSelectAll"
+        android:icon="@drawable/ic_select_all_black_24dp"
+        android:orderInCategory="1"
+        android:title="@string/action_toggle_select_all"
+        app:showAsAction="always" />
+
+
+    <item
         android:id="@+id/albumActions"
         android:title="@string/label_album_actions"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         android:icon="@drawable/ic_photo_album_black_24dp"
-        app:iconTint="@color/white"
         app:showAsAction="ifRoom"
         android:visible="false"
         >
@@ -26,12 +33,19 @@
     </item>
 
     <item
+        android:id="@+id/actionMove"
+        android:orderInCategory="3"
+        android:title="@string/action_move"
+        app:showAsAction="never"
+        android:visible="false"
+        />
+
+    <item
         android:id="@+id/actionDelete"
-        android:orderInCategory="2"
+        android:orderInCategory="4"
         android:icon="@drawable/ic_delete_black_24dp"
-        app:iconTint="@color/white"
         android:title="@string/action_delete"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:visible="false"
         />
 

@@ -216,7 +216,7 @@ class PinnedCollectionsFragment :
     override fun onDestroyActionMode(mode: ActionMode) {
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
-        mCollectionItems.map { item -> item.setSelection(false)}
+        adapter.currentItems.map { item -> item.setSelection(false)}
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()

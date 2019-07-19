@@ -22,6 +22,7 @@ object CollectionManager {
     const val ALBUM_KEY = "albums"
     const val PICTURE_KEY = "pictures"
 
+    private var ready = false
     private lateinit var root: Folder
     private var mCollections: MutableList<Collection> = ArrayList()
     private var mCollectionStack = ArrayDeque<Collection>()
@@ -42,7 +43,14 @@ object CollectionManager {
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
-    fun setup() {
+    fun setupIfRequired() {
+        if (!ready) {
+            setup()
+            ready = true
+        }
+    }
+
+    private fun setup() {
 
         root = Storage.retrievedFolders.firstOrNull() ?: return
         val displayedFolders = findFolderByPath(STORAGE_PATH)?.folders

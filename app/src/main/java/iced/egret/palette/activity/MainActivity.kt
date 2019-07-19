@@ -79,8 +79,8 @@ class MainActivity : BaseActivity() {
     }
 
     private fun buildApp(savedInstanceState: Bundle?) {
-        Storage.setup(this)
-        CollectionManager.setup()
+        Storage.setupIfRequired(this)
+        CollectionManager.setupIfRequired()
         Painter.color = ContextCompat.getColor(this, Painter.colorResource)
         sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 

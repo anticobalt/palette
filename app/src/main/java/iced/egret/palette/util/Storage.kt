@@ -22,6 +22,7 @@ object Storage {
     private const val rootCacheFileName = "root-cache.json"
     private const val albumsFileName = "albums.json"
 
+    private var ready = false
     private lateinit var fileDirectory : File
     lateinit var recycleBin : RecycleBin
         private set
@@ -62,7 +63,14 @@ object Storage {
         }
     }
 
-    fun setup(activity: Activity) {
+    fun setupIfRequired(activity: Activity) {
+        if (!ready) {
+            setup(activity)
+            ready = true
+        }
+    }
+
+    private fun setup(activity: Activity) {
         fileDirectory = activity.filesDir
         retrievedFolders.clear()
         retrievedAlbums.clear()

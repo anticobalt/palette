@@ -252,6 +252,9 @@ class CollectionViewFragment :
         val typeString = if (coverables.size > 1) typePlural else typeSingular
 
         when (item.itemId) {
+            R.id.actionToggleSelectAll -> {
+                selectAll()
+            }
             R.id.albumActions -> {
                 // No changes, don't refresh, so exit immediately.
                 // Must return true for submenus to popup.
@@ -363,6 +366,12 @@ class CollectionViewFragment :
                 adapter.addItem(i, item)
             }
         }
+    }
+
+    private fun selectAll() {
+        adapter.currentItems.map {item -> item.setSelection(true)}
+        adapter.selectAll()
+        mActionModeHelper.updateContextTitle(adapter.selectedItemCount)
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {

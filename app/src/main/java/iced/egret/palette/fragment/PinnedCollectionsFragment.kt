@@ -194,6 +194,9 @@ class PinnedCollectionsFragment :
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.actionToggleSelectAll -> {
+                selectAll()
+            }
             R.id.actionDeleteAlbum -> {
                 val callback = callback@{
                     CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions)
@@ -341,6 +344,12 @@ class PinnedCollectionsFragment :
                 adapter.addItem(i, item)
             }
         }
+    }
+
+    private fun selectAll() {
+        adapter.currentItems.map {item -> item.setSelection(true)}
+        adapter.selectAll()
+        mActionModeHelper.updateContextTitle(adapter.selectedItemCount)
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {

@@ -108,7 +108,8 @@ class CollectionViewFragment :
 
     override fun onResume() {
         super.onResume()
-        refreshFragment()
+        // Don't refresh if currently selecting stuff
+        if (mSelectedContentType == null) refreshFragment()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

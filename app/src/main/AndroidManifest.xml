@@ -30,6 +30,7 @@
         <activity
             android:name=".activity.CropActivity"
             android:theme="@style/AppTheme"
+            android:label="@string/crop_activity_name"
             />
         <activity
             android:name=".activity.RecycleBinActivity"

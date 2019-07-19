@@ -49,7 +49,7 @@ class PictureViewActivity : BottomActionsActivity() {
     private fun getStartPosition(): Boolean {
         itemPosition = intent.getIntExtra(getString(R.string.intent_item_key), -1)
         return if (itemPosition == -1) {
-            toast(R.string.error_intent_extra)
+            toast(R.string.intent_extra_error)
             false
         } else {
             true
@@ -194,6 +194,7 @@ class PictureViewActivity : BottomActionsActivity() {
             if (files != null) {
                 broadcastNewMedia(files.first)
                 broadcastNewMedia(files.second)
+                toast(R.string.file_move_success)
                 setResult(RESULT_OK)
                 finish()
             } else {

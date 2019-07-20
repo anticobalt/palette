@@ -3,12 +3,10 @@ package iced.egret.palette.activity
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
@@ -77,23 +75,6 @@ class PictureViewActivity : BottomActionsActivity() {
         appBarLayout.background = ColorDrawable(backgroundColor)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    /**
-     * Set ellipse location for overflow text in default action bar.
-     * Getting action_bar_title directly or via resources do not work.
-     * https://stackoverflow.com/a/34933846
-     *
-     * Default action bar is used because custom one is buggy when trying to animate it alongside
-     * system status bar.
-     */
-    private fun setActionBarEllipsize(location: TextUtils.TruncateAt) {
-        val toolbar = findViewById<Toolbar>(R.id.action_bar)
-        for (child in 0 until toolbar.childCount) {
-            if (toolbar.getChildAt(child) is TextView) {
-                (toolbar.getChildAt(child) as TextView).ellipsize = location
-            }
-        }
     }
 
     private fun setToolbarTitle() {
@@ -172,11 +153,6 @@ class PictureViewActivity : BottomActionsActivity() {
     private fun fetchPictures() {
         mPictures.clear()
         mPictures.addAll(CollectionManager.getCurrentCollectionPictures())
-    }
-
-    private fun updatePictures() {
-        fetchPictures()
-        viewpager.adapter?.notifyDataSetChanged()
     }
 
     private fun startCropActivity() {

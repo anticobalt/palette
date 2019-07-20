@@ -25,6 +25,7 @@ object Painter {
     private val themeColorResources = listOf(
             R.color.dodger_blue,
             R.color.sea_green,
+            R.color.fruit_salad,
             R.color.tangerine,
             R.color.lynch,
             R.color.coffee,

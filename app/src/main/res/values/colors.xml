@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">@color/blue</color>
-    <color name="colorPrimaryDark">@color/greyBlue</color>
-    <color name="colorAccent">@color/pink</color>
+    <color name="colorPrimary">@color/dodger_blue</color>
+    <color name="colorPrimaryDark">@color/space</color>
+    <color name="colorAccent">@color/fashion_red</color>
 
+    <!-- For themes -->
+    <color name="dodger_blue">#5B67FF</color>
+    <color name="sea_green">#2E8B57</color>
+    <color name="fruit_salad">#4CAF50</color>
+    <color name="tangerine">#EB9800</color>
+    <color name="lynch">#727D84</color>
+    <color name="coffee">#7D6757</color>
+    <color name="idle_pink">#FE88BA</color>
+    <color name="boppin_blue">#55DDED</color>
+    <color name="astral_yellow">#FBD87A</color>
+    <color name="myriad_magenta">#881187</color>
+    <color name="resolute_cyan">#00AABB</color>
+    <color name="fashion_red">#DD2200</color>
+
+    <!-- For text/icons -->
     <color name="black">#000</color>
-    <color name="blue">#5b67ff</color>
     <color name="white">#FFF</color>
-    <color name="silver">#C0C0C0</color>
+
+    <!-- For window backgrounds -->
     <color name="grey">#525252</color>
-    <color name="pink">#FF4081</color>
+    <color name="space">#2D343A</color>
 
-    <color name="lightBlue">#00AABB</color>
-    <color name="greyBlue">#2D343A</color>
-
-    <!-- Same color as translucent status bars -->
+    <!-- Same color as translucent navigation bar -->
     <color name="translucentBlack">#66000000</color>
 
 </resources>

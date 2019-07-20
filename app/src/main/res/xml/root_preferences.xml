@@ -1,0 +1,22 @@
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:title="@string/appearance_header"
+        app:iconSpaceReserved="false"
+        >
+
+        <!--
+        Didn't use normal Preference + MaterialDialogs ColorPicker because
+        there's a bug where the title of the dialog is highlighted on launch.
+        -->
+        <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
+            app:key="@string/color_key"
+            app:title="@string/color_preference"
+            app:iconSpaceReserved="false"
+            app:colorChoices="@array/theme_colors"
+            app:numColumns="6"
+            />
+
+    </PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

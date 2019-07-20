@@ -8,7 +8,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
@@ -51,8 +50,8 @@ class MainActivity : BaseActivity() {
 
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        outState?.putString(onScreenCollection, CollectionManager.currentCollection?.path)
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(onScreenCollection, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
     }
 
@@ -81,7 +80,8 @@ class MainActivity : BaseActivity() {
     private fun buildApp(savedInstanceState: Bundle?) {
         Storage.setupIfRequired(this)
         CollectionManager.setupIfRequired()
-        Painter.color = ContextCompat.getColor(this, Painter.colorResource)
+        Painter.setup(this)
+
         sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         if (savedInstanceState == null) {

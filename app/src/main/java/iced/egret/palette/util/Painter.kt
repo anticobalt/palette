@@ -1,12 +1,15 @@
 package iced.egret.palette.util
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import iced.egret.palette.R
 
 /**
- * Uniformly colors and darkens objects.
+ * Handles color-related operations.
  * Requires setting up, ideally in the starting activity.
  */
 object Painter {
@@ -20,15 +23,48 @@ object Painter {
             DARKEN_MODERATE
     )
 
-    const val colorResource = R.color.white
-    var color: Int? = null  // set by getColor() in an activity or fragment, using colorResource
+    private val themeColorResources = listOf(
+            R.color.dodger_blue,
+            R.color.sea_green,
+            R.color.tangerine,
+            R.color.lynch,
+            R.color.coffee,
+            R.color.idle_pink,
+            R.color.boppin_blue,
+            R.color.astral_yellow,
+            R.color.myriad_magenta,
+            R.color.resolute_cyan,
+            R.color.fashion_red
+    )
+    // maps color ints to resources
+    val colorResId = mutableMapOf<Int, Int>()
+
+    var black: Int? = null
+    var white: Int? = null
+    var currentDrawableColor: Int? = null
+    var currentThemeColorResId : Int? = null
+
+    fun setup(context: Context) {
+        loadColorsFromResources(context)
+        currentDrawableColor = white
+    }
+
+    private fun loadColorsFromResources(context: Context) {
+        for (i in 0 until themeColorResources.size) {
+            val resId = themeColorResources[i]
+            val colorInt = ContextCompat.getColor(context, resId)
+            colorResId[colorInt] = resId
+        }
+        black = ContextCompat.getColor(context, R.color.black)
+        white = ContextCompat.getColor(context, R.color.white)
+    }
 
     /**
      * Changes the color of object to a predetermined color.
      */
     fun paintDrawable(drawable: Drawable?) {
         drawable?.mutate()  // make drawable not share state with others
-        drawable?.setTint(color as Int)
+        drawable?.setTint(currentDrawableColor as Int)
     }
 
     /**
@@ -44,6 +80,32 @@ object Painter {
         else {
             imageView.setColorFilter(strength, android.graphics.PorterDuff.Mode.MULTIPLY)
         }
+    }
+
+    /**
+     * Given a color that is to be the primary color, return an approximation of
+     * the primary color dark version.
+     * https://material.io/design/color/#color-theme-creation
+     *
+     * @param colorHex a string in form #RRGGBB or #AARRGGBB
+     */
+    fun getMaterialDark(colorHex: String) : String {
+        val colorInt = Color.parseColor(colorHex)
+        val colorDarkInt = getMaterialDark(colorInt)
+        return Integer.toHexString(colorDarkInt)
+    }
+
+    fun getMaterialDark(colorInt: Int) : Int {
+        val hsl = FloatArray(3)
+        ColorUtils.colorToHSL(colorInt, hsl)
+
+        // Darken HSL by factor of 12, as specified in https://stackoverflow.com/a/40964456
+        val materialDark700 = 12
+        hsl[2] -= materialDark700 / 100f
+        if (hsl[2] < 0)
+            hsl[2] = 0f
+
+        return ColorUtils.HSLToColor(hsl)
     }
 
 }

@@ -2,14 +2,38 @@ package iced.egret.palette.activity
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
+import androidx.preference.PreferenceManager
+import com.afollestad.aesthetic.Aesthetic
+import com.afollestad.aesthetic.AestheticActivity
 import iced.egret.palette.R
 import java.io.File
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AestheticActivity() {
+
+    // Assume theme color can't be white
+    private val invalidColor = -1
+
+    private lateinit var sharedPreferences : SharedPreferences
+    protected var primaryColor = invalidColor
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        applyTheme()
+    }
+
+    fun applyTheme(colorInt: Int? = null) {
+        val primaryColor = colorInt ?: sharedPreferences.getInt(getString(R.string.color_key), invalidColor)
+        //val primaryColorRes = Painter.colorResId[primaryColor] ?: return
+        Aesthetic.config {
+            colorPrimary(literal = primaryColor)
+        }
+    }
 
     fun toast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

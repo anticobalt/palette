@@ -1,7 +1,9 @@
 package iced.egret.palette.activity
 
+import android.annotation.TargetApi
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
@@ -56,11 +58,20 @@ class PictureViewActivity : BottomActionsActivity() {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private fun buildActionBar() {
         val backgroundColor = ContextCompat.getColor(this, R.color.translucentBlack)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setBackgroundDrawable(ColorDrawable(backgroundColor))
         setActionBarEllipsize(TextUtils.TruncateAt.MIDDLE)
+        /*
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = Color.argb(100, 0, 0, 0)
+        val backgroundColor = ContextCompat.getColor(this, android.R.color.transparent)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.background = ColorDrawable(backgroundColor)*/
     }
 
     /**
@@ -208,7 +219,7 @@ class PictureViewActivity : BottomActionsActivity() {
         // For "sticky immersive," add SYSTEM_UI_FLAG_IMMERSIVE_STICKY instead.
         // For "lean back" mode, have neither.
         uiHidden = true
-        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
                 // Set the content to appear under the system bars so that the
                 // content doesn't resize when the system bars hide and show.
                 or View.SYSTEM_UI_FLAG_LAYOUT_STABLE

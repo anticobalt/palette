@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="theme_colors">
+        <item>@color/idle_pink</item>
+        <item>@color/boppin_blue</item>
+        <item>@color/astral_yellow</item>
+        <item>@color/myriad_magenta</item>
+        <item>@color/resolute_cyan</item>
+        <item>@color/fashion_red</item>
+        <item>@color/dodger_blue</item>
+        <item>@color/sea_green</item>
+        <item>@color/fruit_salad</item>
+        <item>@color/tangerine</item>
+        <item>@color/lynch</item>
+        <item>@color/coffee</item>
+    </array>
+</resources>

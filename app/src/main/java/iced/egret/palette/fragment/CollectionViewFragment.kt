@@ -15,10 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
-import iced.egret.palette.activity.BaseActivity
-import iced.egret.palette.activity.MainActivity
-import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
-import iced.egret.palette.activity.RecycleBinActivity
+import iced.egret.palette.activity.*
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.model.Folder
@@ -460,7 +457,10 @@ class CollectionViewFragment :
                 startActivity(Intent(this.context, RecycleBinActivity::class.java))
                 true
             }
-            R.id.gotoSettings -> true
+            R.id.gotoSettings -> {
+                startActivity(Intent(this.context, SettingsActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

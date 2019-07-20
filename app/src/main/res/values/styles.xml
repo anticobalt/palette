@@ -5,24 +5,42 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <!-- Background colors -->
+    </style>
+
+    <style name="AppTheme.ColorBackground" parent="AppTheme">
         <item name="android:windowBackground">@color/grey</item>
     </style>
 
-    <style name="AppTheme.NoDefaultActionBar" parent="AppTheme">
+    <style name="AppTheme.ColorBackground.NoDefaultActionBar" parent="AppTheme.ColorBackground">
         <!-- Disables default action bar, allowing you to specify your own toolbar in the layout. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.NoDefaultActionBar.ActionMode" parent="AppTheme.NoDefaultActionBar">
+    <style name="AppTheme.ColorBackground.NoDefaultActionBar.ActionMode" parent="AppTheme.ColorBackground.NoDefaultActionBar">
         <!-- Make ActionMode toolbar overlap existing toolbars -->
         <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="AppTheme.TranslucentUI" parent="AppTheme">
+    <style name="AppTheme.ColorBackground.TranslucentUI" parent="AppTheme.ColorBackground">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+
+        <item name="android:actionBarTheme">@style/TransparentActionBar</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="actionBarTheme">@style/TransparentActionBar</item>
+        <item name="windowActionBarOverlay">true</item>
+    </style>
+
+    <style name="TransparentActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:background">@null</item>
+        <item name="background">@null</item>
+    </style>
+
+    <style name="TranslucentToolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <!-- Make action bar sit on top, z-index-wise, to prevent resizing other views on hide -->
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

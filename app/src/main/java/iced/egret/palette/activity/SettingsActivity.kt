@@ -6,7 +6,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
 import iced.egret.palette.R
 
-class SettingsActivity : BaseActivity() {
+class SettingsActivity : BasicAestheticActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +41,7 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun applyTheme(colorInt: Int) {
-            (this.activity!! as BaseActivity).applyTheme(colorInt)
+            (this.activity!! as BasicAestheticActivity).applyTheme(colorInt)
         }
 
     }

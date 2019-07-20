@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Pair
 import android.view.Menu
 import android.view.MenuItem
+import com.afollestad.aesthetic.Aesthetic
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import iced.egret.palette.R
@@ -25,6 +26,7 @@ class CropActivity : BottomActionsActivity() {
     private lateinit var mOptions: CropImageOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Aesthetic.attach(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crop)
 
@@ -35,6 +37,16 @@ class CropActivity : BottomActionsActivity() {
         buildCropView()
         buildActionBar()
         buildBottomActions()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Aesthetic.resume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Aesthetic.pause(this)
     }
 
     private fun buildCropView() {

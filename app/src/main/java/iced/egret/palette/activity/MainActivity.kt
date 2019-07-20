@@ -19,7 +19,7 @@ const val EXTERNAL_CODE = 100
 const val PICTURE_ACTIVITY_REQUEST = 1
 const val SD_CARD_WRITE_REQUEST = 2
 
-class MainActivity : BaseActivity() {
+class MainActivity : BasicAestheticActivity() {
 
     private var hasPermission = false
     private val permissions = arrayOf(

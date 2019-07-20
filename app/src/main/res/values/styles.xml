@@ -25,22 +25,6 @@
     <style name="AppTheme.ColorBackground.TranslucentUI" parent="AppTheme.ColorBackground">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
-
-        <item name="android:actionBarTheme">@style/TransparentActionBar</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="actionBarTheme">@style/TransparentActionBar</item>
-        <item name="windowActionBarOverlay">true</item>
-    </style>
-
-    <style name="TransparentActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid">
-        <item name="android:background">@null</item>
-        <item name="background">@null</item>
-    </style>
-
-    <style name="TranslucentToolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <!-- Make action bar sit on top, z-index-wise, to prevent resizing other views on hide -->
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="windowActionBarOverlay">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

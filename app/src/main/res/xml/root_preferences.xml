@@ -1,4 +1,5 @@
-<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
         app:title="@string/appearance_header"
@@ -12,6 +13,7 @@
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
             app:key="@string/color_key"
             app:title="@string/color_preference"
+            android:defaultValue="@color/colorPrimary"
             app:iconSpaceReserved="false"
             app:colorChoices="@array/theme_colors"
             app:numColumns="6"

@@ -21,7 +21,7 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Storage
 
-class RecycleBinActivity : BaseActivity(), ActionMode.Callback,
+class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper

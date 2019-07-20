@@ -1,20 +1,20 @@
 package iced.egret.palette.activity
 
-import android.annotation.TargetApi
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.glide.GlideImageLoader
+import com.google.android.material.appbar.AppBarLayout
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
@@ -38,6 +38,7 @@ class PictureViewActivity : BottomActionsActivity() {
 
         if (!getStartPosition()) return
 
+        buildSystemBars()
         buildActionBar()
         buildViewPager()
         buildBottomActions()
@@ -58,20 +59,24 @@ class PictureViewActivity : BottomActionsActivity() {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun buildSystemBars() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+
+        window.statusBarColor = ContextCompat.getColor(this, R.color.translucentBlack)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.translucentBlack)
+    }
+
     private fun buildActionBar() {
         val backgroundColor = ContextCompat.getColor(this, R.color.translucentBlack)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setBackgroundDrawable(ColorDrawable(backgroundColor))
-        setActionBarEllipsize(TextUtils.TruncateAt.MIDDLE)
-        /*
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = Color.argb(100, 0, 0, 0)
-        val backgroundColor = ContextCompat.getColor(this, android.R.color.transparent)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        val appBarLayout = findViewById<AppBarLayout>(R.id.appbar)
+
+        // setting AppBarLayout background instead of toolbar makes entire hide animation show
+        appBarLayout.background = ColorDrawable(backgroundColor)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.background = ColorDrawable(backgroundColor)*/
     }
 
     /**

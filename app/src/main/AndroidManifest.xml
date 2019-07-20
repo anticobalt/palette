@@ -30,7 +30,7 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.PictureViewActivity"
-            android:theme="@style/AppTheme.ColorBackground.TranslucentUI" />
+            android:theme="@style/AppTheme.ColorBackground.NoDefaultActionBar" />
         <activity
             android:name=".activity.CropActivity"
             android:label="@string/title_activity_crop"

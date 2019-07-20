@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Automatically prevents overlapping with other views (when used with
-appbar_scrolling_view_behavior and CoordinatorView, at least).
+Toolbar by default has elevation in AppBarLayout, so turn it off for smooth transition
+between status bar and toolbar
 -->
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:tag=":aesthetic_ignore">
+    android:background="@null"
+    app:elevation="0dp"
+    android:translationZ="0.1dp"
+    android:theme="@style/AppTheme.AppBarOverlay">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:tag=":aesthetic_ignore">
+        android:background="@null"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
 
         <TextView
             android:id="@+id/toolbarTitle"
@@ -22,7 +26,7 @@ appbar_scrolling_view_behavior and CoordinatorView, at least).
             android:textSize="19sp"
             android:fontFamily="sans-serif-medium"
             android:textColor="@color/white"
-            android:ellipsize="start"
+            android:ellipsize="middle"
             android:singleLine="true"
             />
 

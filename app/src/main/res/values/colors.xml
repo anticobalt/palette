@@ -29,5 +29,6 @@
 
     <!-- Same color as translucent navigation bar -->
     <color name="translucentBlack">#66000000</color>
+    <color name="t_red">#66DD2200</color>
 
 </resources>

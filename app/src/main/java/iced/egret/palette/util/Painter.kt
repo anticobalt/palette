@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import iced.egret.palette.R
 
 /**
@@ -42,7 +41,6 @@ object Painter {
     var black: Int? = null
     var white: Int? = null
     var currentDrawableColor: Int? = null
-    var currentThemeColorResId : Int? = null
 
     fun setup(context: Context) {
         loadColorsFromResources(context)
@@ -80,32 +78,6 @@ object Painter {
         else {
             imageView.setColorFilter(strength, android.graphics.PorterDuff.Mode.MULTIPLY)
         }
-    }
-
-    /**
-     * Given a color that is to be the primary color, return an approximation of
-     * the primary color dark version.
-     * https://material.io/design/color/#color-theme-creation
-     *
-     * @param colorHex a string in form #RRGGBB or #AARRGGBB
-     */
-    fun getMaterialDark(colorHex: String) : String {
-        val colorInt = Color.parseColor(colorHex)
-        val colorDarkInt = getMaterialDark(colorInt)
-        return Integer.toHexString(colorDarkInt)
-    }
-
-    fun getMaterialDark(colorInt: Int) : Int {
-        val hsl = FloatArray(3)
-        ColorUtils.colorToHSL(colorInt, hsl)
-
-        // Darken HSL by factor of 12, as specified in https://stackoverflow.com/a/40964456
-        val materialDark700 = 12
-        hsl[2] -= materialDark700 / 100f
-        if (hsl[2] < 0)
-            hsl[2] = 0f
-
-        return ColorUtils.HSLToColor(hsl)
     }
 
 }

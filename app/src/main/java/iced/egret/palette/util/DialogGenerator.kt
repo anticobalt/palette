@@ -165,16 +165,4 @@ object DialogGenerator {
         }
     }
 
-    /*
-    fun pickColor(context: Context, onConfirm: (Int) -> Unit) {
-        val colors = Painter.themeColors
-        MaterialDialog(context).show {
-            title(R.string.color_preference)
-            colorChooser(colors, initialSelection = colors[0])
-            negativeButton()
-            positiveButton()
-        }
-    }
-    */
-
 }

@@ -27,7 +27,7 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
-import kotlinx.android.synthetic.main.appbar.view.*
+import kotlinx.android.synthetic.main.appbar_main_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.io.File
 
@@ -117,6 +117,9 @@ class CollectionViewFragment :
 
     override fun onAllFragmentsCreated() {
         // This fragment is always created last, so this function is not required.
+    }
+
+    override fun applyThemeToAppBar(color: Int) {
     }
 
     /**

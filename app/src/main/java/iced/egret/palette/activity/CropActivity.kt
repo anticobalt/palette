@@ -1,12 +1,13 @@
 package iced.egret.palette.activity
 
 import android.app.Activity
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Pair
-import android.view.Menu
 import android.view.MenuItem
+import androidx.preference.PreferenceManager
 import com.afollestad.aesthetic.Aesthetic
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
@@ -16,11 +17,16 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_crop.*
 import kotlinx.android.synthetic.main.activity_view_picture.bottomActions
+import kotlinx.android.synthetic.main.appbar_main_fragment.*
 import kotlinx.android.synthetic.main.bottom_actions_crop.view.*
 import java.io.File
 import java.io.IOException
 
 class CropActivity : BottomActionsActivity() {
+
+    // Assume theme color can't be white
+    private val invalidColor = -1
+    private lateinit var sharedPreferences : SharedPreferences
 
     private lateinit var mImageUri: Uri
     private lateinit var mOptions: CropImageOptions
@@ -37,6 +43,9 @@ class CropActivity : BottomActionsActivity() {
         buildCropView()
         buildActionBar()
         buildBottomActions()
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        //applyTheme()
     }
 
     override fun onResume() {
@@ -57,7 +66,12 @@ class CropActivity : BottomActionsActivity() {
     }
 
     private fun buildActionBar() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.title = getString(R.string.title_activity_crop)
+        toolbar.inflateMenu(R.menu.menu_crop)
+        toolbar.setOnMenuItemClickListener {
+            onOptionsItemSelected(it)
+        }
     }
 
     override fun buildBottomActions() {
@@ -89,11 +103,12 @@ class CropActivity : BottomActionsActivity() {
         }
     }
 
+    /*
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // use CropImageActivity's default menu
-        menuInflater.inflate(R.menu.crop_image_menu, menu)
+        menuInflater.inflate(R.menu.menu_crop, menu)
         return super.onCreateOptionsMenu(menu)
-    }
+    }*/
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retValue = when (item?.itemId) {

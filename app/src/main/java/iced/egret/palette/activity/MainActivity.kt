@@ -225,4 +225,8 @@ class MainActivity : BasicAestheticActivity() {
         }
     }
 
+    /*fun applyThemeToAppBar(color: Int) {
+        finishedFragments.map {fragment -> fragment.applyThemeToAppBar(color)}
+    }*/
+
 }

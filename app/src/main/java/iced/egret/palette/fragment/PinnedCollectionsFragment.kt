@@ -21,7 +21,7 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
-import kotlinx.android.synthetic.main.appbar.view.*
+import kotlinx.android.synthetic.main.appbar_main_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_pinned_collections.*
 
 class PinnedCollectionsFragment :
@@ -29,6 +29,10 @@ class PinnedCollectionsFragment :
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener {
+
+    override fun applyThemeToAppBar(color: Int) {
+        // TODO
+    }
 
     companion object SaveDataKeys {
         const val selectedType = "PinnedCollectionFragment_ST"
@@ -113,7 +117,7 @@ class PinnedCollectionsFragment :
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
-        paintToolbar()
+        //paintToolbar()
     }
 
     private fun paintToolbar() {

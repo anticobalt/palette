@@ -14,4 +14,12 @@
         <item>@color/lynch</item>
         <item>@color/coffee</item>
     </array>
+    <array name="text_colors">
+        <item>@color/black</item>
+        <item>@color/white</item>
+    </array>
+    <array name="bg_colors">
+        <item>@color/space</item>
+        <item>@color/white</item>
+    </array>
 </resources>

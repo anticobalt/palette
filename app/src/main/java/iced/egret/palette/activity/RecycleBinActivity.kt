@@ -45,15 +45,6 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        paintMenuItems(menu)
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    private fun paintMenuItems(menu: Menu) {
-        Painter.paintDrawable(menu.findItem(R.id.actionEmpty).icon)
-    }
-
     private fun fetchContents() {
         mContents.clear()
         mContentItems.clear()
@@ -91,8 +82,13 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
 
     private fun buildActionBar() {
         mToolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(mToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        mToolbar.inflateMenu(R.menu.menu_recycle_bin)
+        mToolbar.title = getString(R.string.recycle_bin)
+        mToolbar.setOnMenuItemClickListener {
+            onOptionsItemSelected(it)
+        }
+        //setSupportActionBar(mToolbar)
+        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun buildRecyclerView() {

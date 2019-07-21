@@ -11,11 +11,37 @@
         there's a bug where the title of the dialog is highlighted on launch.
         -->
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            app:key="@string/color_key"
-            app:title="@string/color_preference"
+            app:key="@string/primary_color_key"
+            app:title="@string/primary_color_preference"
             android:defaultValue="@color/colorPrimary"
             app:iconSpaceReserved="false"
             app:colorChoices="@array/theme_colors"
+            app:numColumns="6"
+            />
+
+        <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
+            app:key="@string/accent_color_key"
+            app:title="@string/accent_color_preference"
+            android:defaultValue="@color/colorAccent"
+            app:iconSpaceReserved="false"
+            app:colorChoices="@array/theme_colors"
+            app:numColumns="6"
+            />
+
+        <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
+            app:key="@string/text_color_key"
+            app:title="@string/text_color_preference"
+            android:defaultValue="@color/white"
+            app:iconSpaceReserved="false"
+            app:colorChoices="@array/text_colors"
+            app:numColumns="6"
+            />
+
+        <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
+            app:key="@string/bg_color_key"
+            app:title="@string/bg_color_preference"
+            app:iconSpaceReserved="false"
+            app:colorChoices="@array/bg_colors"
             app:numColumns="6"
             />
 

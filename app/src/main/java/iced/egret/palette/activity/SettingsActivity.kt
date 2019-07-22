@@ -38,10 +38,11 @@ class SettingsActivity : BasicAestheticActivity() {
         }
 
         private fun setOnClickListeners() {
-            val primaryColorPref = findPreference<ColorPreferenceCompat>(getString(R.string.primary_color_key))!!
-            val accentColorPref = findPreference<ColorPreferenceCompat>(getString(R.string.accent_color_key))!!
-            val textColorPref = findPreference<ColorPreferenceCompat>(getString(R.string.text_color_key))!!
-            val bgColorPref = findPreference<ColorPreferenceCompat>(getString(R.string.bg_color_key))!!
+
+            val primaryColorPref = findColorPreference(getString(R.string.primary_color_key))
+            val accentColorPref = findColorPreference(getString(R.string.accent_color_key))
+            val textColorPref = findColorPreference(getString(R.string.text_color_key))
+            val bgColorPref = findColorPreference(getString(R.string.bg_color_key))
 
             primaryColor = primaryColorPref.value
             accentColor = accentColorPref.value
@@ -76,6 +77,10 @@ class SettingsActivity : BasicAestheticActivity() {
                 }
                 true
             }
+        }
+
+        private fun findColorPreference(key: String) : ColorPreferenceCompat {
+            return findPreference<ColorPreferenceCompat>(key)!!
         }
 
         private fun applyTheme() {

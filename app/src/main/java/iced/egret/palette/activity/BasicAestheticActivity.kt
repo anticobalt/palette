@@ -45,11 +45,7 @@ abstract class BasicAestheticActivity: BaseActivity() {
             toolbarIconColor(literal = textColor)
         }
 
-        applyThemeToAppBar(textColor)
-
     }
-
-    fun applyThemeToAppBar(color: Int) {}
 
     private fun getColor(resource: Int, defaultColor: Int) : Int {
         return sharedPreferences.getInt(getString(resource), defaultColor)

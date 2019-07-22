@@ -87,8 +87,6 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
-        //setSupportActionBar(mToolbar)
-        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun buildRecyclerView() {

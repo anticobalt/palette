@@ -24,8 +24,6 @@ import java.io.IOException
 
 class CropActivity : BottomActionsActivity() {
 
-    // Assume theme color can't be white
-    private val invalidColor = -1
     private lateinit var sharedPreferences : SharedPreferences
 
     private lateinit var mImageUri: Uri
@@ -45,7 +43,6 @@ class CropActivity : BottomActionsActivity() {
         buildBottomActions()
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        //applyTheme()
     }
 
     override fun onResume() {
@@ -66,7 +63,6 @@ class CropActivity : BottomActionsActivity() {
     }
 
     private fun buildActionBar() {
-        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.title = getString(R.string.title_activity_crop)
         toolbar.inflateMenu(R.menu.menu_crop)
         toolbar.setOnMenuItemClickListener {
@@ -102,13 +98,6 @@ class CropActivity : BottomActionsActivity() {
             cropImageView.resetCropRect()  // expand to fill whole image
         }
     }
-
-    /*
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        // use CropImageActivity's default menu
-        menuInflater.inflate(R.menu.menu_crop, menu)
-        return super.onCreateOptionsMenu(menu)
-    }*/
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retValue = when (item?.itemId) {

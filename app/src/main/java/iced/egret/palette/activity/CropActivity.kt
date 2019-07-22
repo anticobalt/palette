@@ -68,6 +68,10 @@ class CropActivity : BottomActionsActivity() {
         toolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
+        toolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
     }
 
     override fun buildBottomActions() {
@@ -101,10 +105,6 @@ class CropActivity : BottomActionsActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retValue = when (item?.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                true
-            }
             R.id.crop_image_menu_crop -> {
                 val result = cropImage()
                 if (!result) showFailToast()

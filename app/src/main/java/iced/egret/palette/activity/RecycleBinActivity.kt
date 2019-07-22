@@ -87,6 +87,10 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
+        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
+        mToolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
     }
 
     private fun buildRecyclerView() {

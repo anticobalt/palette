@@ -1,18 +1,20 @@
 package iced.egret.palette.activity
 
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
+import android.widget.ImageButton
+import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.glide.GlideImageLoader
-import com.google.android.material.appbar.AppBarLayout
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
@@ -20,9 +22,15 @@ import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.activity_view_picture.*
+import kotlinx.android.synthetic.main.appbar_view_picture.*
 import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
 
+
 class PictureViewActivity : BottomActionsActivity() {
+
+    private lateinit var sharedPrefs : SharedPreferences
+    private var barBackgroundColor : Int = Color.BLACK
+    private var barIconColor : Int = Color.WHITE
 
     private var uiHidden = false
     private var itemPosition = -1
@@ -33,9 +41,11 @@ class PictureViewActivity : BottomActionsActivity() {
         super.onCreate(savedInstanceState)
         BigImageViewer.initialize(GlideImageLoader.with(applicationContext))
         setContentView(R.layout.activity_view_picture)
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         if (!getStartPosition()) return
 
+        setColors()
         buildSystemBars()
         buildActionBar()
         buildViewPager()
@@ -57,28 +67,74 @@ class PictureViewActivity : BottomActionsActivity() {
         }
     }
 
+    private fun setColors() {
+        // Update from Preferences if possible
+        barBackgroundColor = sharedPrefs.getInt(getString(R.string.primary_color_key), barBackgroundColor)
+        barIconColor = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), barIconColor)
+
+        // make translucent
+        barBackgroundColor = getTranslucentColor(barBackgroundColor)
+        barIconColor = getTranslucentColor(barIconColor)
+    }
+
+    private fun getTranslucentColor(color: Int) : Int {
+        val sixDigitHex = String.format("%06X", 0xFFFFFF and color)  // https://stackoverflow.com/a/6540378
+        val translucency = "B3"  // 70% opacity
+        return Color.parseColor("#$translucency$sixDigitHex")
+    }
+
     private fun buildSystemBars() {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
 
-        window.statusBarColor = ContextCompat.getColor(this, R.color.translucentBlack)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.translucentBlack)
+        // Hack to avoid extra status-bar and navigation-bars's worth of space from initially
+        // showing between status-bar/toolbar and bottom-bar/navigation-bar, respectively.
+        // No idea why it works. Caused by clearing the translucent flags,
+        // which is required setting custom colors.
+        hideSystemUI()
+        showSystemUI()
+
+        window.statusBarColor = barBackgroundColor
+        window.navigationBarColor = barBackgroundColor
     }
 
     private fun buildActionBar() {
-        val backgroundColor = ContextCompat.getColor(this, R.color.translucentBlack)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        val appBarLayout = findViewById<AppBarLayout>(R.id.appbar)
 
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
-        appBarLayout.background = ColorDrawable(backgroundColor)
+        appbar.background = ColorDrawable(barBackgroundColor)
+
+        // https://stackoverflow.com/a/33534039
+        toolbar.overflowIcon?.setTint(barIconColor)
+        toolbar.navigationIcon?.setTint(barIconColor)
+        toolbarTitle.setTextColor(barIconColor)
+
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = ""  // toolbarTitle is handling title
     }
 
     private fun setToolbarTitle() {
-        supportActionBar?.title = CollectionManager.getCurrentCollectionPictures()[itemPosition].name
+        toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[itemPosition].name
+    }
+
+    override fun buildBottomActions() {
+        super.buildBottomActions()
+
+        // color bar and bar actions
+        bottomActions.background = ColorDrawable(barBackgroundColor)
+        for (touchable in bottomActions.touchables) {
+            if (touchable is ImageButton) {
+                touchable.imageTintList = ColorStateList.valueOf(barIconColor)
+            }
+        }
+
+        // prevent propagation of touch events on bottom action bar
+        bottomActions.setOnTouchListener { _, _ -> true }
+
+        bottomActions.crop.setOnClickListener {
+            startCropActivity()
+        }
+
     }
 
     private fun buildViewPager() {
@@ -116,17 +172,6 @@ class PictureViewActivity : BottomActionsActivity() {
     private fun setPage(position: Int) {
         itemPosition = position
         setToolbarTitle()
-    }
-
-    override fun buildBottomActions() {
-        super.buildBottomActions()
-
-        // prevent propagation of touch events on bottom action bar
-        bottomActions.setOnTouchListener { _, _ -> true }
-
-        bottomActions.crop.setOnClickListener {
-            startCropActivity()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

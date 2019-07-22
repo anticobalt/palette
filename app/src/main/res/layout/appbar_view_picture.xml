@@ -17,6 +17,7 @@ between status bar and toolbar
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@null"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:popupTheme="@style/AppTheme.PopupOverlay">
 
         <TextView
@@ -25,7 +26,6 @@ between status bar and toolbar
             android:layout_height="wrap_content"
             android:textSize="19sp"
             android:fontFamily="sans-serif-medium"
-            android:textColor="@color/white"
             android:ellipsize="middle"
             android:singleLine="true"
             />

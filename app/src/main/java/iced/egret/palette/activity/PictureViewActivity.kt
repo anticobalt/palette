@@ -104,6 +104,10 @@ class PictureViewActivity : BottomActionsActivity() {
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
         appbar.background = ColorDrawable(barBackgroundColor)
 
+        // Universal fix for appbar being behind ImageView due to elevation=0dp in XML.
+        // Setting translationZ=0.1dp doesn't work on some devices (e.g. Nexus5).
+        appbar.bringToFront()
+
         // https://stackoverflow.com/a/33534039
         toolbar.overflowIcon?.setTint(barIconColor)
         toolbar.navigationIcon?.setTint(barIconColor)

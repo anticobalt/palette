@@ -9,7 +9,6 @@ between status bar and toolbar
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@null"
     app:elevation="0dp"
-    android:translationZ="0.1dp"
     android:theme="@style/AppTheme.AppBarOverlay">
 
     <androidx.appcompat.widget.Toolbar

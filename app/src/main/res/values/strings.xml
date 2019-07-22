@@ -20,14 +20,12 @@
     <string name="primary_color_key">com.iced.egret.palette.PRIMARY_COLOR</string>
     <string name="accent_color_key">com.iced.egret.palette.ACCENT_COLOR</string>
     <string name="text_color_key">com.iced.egret.palette.TEXT_COLOR</string>
-    <string name="bg_color_key">com.iced.egret.palette.BG_COLOR</string>
 
     <!-- Preference names -->
     <string name="appearance_header">Appearance</string>
     <string name="primary_color_preference">Primary Color</string>
     <string name="accent_color_preference">Accent Color</string>
     <string name="text_color_preference">Title and Icon Color</string>
-    <string name="bg_color_preference">Background Color</string>
 
     <!-- Actions -->
     <string name="action_settings">Settings</string>

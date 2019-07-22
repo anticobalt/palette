@@ -27,12 +27,11 @@ abstract class BasicAestheticActivity: BaseActivity() {
     }
 
     fun applyTheme(primary: Int? = null, accent: Int? = null,
-                   text: Int? = null, bg: Int? = null) {
+                   text: Int? = null) {
 
         val primaryColor = primary ?: getColor(R.string.primary_color_key, R.color.colorPrimary)
         val accentColor = accent ?: getColor(R.string.accent_color_key, R.color.colorAccent)
         val textColor = text ?: getColor(R.string.text_color_key, R.color.white)
-        val bgColor = bg ?: getColor(R.string.bg_color_key, R.color.space)
 
         Aesthetic.config {
             colorPrimary(literal = primaryColor)

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--
+    Default colors used by Aesthetic on initial install.
+    colorPrimaryDark is a placeholder that has to exist for compiling,
+    but will be replaced by Aesthetic based on the value of colorPrimary.
+    -->
     <color name="colorPrimary">@color/dodger_blue</color>
     <color name="colorPrimaryDark">@color/space</color>
     <color name="colorAccent">@color/fashion_red</color>

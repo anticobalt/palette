@@ -30,7 +30,6 @@ class SettingsActivity : BasicAestheticActivity() {
         var primaryColor : Int? = null
         var accentColor : Int? = null
         var textColor : Int? = null
-        var bgColor : Int? = null
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -42,12 +41,10 @@ class SettingsActivity : BasicAestheticActivity() {
             val primaryColorPref = findColorPreference(getString(R.string.primary_color_key))
             val accentColorPref = findColorPreference(getString(R.string.accent_color_key))
             val textColorPref = findColorPreference(getString(R.string.text_color_key))
-            val bgColorPref = findColorPreference(getString(R.string.bg_color_key))
 
             primaryColor = primaryColorPref.value
             accentColor = accentColorPref.value
             textColor = textColorPref.value
-            bgColor = bgColorPref.value
 
             primaryColorPref.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue is Int) {
@@ -70,13 +67,6 @@ class SettingsActivity : BasicAestheticActivity() {
                 }
                 true
             }
-            bgColorPref.setOnPreferenceChangeListener { _, newValue ->
-                if (newValue is Int) {
-                    bgColor = newValue
-                    applyTheme()
-                }
-                true
-            }
         }
 
         private fun findColorPreference(key: String) : ColorPreferenceCompat {
@@ -84,7 +74,7 @@ class SettingsActivity : BasicAestheticActivity() {
         }
 
         private fun applyTheme() {
-            (this.activity!! as BasicAestheticActivity).applyTheme(primaryColor, accentColor, textColor, bgColor)
+            (this.activity!! as BasicAestheticActivity).applyTheme(primaryColor, accentColor, textColor)
         }
 
     }

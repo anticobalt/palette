@@ -37,14 +37,6 @@
             app:numColumns="6"
             />
 
-        <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            app:key="@string/bg_color_key"
-            app:title="@string/bg_color_preference"
-            app:iconSpaceReserved="false"
-            app:colorChoices="@array/bg_colors"
-            app:numColumns="6"
-            />
-
     </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

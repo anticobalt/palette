@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,13 +26,13 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
-import kotlinx.android.synthetic.main.appbar_main_fragment.view.*
+import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.io.File
 
 
 class CollectionViewFragment :
-        MainFragment(),
+        ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener {
@@ -45,7 +44,6 @@ class CollectionViewFragment :
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
 
     private var mRootView: View? = null
-    private lateinit var mToolbar: Toolbar
     private lateinit var mCollectionRecyclerView: RecyclerView
     private lateinit var mFloatingActionButton: FloatingActionButton
 
@@ -117,9 +115,6 @@ class CollectionViewFragment :
 
     override fun onAllFragmentsCreated() {
         // This fragment is always created last, so this function is not required.
-    }
-
-    override fun applyThemeToAppBar(color: Int) {
     }
 
     /**

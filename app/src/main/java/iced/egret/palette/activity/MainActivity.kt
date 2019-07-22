@@ -11,7 +11,7 @@ import android.os.Bundle
 import androidx.documentfile.provider.DocumentFile
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
-import iced.egret.palette.fragment.MainFragment
+import iced.egret.palette.fragment.ListFragment
 import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -27,7 +27,7 @@ class MainActivity : BasicAestheticActivity() {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    private val finishedFragments = mutableListOf<MainFragment>()
+    private val finishedFragments = mutableListOf<ListFragment>()
     private lateinit var sharedPrefs: SharedPreferences
 
     companion object SaveDataKeys {
@@ -68,7 +68,7 @@ class MainActivity : BasicAestheticActivity() {
      * Note that argument fragment has finished onCreateView(),
      * and thus its views can be indirectly manipulated e.g. via isolateFragment().
      */
-    fun notifyFragmentCreationFinished(finishedFragment: MainFragment) {
+    fun notifyFragmentCreationFinished(finishedFragment: ListFragment) {
         finishedFragments.add(finishedFragment)
         if (finishedFragments.toSet() == MainFragmentManager.fragments.toSet()) {
             for (fragment in finishedFragments) {
@@ -197,7 +197,7 @@ class MainActivity : BasicAestheticActivity() {
                 index = MainFragmentManager.PINNED_COLLECTIONS
             }
 
-            val currentFragment = MainFragmentManager.fragments[index] as MainFragment
+            val currentFragment = MainFragmentManager.fragments[index] as ListFragment
             val success = (currentFragment).onBackPressed()
             if (!success) {
                 moveTaskToBack(true)  // don't destroy
@@ -208,7 +208,7 @@ class MainActivity : BasicAestheticActivity() {
     /**
      * Block click actions for all manipulable fragments except the given one.
      */
-    fun isolateFragment(toIsolateFragment: MainFragment) {
+    fun isolateFragment(toIsolateFragment: ListFragment) {
         for (fragment in finishedFragments) {
             if (fragment != toIsolateFragment) {
                 fragment.setClicksBlocked(true)

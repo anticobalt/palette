@@ -17,7 +17,7 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_crop.*
 import kotlinx.android.synthetic.main.activity_view_picture.bottomActions
-import kotlinx.android.synthetic.main.appbar_main_fragment.*
+import kotlinx.android.synthetic.main.appbar_list_fragment.*
 import kotlinx.android.synthetic.main.bottom_actions_crop.view.*
 import java.io.File
 import java.io.IOException

@@ -7,7 +7,7 @@
     tools:context=".activity.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <include layout="@layout/appbar_main_fragment" />
+    <include layout="@layout/appbar_list_fragment" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

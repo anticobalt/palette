@@ -18,6 +18,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/ratio_free"
         android:text="@string/ratio_free"
+        android:tag=":aesthetic_ignore"
         android:textColor="@color/white" />
 
     <Button
@@ -29,6 +30,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/ratio_1x1"
         android:text="@string/ratio_1x1"
+        android:tag=":aesthetic_ignore"
         android:textColor="@color/white" />
 
     <Button
@@ -40,6 +42,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/ratio_4x3"
         android:text="@string/ratio_4x3"
+        android:tag=":aesthetic_ignore"
         android:textColor="@color/white" />
 
     <Button
@@ -51,6 +54,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/ratio_16x9"
         android:text="@string/ratio_16x9"
+        android:tag=":aesthetic_ignore"
         android:textColor="@color/white" />
 
     <Button
@@ -62,6 +66,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/ratio_reset"
         android:text="@string/ratio_reset"
+        android:tag=":aesthetic_ignore"
         android:textColor="@color/white" />
 
 </LinearLayout>

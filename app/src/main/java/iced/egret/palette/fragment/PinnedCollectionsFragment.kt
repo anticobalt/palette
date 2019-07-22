@@ -2,7 +2,6 @@ package iced.egret.palette.fragment
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
@@ -21,18 +20,14 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
-import kotlinx.android.synthetic.main.appbar_main_fragment.view.*
+import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_pinned_collections.*
 
 class PinnedCollectionsFragment :
-        MainFragment(),
+        ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener {
-
-    override fun applyThemeToAppBar(color: Int) {
-        // TODO
-    }
 
     companion object SaveDataKeys {
         const val selectedType = "PinnedCollectionFragment_ST"
@@ -40,7 +35,6 @@ class PinnedCollectionsFragment :
 
     private var mRootView : View? = null
     private lateinit var mRecyclerView : RecyclerView
-    private lateinit var mToolbar : Toolbar
 
     private var mCollections = mutableListOf<Collection>()
     private var mCollectionItems = mutableListOf<PinnedCollectionsItem>()
@@ -103,6 +97,7 @@ class PinnedCollectionsFragment :
     override fun onResume() {
         super.onResume()
         // Don't refresh if currently selecting stuff
+        // FIXME: redundant if onCreate() was previously called
         if (mSelectedContentType == null) refreshFragment()
     }
 
@@ -117,11 +112,6 @@ class PinnedCollectionsFragment :
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
-        //paintToolbar()
-    }
-
-    private fun paintToolbar() {
-        Painter.paintDrawable(mToolbar.menu.findItem(R.id.actionCreateAlbum).icon)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

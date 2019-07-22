@@ -36,7 +36,7 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recycle_bin)
         fetchContents()
-        buildActionBar()
+        buildToolbar()
         buildRecyclerView()
     }
 
@@ -80,7 +80,7 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         mActionModeHelper.destroyActionModeIfCan()
     }
 
-    private fun buildActionBar() {
+    private fun buildToolbar() {
         mToolbar = findViewById(R.id.toolbar)
         mToolbar.inflateMenu(R.menu.menu_recycle_bin)
         mToolbar.title = getString(R.string.recycle_bin)

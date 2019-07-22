@@ -39,7 +39,7 @@ class CropActivity : BottomActionsActivity() {
         mOptions = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS)
 
         buildCropView()
-        buildActionBar()
+        buildToolbar()
         buildBottomActions()
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -62,7 +62,7 @@ class CropActivity : BottomActionsActivity() {
         }
     }
 
-    private fun buildActionBar() {
+    private fun buildToolbar() {
         toolbar.title = getString(R.string.title_activity_crop)
         toolbar.inflateMenu(R.menu.menu_crop)
         toolbar.setOnMenuItemClickListener {

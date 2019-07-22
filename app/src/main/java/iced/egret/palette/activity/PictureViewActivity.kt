@@ -6,10 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.widget.ImageButton
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
@@ -101,6 +98,8 @@ class PictureViewActivity : BottomActionsActivity() {
 
     private fun buildActionBar() {
 
+        (appbar.layoutParams as ViewGroup.MarginLayoutParams).topMargin = getStatusBarHeight()
+
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
         appbar.background = ColorDrawable(barBackgroundColor)
 
@@ -115,6 +114,14 @@ class PictureViewActivity : BottomActionsActivity() {
 
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""  // toolbarTitle is handling title
+    }
+
+    private fun getStatusBarHeight() : Int {
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resourceId > 0) {
+            resources.getDimensionPixelSize(resourceId)
+        }
+        else 0
     }
 
     private fun setToolbarTitle() {

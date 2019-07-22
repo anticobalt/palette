@@ -26,12 +26,15 @@ abstract class BasicAestheticActivity: BaseActivity() {
         Aesthetic.pause(this)
     }
 
+    /**
+     * Change the theme in response to user action.
+     */
     fun applyTheme(primary: Int? = null, accent: Int? = null,
                    text: Int? = null) {
 
         val primaryColor = primary ?: getColor(R.string.primary_color_key, R.color.colorPrimary)
         val accentColor = accent ?: getColor(R.string.accent_color_key, R.color.colorAccent)
-        val textColor = text ?: getColor(R.string.text_color_key, R.color.white)
+        val textColor = text ?: getColor(R.string.toolbar_item_color_key, R.color.white)
 
         Aesthetic.config {
             colorPrimary(literal = primaryColor)

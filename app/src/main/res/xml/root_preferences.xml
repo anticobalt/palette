@@ -29,8 +29,8 @@
             />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            app:key="@string/text_color_key"
-            app:title="@string/text_color_preference"
+            app:key="@string/toolbar_item_color_key"
+            app:title="@string/toolbar_item_color_preference"
             android:defaultValue="@color/white"
             app:iconSpaceReserved="false"
             app:colorChoices="@array/text_colors"

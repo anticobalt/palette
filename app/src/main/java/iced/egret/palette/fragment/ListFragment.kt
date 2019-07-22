@@ -23,7 +23,7 @@ abstract class ListFragment : Fragment() {
 
     private fun setToolbarTextColor() {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.context)
-        val color = sharedPrefs!!.getInt(getString(R.string.text_color_key), Color.WHITE)
+        val color = sharedPrefs!!.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
         mToolbar.toolbarTitle.setTextColor(color)
     }
 

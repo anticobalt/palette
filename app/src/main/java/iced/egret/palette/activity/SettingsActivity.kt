@@ -29,7 +29,7 @@ class SettingsActivity : BasicAestheticActivity() {
 
         var primaryColor : Int? = null
         var accentColor : Int? = null
-        var textColor : Int? = null
+        var toolbarItemColor : Int? = null
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -40,11 +40,11 @@ class SettingsActivity : BasicAestheticActivity() {
 
             val primaryColorPref = findColorPreference(getString(R.string.primary_color_key))
             val accentColorPref = findColorPreference(getString(R.string.accent_color_key))
-            val textColorPref = findColorPreference(getString(R.string.text_color_key))
+            val toolbarItemColorPref = findColorPreference(getString(R.string.toolbar_item_color_key))
 
             primaryColor = primaryColorPref.value
             accentColor = accentColorPref.value
-            textColor = textColorPref.value
+            toolbarItemColor = toolbarItemColorPref.value
 
             primaryColorPref.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue is Int) {
@@ -60,9 +60,9 @@ class SettingsActivity : BasicAestheticActivity() {
                 }
                 true
             }
-            textColorPref.setOnPreferenceChangeListener { _, newValue ->
+            toolbarItemColorPref.setOnPreferenceChangeListener { _, newValue ->
                 if (newValue is Int) {
-                    textColor = newValue
+                    toolbarItemColor = newValue
                     applyTheme()
                 }
                 true
@@ -74,7 +74,7 @@ class SettingsActivity : BasicAestheticActivity() {
         }
 
         private fun applyTheme() {
-            (this.activity!! as BasicAestheticActivity).applyTheme(primaryColor, accentColor, textColor)
+            (this.activity!! as BasicAestheticActivity).applyTheme(primaryColor, accentColor, toolbarItemColor)
         }
 
     }

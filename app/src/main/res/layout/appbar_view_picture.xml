@@ -23,8 +23,7 @@ between status bar and toolbar
             android:id="@+id/toolbarTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="19sp"
-            android:fontFamily="sans-serif-medium"
+            android:textAppearance="@style/ToolbarTitle"
             android:ellipsize="middle"
             android:singleLine="true"
             />

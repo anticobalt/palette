@@ -4,7 +4,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageButton
@@ -101,7 +101,7 @@ class PictureViewActivity : BottomActionsActivity() {
         (appbar.layoutParams as ViewGroup.MarginLayoutParams).topMargin = getStatusBarHeight()
 
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
-        appbar.background = ColorDrawable(barBackgroundColor)
+        appbar.background = getGradientToTransparent(barBackgroundColor, GradientDrawable.Orientation.TOP_BOTTOM)
 
         // Universal fix for appbar being behind ImageView due to elevation=0dp in XML.
         // Setting translationZ=0.1dp doesn't work on some devices (e.g. Nexus5).
@@ -124,6 +124,17 @@ class PictureViewActivity : BottomActionsActivity() {
         else 0
     }
 
+    /**
+     * E.g. orientation of BOTTOM_TOP with color=red has red on bottom.
+     * @return a linear gradient that can be directly set as view background
+     */
+    private fun getGradientToTransparent(color: Int, orientation: GradientDrawable.Orientation) : GradientDrawable {
+        val colors = intArrayOf(color, Color.TRANSPARENT)
+        val gradientDrawable = GradientDrawable(orientation, colors)
+        gradientDrawable.gradientType = GradientDrawable.LINEAR_GRADIENT
+        return gradientDrawable
+    }
+
     private fun setToolbarTitle() {
         toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[itemPosition].name
     }
@@ -132,7 +143,7 @@ class PictureViewActivity : BottomActionsActivity() {
         super.buildBottomActions()
 
         // color bar and bar actions
-        bottomActions.background = ColorDrawable(barBackgroundColor)
+        bottomActions.background = getGradientToTransparent(Color.BLACK, GradientDrawable.Orientation.BOTTOM_TOP)
         for (touchable in bottomActions.touchables) {
             if (touchable is ImageButton) {
                 touchable.imageTintList = ColorStateList.valueOf(barIconColor)

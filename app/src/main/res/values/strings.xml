@@ -20,12 +20,18 @@
     <string name="primary_color_key">com.iced.egret.palette.PRIMARY_COLOR</string>
     <string name="accent_color_key">com.iced.egret.palette.ACCENT_COLOR</string>
     <string name="toolbar_item_color_key">com.iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
+    <string name="flipper_toolbar_color_key">com.iced.egret.palette.FLIPPER_TOOLBAR_COLOR</string>
 
     <!-- Preference names -->
     <string name="appearance_header">Appearance</string>
     <string name="primary_color_preference">Primary Color</string>
     <string name="accent_color_preference">Accent Color</string>
     <string name="toolbar_item_color_preference">Toolbar Item Color</string>
+    <string name="flipper_header">Picture Flipper</string>
+    <string name="flipper_toolbar_color_preference">Primary Color in Toolbars</string>
+
+    <!-- Preference summaries -->
+    <string name="flipper_toolbar_color_summary">Turn off to use default black color</string>
 
     <!-- Actions -->
     <string name="action_settings">Settings</string>

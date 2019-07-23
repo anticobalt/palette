@@ -39,4 +39,18 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:title="@string/flipper_header"
+        app:iconSpaceReserved="false"
+        >
+
+        <androidx.preference.SwitchPreferenceCompat
+            app:key="@string/flipper_toolbar_color_key"
+            app:title="@string/flipper_toolbar_color_preference"
+            app:summary="@string/flipper_toolbar_color_summary"
+            app:iconSpaceReserved="false"
+            />
+
+    </PreferenceCategory>
+
 </androidx.preference.PreferenceScreen>

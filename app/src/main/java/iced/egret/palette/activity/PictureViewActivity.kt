@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import com.github.piasy.biv.BigImageViewer
@@ -66,9 +67,17 @@ class PictureViewActivity : BottomActionsActivity() {
         }
     }
 
+    /**
+     * Update from Preferences if possible.
+     */
     private fun setColors() {
-        // Update from Preferences if possible
-        barBackgroundColor = sharedPrefs.getInt(getString(R.string.primary_color_key), barBackgroundColor)
+
+        val usePrimary = sharedPrefs.getBoolean(getString(R.string.flipper_toolbar_color_key), false)
+        if (usePrimary) {
+            barBackgroundColor = sharedPrefs.getInt(getString(R.string.primary_color_key),
+                    ContextCompat.getColor(this, R.color.colorPrimary))
+        }  // else use default
+
         barIconColor = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), barIconColor)
 
         // make translucent
@@ -138,7 +147,7 @@ class PictureViewActivity : BottomActionsActivity() {
         super.buildBottomActions()
 
         // color bar and bar actions
-        bottomActions.background = getGradientToTransparent(Color.BLACK, GradientDrawable.Orientation.BOTTOM_TOP)
+        bottomActions.background = getGradientToTransparent(barBackgroundColor, GradientDrawable.Orientation.BOTTOM_TOP)
         for (touchable in bottomActions.touchables) {
             if (touchable is ImageButton) {
                 touchable.imageTintList = ColorStateList.valueOf(barIconColor)

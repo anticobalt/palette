@@ -6,7 +6,9 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.ImageButton
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
@@ -81,24 +83,17 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun buildSystemBars() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        // Prevent extra space below and above status bar and navigation bar, respectively.
+        // https://developer.android.com/reference/kotlin/android/view/Window.html#setstatusbarcolor
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
 
-        // Hack to avoid extra status-bar and navigation-bars's worth of space from initially
-        // showing between status-bar/toolbar and bottom-bar/navigation-bar, respectively.
-        // No idea why it works. Caused by clearing the translucent flags,
-        // which is required setting custom colors.
-        hideSystemUI()
-        showSystemUI()
-
-        window.statusBarColor = barBackgroundColor
-        window.navigationBarColor = barBackgroundColor
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
     }
 
     private fun buildActionBar() {
-
-        (appbar.layoutParams as ViewGroup.MarginLayoutParams).topMargin = getStatusBarHeight()
+        appbar.setPadding(0, getStatusBarHeight(), 0, 0)
 
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
         appbar.background = getGradientToTransparent(barBackgroundColor, GradientDrawable.Orientation.TOP_BOTTOM)
@@ -292,12 +287,13 @@ class PictureViewActivity : BottomActionsActivity() {
     fun toggleUIs() {
         if (uiHidden) {
             showSystemUI()
-            bottomActions.visibility = View.VISIBLE
-            supportActionBar?.show()
+            bottomActions.animate().translationY(0f)
+            appbar.animate().translationY(0f)
         } else {
             hideSystemUI()
-            bottomActions.visibility = View.GONE
-            supportActionBar?.hide()
+            // bottomActions and appbar are padded, so translating by height causes disappearance
+            bottomActions.animate().translationY(bottomActions.height.toFloat())
+            appbar.animate().translationY(-appbar.height.toFloat())
         }
     }
 

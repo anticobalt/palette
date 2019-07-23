@@ -1,6 +1,5 @@
 package iced.egret.palette.activity
 
-import android.view.ViewGroup
 import kotlinx.android.synthetic.main.activity_view_picture.*
 
 /**
@@ -13,7 +12,7 @@ abstract class BottomActionsActivity : BaseActivity() {
      * Should be extended. Bottom action bar MUST be have id "bottomActions".
      */
     protected open fun buildBottomActions() {
-        (bottomActions.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = getNavigationBarHeight()
+        bottomActions.setPadding(0, 0, 0, getNavigationBarHeight())
     }
 
     /**

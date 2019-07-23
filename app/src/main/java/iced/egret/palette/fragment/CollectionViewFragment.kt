@@ -153,20 +153,16 @@ class CollectionViewFragment :
      * Hooks up adapter and LayoutManager to RecyclerView
      */
     private fun buildRecyclerView() {
-        if (mContents.isNotEmpty()) {
+        val orientation = resources.configuration.orientation
+        val numColumns = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 5 else 3
+        val manager = GridLayoutManager(activity, numColumns)
 
-            val orientation = resources.configuration.orientation
-            val numColumns = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 5 else 3
-            val manager = GridLayoutManager(activity, numColumns)
+        fetchContents()
+        adapter = FlexibleAdapter(mContentItems, this, true)
+        initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
 
-            fetchContents()
-            adapter = FlexibleAdapter(mContentItems, this, true)
-            initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
-
-            mCollectionRecyclerView.layoutManager = manager
-            mCollectionRecyclerView.adapter = adapter
-
-        }
+        mCollectionRecyclerView.layoutManager = manager
+        mCollectionRecyclerView.adapter = adapter
     }
 
     /**

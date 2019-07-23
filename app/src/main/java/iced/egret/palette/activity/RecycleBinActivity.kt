@@ -94,8 +94,6 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
     }
 
     private fun buildRecyclerView() {
-        if (mContents.isEmpty()) return
-
         val orientation = resources.configuration.orientation
         val numColumns = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 5 else 3
         val manager = GridLayoutManager(this, numColumns)

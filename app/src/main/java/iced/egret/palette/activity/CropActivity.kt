@@ -3,10 +3,13 @@ package iced.egret.palette.activity
 import android.app.Activity
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Pair
 import android.view.MenuItem
+import android.widget.Button
 import androidx.preference.PreferenceManager
 import com.afollestad.aesthetic.Aesthetic
 import com.theartofdev.edmodo.cropper.CropImage
@@ -33,6 +36,7 @@ class CropActivity : BottomActionsActivity() {
         Aesthetic.attach(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crop)
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         val bundle = intent.getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE)
         mImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE)
@@ -41,8 +45,6 @@ class CropActivity : BottomActionsActivity() {
         buildCropView()
         buildToolbar()
         buildBottomActions()
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
     override fun onResume() {
@@ -76,6 +78,17 @@ class CropActivity : BottomActionsActivity() {
 
     override fun buildBottomActions() {
         super.buildBottomActions()
+
+        // color bar and bar actions
+        val barBgColor = sharedPreferences.getInt(getString(R.string.primary_color_key), Color.BLACK)
+        val barTextColor = sharedPreferences.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
+        bottomActions.background = ColorDrawable(barBgColor)
+        for (touchable in bottomActions.touchables) {
+            if (touchable is Button) {
+                touchable.setTextColor(barTextColor)
+            }
+        }
+
         bottomActions.ratio_free.setOnClickListener {
             // FIXME: side-effect: crop window fills whole screen if set from true to false
             cropImageView.setFixedAspectRatio(false)

@@ -145,6 +145,7 @@ class PictureViewActivity : BottomActionsActivity() {
 
     override fun buildBottomActions() {
         super.buildBottomActions()
+        bottomActions.setPadding(0, 0, 0, getNavigationBarHeight())
 
         // color bar and bar actions
         bottomActions.background = getGradientToTransparent(barBackgroundColor, GradientDrawable.Orientation.BOTTOM_TOP)

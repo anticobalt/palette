@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.widget.TextView
+import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
@@ -173,8 +174,9 @@ object DialogGenerator {
     }
 
     fun pictureDetails(context: Context, picture: Picture) {
-        val dialog = MaterialDialog(context, BottomSheet())
-        dialog.customView(R.layout.content_bottomsheet_picture_details)
+        val dialog = MaterialDialog(context, BottomSheet(LayoutMode.WRAP_CONTENT))
+        dialog.cornerRadius(res = R.dimen.bottom_sheet_corner_radius)
+        dialog.customView(R.layout.content_bottomsheet_picture_details, horizontalPadding = true)
         populateWithMetadata(dialog.getCustomView(), picture)
         dialog.show()
     }

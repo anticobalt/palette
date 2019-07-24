@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_path"
+            android:textStyle="bold"
             />
 
         <TextView
@@ -22,6 +23,10 @@
             />
 
     </LinearLayout>
+    
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,6 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_type"
+            android:textStyle="bold"
             />
 
         <TextView
@@ -42,6 +48,10 @@
             />
 
     </LinearLayout>
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -53,6 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_size"
+            android:textStyle="bold"
             />
 
         <TextView
@@ -62,6 +73,10 @@
             />
 
     </LinearLayout>
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,6 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_dimensions"
+            android:textStyle="bold"
             />
 
         <TextView
@@ -82,6 +98,10 @@
             />
 
     </LinearLayout>
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -93,6 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_orientation"
+            android:textStyle="bold"
             />
 
         <TextView
@@ -102,6 +123,10 @@
             />
 
     </LinearLayout>
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -113,6 +138,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_modified"
+            android:textStyle="bold"
             />
 
         <TextView
@@ -122,6 +148,10 @@
             />
 
     </LinearLayout>
+
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -133,6 +163,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/title_created"
+            android:textStyle="bold"
             />
 
         <TextView

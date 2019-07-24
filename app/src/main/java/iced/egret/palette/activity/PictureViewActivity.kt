@@ -196,6 +196,12 @@ class PictureViewActivity : BottomActionsActivity() {
         })
     }
 
+    private fun refreshViewPager() {
+        val currentPage = viewpager.currentItem
+        viewpager.adapter = viewpager.adapter
+        viewpager.currentItem = currentPage
+    }
+
     private fun setPage(position: Int) {
         itemPosition = position
         setToolbarTitle()
@@ -206,10 +212,23 @@ class PictureViewActivity : BottomActionsActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val deepZoomOn = sharedPrefs.getBoolean(getString(R.string.deep_zoom_key), false)
+        val deepZoomItem = menu.findItem(R.id.switchDeepZoom)
+        deepZoomItem.isChecked = deepZoomOn
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retVal = when (item?.itemId) {
             android.R.id.home -> {
                 onBackPressed()
+                true
+            }
+            R.id.switchDeepZoom -> {
+                item.isChecked = !item.isChecked
+                sharedPrefs.edit().putBoolean(getString(R.string.deep_zoom_key), item.isChecked).apply()
+                refreshViewPager()
                 true
             }
             R.id.actionMove -> {

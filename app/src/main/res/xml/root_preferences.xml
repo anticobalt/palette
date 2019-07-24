@@ -51,6 +51,13 @@
             app:iconSpaceReserved="false"
             />
 
+        <androidx.preference.SwitchPreferenceCompat
+            app:key="@string/deep_zoom_key"
+            app:title="@string/deep_zoom_title"
+            app:summary="@string/deep_zoom_summary"
+            app:iconSpaceReserved="false"
+            />
+
     </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

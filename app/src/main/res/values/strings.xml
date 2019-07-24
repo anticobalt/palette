@@ -95,6 +95,15 @@
     <string name="folder_empty">Folder is empty!</string>
     <string name="confirm">Okay</string>
 
+    <!-- For picture details -->
+    <string name="title_path">File Path</string>
+    <string name="title_type">File Type</string>
+    <string name="title_size">File Size</string>
+    <string name="title_dimensions">Dimensions</string>
+    <string name="title_orientation">Orientation</string>
+    <string name="title_modified">Last Modified</string>
+    <string name="title_created">Creation Date</string>
+
     <!-- For selections -->
     <string name="action_selected_one">%1$d item selected</string>
     <string name="action_selected_many">%1$d items selected</string>

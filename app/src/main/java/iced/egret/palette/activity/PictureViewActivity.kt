@@ -158,6 +158,9 @@ class PictureViewActivity : BottomActionsActivity() {
         // prevent propagation of touch events on bottom action bar
         bottomActions.setOnTouchListener { _, _ -> true }
 
+        bottomActions.details.setOnClickListener {
+            DialogGenerator.pictureDetails(this, mPictures[itemPosition])
+        }
         bottomActions.crop.setOnClickListener {
             startCropActivity()
         }

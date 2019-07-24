@@ -1,9 +1,15 @@
 package iced.egret.palette.util
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.view.View
+import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.files.FileFilter
 import com.afollestad.materialdialogs.files.folderChooser
 import com.afollestad.materialdialogs.input.getInputField
@@ -12,6 +18,7 @@ import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
+import iced.egret.palette.model.Picture
 import java.io.File
 
 /**
@@ -163,6 +170,24 @@ object DialogGenerator {
                 onConfirm()
             }
         }
+    }
+
+    fun pictureDetails(context: Context, picture: Picture) {
+        val dialog = MaterialDialog(context, BottomSheet())
+        dialog.customView(R.layout.content_bottomsheet_picture_details)
+        populateWithMetadata(dialog.getCustomView(), picture)
+        dialog.show()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun populateWithMetadata(view: View, picture: Picture) {
+        view.findViewById<TextView>(R.id.path).text = picture.filePath
+        view.findViewById<TextView>(R.id.type).text = picture.mimeType
+        view.findViewById<TextView>(R.id.size).text = picture.fileSize
+        view.findViewById<TextView>(R.id.dimensions).text = "${picture.width} x ${picture.height}"
+        view.findViewById<TextView>(R.id.orientation).text = picture.orientation.toString()
+        view.findViewById<TextView>(R.id.modified).text = picture.lastModifiedDate
+        view.findViewById<TextView>(R.id.created).text = picture.createdDate
     }
 
 }

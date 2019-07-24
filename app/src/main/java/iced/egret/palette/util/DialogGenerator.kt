@@ -186,7 +186,7 @@ object DialogGenerator {
         view.findViewById<TextView>(R.id.type).text = picture.mimeType
         view.findViewById<TextView>(R.id.size).text = picture.fileSize
         view.findViewById<TextView>(R.id.dimensions).text = "${picture.width} x ${picture.height}"
-        view.findViewById<TextView>(R.id.orientation).text = picture.orientation.toString()
+        view.findViewById<TextView>(R.id.orientation).text = picture.orientation
         view.findViewById<TextView>(R.id.modified).text = picture.lastModifiedDate
         view.findViewById<TextView>(R.id.created).text = picture.createdDate
     }

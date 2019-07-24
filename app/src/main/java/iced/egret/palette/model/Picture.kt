@@ -80,8 +80,12 @@ class Picture(override var name: String, override var filePath: String) : Termin
             BitmapFactory.decodeFile(filePath, options)
             return options.outWidth
         }
-    val orientation: Int
-        get() = ExifInterface(filePath).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+    val orientation: String
+        get() {
+            val rawInt = ExifInterface(filePath).getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED)
+            return parseOrientation(rawInt)
+        }
 
     val lastModifiedDate: String
         get() {
@@ -114,6 +118,21 @@ class Picture(override var name: String, override var filePath: String) : Termin
         val date = parser.parse(stamp)
         parser.applyPattern(returnFormat)
         return parser.format(date)
+    }
+
+    private fun parseOrientation(rawInt: Int) : String {
+        return when (rawInt) {
+            ExifInterface.ORIENTATION_NORMAL -> "Normal"
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> "Flipped horizontally"
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> "Flipped vertically"
+            ExifInterface.ORIENTATION_ROTATE_90 -> "Rotated 90 degrees clockwise"
+            ExifInterface.ORIENTATION_ROTATE_180 -> "Rotated 180 degrees"
+            ExifInterface.ORIENTATION_ROTATE_270 -> "Rotated 90 degrees counterclockwise"
+            ExifInterface.ORIENTATION_TRANSPOSE -> "Flipped top-left to bottom-right"
+            ExifInterface.ORIENTATION_TRANSVERSE -> "Flipped top-right to bottom-left"
+            else -> "Not specified"
+        }
+
     }
 
     override fun toString() = name

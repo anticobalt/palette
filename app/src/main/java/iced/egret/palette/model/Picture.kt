@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import androidx.exifinterface.media.ExifInterface
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
@@ -159,7 +160,16 @@ class Picture(override var name: String, override var filePath: String) : Termin
     }
 
     fun loadPictureInto(imageView: ImageView) {
-        val glide = Glide.with(imageView.context).load(uri)
+        val progressDrawable = CircularProgressDrawable(imageView.context)
+        progressDrawable.strokeWidth = 5f
+        progressDrawable.centerRadius = 40f
+        progressDrawable.start()
+
+        val glide = Glide
+                .with(imageView.context)
+                .load(uri)
+                .placeholder(progressDrawable)
+
         buildGlideImage(glide, imageView, uri)
     }
 

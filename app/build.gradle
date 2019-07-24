@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.github.piasy:BigImageViewer:1.5.7'
     implementation 'com.github.piasy:GlideImageLoader:1.5.7'
+    implementation 'com.github.piasy:GlideImageViewFactory:1.5.7'
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.afollestad.material-dialogs:core:3.0.0-rc3'

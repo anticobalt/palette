@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.PagerAdapter
+import com.github.piasy.biv.view.GlideImageViewFactory
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
 import iced.egret.palette.model.Picture
@@ -35,50 +36,60 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
 
     /**
      * BigImageViews (or SSIVs) are not compatible with GestureViews, so use both
-     * ImageView and BigImageView, depending on whether deep zoom is required or not.
+     * GestureImageView and BigImageView, depending on whether true zoom is required or not.
      */
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
 
-        val deepZoomOn = PreferenceManager
+        val trueZoomOn = PreferenceManager
                 .getDefaultSharedPreferences(activityReference.get())
-                .getBoolean(activityReference.get()?.getString(R.string.deep_zoom_key), false)
+                .getBoolean(activityReference.get()?.getString(R.string.true_zoom_key), false)
 
-        // Set layout
-        val layoutItem = if (deepZoomOn) {
-            LayoutInflater
+        // Set layout and build ImageView
+        val layoutItem : View
+        if (trueZoomOn) {
+            layoutItem = LayoutInflater
                     .from(container.context)
                     .inflate(R.layout.item_view_picture_big, container, false)
+            buildBigImageView(layoutItem, pictures[position])
         } else {
-            LayoutInflater
+            layoutItem = LayoutInflater
                     .from(container.context)
                     .inflate(R.layout.item_view_picture_gestures, container, false)
-        }
-
-        // Build ImageView; each needs its own onClickListener
-        if (deepZoomOn) {
-            val bigImageView = layoutItem.bigImageView
-            bigImageView.showImage(pictures[position].uri)
-            // Reset touch listener; GestureView controller sets its own, which prevents
-            // coherent scrolling of BigImageViews.
-            activityReference.get()?.viewpager?.setOnTouchListener(DummyTouchListener())
-            bigImageView.setOnClickListener {
-                activityReference.get()?.toggleUIs()
-            }
-        } else {
-            val gestureImageView = layoutItem.gestureImageView
-            pictures[position].loadPictureInto(gestureImageView)
-            gestureImageView.controller.settings.isRotationEnabled = true
-            gestureImageView.controller.settings.isRestrictRotation = true
-            // Allow scrolling when zoomed in
-            gestureImageView.controller.enableScrollInViewPager(activityReference.get()?.viewpager)
-            gestureImageView.setOnClickListener {
-                activityReference.get()?.toggleUIs()
-            }
+            buildGestureImageView(layoutItem, pictures[position])
         }
 
         container.addView(layoutItem)
         return layoutItem
 
+    }
+
+    private fun buildBigImageView(layoutItem: View, picture: Picture) {
+        val bigImageView = layoutItem.bigImageView
+        bigImageView.setImageViewFactory(GlideImageViewFactory())
+        bigImageView.showImage(picture.uri)
+
+        // Reset touch listener; GestureView controller sets its own, which prevents
+        // coherent scrolling of BigImageViews.
+        activityReference.get()?.viewpager?.setOnTouchListener(DummyTouchListener())
+
+        bigImageView.setOnClickListener {
+            activityReference.get()?.toggleUIs()
+        }
+    }
+
+    private fun buildGestureImageView(layoutItem: View, picture: Picture) {
+        val gestureImageView = layoutItem.gestureImageView
+        picture.loadPictureInto(gestureImageView)
+
+        gestureImageView.controller.settings.isRotationEnabled = true
+        gestureImageView.controller.settings.isRestrictRotation = true
+
+        // Allow scrolling when zoomed in
+        gestureImageView.controller.enableScrollInViewPager(activityReference.get()?.viewpager)
+
+        gestureImageView.setOnClickListener {
+            activityReference.get()?.toggleUIs()
+        }
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {

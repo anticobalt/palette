@@ -215,9 +215,9 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val deepZoomOn = sharedPrefs.getBoolean(getString(R.string.deep_zoom_key), false)
-        val deepZoomItem = menu.findItem(R.id.switchDeepZoom)
-        deepZoomItem.isChecked = deepZoomOn
+        val trueZoomOn = sharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
+        val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
+        trueZoomItem.isChecked = trueZoomOn
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -227,9 +227,9 @@ class PictureViewActivity : BottomActionsActivity() {
                 onBackPressed()
                 true
             }
-            R.id.switchDeepZoom -> {
+            R.id.switchTrueZoom -> {
                 item.isChecked = !item.isChecked
-                sharedPrefs.edit().putBoolean(getString(R.string.deep_zoom_key), item.isChecked).apply()
+                sharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
                 refreshViewPager()
                 true
             }

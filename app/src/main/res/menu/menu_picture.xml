@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/switchDeepZoom"
-        android:title="@string/switch_deep_zoom"
+        android:id="@+id/switchTrueZoom"
+        android:title="@string/switch_true_zoom"
         android:checkable="true"
         app:showAsAction="never" />
 

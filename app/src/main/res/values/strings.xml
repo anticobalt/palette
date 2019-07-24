@@ -21,7 +21,7 @@
     <string name="accent_color_key">com.iced.egret.palette.ACCENT_COLOR</string>
     <string name="toolbar_item_color_key">com.iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
     <string name="flipper_toolbar_color_key">com.iced.egret.palette.FLIPPER_TOOLBAR_COLOR</string>
-    <string name="deep_zoom_key">com.iced.egret.palette.DEEP_ZOOM</string>
+    <string name="true_zoom_key">com.iced.egret.palette.TRUE_ZOOM</string>
 
     <!-- Preference names -->
     <string name="appearance_header">Appearance</string>
@@ -30,13 +30,12 @@
     <string name="toolbar_item_color_preference">Toolbar Item Color</string>
     <string name="flipper_header">Picture Flipper</string>
     <string name="flipper_toolbar_color_preference">Primary Color in Toolbars</string>
-    <string name="deep_zoom_title">Deep Zoomable Pictures</string>
+    <string name="true_zoom_title">True Zoom</string>
 
     <!-- Preference summaries -->
     <string name="flipper_toolbar_color_summary">Turn off to use default black color</string>
-    <string name="deep_zoom_summary">
-        Allows large pictures to be viewed clearly (and may improve performance with some pictures),
-        but disables rotation gesture
+    <string name="true_zoom_summary">
+        Show pictures as-is. Enabling allows large images to be viewed clearly. May improve performance. Disables rotation gestures.
     </string>
 
     <!-- Actions -->
@@ -60,7 +59,7 @@
     <string name="action_restore">Restore</string>
 
     <!-- Menu switches/checkboxes -->
-    <string name="switch_deep_zoom">Deep Zoom</string>
+    <string name="switch_true_zoom">True Zoom</string>
 
     <!-- Strings indicate what buttons or objects represent -->
     <string name="label_album_actions">Album Actions</string>

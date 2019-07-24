@@ -12,10 +12,10 @@ import iced.egret.palette.recyclerview_component.CoverViewHolder
 import java.io.File
 
 interface Coverable {
-    val terminal : Boolean
-    var name : String
-    val cover : MutableMap<String, *>
-    val icon : Int?
+    val terminal: Boolean
+    var name: String
+    val cover: MutableMap<String, *>
+    val icon: Int?
     fun loadCoverInto(holder: CoverViewHolder)
 
     /**
@@ -38,7 +38,7 @@ interface Coverable {
      * Getting MIME type: https://stackoverflow.com/a/12473985
      * Getting orientation: https://stackoverflow.com/a/20480741
      */
-    private fun createMediaStoreSignature(context: Context, imageReference: Any?) : MediaStoreSignature? {
+    private fun createMediaStoreSignature(context: Context, imageReference: Any?): MediaStoreSignature? {
         if (imageReference is Uri) {
             val file = File(imageReference.path)
             val mimeType = context.contentResolver.getType(imageReference)

@@ -57,7 +57,7 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
      * and discard those not found in storage.
      */
     private fun discardOutdatedContents() {
-        val freshUris = Storage.recycleBin.contents.map{ c -> c.uri}.toSet()
+        val freshUris = Storage.recycleBin.contents.map { c -> c.uri }.toSet()
         val toDiscardItems = mutableListOf<CollectionViewItem>()
         val toDiscardContents = mutableListOf<Picture>()
 
@@ -131,7 +131,7 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
     // Return true to continue with Action Mode
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
 
-        val selected = mAdapter.selectedPositions.map {i -> mContents[i]}
+        val selected = mAdapter.selectedPositions.map { i -> mContents[i] }
 
         val typePlural = CollectionManager.PICTURE_KEY.toLowerCase()
         val typeSingular = typePlural.dropLast(1)  // only works on s-appending plurals

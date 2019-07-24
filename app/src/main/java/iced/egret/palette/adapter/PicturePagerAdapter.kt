@@ -64,8 +64,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
             bigImageView.setOnClickListener {
                 activityReference.get()?.toggleUIs()
             }
-        }
-        else {
+        } else {
             val gestureImageView = layoutItem.gestureImageView
             pictures[position].loadPictureInto(gestureImageView)
             gestureImageView.controller.settings.isRotationEnabled = true

@@ -14,7 +14,7 @@ class StoicViewPager(context: Context, attributeSet: AttributeSet? = null) : Vie
     override fun onTouchEvent(ev: MotionEvent?): Boolean {
         try {
             return super.onTouchEvent(ev)
-        } catch (e : IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             e.printStackTrace()
         }
         return false

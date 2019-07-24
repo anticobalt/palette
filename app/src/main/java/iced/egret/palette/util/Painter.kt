@@ -75,8 +75,7 @@ object Painter {
 
         if (strength == null) {
             imageView.colorFilter = null
-        }
-        else {
+        } else {
             imageView.setColorFilter(strength, android.graphics.PorterDuff.Mode.MULTIPLY)
         }
     }

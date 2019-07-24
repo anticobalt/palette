@@ -6,14 +6,12 @@
         android:orderInCategory="1"
         android:icon="@drawable/ic_add_black_24dp"
         android:title="@string/action_create_album"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/gotoSettings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never"
-        />
+        app:showAsAction="never" />
 
 </menu>

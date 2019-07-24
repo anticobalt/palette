@@ -25,19 +25,26 @@ import java.util.*
  * - cover
  * - icon
  * - activity
+ * - mimeType
+ * - fileSize
+ * - height
+ * - width
+ * - orientation
+ * - lastModifiedDate
+ * - createdDate
  */
 class Picture(override var name: String, override var filePath: String) : TerminalCoverable, FileObject {
 
     // Getters computed lazily, so that changing path doesn't break everything
-    private val file : File
+    private val file: File
         get() = File(filePath)
-    val uri : Uri
+    val uri: Uri
         get() = Uri.fromFile(file)
     val fileLocation
         get() = filePath.removeSuffix(name).removeSuffix("/")
 
     override val terminal = true
-    override val cover : MutableMap<String, Uri>
+    override val cover: MutableMap<String, Uri>
         get() = mutableMapOf(
                 "uri" to uri
         )
@@ -48,7 +55,7 @@ class Picture(override var name: String, override var filePath: String) : Termin
     override val deletable = true
 
     // Image Properties
-    val mimeType : String
+    val mimeType: String
         get() {
             // Tries to get type from actual file instead of reading off the extension
             // https://stackoverflow.com/a/19739471
@@ -57,49 +64,51 @@ class Picture(override var name: String, override var filePath: String) : Termin
             BitmapFactory.decodeFile(filePath, options)
             return options.outMimeType
         }
-    val fileSize : String
+    val fileSize: String
         get() = parseFileSize(file.length())
-    val height : Int
+    val height: Int
         get() {
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true  // don't allocate memory for pixels
             BitmapFactory.decodeFile(filePath, options)
             return options.outHeight
         }
-    val width : Int
+    val width: Int
         get() {
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true  // don't allocate memory for pixels
             BitmapFactory.decodeFile(filePath, options)
             return options.outWidth
         }
-    val orientation : Int
+    val orientation: Int
         get() = ExifInterface(filePath).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-    val lastModifiedDate : String
+
+    val lastModifiedDate: String
         get() {
             val stamp = Date(file.lastModified()).toString()
             return parseDateStamp(stamp, "EEE MMM dd HH:mm:ss zzz yyyy")
         }
-    val createdDate : String
+    val createdDate: String
         get() {
-            val stamp = ExifInterface(filePath).getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL) ?: return "Unknown"
+            val stamp = ExifInterface(filePath).getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
+                    ?: return "Unknown"
             return parseDateStamp(stamp, "yyyy:MM:dd HH:mm:ss")
         }
 
-    private fun parseFileSize(bytes: Long) : String {
+    private fun parseFileSize(bytes: Long): String {
         val format = "%.2f"
         return when {
             bytes < 1024 -> "$bytes B"
-            bytes < 1024*1024 -> String.format(format, bytes/1024.toDouble()) + " KB"
-            bytes < 1024*1024*1024 -> String.format(format, bytes/(1024*1024.toDouble())) + " MB"
-            else -> String.format(format, bytes/(1024*1024*1024.toDouble())) + " GB"
+            bytes < 1024 * 1024 -> String.format(format, bytes / 1024.toDouble()) + " KB"
+            bytes < 1024 * 1024 * 1024 -> String.format(format, bytes / (1024 * 1024.toDouble())) + " MB"
+            else -> String.format(format, bytes / (1024 * 1024 * 1024.toDouble())) + " GB"
         }
     }
 
     /**
      * https://stackoverflow.com/a/20815893
      */
-    private fun parseDateStamp(stamp: String, format: String) : String {
+    private fun parseDateStamp(stamp: String, format: String): String {
         val returnFormat = "EEE, MMM dd, yyyy @ HH:mm:ss zzz"  // e.g. Thu, Apr 6, 2000 @ 17:45:21 UTC
         val parser = SimpleDateFormat(format, Locale.getDefault())
         val date = parser.parse(stamp)

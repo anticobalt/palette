@@ -27,9 +27,9 @@ class SettingsActivity : BasicAestheticActivity() {
 
     class SettingsFragment : PreferenceFragmentCompat() {
 
-        var primaryColor : Int? = null
-        var accentColor : Int? = null
-        var toolbarItemColor : Int? = null
+        var primaryColor: Int? = null
+        var accentColor: Int? = null
+        var toolbarItemColor: Int? = null
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -69,7 +69,7 @@ class SettingsActivity : BasicAestheticActivity() {
             }
         }
 
-        private fun findColorPreference(key: String) : ColorPreferenceCompat {
+        private fun findColorPreference(key: String): ColorPreferenceCompat {
             return findPreference<ColorPreferenceCompat>(key)!!
         }
 

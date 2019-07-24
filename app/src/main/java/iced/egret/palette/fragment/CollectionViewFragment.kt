@@ -361,7 +361,7 @@ class CollectionViewFragment :
     }
 
     private fun selectAll() {
-        adapter.currentItems.map {item -> item.setSelection(true)}
+        adapter.currentItems.map { item -> item.setSelection(true) }
         adapter.selectAll()
         mActionModeHelper.updateContextTitle(adapter.selectedItemCount)
     }

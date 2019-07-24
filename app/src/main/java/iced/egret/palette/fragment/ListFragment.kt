@@ -19,7 +19,7 @@ abstract class ListFragment : Fragment() {
 
     abstract fun setClicksBlocked(doBlock: Boolean)
     abstract fun onAllFragmentsCreated()
-    abstract fun onBackPressed() : Boolean
+    abstract fun onBackPressed(): Boolean
 
     private fun setToolbarTextColor() {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.context)

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 A copy of crop_image_menu from Android-Image_Cropper
 (https://github.com/ArthurHub/Android-Image-Cropper)
 -->
@@ -11,22 +10,20 @@ A copy of crop_image_menu from Android-Image_Cropper
         android:id="@+id/crop_image_menu_rotate_right"
         android:icon="@drawable/crop_image_menu_rotate_right"
         android:title="@string/crop_image_menu_rotate_right"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/crop_image_menu_flip"
         android:icon="@drawable/crop_image_menu_flip"
         android:title="@string/crop_image_menu_flip"
-        app:showAsAction="ifRoom"
-        >
+        app:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/crop_image_menu_flip_horizontally"
-                android:title="@string/crop_image_menu_flip_horizontally"/>
+                android:title="@string/crop_image_menu_flip_horizontally" />
             <item
                 android:id="@+id/crop_image_menu_flip_vertically"
-                android:title="@string/crop_image_menu_flip_vertically"/>
+                android:title="@string/crop_image_menu_flip_vertically" />
         </menu>
     </item>
 
@@ -34,7 +31,6 @@ A copy of crop_image_menu from Android-Image_Cropper
         android:id="@+id/crop_image_menu_crop"
         android:icon="@drawable/checkmark_black"
         android:title="@string/crop_image_menu_crop"
-        app:showAsAction="always"
-        />
+        app:showAsAction="always" />
 
 </menu>

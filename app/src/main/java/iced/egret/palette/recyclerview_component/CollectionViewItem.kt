@@ -23,7 +23,8 @@ class CollectionViewItem(obj: Coverable) : CoverableItem(obj) {
      * Turn indicator on or off based on current visibility
      */
     override fun toggleSelection() {
-        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark) ?: return
+        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark)
+                ?: return
         if (statusView.visibility == View.GONE) setSelection(true)
         else setSelection(false)
     }

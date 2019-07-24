@@ -27,7 +27,7 @@ import java.io.IOException
 
 class CropActivity : BottomActionsActivity() {
 
-    private lateinit var sharedPreferences : SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
 
     private lateinit var mImageUri: Uri
     private lateinit var mOptions: CropImageOptions

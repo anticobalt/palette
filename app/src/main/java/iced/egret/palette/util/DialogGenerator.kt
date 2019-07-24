@@ -30,15 +30,14 @@ object DialogGenerator {
     fun createAlbum(context: Context, albumExists: (CharSequence) -> Boolean, onConfirm: (CharSequence) -> Unit) {
         MaterialDialog(context).show {
             title(R.string.title_album_form)
-            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH, waitForPositiveButton = false) {
-                dialog, text ->
-                    val isValid = !albumExists(text)
-                    dialog.getInputField().error = if (isValid) {
-                        null
-                    } else {
-                        "Album with name already exists"
-                    }
-                    dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
+            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH, waitForPositiveButton = false) { dialog, text ->
+                val isValid = !albumExists(text)
+                dialog.getInputField().error = if (isValid) {
+                    null
+                } else {
+                    "Album with name already exists"
+                }
+                dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
             }
             positiveButton(R.string.action_create_album) {
                 onConfirm(this.getInputField().text)
@@ -105,8 +104,8 @@ object DialogGenerator {
 
     fun nameFile(context: Context, name: String?, onConfirm: (CharSequence) -> Unit) {
 
-        var nameWithoutExtension : String? = null
-        var extension : String? = null
+        var nameWithoutExtension: String? = null
+        var extension: String? = null
         val parts = name?.split(".")
 
         // names with periods are fair game
@@ -142,10 +141,10 @@ object DialogGenerator {
     }
 
     fun moveFile(context: Context, onConfirm: (File) -> Unit) {
-        val filter: FileFilter = {it.path.startsWith("/storage")}
+        val filter: FileFilter = { it.path.startsWith("/storage") }
         MaterialDialog(context).show {
-            folderChooser(emptyTextRes = R.string.folder_empty, filter = filter) {
-                dialog, file -> onConfirm(file)
+            folderChooser(emptyTextRes = R.string.folder_empty, filter = filter) { dialog, file ->
+                onConfirm(file)
             }
             negativeButton()
         }

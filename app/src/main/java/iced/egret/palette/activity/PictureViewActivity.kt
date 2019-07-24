@@ -28,9 +28,9 @@ import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
 
 class PictureViewActivity : BottomActionsActivity() {
 
-    private lateinit var sharedPrefs : SharedPreferences
-    private var barBackgroundColor : Int = Color.BLACK
-    private var barIconColor : Int = Color.WHITE
+    private lateinit var sharedPrefs: SharedPreferences
+    private var barBackgroundColor: Int = Color.BLACK
+    private var barIconColor: Int = Color.WHITE
 
     private var uiHidden = false
     private var itemPosition = -1
@@ -85,7 +85,7 @@ class PictureViewActivity : BottomActionsActivity() {
         barIconColor = getTranslucentColor(barIconColor)
     }
 
-    private fun getTranslucentColor(color: Int) : Int {
+    private fun getTranslucentColor(color: Int): Int {
         val sixDigitHex = String.format("%06X", 0xFFFFFF and color)  // https://stackoverflow.com/a/6540378
         val translucency = "B3"  // 70% opacity
         return Color.parseColor("#$translucency$sixDigitHex")
@@ -120,19 +120,18 @@ class PictureViewActivity : BottomActionsActivity() {
         supportActionBar?.title = ""  // toolbarTitle is handling title
     }
 
-    private fun getStatusBarHeight() : Int {
+    private fun getStatusBarHeight(): Int {
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         return if (resourceId > 0) {
             resources.getDimensionPixelSize(resourceId)
-        }
-        else 0
+        } else 0
     }
 
     /**
      * E.g. orientation of BOTTOM_TOP with color=red has red on bottom.
      * @return a linear gradient that can be directly set as view background
      */
-    private fun getGradientToTransparent(color: Int, orientation: GradientDrawable.Orientation) : GradientDrawable {
+    private fun getGradientToTransparent(color: Int, orientation: GradientDrawable.Orientation): GradientDrawable {
         val colors = intArrayOf(color, Color.TRANSPARENT)
         val gradientDrawable = GradientDrawable(orientation, colors)
         gradientDrawable.gradientType = GradientDrawable.LINEAR_GRADIENT

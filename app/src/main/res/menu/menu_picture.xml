@@ -6,19 +6,16 @@
         android:id="@+id/switchDeepZoom"
         android:title="@string/switch_deep_zoom"
         android:checkable="true"
-        app:showAsAction="never"
-        />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/actionMove"
         android:title="@string/action_move"
-        app:showAsAction="never"
-        />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/actionRename"
         android:title="@string/action_rename"
-        app:showAsAction="never"
-        />
+        app:showAsAction="never" />
 
 </menu>

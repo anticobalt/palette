@@ -11,8 +11,8 @@ object MainFragmentManager {
     const val COLLECTION_CONTENTS = 1
     const val NUM_FRAGMENTS = 2
 
-    private lateinit var nativeFragmentManager : FragmentManager
-    var fragments : Array<Fragment> = Array(NUM_FRAGMENTS) { Fragment() }
+    private lateinit var nativeFragmentManager: FragmentManager
+    var fragments: Array<Fragment> = Array(NUM_FRAGMENTS) { Fragment() }
         private set
 
     fun setup(fm: FragmentManager) {
@@ -26,7 +26,7 @@ object MainFragmentManager {
 
     fun updateFragments(fragments: List<Fragment>) {
         loop@ for (fragment in fragments) {
-            val index : Int = when (fragment) {
+            val index: Int = when (fragment) {
                 is PinnedCollectionsFragment -> PINNED_COLLECTIONS
                 is CollectionViewFragment -> COLLECTION_CONTENTS
                 else -> continue@loop

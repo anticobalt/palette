@@ -9,11 +9,11 @@ import eu.davidea.flexibleadapter.items.IFlexible
 import eu.davidea.viewholders.FlexibleViewHolder
 import iced.egret.palette.R
 
-class CoverViewHolder(view : View,
+class CoverViewHolder(view: View,
                       adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>)
     : FlexibleViewHolder(view, adapter) {
 
-    val tvItem : TextView? = view.findViewById(R.id.label)
-    val ivItem : ImageView? = view.findViewById(R.id.cover)
+    val tvItem: TextView? = view.findViewById(R.id.label)
+    val ivItem: ImageView? = view.findViewById(R.id.cover)
 
 }

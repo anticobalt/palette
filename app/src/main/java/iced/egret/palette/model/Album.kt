@@ -27,16 +27,16 @@ class Album(name: String, path: String) : Collection(name, path) {
 
     override val icon = R.drawable.ic_photo_album_black_24dp
 
-    override var _pictures : MutableList<Picture> = ArrayList()
-    override val pictures : List<Picture>
+    override var _pictures: MutableList<Picture> = ArrayList()
+    override val pictures: List<Picture>
         get() = _pictures
 
-    private var _albums : MutableList<Album> = ArrayList()
-    val albums : List<Album>
+    private var _albums: MutableList<Album> = ArrayList()
+    val albums: List<Album>
         get() = _albums
 
-    private var _folders : MutableList<Folder> = ArrayList()
-    val folders : List<Folder>
+    private var _folders: MutableList<Folder> = ArrayList()
+    val folders: List<Folder>
         get() = _folders
 
     override val contentsMap: Map<String, List<Coverable>>
@@ -60,7 +60,7 @@ class Album(name: String, path: String) : Collection(name, path) {
             return rs
         }
 
-    fun toDataClass() : AlbumData {
+    fun toDataClass(): AlbumData {
         val picturePaths = pictures.map { picture -> picture.filePath }
         val foldersData = folders.map { folder -> folder.toDataClass() }
         val albumsData = albums.map { album -> album.toDataClass() }
@@ -77,7 +77,7 @@ class Album(name: String, path: String) : Collection(name, path) {
         return null
     }
 
-    private fun getCollections() : List<Collection> {
+    private fun getCollections(): List<Collection> {
         return ((albums as List<Collection>) + (folders as List<Collection>))
     }
 
@@ -130,7 +130,7 @@ class Album(name: String, path: String) : Collection(name, path) {
     }
 
     fun removeAlbums(albums: List<Album>) {
-        albums.map {album -> removeAlbum(album) }
+        albums.map { album -> removeAlbum(album) }
     }
 
 }

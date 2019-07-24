@@ -28,15 +28,15 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
     : Collection(name, filePath), FileObject {
 
     override val icon = R.drawable.ic_folder_black_24dp
-    override val deletable : Boolean
+    override val deletable: Boolean
         get() = _folders.size + _pictures.size == 0
 
-    override var _pictures : MutableList<Picture> = ArrayList()
-    override val pictures : List<Picture>
+    override var _pictures: MutableList<Picture> = ArrayList()
+    override val pictures: List<Picture>
         get() = _pictures
 
-    private var _folders : MutableList<Folder> = subFolders
-    val folders : List<Folder>
+    private var _folders: MutableList<Folder> = subFolders
+    val folders: List<Folder>
         get() = _folders
 
     override val contentsMap: Map<String, List<Coverable>>
@@ -60,13 +60,13 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
         size = folders.size
     }
 
-    fun toDataClass() : FolderData {
+    fun toDataClass(): FolderData {
         val picturePaths = pictures.map { picture -> picture.filePath }
         val subFolders = folders.map { folder -> folder.toDataClass() }
         return FolderData(name, path, subFolders, picturePaths)
     }
 
-    override fun getOnePictureUri() : Uri? {
+    override fun getOnePictureUri(): Uri? {
         if (pictures.isNotEmpty()) {
             return pictures[0].uri
         } else if (folders.isNotEmpty()) {
@@ -116,7 +116,7 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
      *
      * @return Success or failure. Fails if object initialized with non-Folder parent.
      */
-    private fun delete() : Boolean {
+    private fun delete(): Boolean {
         val parentAsFolder = parent as? Folder ?: return false
         parentAsFolder.removeFolder(this)
         parent = null

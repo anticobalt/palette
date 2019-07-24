@@ -25,16 +25,18 @@ import eu.davidea.flexibleadapter.utils.Log
  * more advanced visual selection than the ones provided by FlexibleUtils.
  */
 open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
-                              @MenuRes cabMenu: Int,
-                              callback: ActionMode.Callback? = null) : ActionMode.Callback {
+                                   @MenuRes cabMenu: Int,
+                                   callback: ActionMode.Callback? = null) : ActionMode.Callback {
 
-    @Mode private var defaultMode = Mode.IDLE
-    @MenuRes private var mCabMenu: Int = cabMenu
+    @Mode
+    private var defaultMode = Mode.IDLE
+    @MenuRes
+    private var mCabMenu: Int = cabMenu
     private var disableSwipe: Boolean = false
-    private var disableDrag:Boolean = false
+    private var disableDrag: Boolean = false
     private var longPressDragDisabledByHelper: Boolean = false
     private var handleDragDisabledByHelper: Boolean = false
-    private var swipeDisabledByHelper :Boolean = false
+    private var swipeDisabledByHelper: Boolean = false
     private var mAdapter: FlexibleAdapter<*> = adapter
     private val mCallback: ActionMode.Callback? = callback
     var mActionMode: ActionMode? = null

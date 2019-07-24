@@ -27,15 +27,15 @@ abstract class Collection(override var name: String, val path: String) : Coverab
     abstract val pictures: List<Picture>  // external
 
     abstract val contentsMap: Map<String, List<Coverable>>
-    abstract val totalSize : Int
+    abstract val totalSize: Int
     var size = 0
         protected set
 
-    fun isEmpty() : Boolean {
+    fun isEmpty(): Boolean {
         return size == 0
     }
 
-    fun isNotEmpty() : Boolean {
+    fun isNotEmpty(): Boolean {
         return !isEmpty()
     }
 
@@ -46,7 +46,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
     override fun loadCoverInto(holder: CoverViewHolder) {
         if (holder.ivItem != null) {
             setCoverUri()
-            val imageReference : Any? = if (cover["uri"] != null) {
+            val imageReference: Any? = if (cover["uri"] != null) {
                 cover["uri"]
             } else {
                 cover["id"]
@@ -67,10 +67,10 @@ abstract class Collection(override var name: String, val path: String) : Coverab
     }
 
 
-    abstract fun getContents() : List<Coverable>
+    abstract fun getContents(): List<Coverable>
 
-    fun findPictureByPath(path: String) : Picture? {
-        return _pictures.find {picture -> picture.filePath == path}
+    fun findPictureByPath(path: String): Picture? {
+        return _pictures.find { picture -> picture.filePath == path }
     }
 
     open fun addPicture(newPicture: Picture, toFront: Boolean = false, position: Int? = null) {
@@ -81,6 +81,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
         }
         size += 1
     }
+
     open fun addPictures(newPictures: List<Picture>) {
         _pictures.addAll(newPictures)
         size += newPictures.size
@@ -100,6 +101,6 @@ abstract class Collection(override var name: String, val path: String) : Coverab
         }
     }
 
-    abstract fun getOnePictureUri() : Uri?
+    abstract fun getOnePictureUri(): Uri?
 
 }

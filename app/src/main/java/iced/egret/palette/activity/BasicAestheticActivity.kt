@@ -6,9 +6,9 @@ import androidx.preference.PreferenceManager
 import com.afollestad.aesthetic.Aesthetic
 import iced.egret.palette.R
 
-abstract class BasicAestheticActivity: BaseActivity() {
+abstract class BasicAestheticActivity : BaseActivity() {
 
-    private lateinit var sharedPreferences : SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Aesthetic.attach(this)
@@ -49,7 +49,7 @@ abstract class BasicAestheticActivity: BaseActivity() {
 
     }
 
-    private fun getColor(resource: Int, defaultColor: Int) : Int {
+    private fun getColor(resource: Int, defaultColor: Int): Int {
         return sharedPreferences.getInt(getString(resource), defaultColor)
     }
 

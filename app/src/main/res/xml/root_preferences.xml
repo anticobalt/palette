@@ -3,8 +3,7 @@
 
     <PreferenceCategory
         app:title="@string/appearance_header"
-        app:iconSpaceReserved="false"
-        >
+        app:iconSpaceReserved="false">
 
         <!--
         Didn't use normal Preference + MaterialDialogs ColorPicker because
@@ -16,8 +15,7 @@
             android:defaultValue="@color/colorPrimary"
             app:iconSpaceReserved="false"
             app:colorChoices="@array/theme_colors"
-            app:numColumns="6"
-            />
+            app:numColumns="6" />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
             app:key="@string/accent_color_key"
@@ -25,8 +23,7 @@
             android:defaultValue="@color/colorAccent"
             app:iconSpaceReserved="false"
             app:colorChoices="@array/theme_colors"
-            app:numColumns="6"
-            />
+            app:numColumns="6" />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
             app:key="@string/toolbar_item_color_key"
@@ -34,29 +31,25 @@
             android:defaultValue="@color/white"
             app:iconSpaceReserved="false"
             app:colorChoices="@array/text_colors"
-            app:numColumns="6"
-            />
+            app:numColumns="6" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:title="@string/flipper_header"
-        app:iconSpaceReserved="false"
-        >
+        app:iconSpaceReserved="false">
 
         <androidx.preference.SwitchPreferenceCompat
             app:key="@string/flipper_toolbar_color_key"
             app:title="@string/flipper_toolbar_color_preference"
             app:summary="@string/flipper_toolbar_color_summary"
-            app:iconSpaceReserved="false"
-            />
+            app:iconSpaceReserved="false" />
 
         <androidx.preference.SwitchPreferenceCompat
             app:key="@string/deep_zoom_key"
             app:title="@string/deep_zoom_title"
             app:summary="@string/deep_zoom_summary"
-            app:iconSpaceReserved="false"
-            />
+            app:iconSpaceReserved="false" />
 
     </PreferenceCategory>
 

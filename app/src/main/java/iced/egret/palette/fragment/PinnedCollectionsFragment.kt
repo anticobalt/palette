@@ -33,15 +33,15 @@ class PinnedCollectionsFragment :
         const val selectedType = "PinnedCollectionFragment_ST"
     }
 
-    private var mRootView : View? = null
-    private lateinit var mRecyclerView : RecyclerView
+    private var mRootView: View? = null
+    private lateinit var mRecyclerView: RecyclerView
 
     private var mCollections = mutableListOf<Collection>()
     private var mCollectionItems = mutableListOf<PinnedCollectionsItem>()
 
     lateinit var adapter: FlexibleAdapter<PinnedCollectionsItem>
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
-    private var mSelectedContentType : String? = null
+    private var mSelectedContentType: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
@@ -118,8 +118,8 @@ class PinnedCollectionsFragment :
 
         val context = context!!
 
-        fun albumExists(name: CharSequence) : Boolean {
-            val found = CollectionManager.albums.find {album -> album.name == name.toString() }
+        fun albumExists(name: CharSequence): Boolean {
+            val found = CollectionManager.albums.find { album -> album.name == name.toString() }
             return found != null
         }
 
@@ -211,7 +211,7 @@ class PinnedCollectionsFragment :
     override fun onDestroyActionMode(mode: ActionMode) {
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
-        adapter.currentItems.map { item -> item.setSelection(false)}
+        adapter.currentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
@@ -226,8 +226,7 @@ class PinnedCollectionsFragment :
 
         return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, clickedItem)
-        }
-        else {
+        } else {
             openCollectionViewPanel(absolutePosition)
             false
         }
@@ -259,7 +258,7 @@ class PinnedCollectionsFragment :
      * All positions refer to arrangement before click handling.
      */
     override fun onItemLongClick(absolutePosition: Int) {
-        val relativePosition : Int
+        val relativePosition: Int
 
         // Isolate the content type BEFORE ActionMode is created, so that the correct
         // relative position can be noted by the ActionModeHelper (instead of global position,
@@ -269,14 +268,13 @@ class PinnedCollectionsFragment :
             isolateContent(mSelectedContentType!!)
             // adapter only holds one type now, so global == relative
             relativePosition = adapter.getGlobalPositionOf(mCollectionItems[absolutePosition])
-        }
-        else {
+        } else {
             relativePosition = absolutePosition
         }
         mActionModeHelper.onLongClick(mToolbar, relativePosition, mCollectionItems[absolutePosition])
     }
 
-    private fun inferContentType(collection: Collection) : String? {
+    private fun inferContentType(collection: Collection): String? {
         return when (collection) {
             is Folder -> CollectionManager.FOLDER_KEY
             is Album -> CollectionManager.ALBUM_KEY
@@ -287,19 +285,19 @@ class PinnedCollectionsFragment :
     /**
      * Get one collection with type name provided, if one exists
      */
-    private fun getInstanceOfType(typeName: String) : Collection? {
+    private fun getInstanceOfType(typeName: String): Collection? {
         val type = when (typeName) {
             CollectionManager.FOLDER_KEY -> Folder::class.java
             CollectionManager.ALBUM_KEY -> Album::class.java
             else -> return null
         }
-        return mCollections.find {collection -> collection.javaClass == type }
+        return mCollections.find { collection -> collection.javaClass == type }
     }
 
     /**
      * Get all collections with same type as parameter, including the parameter
      */
-    private fun getAllOfSameType(collection: Collection) : List<Collection> {
+    private fun getAllOfSameType(collection: Collection): List<Collection> {
         val typeList = mutableListOf<Collection>()
         for (c in mCollections) {
             if (c.javaClass == collection.javaClass) {
@@ -342,7 +340,7 @@ class PinnedCollectionsFragment :
     }
 
     private fun selectAll() {
-        adapter.currentItems.map {item -> item.setSelection(true)}
+        adapter.currentItems.map { item -> item.setSelection(true) }
         adapter.selectAll()
         mActionModeHelper.updateContextTitle(adapter.selectedItemCount)
     }
@@ -351,8 +349,7 @@ class PinnedCollectionsFragment :
         if (doBlock) {
             recyclerView.visibility = View.GONE
             blocker.visibility = View.VISIBLE
-        }
-        else {
+        } else {
             recyclerView.visibility = View.VISIBLE
             blocker.visibility = View.GONE
         }

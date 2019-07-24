@@ -462,7 +462,7 @@ object CollectionManager {
         return failCounter
     }
 
-    fun deletePictures(pictures: List<Picture>) : Int {
+    fun deletePictures(pictures: List<Picture>): Int {
         var failCounter = 0
         for (picture in pictures) {
             if (!Storage.deleteFileFromRecycleBin(picture.filePath, null)) failCounter += 1

@@ -8,11 +8,11 @@ data class AlbumData(val name: String,
                      val foldersData: List<FolderData>,
                      val albumsData: List<AlbumData>) : Serializable {
 
-    fun toFullClass(existingPictures: Map<String, Picture> = mapOf()) : Album {
+    fun toFullClass(existingPictures: Map<String, Picture> = mapOf()): Album {
 
         val album = Album(name, path)
-        val folders = foldersData.map {data -> data.toFullClass() } as MutableList<Folder>
-        val albums = albumsData.map {data -> data.toFullClass() } as MutableList<Album>
+        val folders = foldersData.map { data -> data.toFullClass() } as MutableList<Folder>
+        val albums = albumsData.map { data -> data.toFullClass() } as MutableList<Album>
         val pictures = arrayListOf<Picture>()
 
         for (path in picturePaths) {

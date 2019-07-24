@@ -19,7 +19,6 @@
 
     <include
         layout="@layout/bottom_actions_view_picture"
-        android:id="@+id/bottomActions"
-        />
+        android:id="@+id/bottomActions" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

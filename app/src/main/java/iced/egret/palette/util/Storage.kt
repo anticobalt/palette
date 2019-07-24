@@ -23,8 +23,8 @@ object Storage {
     private const val albumsFileName = "albums.json"
 
     private var ready = false
-    private lateinit var fileDirectory : File
-    lateinit var recycleBin : RecycleBin
+    private lateinit var fileDirectory: File
+    lateinit var recycleBin: RecycleBin
         private set
 
     val retrievedFolders = mutableListOf<Folder>()
@@ -37,10 +37,10 @@ object Storage {
         val name = "recycle-bin"
         private val locationsName = "recycle-restore-locations"
         val file = File(directory, name)
-        val valid : Boolean
+        val valid: Boolean
             get() = file.isDirectory && file.canRead()
-        val contents : List<Picture>
-            get() = file.listFiles().map {file -> Picture(file.path.split("/").last(), file.path) }
+        val contents: List<Picture>
+            get() = file.listFiles().map { file -> Picture(file.path.split("/").last(), file.path) }
         val oldLocations = mutableMapOf<String, String>()
 
         init {
@@ -51,6 +51,7 @@ object Storage {
             cleanLocations()
             saveJsonToDisk(gson.toJson(oldLocations), locationsName)
         }
+
         fun loadLocationsFromDisk() {
             val json = readJsonFromDisk(locationsName) ?: return
             val type = object : TypeToken<HashMap<String, String>>() {}.type
@@ -84,7 +85,7 @@ object Storage {
      * Gets images from Android's default gallery API
      * API access stuff from https://stackoverflow.com/a/36815451
      */
-     private fun getPictureFoldersMediaStore(activity: Activity) : ArrayList<Folder> {
+    private fun getPictureFoldersMediaStore(activity: Activity): ArrayList<Folder> {
 
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val cursor: Cursor?
@@ -98,11 +99,11 @@ object Storage {
 
         val rootLevelIndex = 0
         var absolutePathOfImage: String
-        var pathLevels : List<String>
-        var rootPath : String
-        var parentFolder : Folder?
-        var childFolder : Folder?
-        var folderPath : String
+        var pathLevels: List<String>
+        var rootPath: String
+        var parentFolder: Folder?
+        var childFolder: Folder?
+        var folderPath: String
 
         while (cursor.moveToNext()) {
 
@@ -124,7 +125,7 @@ object Storage {
 
                 folderPath = pathLevels.subList(0, levelInt + 1).joinToString("/")
 
-                childFolder = parentFolder!!.folders.find {folder -> folder.filePath == folderPath}
+                childFolder = parentFolder!!.folders.find { folder -> folder.filePath == folderPath }
                 if (childFolder == null) {
                     childFolder = Folder(level, folderPath, parent = parentFolder)
                     parentFolder.addFolder(childFolder)
@@ -165,12 +166,12 @@ object Storage {
         saveJsonToDisk(json, albumsFileName)
     }
 
-    fun getAlbumsFromDisk() : MutableList<Album> {
+    fun getAlbumsFromDisk(): MutableList<Album> {
         val json = readJsonFromDisk(albumsFileName)
         val type = object : TypeToken<ArrayList<AlbumData>>() {}.type
         if (json != null) {
             val albumsData = gson.fromJson<ArrayList<AlbumData>>(json, type)
-            val albums  = ArrayList<Album>()
+            val albums = ArrayList<Album>()
             for (data in albumsData) {
                 val album = data.toFullClass(existingPictures = retrievedPictures)
                 albums.add(album)
@@ -187,7 +188,7 @@ object Storage {
         saveJsonToDisk(json, rootCacheFileName)
     }
 
-    fun getFolderFromDisk() : Folder? {
+    fun getFolderFromDisk(): Folder? {
         val json = readJsonFromDisk(rootCacheFileName)
         if (json != null) {
             val rootData = gson.fromJson(json, FolderData::class.java)
@@ -199,31 +200,29 @@ object Storage {
     private fun saveJsonToDisk(json: String, fileName: String) {
         try {
             File(fileDirectory, fileName).writeText(json)
-        }
-        catch (e : FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             File(fileDirectory, fileName).createNewFile()
             File(fileDirectory, fileName).writeText(json)
         }
     }
 
-    private fun readJsonFromDisk(fileName: String) : String? {
+    private fun readJsonFromDisk(fileName: String): String? {
         return try {
             File(fileDirectory, fileName).bufferedReader().readText()
-        }
-        catch (e : FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             Log.i("collection-manager", "couldn't find $fileName when trying to read")
             null
         }
     }
 
     fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String,
-                         sdCardFile: DocumentFile?, contentResolver: ContentResolver) : File? {
+                         sdCardFile: DocumentFile?, contentResolver: ContentResolver): File? {
 
         val extension = name.split(".").last().toLowerCase()
         val path = location + name
         val file = File(path)
         val locationOnSdCard = pathOnSdCard(location)
-        val outStream : OutputStream
+        val outStream: OutputStream
 
         val compressionFormat = when (extension) {
             "png" -> Bitmap.CompressFormat.PNG
@@ -236,8 +235,7 @@ object Storage {
         if (locationOnSdCard != null && sdCardFile != null) {
             outStream = getSdOutputStream(name, locationOnSdCard, "image/webp", sdCardFile, contentResolver)
                     ?: return null
-        }
-        else {
+        } else {
             try {
                 outStream = FileOutputStream(file)
             } catch (accessDenied: FileNotFoundException) {
@@ -258,7 +256,7 @@ object Storage {
      * @return Old and new file if successfully moved, null otherwise
      */
     fun moveFile(sourcePath: String, destinationParent: File, sdCardFile: DocumentFile?,
-                 contentResolver: ContentResolver?, newName: String? = null) : Pair<File, File>? {
+                 contentResolver: ContentResolver?, newName: String? = null): Pair<File, File>? {
         val sourceFile = File(sourcePath)
         val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver, newName)
                 ?: return null
@@ -273,7 +271,7 @@ object Storage {
      * @return The copy of the File, or null if failed.
      */
     fun copyFile(sourceFile: File, destinationParent: File, sdCardFile: DocumentFile?,
-                 contentResolver: ContentResolver?, newName: String? = null) : File? {
+                 contentResolver: ContentResolver?, newName: String? = null): File? {
 
         val name = newName ?: sourceFile.name
         val destinationLocation = destinationParent.path.removeSuffix("/") + "/"
@@ -285,8 +283,7 @@ object Storage {
         if (destinationOnSdCard != null && sdCardFile != null && contentResolver != null) {
             outStream = getSdOutputStream(name, destinationOnSdCard, "image/webp", sdCardFile, contentResolver)
                     ?: return null
-        }
-        else {
+        } else {
             try {
                 outStream = FileOutputStream(copy)
             } catch (accessDenied: FileNotFoundException) {
@@ -304,13 +301,13 @@ object Storage {
      *
      * @return True if deleted, false if not.
      */
-    private fun deleteFile(sourceFile: File, sdCardFile: DocumentFile?) : Boolean {
+    private fun deleteFile(sourceFile: File, sdCardFile: DocumentFile?): Boolean {
         val pathOnSdCard = pathOnSdCard(sourceFile.path)
         if (pathOnSdCard != null && sdCardFile != null) {
-            val sourceDocumentFile = findFileInsideRecursive(sdCardFile, pathOnSdCard) ?: return false
+            val sourceDocumentFile = findFileInsideRecursive(sdCardFile, pathOnSdCard)
+                    ?: return false
             return sourceDocumentFile.delete()
-        }
-        else {
+        } else {
             return sourceFile.delete()
         }
     }
@@ -319,7 +316,7 @@ object Storage {
      * Try to move to recycle bin. Abort if move fails.
      * @return Old and new file if successfully moved, null otherwise
      */
-    fun moveFileToRecycleBin(sourcePath: String, sdCardFile: DocumentFile?) : Pair<File, File>? {
+    fun moveFileToRecycleBin(sourcePath: String, sdCardFile: DocumentFile?): Pair<File, File>? {
         val newName = getUniqueNameInRecycleBin(sourcePath.split("/").last())
         // Pair<Original, New>
         val files = moveFile(sourcePath, recycleBin.file, sdCardFile, null, newName)
@@ -329,7 +326,7 @@ object Storage {
     }
 
     fun restoreFileFromRecycleBin(pathInBin: String, sdCardFile: DocumentFile?,
-                                  contentResolver: ContentResolver) : Pair<File, File>? {
+                                  contentResolver: ContentResolver): Pair<File, File>? {
 
         val nameInBin = pathInBin.split("/").last()
         val oldPath = recycleBin.oldLocations[nameInBin] ?: return null
@@ -351,7 +348,7 @@ object Storage {
     /**
      * @return True if deleted, false if not.
      */
-    fun deleteFileFromRecycleBin(path: String, sdCardFile: DocumentFile?) : Boolean {
+    fun deleteFileFromRecycleBin(path: String, sdCardFile: DocumentFile?): Boolean {
         val file = File(path)
         val success = deleteFile(file, sdCardFile)
         recycleBin.oldLocations.remove(file.name)
@@ -362,7 +359,7 @@ object Storage {
      * @param name The filename (e.g. myImage.png) or whole path (e.g. /path/to/myImage.png)
      * @param location The folder the file sits in (e.g. /path/to)
      */
-    fun fileExists(name: String, location: String = "") : Boolean {
+    fun fileExists(name: String, location: String = ""): Boolean {
         val file = File(location + name)
         return file.exists()
     }
@@ -370,7 +367,7 @@ object Storage {
     /**
      * Make unique name in case two files with same name in recycle bin.
      */
-    private fun getUniqueNameInRecycleBin(originalName: String) : String {
+    private fun getUniqueNameInRecycleBin(originalName: String): String {
         var name = originalName
         var counter = 1
         while (fileExists(name, recycleBin.file.path)) {
@@ -386,21 +383,22 @@ object Storage {
         outputStream.close()
     }
 
-    private fun isPathOnSdCard(path: String) : Boolean {
+    private fun isPathOnSdCard(path: String): Boolean {
         return pathOnSdCard(path) != null
     }
 
-    private fun pathOnSdCard(path: String) : String? {
+    private fun pathOnSdCard(path: String): String? {
         // At start of string, match "/storage/" + any 4 alphanumerics + a dash + any 4 alphanumerics + "/"
         val regex = Regex("^/storage/[a-zA-z0-9]{4}-[a-zA-z0-9]{4}/")
         val sdCardLocation = regex.find(path)?.value ?: return null
         return path.removePrefix(sdCardLocation).removeSuffix("/")
     }
 
-    private fun getSdOutputStream(name: String, locationOnSdCard: String, defaultMimeType : String,
-                                  sdCardFile: DocumentFile, contentResolver: ContentResolver) : OutputStream? {
+    private fun getSdOutputStream(name: String, locationOnSdCard: String, defaultMimeType: String,
+                                  sdCardFile: DocumentFile, contentResolver: ContentResolver): OutputStream? {
         val extension = name.split(".").last().toLowerCase()
-        val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: defaultMimeType
+        val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+                ?: defaultMimeType
         val subFolderFile = findFileInsideRecursive(sdCardFile, locationOnSdCard) ?: return null
         val imageFile = getChildFile(subFolderFile, mimeType, name) ?: return null
         return contentResolver.openOutputStream(imageFile.uri) ?: return null
@@ -411,7 +409,7 @@ object Storage {
      *
      * @return The desired DocumentFile, or null if not found.
      */
-    private fun findFileInsideRecursive(rootFile: DocumentFile, relativePath: String) : DocumentFile? {
+    private fun findFileInsideRecursive(rootFile: DocumentFile, relativePath: String): DocumentFile? {
 
         // splitting empty string will still produce list with one element
         if (relativePath.isEmpty()) {
@@ -431,7 +429,7 @@ object Storage {
      *
      * @return The desired DocumentFile, or null if it doesn't exist and couldn't be created.
      */
-    private fun getChildFile(subFolderFile: DocumentFile, mimeType: String, name: String) : DocumentFile? {
+    private fun getChildFile(subFolderFile: DocumentFile, mimeType: String, name: String): DocumentFile? {
         return subFolderFile.findFile(name) ?: subFolderFile.createFile(mimeType, name)
     }
 

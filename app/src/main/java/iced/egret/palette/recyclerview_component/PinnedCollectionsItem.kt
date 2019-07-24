@@ -35,7 +35,8 @@ class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
      * Turn indicator on or off based on current visibility
      */
     override fun toggleSelection() {
-        val selectView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark) ?: return
+        val selectView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark)
+                ?: return
         if (selectView.visibility == View.INVISIBLE) setSelection(true)
         else setSelection(false)
     }
@@ -49,7 +50,8 @@ class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
      */
     override fun setSelection(selected: Boolean) {
         isSelected = selected
-        val selectView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark) ?: return
+        val selectView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark)
+                ?: return
 
         if (selected) {
             selectView.visibility = View.VISIBLE

@@ -5,16 +5,22 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.annotation.RequiresApi
 import androidx.documentfile.provider.DocumentFile
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import iced.egret.palette.model.*
 import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 object Storage {
@@ -215,14 +221,20 @@ object Storage {
         }
     }
 
+    /**
+     * Save bitmap to specified location with specified name.
+     * Created date and orientation are also set if image is JPG;
+     * this metadata editing process differs based on API version.
+     *
+     * https://stackoverflow.com/a/46755279
+     *
+     * @param location Has trailing file separator (i.e. "/")
+     */
     fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String,
                          sdCardFile: DocumentFile?, contentResolver: ContentResolver): File? {
 
         val extension = name.split(".").last().toLowerCase()
-        val path = location + name
-        val file = File(path)
-        val locationOnSdCard = pathOnSdCard(location)
-        val outStream: OutputStream
+        val file: File
 
         val compressionFormat = when (extension) {
             "png" -> Bitmap.CompressFormat.PNG
@@ -230,11 +242,73 @@ object Storage {
             else -> Bitmap.CompressFormat.JPEG
         }
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+
+            // If JPG and API < 24: need to write to temp file, then move it
+            if (compressionFormat == Bitmap.CompressFormat.JPEG) {
+                val tempFile = saveRawBitmap(bitmap, name, compressionFormat)
+                setJpegMetadata(tempFile)
+                val files = moveFile(tempFile.path, File(location), sdCardFile, contentResolver)
+                        ?: return null
+                file = files.second  // new file
+            }
+            // If not JPG and API < 24: no metadata writing, so save normally
+            else {
+                saveRawBitmapToLocation(bitmap, name, compressionFormat, location, sdCardFile, contentResolver)
+                        ?: return null
+                file = File(location + name)
+            }
+
+        }
+        // Else, API >= 24: save bitmap and set metadata freely as required
+        else {
+
+            val fileDescriptor =
+                    saveRawBitmapToLocation(bitmap, name, compressionFormat, location, sdCardFile, contentResolver)
+                            ?: return null
+            if (compressionFormat == Bitmap.CompressFormat.JPEG) setJpegMetadata(fileDescriptor)
+            file = File(location + name)
+
+        }
+
+        return file
+
+    }
+
+    /**
+     * Save bitmap without metadata to app storage.
+     */
+    private fun saveRawBitmap(bitmap: Bitmap, name: String, compressionFormat: Bitmap.CompressFormat): File {
+        val file = File(fileDirectory.path.removeSuffix("/") + "/temp/$name")
+        file.parentFile.mkdirs()
+
+        // Save as max quality
+        val outputStream = FileOutputStream(file)
+        bitmap.compress(compressionFormat, 100, outputStream)
+        outputStream.close()
+
+        return file
+    }
+
+    /**
+     * Save bitmap without metadata to specified location.
+     */
+    private fun saveRawBitmapToLocation(bitmap: Bitmap, name: String, compressionFormat: Bitmap.CompressFormat,
+                                        location: String, sdCardFile: DocumentFile?,
+                                        contentResolver: ContentResolver): FileDescriptor? {
+
+        val path = location + name
+        val file = File(path)
+        var documentFile: DocumentFile? = null
+        val locationOnSdCard = pathOnSdCard(location)
+        val outStream: OutputStream
+
         // If saving to SD card and can do it, do it. Otherwise try to save normally.
         // https://stackoverflow.com/a/43317703
         if (locationOnSdCard != null && sdCardFile != null) {
-            outStream = getSdOutputStream(name, locationOnSdCard, "image/webp", sdCardFile, contentResolver)
+            documentFile = getImageDocumentFile(name, locationOnSdCard, "image/webp", sdCardFile, contentResolver)
                     ?: return null
+            outStream = contentResolver.openOutputStream(documentFile.uri) ?: return null
         } else {
             try {
                 outStream = FileOutputStream(file)
@@ -243,11 +317,16 @@ object Storage {
             }
         }
 
-        // save as max quality
+        // Save as max quality
         bitmap.compress(compressionFormat, 100, outStream)
         outStream.close()
 
-        return file
+        // Get ParcelFileDescriptor
+        val parcelFd = if (documentFile == null) {
+            contentResolver.openFileDescriptor(Uri.fromFile(file), "rw") ?: return null
+        } else contentResolver.openFileDescriptor(documentFile.uri, "rw") ?: return null
+
+        return parcelFd.fileDescriptor
 
     }
 
@@ -278,21 +357,23 @@ object Storage {
         val destinationOnSdCard = pathOnSdCard(destinationLocation)
         val inStream = FileInputStream(sourceFile)
         val outStream: OutputStream
-        val copy = File(destinationLocation + name)
+        val copyAsFile = File(destinationLocation + name)
+        val copyAsDocumentFile: DocumentFile
 
         if (destinationOnSdCard != null && sdCardFile != null && contentResolver != null) {
-            outStream = getSdOutputStream(name, destinationOnSdCard, "image/webp", sdCardFile, contentResolver)
+            copyAsDocumentFile = getImageDocumentFile(name, destinationOnSdCard, "image/webp", sdCardFile, contentResolver)
                     ?: return null
+            outStream = contentResolver.openOutputStream(copyAsDocumentFile.uri) ?: return null
         } else {
             try {
-                outStream = FileOutputStream(copy)
+                outStream = FileOutputStream(copyAsFile)
             } catch (accessDenied: FileNotFoundException) {
                 return null
             }
         }
 
         copyStreams(inStream, outStream)
-        return copy
+        return copyAsFile
     }
 
     /**
@@ -383,6 +464,54 @@ object Storage {
         outputStream.close()
     }
 
+    /**
+     * Set JPG metadata for specified File.
+     *
+     * @param tags Attribute name and value pairs; if null, default values are set.
+     */
+    private fun setJpegMetadata(file: File, tags: Map<String, String>? = null) {
+        setAttributes(ExifInterface(file.path), tags)
+    }
+
+    /**
+     * Set JPG metadata for specified FileDescriptor, which can be stand-in for a DocumentFile.
+     * Uses non-support version of ExifInterface because support ver. doesn't have FileDescriptor
+     * constructor. Need to use FileDescriptor to edit SD card files.
+     *
+     * @param tags Attribute name and value pairs; if null, default values are set.
+     */
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun setJpegMetadata(fileDescriptor: FileDescriptor, tags: Map<String, String>? = null) {
+        setAttributes(ExifInterface(fileDescriptor), tags)
+    }
+
+    private fun setAttributes(exifInterface: ExifInterface, tags: Map<String, String>?) {
+
+        if (tags == null) {
+            val dtString = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault())
+                    .format(Calendar.getInstance().time)
+
+            exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL.toString())
+            exifInterface.setAttribute(ExifInterface.TAG_DATETIME, dtString)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                exifInterface.setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, dtString)
+            }
+
+        } else {
+            for (tag in tags) {
+                try {
+                    exifInterface.setAttribute(tag.key, tag.value)
+                } catch (e: Exception) {
+                    // If attribute doesn't exist or API version not high enough
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        exifInterface.saveAttributes()
+    }
+
     private fun isPathOnSdCard(path: String): Boolean {
         return pathOnSdCard(path) != null
     }
@@ -394,14 +523,13 @@ object Storage {
         return path.removePrefix(sdCardLocation).removeSuffix("/")
     }
 
-    private fun getSdOutputStream(name: String, locationOnSdCard: String, defaultMimeType: String,
-                                  sdCardFile: DocumentFile, contentResolver: ContentResolver): OutputStream? {
+    private fun getImageDocumentFile(name: String, locationOnSdCard: String, defaultMimeType: String,
+                                     sdCardFile: DocumentFile, contentResolver: ContentResolver): DocumentFile? {
         val extension = name.split(".").last().toLowerCase()
         val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
                 ?: defaultMimeType
         val subFolderFile = findFileInsideRecursive(sdCardFile, locationOnSdCard) ?: return null
-        val imageFile = getChildFile(subFolderFile, mimeType, name) ?: return null
-        return contentResolver.openOutputStream(imageFile.uri) ?: return null
+        return getChildFile(subFolderFile, mimeType, name)
     }
 
     /**

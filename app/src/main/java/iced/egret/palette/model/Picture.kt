@@ -95,7 +95,9 @@ class Picture(override var name: String, override var filePath: String) : Termin
         }
     val createdDate: String
         get() {
-            val stamp = ExifInterface(filePath).getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
+            val exif = ExifInterface(filePath)
+            val stamp = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
+                    ?: exif.getAttribute(ExifInterface.TAG_DATETIME)
                     ?: return "Unknown"
             return parseDateStamp(stamp, "yyyy:MM:dd HH:mm:ss")
         }

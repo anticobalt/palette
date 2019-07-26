@@ -301,13 +301,12 @@ class PictureViewActivity : BottomActionsActivity() {
                 toast(R.string.already_exists_error)
             }
             else {
-                val files = CollectionManager.renamePicture(picture, getSdCardDocumentFile(), contentResolver, newName)
-                if (files == null) {
+                val file = CollectionManager.renamePicture(picture, newName, getSdCardDocumentFile())
+                if (file == null) {
                     toast(R.string.access_denied_error)
                 }
                 else {
-                    broadcastMediaChanged(files.first)
-                    broadcastMediaChanged(files.second)
+                    broadcastMediaChanged(file)
                     toast(R.string.file_save_success)
                     dialog.dismiss()  // nameFile dialog has no auto-dismiss, so do it manually
                     setToolbarTitle()  // to update name

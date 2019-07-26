@@ -407,16 +407,13 @@ object CollectionManager {
         return files
     }
 
-    fun renamePicture(picture: Picture, sdCardFile: DocumentFile?,
-                      contentResolver: ContentResolver?, newName: String): Pair<File, File>? {
-
-        val files = Storage.moveFile(picture.filePath, File(picture.parentFilePath),
-                sdCardFile, contentResolver, newName) ?: return null
-
+    fun renamePicture(picture: Picture, newName: String, sdCardFile: DocumentFile?): File? {
+        val file = Storage.renameFile(picture.filePath, newName, sdCardFile)
+                ?: return null
         picture.name = newName
-        picture.filePath = files.second.path
+        picture.filePath = file.path
         Storage.saveAlbumsToDisk(albums)
-        return files
+        return file
     }
 
     /**

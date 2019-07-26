@@ -331,6 +331,27 @@ object Storage {
     }
 
     /**
+     * Assumes file with new name doesn't already exist.
+     */
+    fun renameFile(path: String, newName: String, sdCardFile: DocumentFile?): File? {
+
+        val file = File(path)
+        val target = File(file.parent + "/" + newName)
+        val pathOnSdCard = pathOnSdCard(file.path)
+
+        val success = if (pathOnSdCard != null && sdCardFile != null) {
+            val documentFile = findFileInsideRecursive(sdCardFile, pathOnSdCard)
+                    ?: return null
+            documentFile.renameTo(newName)
+        }
+        else {
+            file.renameTo(target)
+        }
+
+        return if (success) target else null
+    }
+
+    /**
      * Try to copy to destination, then delete original. Abort if copy fails.
      * @return Old and new file if successfully moved, null otherwise
      */

@@ -441,7 +441,7 @@ object Storage {
      * @param location The folder the file sits in (e.g. /path/to)
      */
     fun fileExists(name: String, location: String = ""): Boolean {
-        val file = File(location + name)
+        val file = File(location.removeSuffix("/") + "/" + name)
         return file.exists()
     }
 

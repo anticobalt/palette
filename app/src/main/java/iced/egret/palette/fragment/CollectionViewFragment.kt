@@ -527,7 +527,7 @@ class CollectionViewFragment :
     }
 
     private fun broadcastNewMedia(file: File) {
-        (activity as BaseActivity).broadcastNewMedia(file)
+        (activity as BaseActivity).broadcastMediaChanged(file)
     }
 
     private fun toast(message: String) {

@@ -21,6 +21,7 @@ import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_view_picture.*
 import kotlinx.android.synthetic.main.appbar_view_picture.*
 import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
@@ -237,6 +238,10 @@ class PictureViewActivity : BottomActionsActivity() {
                 initiateMove()
                 true
             }
+            R.id.actionRename -> {
+                initiateRename()
+                true
+            }
             else -> false
         }
         return if (retVal) true  // consume action
@@ -277,14 +282,38 @@ class PictureViewActivity : BottomActionsActivity() {
 
             val files = CollectionManager.movePicture(itemPosition, destination, getSdCardDocumentFile(), contentResolver)
             if (files != null) {
-                broadcastNewMedia(files.first)
-                broadcastNewMedia(files.second)
+                broadcastMediaChanged(files.first)
+                broadcastMediaChanged(files.second)
                 toast(R.string.file_move_success)
                 setResult(RESULT_OK)
                 finish()
             } else {
                 toast(R.string.move_fail_error)
             }
+        }
+    }
+
+    private fun initiateRename() {
+        val picture = mPictures[itemPosition]
+        DialogGenerator.nameFile(this, picture.name) { charSequence, dialog ->
+            val newName = charSequence.toString()
+            if (Storage.fileExists(newName, picture.parentFilePath)) {
+                toast(R.string.already_exists_error)
+            }
+            else {
+                val files = CollectionManager.renamePicture(picture, getSdCardDocumentFile(), contentResolver, newName)
+                if (files == null) {
+                    toast(R.string.access_denied_error)
+                }
+                else {
+                    broadcastMediaChanged(files.first)
+                    broadcastMediaChanged(files.second)
+                    toast(R.string.file_save_success)
+                    dialog.dismiss()  // nameFile dialog has no auto-dismiss, so do it manually
+                    setToolbarTitle()  // to update name
+                }
+            }
+
         }
     }
 

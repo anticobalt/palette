@@ -156,18 +156,39 @@ class CropActivity : BottomActionsActivity() {
         fun save(name: String, location: String, isNewFile: Boolean) {
             val sdCardFile = getSdCardDocumentFile()
             val file = CollectionManager
-                    .createPictureFromBitmap(bitmap, name, location, isNewFile,
-                            sdCardFile, contentResolver)
+                    .createPictureFromBitmap(bitmap, name, location, isNewFile, sdCardFile, contentResolver)
             if (file == null) {
                 showAccessDeniedToast()
                 return
             }
-            broadcastNewMedia(file)
+            broadcastMediaChanged(file)
             setResult(Activity.RESULT_OK)
             finish()
         }
 
+        // names with periods are fair game
+        fun generateNewName(original: String?): String {
+            val parts = original?.split(".")
+            if (parts == null || parts.size <= 1) return "image.jpg"  // only if original is corrupt
+
+            val extension = parts.last()
+            var nameWithoutExtension = parts.dropLast(1).joinToString(".")
+            var id = 1
+
+            // Get suffix in form "-43" from "name-43" if it exists, remove it,
+            // and update id (in this case, to 44)
+            val regex = Regex("-[0-9]+\$")  // anything + dash + any number
+            val existingEditMarker = regex.find(nameWithoutExtension)?.value
+            if (existingEditMarker != null) {
+                nameWithoutExtension = nameWithoutExtension.removeSuffix(existingEditMarker)
+                id = existingEditMarker.removePrefix("-").toInt() + 1
+            }
+
+            return "$nameWithoutExtension-$id.$extension"
+        }
+
         val oldName = mImageUri.lastPathSegment
+        val defaultNewName = generateNewName(oldName)
         val location = mImageUri.path?.removeSuffix(oldName as CharSequence)
 
         if (location == null) {
@@ -177,8 +198,8 @@ class CropActivity : BottomActionsActivity() {
 
         // Nested dialogs is a QoL feature; makes it easy to change filenames if you
         // don't want to overwrite existing file b/c first dialog won't close after OK pressed
-        DialogGenerator.nameFile(this, oldName) {
-            val name = it.toString()
+        DialogGenerator.nameFile(this, defaultNewName) { charSequence, _ ->
+            val name = charSequence.toString()
             if (Storage.fileExists(name, location)) {
                 DialogGenerator.confirmReplaceFile(this) {
                     save(name, location, isNewFile = false)

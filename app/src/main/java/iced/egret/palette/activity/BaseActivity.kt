@@ -34,7 +34,7 @@ abstract class BaseActivity : AppCompatActivity() {
      * Broadcast changes so that they show up immediately whenever MediaStore is accessed.
      * https://stackoverflow.com/a/39241495
      */
-    fun broadcastNewMedia(file: File) {
+    fun broadcastMediaChanged(file: File) {
         val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
         val uri = Uri.fromFile(file)
         mediaScanIntent.data = uri

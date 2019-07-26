@@ -200,7 +200,7 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
     private fun restorePictures(pictures: List<Picture>, typeString: String) {
         val failCounter = CollectionManager.restorePicturesFromRecycleBin(
                 pictures, getSdCardDocumentFile(), contentResolver) {
-            broadcastNewMedia(it)
+            broadcastMediaChanged(it)
         }
         if (failCounter > 0) toast("Failed to restore $failCounter $typeString!")
         else toast("${pictures.size} ${typeString.capitalize()} restored")

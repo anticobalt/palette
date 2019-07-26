@@ -102,28 +102,20 @@ object DialogGenerator {
         }
     }
 
-    fun nameFile(context: Context, name: String?, onConfirm: (CharSequence) -> Unit) {
-
-        var nameWithoutExtension: String? = null
-        var extension: String? = null
-        val parts = name?.split(".")
-
-        // names with periods are fair game
-        if (parts != null && parts.size > 1) {
-            extension = parts.last()
-            nameWithoutExtension = parts.dropLast(1).joinToString(".")
-        }
-
+    /**
+     * No auto-dismiss to allow follow-up dialogs in case name already in use.
+     */
+    fun nameFile(context: Context, name: String, onConfirm: (CharSequence, MaterialDialog) -> Unit) {
         MaterialDialog(context).show {
             noAutoDismiss()
             title(R.string.action_save_file)
             // TODO: custom view to separate extension and name fields
-            input(prefill = "$nameWithoutExtension-1.$extension")
+            input(prefill = name)
             negativeButton {
                 dismiss()
             }
             positiveButton {
-                onConfirm(this.getInputField().text)
+                onConfirm(this.getInputField().text, this)
             }
         }
 
@@ -173,22 +165,23 @@ object DialogGenerator {
     }
 
     fun pictureDetails(context: Context, picture: Picture) {
+
+        fun populateWithMetadata(view: View, picture: Picture) {
+            view.findViewById<TextView>(R.id.path).text = picture.filePath
+            view.findViewById<TextView>(R.id.type).text = picture.mimeType
+            view.findViewById<TextView>(R.id.size).text = picture.fileSize
+            @SuppressLint("SetTextI18n")  // is not language specific
+            view.findViewById<TextView>(R.id.dimensions).text = "${picture.width} x ${picture.height}"
+            view.findViewById<TextView>(R.id.orientation).text = picture.orientation
+            view.findViewById<TextView>(R.id.modified).text = picture.lastModifiedDate
+            view.findViewById<TextView>(R.id.created).text = picture.createdDate
+        }
+
         val dialog = MaterialDialog(context, BottomSheet(LayoutMode.WRAP_CONTENT))
         dialog.cornerRadius(res = R.dimen.bottom_sheet_corner_radius)
         dialog.customView(R.layout.content_bottomsheet_picture_details, horizontalPadding = true)
         populateWithMetadata(dialog.getCustomView(), picture)
         dialog.show()
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun populateWithMetadata(view: View, picture: Picture) {
-        view.findViewById<TextView>(R.id.path).text = picture.filePath
-        view.findViewById<TextView>(R.id.type).text = picture.mimeType
-        view.findViewById<TextView>(R.id.size).text = picture.fileSize
-        view.findViewById<TextView>(R.id.dimensions).text = "${picture.width} x ${picture.height}"
-        view.findViewById<TextView>(R.id.orientation).text = picture.orientation
-        view.findViewById<TextView>(R.id.modified).text = picture.lastModifiedDate
-        view.findViewById<TextView>(R.id.created).text = picture.createdDate
     }
 
 }

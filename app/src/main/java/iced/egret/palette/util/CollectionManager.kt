@@ -407,6 +407,18 @@ object CollectionManager {
         return files
     }
 
+    fun renamePicture(picture: Picture, sdCardFile: DocumentFile?,
+                      contentResolver: ContentResolver?, newName: String): Pair<File, File>? {
+
+        val files = Storage.moveFile(picture.filePath, File(picture.parentFilePath),
+                sdCardFile, contentResolver, newName) ?: return null
+
+        picture.name = newName
+        picture.filePath = files.second.path
+        Storage.saveAlbumsToDisk(albums)
+        return files
+    }
+
     /**
      * Different from movePicture() because a) destination Folder is not updated (since Recycle Bin
      * is not a Folder), and b) new moved File doesn't need post-processing

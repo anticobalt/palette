@@ -295,18 +295,22 @@ class PictureViewActivity : BottomActionsActivity() {
 
     private fun initiateRename() {
         val picture = mPictures[itemPosition]
-        DialogGenerator.nameFile(this, picture.name) { charSequence, dialog ->
-            val newName = charSequence.toString()
+        val nameList = picture.name.split(".")
+        val nameWithoutExtension = nameList.dropLast(1).joinToString(".")
+        val extension = nameList.last()
+
+        DialogGenerator.nameFile(this, nameWithoutExtension) { charSequence, dialog ->
+            val newName = "$charSequence.$extension"
             if (Storage.fileExists(newName, picture.parentFilePath)) {
                 toast(R.string.already_exists_error)
-            }
-            else {
-                val file = CollectionManager.renamePicture(picture, newName, getSdCardDocumentFile())
-                if (file == null) {
+            } else {
+                val files = CollectionManager.renamePicture(picture, newName, getSdCardDocumentFile())
+                if (files == null) {
                     toast(R.string.access_denied_error)
-                }
-                else {
-                    broadcastMediaChanged(file)
+                } else {
+                    // File by old name is technically it's own file
+                    broadcastMediaChanged(files.first)
+                    broadcastMediaChanged(files.second)
                     toast(R.string.file_save_success)
                     dialog.dismiss()  // nameFile dialog has no auto-dismiss, so do it manually
                     setToolbarTitle()  // to update name

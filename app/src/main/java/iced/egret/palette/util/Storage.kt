@@ -306,7 +306,7 @@ object Storage {
         // If saving to SD card and can do it, do it. Otherwise try to save normally.
         // https://stackoverflow.com/a/43317703
         if (locationOnSdCard != null && sdCardFile != null) {
-            documentFile = getImageDocumentFile(name, locationOnSdCard, "image/webp", sdCardFile, contentResolver)
+            documentFile = getImageDocumentFile(name, locationOnSdCard, "image/webp", sdCardFile)
                     ?: return null
             outStream = contentResolver.openOutputStream(documentFile.uri) ?: return null
         } else {
@@ -333,22 +333,21 @@ object Storage {
     /**
      * Assumes file with new name doesn't already exist.
      */
-    fun renameFile(path: String, newName: String, sdCardFile: DocumentFile?): File? {
+    fun renameFile(path: String, newName: String, sdCardFile: DocumentFile?): Pair<File, File>? {
 
-        val file = File(path)
-        val target = File(file.parent + "/" + newName)
-        val pathOnSdCard = pathOnSdCard(file.path)
+        val original = File(path)
+        val target = File(original.parent + "/" + newName)
+        val pathOnSdCard = pathOnSdCard(original.path)
 
         val success = if (pathOnSdCard != null && sdCardFile != null) {
             val documentFile = findFileInsideRecursive(sdCardFile, pathOnSdCard)
                     ?: return null
             documentFile.renameTo(newName)
-        }
-        else {
-            file.renameTo(target)
+        } else {
+            original.renameTo(target)
         }
 
-        return if (success) target else null
+        return if (success) Pair(original, target) else null
     }
 
     /**
@@ -382,7 +381,7 @@ object Storage {
         val copyAsDocumentFile: DocumentFile
 
         if (destinationOnSdCard != null && sdCardFile != null && contentResolver != null) {
-            copyAsDocumentFile = getImageDocumentFile(name, destinationOnSdCard, "image/webp", sdCardFile, contentResolver)
+            copyAsDocumentFile = getImageDocumentFile(name, destinationOnSdCard, "image/webp", sdCardFile)
                     ?: return null
             outStream = contentResolver.openOutputStream(copyAsDocumentFile.uri) ?: return null
         } else {
@@ -545,7 +544,7 @@ object Storage {
     }
 
     private fun getImageDocumentFile(name: String, locationOnSdCard: String, defaultMimeType: String,
-                                     sdCardFile: DocumentFile, contentResolver: ContentResolver): DocumentFile? {
+                                     sdCardFile: DocumentFile): DocumentFile? {
         val extension = name.split(".").last().toLowerCase()
         val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
                 ?: defaultMimeType

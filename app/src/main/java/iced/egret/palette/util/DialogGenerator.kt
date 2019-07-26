@@ -84,7 +84,7 @@ object DialogGenerator {
     fun moveToRecycleBin(context: Context, type: String, onConfirm: () -> Unit) {
         MaterialDialog(context).show {
             title(R.string.action_delete)
-            message(text = "Move the selected $type to the recycle bin?")
+            message(text = "Move $type to the recycle bin?")
             negativeButton()
             positiveButton {
                 onConfirm()

@@ -161,8 +161,17 @@ class PictureViewActivity : BottomActionsActivity() {
         bottomActions.details.setOnClickListener {
             DialogGenerator.pictureDetails(this, mPictures[itemPosition])
         }
+        bottomActions.home_folder.setOnClickListener {
+
+        }
+        bottomActions.share.setOnClickListener {
+
+        }
         bottomActions.crop.setOnClickListener {
             startCropActivity()
+        }
+        bottomActions.delete.setOnClickListener {
+            initiateMoveToRecycleBin()
         }
 
     }
@@ -306,7 +315,7 @@ class PictureViewActivity : BottomActionsActivity() {
             } else {
                 val files = CollectionManager.renamePicture(picture, newName, getSdCardDocumentFile())
                 if (files == null) {
-                    toast(R.string.access_denied_error)
+                    toast(R.string.edit_fail_error)  // either no SD card access, or OS-level rename error
                 } else {
                     // File by old name is technically it's own file
                     broadcastMediaChanged(files.first)
@@ -317,6 +326,23 @@ class PictureViewActivity : BottomActionsActivity() {
                 }
             }
 
+        }
+    }
+
+    private fun initiateMoveToRecycleBin() {
+        val picture = mPictures[itemPosition]
+        DialogGenerator.moveToRecycleBin(this, "picture") {
+            // Need sdCardFile to delete from SD card (if required)
+            val failCount = CollectionManager.movePicturesToRecycleBin(listOf(picture), getSdCardDocumentFile()) {
+                toast("Yay")
+                broadcastMediaChanged(it)
+            }
+            if (failCount == 0) {
+                toast("Picture moved to recycle bin")
+                setResult(RESULT_OK)
+                finish()
+            }
+            else toast("Failed to move picture to recycle bin!")
         }
     }
 

@@ -203,12 +203,12 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
             broadcastMediaChanged(it)
         }
         if (failCounter > 0) toast("Failed to restore $failCounter $typeString!")
-        else toast("${pictures.size} ${typeString.capitalize()} restored")
+        else toast("${pictures.size} $typeString restored")
     }
 
     private fun deletePictures(pictures: List<Picture>, typeString: String) {
         val failCounter = CollectionManager.deletePictures(pictures)
         if (failCounter > 0) toast("Failed to delete $failCounter $typeString!")
-        else toast("${pictures.size} ${typeString.capitalize()} permanently deleted")
+        else toast("${pictures.size} $typeString permanently deleted")
     }
 }

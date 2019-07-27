@@ -515,7 +515,7 @@ class CollectionViewFragment :
             broadcastMediaChanged(sourceFile)
             broadcastMediaChanged(movedFile)
         }
-        if (failedCounter > 0) toast("$failedCounter move failed!")
+        if (failedCounter > 0) toast("Failed to move $failedCounter!")
         else toast("${pictures.size} $typeString moved")
     }
 
@@ -524,8 +524,8 @@ class CollectionViewFragment :
             // If moved a Picture successfully, broadcast change
             broadcastMediaChanged(it)
         }
-        if (failedCounter > 0) toast("Failed to move $failedCounter $typeString to recycle bin!")
-        else toast("${pictures.size} ${typeString.capitalize()} moved to recycle bin")
+        if (failedCounter > 0) toast("Failed to move $failedCounter!")
+        else toast("${pictures.size} $typeString moved to recycle bin")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

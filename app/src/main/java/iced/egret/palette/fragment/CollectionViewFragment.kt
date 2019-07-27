@@ -268,6 +268,13 @@ class CollectionViewFragment :
                     refresh()
                 }
             }
+            R.id.actionMove -> {
+                DialogGenerator.moveTo(context!!) {
+                    @Suppress("UNCHECKED_CAST")  // assume internal consistency
+                    movePictures(coverables as List<Picture>, it, typeString)
+                    refresh()
+                }
+            }
             R.id.actionDelete -> {
                 when (mSelectedContentType) {
                     CollectionManager.PICTURE_KEY -> {
@@ -502,10 +509,20 @@ class CollectionViewFragment :
         }
     }
 
+    private fun movePictures(pictures: List<Picture>, destination: File, typeString: String) {
+        val failedCounter = CollectionManager.movePictures(pictures, destination,
+                getSdCardDocumentFile(), activity!!.contentResolver) { sourceFile, movedFile ->
+            broadcastMediaChanged(sourceFile)
+            broadcastMediaChanged(movedFile)
+        }
+        if (failedCounter > 0) toast("$failedCounter move failed!")
+        else toast("${pictures.size} $typeString moved")
+    }
+
     private fun recyclePictures(pictures: List<Picture>, typeString: String) {
         val failedCounter = CollectionManager.movePicturesToRecycleBin(pictures, getSdCardDocumentFile()) {
             // If moved a Picture successfully, broadcast change
-            broadcastNewMedia(it)
+            broadcastMediaChanged(it)
         }
         if (failedCounter > 0) toast("Failed to move $failedCounter $typeString to recycle bin!")
         else toast("${pictures.size} ${typeString.capitalize()} moved to recycle bin")
@@ -526,7 +543,7 @@ class CollectionViewFragment :
         return (activity as BaseActivity).getSdCardDocumentFile()
     }
 
-    private fun broadcastNewMedia(file: File) {
+    private fun broadcastMediaChanged(file: File) {
         (activity as BaseActivity).broadcastMediaChanged(file)
     }
 

@@ -132,7 +132,7 @@ object DialogGenerator {
         }
     }
 
-    fun moveFile(context: Context, onConfirm: (File) -> Unit) {
+    fun moveTo(context: Context, onConfirm: (File) -> Unit) {
         val filter: FileFilter = { it.path.startsWith("/storage") }
         MaterialDialog(context).show {
             folderChooser(emptyTextRes = R.string.folder_empty, filter = filter) { dialog, file ->

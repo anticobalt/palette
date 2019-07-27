@@ -381,30 +381,61 @@ object CollectionManager {
      *
      * @return The old and new Files, or null if move fails.
      */
-    fun movePicture(position: Int, folderFile: File,
-                    sdCardFile: DocumentFile?, contentResolver: ContentResolver): Pair<File, File>? {
+    private fun movePicture(picture: Picture, folderFile: File, sdCardFile: DocumentFile?,
+                            contentResolver: ContentResolver): Pair<File, File>? {
 
-        val picture = currentCollection?.pictures?.get(position) ?: return null
         val files = Storage.moveFile(picture.filePath, folderFile, sdCardFile, contentResolver)
                 ?: return null
-
-        // Remove from old Folder
-        val oldFolder = findFolderByPath(picture.fileLocation)  // looks for existing Folder
-                ?: return files  // should never return here
-        oldFolder.removePicture(picture)
-
-        // Update Picture's path
         picture.filePath = files.second.path
+        return files
+    }
 
-        // Add to new Folder
-        val newFolder = getParentFolder(picture)  // looks for Folder or makes it
-                ?: return files  // should never return here
-        newFolder.addPicture(picture, toFront = true)
+    /**
+     * Old and new folders are the same for all pictures, so find them once and save them.
+     */
+    fun movePictures(pictures: List<Picture>, folderFile: File, sdCardFile: DocumentFile?,
+                     contentResolver: ContentResolver, afterEachMoved: (File, File) -> Unit): Int {
+
+        var failCount = 0
+        var i = 0
+        var oldFolder: Folder? = null
+        var newFolder: Folder? = null
+
+        for (picture in pictures) {
+
+            // Look for existing folder
+            if (oldFolder == null) {
+                oldFolder = findFolderByPath(picture.fileLocation)
+                        // something terrible happened, abort
+                        ?: return failCount + pictures.size - i  // remaining items fail
+            }
+
+            // Move file and update Picture properties
+            val files = movePicture(picture, folderFile, sdCardFile, contentResolver)
+
+            if (files == null) failCount += 1
+            else {
+                // Broadcast changes ASAP
+                afterEachMoved(files.first, files.second)
+
+                oldFolder.removePicture(picture)
+
+                // Find new folder or make it
+                if (newFolder == null) {
+                    newFolder = getParentFolder(picture)
+                            // something terrible happened, abort
+                            ?: return failCount + pictures.size - i  // remaining items fail
+                }
+
+                newFolder.addPicture(picture, toFront = true)
+            }
+            i += 1
+        }
 
         // Save changes
         Storage.saveAlbumsToDisk(albums)
 
-        return files
+        return failCount
     }
 
     fun renamePicture(picture: Picture, newName: String, sdCardFile: DocumentFile?): Pair<File, File>? {

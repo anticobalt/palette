@@ -280,19 +280,21 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun initiateMove() {
-        DialogGenerator.moveFile(this) {
+        DialogGenerator.moveTo(this) {
             val destination = it
             val oldPicture = CollectionManager.getCurrentCollectionPictures()[itemPosition]
 
             if (oldPicture.fileLocation == destination.path) {
                 toast(R.string.already_exists_error)
-                return@moveFile
+                return@moveTo
             }
 
-            val files = CollectionManager.movePicture(itemPosition, destination, getSdCardDocumentFile(), contentResolver)
-            if (files != null) {
-                broadcastMediaChanged(files.first)
-                broadcastMediaChanged(files.second)
+            val failCount = CollectionManager.movePictures(listOf(oldPicture), destination,
+                    getSdCardDocumentFile(), contentResolver) { sourceFile, movedFile ->
+                broadcastMediaChanged(sourceFile)
+                broadcastMediaChanged(movedFile)
+            }
+            if (failCount == 0) {
                 toast(R.string.file_move_success)
                 setResult(RESULT_OK)
                 finish()
@@ -334,7 +336,6 @@ class PictureViewActivity : BottomActionsActivity() {
         DialogGenerator.moveToRecycleBin(this, "picture") {
             // Need sdCardFile to delete from SD card (if required)
             val failCount = CollectionManager.movePicturesToRecycleBin(listOf(picture), getSdCardDocumentFile()) {
-                toast("Yay")
                 broadcastMediaChanged(it)
             }
             if (failCount == 0) {

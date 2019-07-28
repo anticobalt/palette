@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
@@ -20,7 +19,6 @@ import iced.egret.palette.recyclerview_component.PinnedCollectionsItem
 import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
-import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_pinned_collections.*
@@ -35,6 +33,7 @@ class PinnedCollectionsFragment :
         const val selectedType = "PinnedCollectionFragment_ST"
     }
 
+    private lateinit var mMaster: MainActivity
     private var mRootView: View? = null
     private lateinit var mRecyclerView: RecyclerView
 
@@ -48,6 +47,7 @@ class PinnedCollectionsFragment :
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
         mRecyclerView = mRootView!!.findViewById(R.id.recyclerView)
+        mMaster = activity as MainActivity
         buildToolbar()
         buildRecyclerView()
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
@@ -200,7 +200,7 @@ class PinnedCollectionsFragment :
                 val callback = callback@{
                     CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions)
                     refreshFragment()
-                    MainFragmentManager.notifyAlbumDeletedFromPinnedCollections()
+                    mMaster.notifyAlbumDeletedFromPinnedCollections()
                 }
                 DialogGenerator.deleteAlbum(context ?: return false, onConfirm = callback)
             }
@@ -242,17 +242,7 @@ class PinnedCollectionsFragment :
      * @param referencePosition Index of Collection to open with
      */
     private fun openCollectionViewPanel(referencePosition: Int) {
-        val fragmentIndex = MainFragmentManager.COLLECTION_CONTENTS
-        val fragment = MainFragmentManager.fragments[fragmentIndex] as CollectionViewFragment
-        fragment.activity?.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
-
-        val coverable = mCollections[referencePosition]
-        CollectionManager.clearStack()
-        if (coverable is Folder) CollectionManager.launchAsShortcut(coverable)
-        else CollectionManager.launch(coverable)
-
-        fragment.setToolbarTitle()
-        fragment.refreshFragment()
+        mMaster.buildCollectionView(mCollections[referencePosition])
     }
 
     /**

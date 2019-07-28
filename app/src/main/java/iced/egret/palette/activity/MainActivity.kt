@@ -9,10 +9,20 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import androidx.documentfile.provider.DocumentFile
+import androidx.fragment.app.Fragment
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
+import iced.egret.palette.fragment.CollectionViewFragment
+import iced.egret.palette.fragment.FolderViewFragment
 import iced.egret.palette.fragment.ListFragment
-import iced.egret.palette.util.*
+import iced.egret.palette.fragment.PinnedCollectionsFragment
+import iced.egret.palette.model.Collection
+import iced.egret.palette.model.Folder
+import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.Painter
+import iced.egret.palette.util.Permission
+import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val EXTERNAL_CODE = 100
@@ -21,13 +31,23 @@ const val SD_CARD_WRITE_REQUEST = 2
 
 class MainActivity : BasicAestheticActivity() {
 
+    class DummyFragment : ListFragment() {
+        override fun setClicksBlocked(doBlock: Boolean) {}
+        override fun onAllFragmentsCreated() {}
+        override fun onBackPressed(): Boolean { return false }
+    }
+
     private var hasPermission = false
     private val permissions = arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
+    private val fragments = Array<ListFragment>(2) { DummyFragment() }
     private val finishedFragments = mutableListOf<ListFragment>()
+    private val leftIndex = 0
+    private val rightIndex = 1
+
     private lateinit var sharedPrefs: SharedPreferences
 
     companion object SaveDataKeys {
@@ -70,7 +90,7 @@ class MainActivity : BasicAestheticActivity() {
      */
     fun notifyFragmentCreationFinished(finishedFragment: ListFragment) {
         finishedFragments.add(finishedFragment)
-        if (finishedFragments.toSet() == MainFragmentManager.fragments.toSet()) {
+        if (finishedFragments.toSet() == fragments.toSet()) {
             for (fragment in finishedFragments) {
                 fragment.onAllFragmentsCreated()
             }
@@ -90,7 +110,7 @@ class MainActivity : BasicAestheticActivity() {
             makeFragments()
         } else {
             // Save the remade fragments (which are technically different)
-            MainFragmentManager.updateFragments(supportFragmentManager.fragments)
+            updateFragments(supportFragmentManager.fragments)
             // Try to restore Collection being viewed
             val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
             CollectionManager.unwindStack(navigateToPath)
@@ -100,19 +120,32 @@ class MainActivity : BasicAestheticActivity() {
     }
 
     private fun makeFragments() {
-        MainFragmentManager.setup(supportFragmentManager)
-        MainFragmentManager.createFragments()
-        val fragments = MainFragmentManager.fragments.toMutableList()
+
+        fragments[leftIndex] = PinnedCollectionsFragment()
+        fragments[rightIndex] = FolderViewFragment()
+
+        val frames = listOf(R.id.linksFragment, R.id.contentsFragment)
+        assert(frames.size == fragments.size)
 
         // bind fragments
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.linksFragment, fragments[MainFragmentManager.PINNED_COLLECTIONS])
-                .commit()
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.contentsFragment, fragments[MainFragmentManager.COLLECTION_CONTENTS])
-                .commit()
+        for (i in 0 until fragments.size) {
+            supportFragmentManager
+                    .beginTransaction()
+                    .replace(frames[i], fragments[i])
+                    .commit()
+        }
+
+    }
+
+    private fun updateFragments(fragments: List<Fragment>) {
+        loop@ for (fragment in fragments) {
+            val index: Int = when (fragment) {
+                is PinnedCollectionsFragment -> leftIndex
+                is CollectionViewFragment -> rightIndex
+                else -> continue@loop
+            }
+            this.fragments[index] = fragment as ListFragment
+        }
     }
 
     private fun styleSlidingPane() {
@@ -192,12 +225,8 @@ class MainActivity : BasicAestheticActivity() {
 
     override fun onBackPressed() {
         if (hasPermission) {
-            var index = MainFragmentManager.COLLECTION_CONTENTS
-            if (slidingPaneLayout.isOpen) {
-                index = MainFragmentManager.PINNED_COLLECTIONS
-            }
-
-            val currentFragment = MainFragmentManager.fragments[index] as ListFragment
+            val index = if (slidingPaneLayout.isOpen) leftIndex else rightIndex
+            val currentFragment = fragments[index]
             val success = (currentFragment).onBackPressed()
             if (!success) {
                 moveTaskToBack(true)  // don't destroy
@@ -223,6 +252,31 @@ class MainActivity : BasicAestheticActivity() {
         for (fragment in finishedFragments) {
             fragment.setClicksBlocked(false)
         }
+    }
+
+    fun notifyCollectionsChanged() {
+        (fragments[leftIndex] as PinnedCollectionsFragment).refreshFragment()
+    }
+
+    fun notifyAlbumDeletedFromPinnedCollections() {
+        val current = CollectionManager.currentCollection
+        val allCollections = CollectionManager.getCollections()
+        if (current != null && !allCollections.contains(current)) {
+            CollectionManager.resetStack()
+        }
+        (fragments[rightIndex] as CollectionViewFragment).refreshFragment()
+    }
+
+    fun buildCollectionView(collection: Collection) {
+        val fragment = fragments[rightIndex] as CollectionViewFragment
+        findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
+
+        CollectionManager.clearStack()
+        if (collection is Folder) CollectionManager.launchAsShortcut(collection)
+        else CollectionManager.launch(collection)
+
+        fragment.setToolbarTitle()
+        fragment.refreshFragment()
     }
 
 }

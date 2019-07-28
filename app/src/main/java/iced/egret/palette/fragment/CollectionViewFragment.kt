@@ -15,7 +15,10 @@ import com.google.android.material.snackbar.Snackbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
-import iced.egret.palette.activity.*
+import iced.egret.palette.activity.MainActivity
+import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
+import iced.egret.palette.activity.RecycleBinActivity
+import iced.egret.palette.activity.SettingsActivity
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.model.Folder
@@ -25,7 +28,6 @@ import iced.egret.palette.recyclerview_component.CoverableItem
 import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
-import iced.egret.palette.util.MainFragmentManager
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
@@ -36,7 +38,7 @@ import java.io.File
  * Automatically requests CollectionManager to get fresh data when returning from another activity
  * or app.
  */
-class CollectionViewFragment :
+open class CollectionViewFragment :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
@@ -48,6 +50,7 @@ class CollectionViewFragment :
     }
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
+    private lateinit var mMaster : MainActivity
 
     private var mRootView: View? = null
     private lateinit var mCollectionRecyclerView: RecyclerView
@@ -66,6 +69,7 @@ class CollectionViewFragment :
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
         mSwipeRefreshLayout = mRootView!!.findViewById(R.id.swipeRefreshLayout)
+        mMaster = activity as MainActivity
 
         fetchContents()
         buildToolbar()
@@ -87,7 +91,7 @@ class CollectionViewFragment :
      */
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (activity as MainActivity).notifyFragmentCreationFinished(this)
+        mMaster.notifyFragmentCreationFinished(this)
 
         if (savedInstanceState != null) {
 
@@ -142,7 +146,7 @@ class CollectionViewFragment :
         if (requestCode == PICTURE_ACTIVITY_REQUEST) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 // Changes occurred: notify update; self-update occurs automatically in onResume()
-                MainFragmentManager.notifyCollectionsChanged()
+                mMaster.notifyCollectionsChanged()
             }
         }
     }
@@ -214,7 +218,7 @@ class CollectionViewFragment :
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-        (activity as MainActivity).isolateFragment(this)
+        mMaster.isolateFragment(this)
 
         // Always visible
         val selectAll = menu.findItem(R.id.actionToggleSelectAll)
@@ -260,7 +264,7 @@ class CollectionViewFragment :
 
         fun refresh() {
             refreshFragment()
-            MainFragmentManager.notifyCollectionsChanged()  // to update cover
+            mMaster.notifyCollectionsChanged()  // to update cover
         }
 
         // sanity check that selected type is valid
@@ -342,7 +346,7 @@ class CollectionViewFragment :
         adapter.currentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
-        (activity as MainActivity).restoreAllFragments()
+        mMaster.restoreAllFragments()
 
         mode.menu.findItem(R.id.albumActions).isVisible = false
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
@@ -547,7 +551,7 @@ class CollectionViewFragment :
         CollectionManager.fetchFromStorage(activity!!) {
             // When done async fetch, refresh fragment to view up-to-date contents
             refreshFragment()
-            MainFragmentManager.notifyCollectionsChanged()
+            mMaster.notifyCollectionsChanged()
             mSwipeRefreshLayout.isRefreshing = false
         }
     }
@@ -576,15 +580,15 @@ class CollectionViewFragment :
     }
 
     private fun getSdCardDocumentFile(): DocumentFile? {
-        return (activity as BaseActivity).getSdCardDocumentFile()
+        return mMaster.getSdCardDocumentFile()
     }
 
     private fun broadcastMediaChanged(file: File) {
-        (activity as BaseActivity).broadcastMediaChanged(file)
+        mMaster.broadcastMediaChanged(file)
     }
 
     private fun toast(message: String) {
-        (activity as BaseActivity).toast(message)
+        mMaster.toast(message)
     }
 
 }

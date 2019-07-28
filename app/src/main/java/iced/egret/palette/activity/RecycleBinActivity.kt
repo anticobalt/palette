@@ -111,6 +111,12 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
+            R.id.actionEmpty -> {
+                DialogGenerator.delete(this, "pictures") {
+                    deletePictures(mContents, "pictures")
+                    refresh()
+                }
+            }
             else -> return super.onOptionsItemSelected(item)
         }
         return true
@@ -202,13 +208,13 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
                 pictures, getSdCardDocumentFile(), contentResolver) {
             broadcastMediaChanged(it)
         }
-        if (failCounter > 0) toast("Failed to restore $failCounter $typeString!")
+        if (failCounter > 0) toast("Failed to restore $failCounter!")
         else toast("${pictures.size} $typeString restored")
     }
 
     private fun deletePictures(pictures: List<Picture>, typeString: String) {
         val failCounter = CollectionManager.deletePictures(pictures)
-        if (failCounter > 0) toast("Failed to delete $failCounter $typeString!")
+        if (failCounter > 0) toast("Failed to delete $failCounter!")
         else toast("${pictures.size} $typeString permanently deleted")
     }
 }

@@ -158,7 +158,7 @@ object DialogGenerator {
     fun delete(context: Context, typeString: String, onConfirm: () -> Unit) {
         MaterialDialog(context).show {
             title(R.string.action_delete)
-            message(text = "Permanently delete the selected $typeString? This action is irreversible.")
+            message(text = "Permanently delete $typeString? This action is irreversible.")
             negativeButton()
             positiveButton {
                 onConfirm()

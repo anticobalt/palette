@@ -1,5 +1,6 @@
 package iced.egret.palette.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.recyclerview.widget.GridLayoutManager
@@ -10,6 +11,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
+import iced.egret.palette.activity.SettingsActivity
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
@@ -122,7 +124,6 @@ class PinnedCollectionsFragment :
             val found = CollectionManager.albums.find { album -> album.name == name.toString() }
             return found != null
         }
-
         fun onCreateNewAlbum(charSequence: CharSequence) {
             CollectionManager.createNewAlbum(charSequence.toString())
             refreshFragment()
@@ -131,6 +132,9 @@ class PinnedCollectionsFragment :
         when (item.itemId) {
             R.id.actionCreateAlbum -> {
                 DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
+            }
+            R.id.gotoSettings -> {
+                startActivity(Intent(this.context, SettingsActivity::class.java))
             }
             else -> super.onOptionsItemSelected(item)
         }

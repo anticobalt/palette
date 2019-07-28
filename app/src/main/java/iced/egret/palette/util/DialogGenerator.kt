@@ -2,6 +2,7 @@ package iced.egret.palette.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.InputType
 import android.view.View
 import android.widget.TextView
 import com.afollestad.materialdialogs.LayoutMode
@@ -30,7 +31,8 @@ object DialogGenerator {
     fun createAlbum(context: Context, albumExists: (CharSequence) -> Boolean, onConfirm: (CharSequence) -> Unit) {
         MaterialDialog(context).show {
             title(R.string.title_album_form)
-            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH, waitForPositiveButton = false) { dialog, text ->
+            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH, waitForPositiveButton = false,
+                    inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES) { dialog, text ->
                 val isValid = !albumExists(text)
                 dialog.getInputField().error = if (isValid) {
                     null

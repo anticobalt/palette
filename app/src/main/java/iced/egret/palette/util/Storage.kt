@@ -179,7 +179,7 @@ object Storage {
 
     }
 
-    fun getUpdateKit(context: Context): UpdateKit {
+    internal fun getUpdateKit(context: Context): UpdateKit {
 
         val foundPicturePaths = mutableSetOf<String>()
         val existingPicturePaths = retrievedPictures.keys
@@ -210,7 +210,7 @@ object Storage {
         return UpdateKit(addedPictures, removedPaths)
     }
 
-    fun saveAlbumsToDisk(albums: List<Album>) {
+    internal fun saveAlbumsToDisk(albums: List<Album>) {
         val albumsData = ArrayList<AlbumData>()
         for (album in albums) {
             albumsData.add(album.toDataClass())
@@ -280,7 +280,7 @@ object Storage {
      *
      * @param location Has trailing file separator (i.e. "/")
      */
-    fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String,
+    internal fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String,
                          sdCardFile: DocumentFile?, contentResolver: ContentResolver): File? {
 
         val extension = name.split(".").last().toLowerCase()
@@ -383,7 +383,7 @@ object Storage {
     /**
      * Assumes file with new name doesn't already exist.
      */
-    fun renameFile(path: String, newName: String, sdCardFile: DocumentFile?): Pair<File, File>? {
+    internal fun renameFile(path: String, newName: String, sdCardFile: DocumentFile?): Pair<File, File>? {
 
         val original = File(path)
         val target = File(original.parent + "/" + newName)
@@ -404,7 +404,7 @@ object Storage {
      * Try to copy to destination, then delete original. Abort if copy fails.
      * @return Old and new file if successfully moved, null otherwise
      */
-    fun moveFile(sourcePath: String, destinationParent: File, sdCardFile: DocumentFile?,
+    internal fun moveFile(sourcePath: String, destinationParent: File, sdCardFile: DocumentFile?,
                  contentResolver: ContentResolver?, newName: String? = null): Pair<File, File>? {
         val sourceFile = File(sourcePath)
         val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver, newName)
@@ -422,7 +422,7 @@ object Storage {
      *
      * @return The copy of the File, or null if failed.
      */
-    fun copyFile(sourceFile: File, destinationParent: File, sdCardFile: DocumentFile?,
+    internal fun copyFile(sourceFile: File, destinationParent: File, sdCardFile: DocumentFile?,
                  contentResolver: ContentResolver?, newName: String? = null): File? {
 
         val name = newName ?: sourceFile.name
@@ -470,7 +470,7 @@ object Storage {
      * Try to move to recycle bin. Abort if move fails.
      * @return Old and new file if successfully moved, null otherwise
      */
-    fun moveFileToRecycleBin(sourcePath: String, sdCardFile: DocumentFile?): Pair<File, File>? {
+    internal fun moveFileToRecycleBin(sourcePath: String, sdCardFile: DocumentFile?): Pair<File, File>? {
         val newName = getUniqueNameInRecycleBin(sourcePath.split("/").last())
         // Pair<Original, New>
         val files = moveFile(sourcePath, recycleBin.file, sdCardFile, null, newName)
@@ -479,7 +479,7 @@ object Storage {
         return files
     }
 
-    fun restoreFileFromRecycleBin(pathInBin: String, sdCardFile: DocumentFile?,
+    internal fun restoreFileFromRecycleBin(pathInBin: String, sdCardFile: DocumentFile?,
                                   contentResolver: ContentResolver): Pair<File, File>? {
 
         val nameInBin = pathInBin.split("/").last()
@@ -502,7 +502,7 @@ object Storage {
     /**
      * @return True if deleted, false if not.
      */
-    fun deleteFileFromRecycleBin(path: String, sdCardFile: DocumentFile?): Boolean {
+    internal fun deleteFileFromRecycleBin(path: String, sdCardFile: DocumentFile?): Boolean {
         val file = File(path)
         val success = deleteFile(file, sdCardFile)
         recycleBin.oldLocations.remove(file.name)
@@ -637,7 +637,7 @@ object Storage {
     /**
      * Ensure all Pictures in album exist on disk. If they don't, remove them.
      */
-    fun cleanAlbum(album: Album) {
+    internal fun cleanAlbum(album: Album) {
         val pictures = album.pictures.toList()  // a copy to avoid concurrency error
         for (picture in pictures) {
             if (!fileExists(picture.filePath)) {

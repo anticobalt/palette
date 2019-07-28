@@ -50,17 +50,17 @@ open class CollectionViewFragment :
     }
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
-    private lateinit var mMaster : MainActivity
+    protected lateinit var mMaster : MainActivity
 
     private var mRootView: View? = null
     private lateinit var mCollectionRecyclerView: RecyclerView
     private lateinit var mFloatingActionButton: FloatingActionButton
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
-    private var mContents = mutableListOf<Coverable>()
+    protected var mContents = mutableListOf<Coverable>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
     lateinit var adapter: FlexibleAdapter<CollectionViewItem>
-    private var mSelectedContentType: String? = null
+    protected var mSelectedContentType: String? = null
     private var mShouldUpdateContents = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -155,7 +155,7 @@ open class CollectionViewFragment :
     /**
      * Makes default toolbar and fills with items and title
      */
-    private fun buildToolbar() {
+    protected open fun buildToolbar() {
         mToolbar = mRootView!!.findViewById(R.id.toolbar)
         mToolbar.inflateMenu(R.menu.menu_view_collection)
         mToolbar.setOnMenuItemClickListener {
@@ -226,7 +226,6 @@ open class CollectionViewFragment :
         // Conditional
         val albumActions = menu.findItem(R.id.albumActions)
         val addToAlbum = menu.findItem(R.id.actionAddToAlbum)
-        val removeFromAlbum = menu.findItem(R.id.actionRemoveFromAlbum)
         val move = menu.findItem(R.id.actionMove)
         val delete = menu.findItem(R.id.actionDelete)
 
@@ -234,9 +233,6 @@ open class CollectionViewFragment :
         fun setFolderOrPicture() {
             albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
             addToAlbum.isVisible = true; Painter.paintDrawable(addToAlbum.icon)
-            if (CollectionManager.currentCollection is Album) {
-                removeFromAlbum.isVisible = true; Painter.paintDrawable(removeFromAlbum.icon)
-            }
         }
 
         // Make items visible depending on selected content.
@@ -296,13 +292,6 @@ open class CollectionViewFragment :
                     refresh()
                 }
             }
-            R.id.actionRemoveFromAlbum -> {
-                DialogGenerator.removeFromAlbum(context!!, typeString) {
-                    CollectionManager.removeContentFromCurrentAlbum(coverables)
-                    toast("Removed ${coverables.size} $typeString.")
-                    refresh()
-                }
-            }
             R.id.actionMove -> {
                 DialogGenerator.moveTo(context!!) {
                     @Suppress("UNCHECKED_CAST")  // assume internal consistency
@@ -350,7 +339,6 @@ open class CollectionViewFragment :
 
         mode.menu.findItem(R.id.albumActions).isVisible = false
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
-        mode.menu.findItem(R.id.actionRemoveFromAlbum).isVisible = false
         mode.menu.findItem(R.id.actionMove).isVisible = false
         mode.menu.findItem(R.id.actionDelete).isVisible = false
     }
@@ -463,28 +451,9 @@ open class CollectionViewFragment :
         }
     }
 
-    /**
-     * Adds new Coverables to current Collection
-     */
-    private fun onFabClick() {
-
-        fun albumExists(name: CharSequence): Boolean {
-            val found = mContents.find { coverable -> coverable is Album && coverable.name == name.toString() }
-            return found != null
-        }
-
-        fun createNewAlbum(name: CharSequence) {
-            CollectionManager.createNewAlbum(name.toString(), addToCurrent = true)
-            refreshFragment()
-        }
-
-        val collection = CollectionManager.currentCollection
-        if (collection is Album) {
-            DialogGenerator.createAlbum(context!!, ::albumExists, ::createNewAlbum)
-        } else {
-            Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
+    protected open fun onFabClick() {
+        Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -587,7 +556,7 @@ open class CollectionViewFragment :
         mMaster.broadcastMediaChanged(file)
     }
 
-    private fun toast(message: String) {
+    protected fun toast(message: String) {
         mMaster.toast(message)
     }
 

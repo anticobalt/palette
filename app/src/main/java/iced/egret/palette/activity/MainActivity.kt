@@ -13,10 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
-import iced.egret.palette.fragment.CollectionViewFragment
-import iced.egret.palette.fragment.FolderViewFragment
-import iced.egret.palette.fragment.ListFragment
-import iced.egret.palette.fragment.PinnedCollectionsFragment
+import iced.egret.palette.fragment.*
+import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
@@ -268,15 +266,56 @@ class MainActivity : BasicAestheticActivity() {
     }
 
     fun buildCollectionView(collection: Collection) {
-        val fragment = fragments[rightIndex] as CollectionViewFragment
+
+        var cvFragment = fragments[rightIndex] as CollectionViewFragment
+        var swapped = false
+        CollectionManager.clearStack()
+
+        when (collection) {
+            is Folder -> {
+                if (cvFragment !is FolderViewFragment) {
+                    swapped = true
+                    cvFragment = FolderViewFragment()
+                    supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.contentsFragment, cvFragment)
+                            .addToBackStack(null)
+                            .commit()
+                }
+                CollectionManager.launchAsShortcut(collection)
+            }
+            is Album -> {
+                if (cvFragment !is AlbumViewFragment) {
+                    swapped = true
+                    cvFragment = AlbumViewFragment()
+                    supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.contentsFragment, cvFragment)
+                            .addToBackStack(null)
+                            .commit()
+                }
+                CollectionManager.launch(collection)
+            }
+            else -> {
+                toast("Unsupported collection type!")
+                return
+            }
+        }
+
+        fragments[rightIndex] = cvFragment
+
+        if (swapped) {
+            // This probably leads to race condition onStop()
+            finishedFragments.clear()
+            finishedFragments.addAll(fragments)
+            // Toolbar setting handled on fragment creation, unlike other case
+        } else {
+            cvFragment.setToolbarTitle()
+            cvFragment.refreshFragment()
+        }
+
         findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
 
-        CollectionManager.clearStack()
-        if (collection is Folder) CollectionManager.launchAsShortcut(collection)
-        else CollectionManager.launch(collection)
-
-        fragment.setToolbarTitle()
-        fragment.refreshFragment()
     }
 
 }

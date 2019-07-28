@@ -2,6 +2,7 @@ package iced.egret.palette.util
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -22,7 +23,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-
+/**
+ * Handles disk-related operations, like saving/loading images, hosting the Recycle Bin,
+ * and moving files.
+ */
 object Storage {
 
     private const val rootCacheFileName = "root-cache.json"
@@ -33,11 +37,23 @@ object Storage {
     lateinit var recycleBin: RecycleBin
         private set
 
+    // Only updated when reading directly from disk
     val retrievedFolders = mutableListOf<Folder>()
     val retrievedAlbums = mutableListOf<Album>()
     val retrievedPictures = mutableMapOf<String, Picture>()
 
     private var gson = Gson()
+
+    /**
+     * Abstraction of changes to on-disk items.
+     *
+     * @property toAdd set of FileObjects, because these are brand new
+     * @property toRemove a set of paths, because these have to be searched for and removed
+     */
+    class UpdateKit(add: Set<FileObject>? = null, remove: Set<String>? = null) {
+        val toAdd = add ?: mutableSetOf<FileObject>()
+        val toRemove = remove ?: mutableSetOf<String>()
+    }
 
     class RecycleBin(directory: File) {
         val name = "recycle-bin"
@@ -161,6 +177,37 @@ object Storage {
         cursor.close()
         return rootFolders
 
+    }
+
+    fun getUpdateKit(context: Context): UpdateKit {
+
+        val foundPicturePaths = mutableSetOf<String>()
+        val existingPicturePaths = retrievedPictures.keys
+
+        val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaColumns.DATA)
+        val sortBy = MediaStore.Images.ImageColumns.DATE_MODIFIED + " DESC"
+        val cursor = context.contentResolver.query(uri, projection, null, null, sortBy)
+        val columnIndexData = cursor!!.getColumnIndexOrThrow(MediaColumns.DATA)
+
+        while (cursor.moveToNext()) {
+            foundPicturePaths.add(cursor.getString(columnIndexData))
+        }
+        cursor.close()
+
+        val addedPaths = foundPicturePaths - existingPicturePaths
+        val addedPictures = mutableSetOf<Picture>()
+        val removedPaths = existingPicturePaths - foundPicturePaths
+
+        for (path in addedPaths) {
+            val name = path.split("/").last()
+            val picture = Picture(name, path)
+            addedPictures.add(picture)
+            retrievedPictures[path] = picture
+        }
+        for (path in removedPaths) retrievedPictures.remove(path)
+
+        return UpdateKit(addedPictures, removedPaths)
     }
 
     fun saveAlbumsToDisk(albums: List<Album>) {

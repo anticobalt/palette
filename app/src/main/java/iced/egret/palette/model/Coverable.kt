@@ -10,6 +10,7 @@ import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.signature.MediaStoreSignature
 import iced.egret.palette.recyclerview_component.CoverViewHolder
 import java.io.File
+import java.io.FileNotFoundException
 
 interface Coverable {
     val terminal: Boolean
@@ -40,13 +41,17 @@ interface Coverable {
      */
     private fun createMediaStoreSignature(context: Context, imageReference: Any?): MediaStoreSignature? {
         if (imageReference is Uri) {
-            val file = File(imageReference.path)
-            val mimeType = context.contentResolver.getType(imageReference)
-            val dateModified = file.lastModified()
-            val orientation = ExifInterface(file.path).getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-
-            return MediaStoreSignature(mimeType, dateModified, orientation)
+            return try {
+                val file = File(imageReference.path)
+                val mimeType = context.contentResolver.getType(imageReference)
+                val dateModified = file.lastModified()
+                val orientation = ExifInterface(file.path).getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+                MediaStoreSignature(mimeType, dateModified, orientation)
+            } catch (e: FileNotFoundException) {
+                // Occurs when image file moved/deleted outside of app
+                null
+            }
         }
         return null
     }

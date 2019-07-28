@@ -1,6 +1,7 @@
 package iced.egret.palette.util
 
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.documentfile.provider.DocumentFile
@@ -8,11 +9,24 @@ import androidx.fragment.app.Fragment
 import iced.egret.palette.R
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.coroutines.CoroutineContext
 
-object CollectionManager {
+/**
+ * Responsible for handling the Collection Stack needed for in-app navigation,
+ * the state/properties of Collections and their contents, and acts as a mediator between
+ * Activities and Storage. Often delegates work to Storage, so is mildly coupled to it.
+ */
+object CollectionManager : CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO
 
     private const val STORAGE_PATH = "/storage"
     private const val MAIN_STORAGE_PATH = "$STORAGE_PATH/emulated"
@@ -73,6 +87,51 @@ object CollectionManager {
         // Add Albums
         mCollections.addAll(Storage.retrievedAlbums)
 
+    }
+
+    fun fetchFromStorage(context: Context, callback: () -> Unit) {
+        launch {
+            val updateKit = withContext(coroutineContext) {
+                Storage.getUpdateKit(context)
+            }
+            updatePicturesFromKit(updateKit)
+            cleanAlbums()
+            Storage.saveAlbumsToDisk(albums)
+            withContext(Dispatchers.Main) { callback() }
+        }
+    }
+
+    /**
+     * The if clauses of the for loops will fail if a Picture was moved/deleted/added due to
+     * in-app operations. These changes are properly reflected on disk, but Storage isn't alerted
+     * about them, so UpdateKit reports them as added/deleted externally.
+     * Extra overhead to make Storage keep track of those things is probably not worth it.
+     */
+    private fun updatePicturesFromKit(updateKit: Storage.UpdateKit) {
+
+        val addedPictures = updateKit.toAdd.filterIsInstance<Picture>()
+        val removedPaths = updateKit.toRemove
+
+        for (picture in addedPictures) {
+            val folder = getParentFolder(picture)
+            // Don't add if Picture already exists
+            if (folder != null && folder.findPictureByPath(picture.filePath) == null) {
+                picture.parent = folder
+                folder.addPicture(picture, toFront = true)
+            }
+        }
+
+        for (path in removedPaths) {
+            val parentPath = path.split("/").dropLast(1).joinToString("/")
+            val folder = findFolderByPath(parentPath)
+            val picture = folder?.findPictureByPath(path)
+
+            if (folder != null && picture != null) {
+                // Returns false if Picture previously removed by in-app operations.
+                folder.removePicture(picture)
+            }
+
+        }
     }
 
     fun getCollections(): MutableList<Collection> {
@@ -308,6 +367,9 @@ object CollectionManager {
     /**
      * Finds the parent Folder of the FileObject, or makes it (and all required ancestors)
      * with proper linking.
+     *
+     * Returning null should not happen (if it does, it's programmer error), and is in place
+     * (instead of forcing non-nullity) to keep app running in case it does.
      */
     private fun getParentFolder(fileObject: FileObject): Folder? {
         val pathToParent = fileObject.parentFilePath

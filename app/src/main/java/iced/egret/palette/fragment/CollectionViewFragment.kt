@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.transition.Visibility
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -30,12 +31,17 @@ import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.io.File
 
-
+/**
+ * Meat of the app. Shows Collection contents and allows navigation through them.
+ * Automatically requests CollectionManager to get fresh data when returning from another activity
+ * or app.
+ */
 class CollectionViewFragment :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
-        FlexibleAdapter.OnItemLongClickListener {
+        FlexibleAdapter.OnItemLongClickListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     companion object SaveDataKeys {
         const val selectedType = "CollectionViewFragment_ST"
@@ -46,26 +52,29 @@ class CollectionViewFragment :
     private var mRootView: View? = null
     private lateinit var mCollectionRecyclerView: RecyclerView
     private lateinit var mFloatingActionButton: FloatingActionButton
+    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     private var mContents = mutableListOf<Coverable>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
     lateinit var adapter: FlexibleAdapter<CollectionViewItem>
     private var mSelectedContentType: String? = null
+    private var mShouldUpdateContents = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         mRootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
+        mSwipeRefreshLayout = mRootView!!.findViewById(R.id.swipeRefreshLayout)
 
         fetchContents()
-
-        mFloatingActionButton.setOnClickListener {
-            onFabClick()
-        }
-
         buildToolbar()
         buildRecyclerView()
+        mSwipeRefreshLayout.setOnRefreshListener(this)
+        mFloatingActionButton.setOnClickListener { onFabClick() }
+
+        // Already got updated contents, so don't do it again
+        mShouldUpdateContents = false
 
         return mRootView
 
@@ -101,10 +110,15 @@ class CollectionViewFragment :
         }
     }
 
+    /**
+     * Called after onActivityResult() if applicable.
+     */
     override fun onResume() {
         super.onResume()
-        // Don't refresh if currently selecting stuff
-        if (mSelectedContentType == null) refreshFragment()
+        // Never refresh if currently selecting stuff.
+        // If not selecting, refresh if onCreate() not called.
+        if (mSelectedContentType != null) return
+        if (mShouldUpdateContents) showUpdatedContents()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -116,6 +130,23 @@ class CollectionViewFragment :
     override fun onAllFragmentsCreated() {
         // This fragment is always created last, so this function is not required.
     }
+
+    override fun onStop() {
+        super.onStop()
+        // Assume need to update onStart().
+        mShouldUpdateContents = true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICTURE_ACTIVITY_REQUEST) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                // Changes occurred: notify update; self-update occurs automatically in onResume()
+                MainFragmentManager.notifyAlbumUpdateFromCollectionView()
+            }
+        }
+    }
+
 
     /**
      * Makes default toolbar and fills with items and title
@@ -509,6 +540,21 @@ class CollectionViewFragment :
         }
     }
 
+    /**
+     * Queries CollectionManager to get fresh data from disk, and shows it.
+     */
+    private fun showUpdatedContents() {
+        CollectionManager.fetchFromStorage(activity!!) {
+            // When done async fetch, refresh fragment to view up-to-date contents
+            refreshFragment()
+            mSwipeRefreshLayout.isRefreshing = false
+        }
+    }
+
+    override fun onRefresh() {
+        showUpdatedContents()
+    }
+
     private fun movePictures(pictures: List<Picture>, destination: File, typeString: String) {
         val failedCounter = CollectionManager.movePictures(pictures, destination,
                 getSdCardDocumentFile(), activity!!.contentResolver) { sourceFile, movedFile ->
@@ -526,17 +572,6 @@ class CollectionViewFragment :
         }
         if (failedCounter > 0) toast("Failed to move $failedCounter!")
         else toast("${pictures.size} $typeString moved to recycle bin")
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICTURE_ACTIVITY_REQUEST) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                // Changes occurred: update
-                refreshFragment()
-                MainFragmentManager.notifyAlbumUpdateFromCollectionView()
-            }
-        }
     }
 
     private fun getSdCardDocumentFile(): DocumentFile? {

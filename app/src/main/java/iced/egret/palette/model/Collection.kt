@@ -56,6 +56,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
                     Glide.with(holder.itemView.context)
                             .load(imageReference)
                             .centerCrop()
+                            .fallback(R.drawable.ic_broken_image_black_24dp)
 
             // Load image with signature if possible
             buildGlideImage(glide, holder.ivItem, imageReference)

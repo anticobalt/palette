@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.PagerAdapter
-import com.github.piasy.biv.view.GlideImageViewFactory
+import com.davemorrissey.labs.subscaleview.ImageSource
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
 import iced.egret.palette.model.Picture
@@ -35,27 +35,28 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
     }
 
     /**
-     * BigImageViews (or SSIVs) are not compatible with GestureViews, so use both
-     * GestureImageView and BigImageView, depending on whether true zoom is required or not.
+     * SSIVs are not compatible with GestureViews, so use both
+     * GestureImageView and SSIV, depending on whether true zoom is required or not.
      */
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
 
+        val picture = pictures[position]
         val trueZoomOn = PreferenceManager
                 .getDefaultSharedPreferences(activityReference.get())
                 .getBoolean(activityReference.get()?.getString(R.string.true_zoom_key), false)
 
         // Set layout and build ImageView
         val layoutItem : View
-        if (trueZoomOn) {
+        if (trueZoomOn && picture.isJpgOrPng) {
             layoutItem = LayoutInflater
                     .from(container.context)
                     .inflate(R.layout.item_view_picture_big, container, false)
-            buildBigImageView(layoutItem, pictures[position])
+            buildSSIV(layoutItem, picture)
         } else {
             layoutItem = LayoutInflater
                     .from(container.context)
                     .inflate(R.layout.item_view_picture_gestures, container, false)
-            buildGestureImageView(layoutItem, pictures[position])
+            buildGestureImageView(layoutItem, picture)
         }
 
         container.addView(layoutItem)
@@ -63,16 +64,15 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
 
     }
 
-    private fun buildBigImageView(layoutItem: View, picture: Picture) {
-        val bigImageView = layoutItem.bigImageView
-        bigImageView.setImageViewFactory(GlideImageViewFactory())
-        bigImageView.showImage(picture.uri)
+    private fun buildSSIV(layoutItem: View, picture: Picture) {
+        val ssImageView = layoutItem.ssImageView
+        ssImageView.setImage(ImageSource.uri(picture.uri))
 
         // Reset touch listener; GestureView controller sets its own, which prevents
         // coherent scrolling of BigImageViews.
         activityReference.get()?.viewpager?.setOnTouchListener(DummyTouchListener())
 
-        bigImageView.setOnClickListener {
+        ssImageView.setOnClickListener {
             activityReference.get()?.toggleUIs()
         }
     }

@@ -7,10 +7,9 @@
     android:layout_height="match_parent">
 
     <!-- optimizeDisplay = auto-zoom when image is large -->
-    <com.github.piasy.biv.view.BigImageView
-        android:id="@+id/bigImageView"
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:id="@+id/ssImageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:optimizeDisplay="false" />
+        android:layout_height="match_parent" />
 
 </FrameLayout>

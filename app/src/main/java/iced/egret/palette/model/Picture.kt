@@ -65,6 +65,11 @@ class Picture(override var name: String, override var filePath: String) : Termin
             BitmapFactory.decodeFile(filePath, options)
             return options.outMimeType
         }
+    val isJpgOrPng: Boolean
+        get() {
+            val mimeType = this.mimeType
+            return mimeType in setOf("image/jpeg", "image/png")
+        }
     val fileSize: String
         get() = parseFileSize(file.length())
     val height: Int

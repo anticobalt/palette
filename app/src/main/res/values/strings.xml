@@ -35,7 +35,7 @@
     <!-- Preference summaries -->
     <string name="flipper_toolbar_color_summary">Turn off to use default black color</string>
     <string name="true_zoom_summary">
-        Show pictures as-is. Enabling allows large images to be viewed clearly. May improve performance. Disables rotation gestures.
+        Show PNGs and JPGs as-is. Enabling allows large images to be viewed clearly. May improve performance. Disables rotation gestures.
     </string>
 
     <!-- Actions -->

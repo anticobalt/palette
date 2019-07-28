@@ -13,8 +13,6 @@ import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
-import com.github.piasy.biv.BigImageViewer
-import com.github.piasy.biv.loader.glide.GlideImageLoader
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
@@ -40,7 +38,6 @@ class PictureViewActivity : BottomActionsActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        BigImageViewer.initialize(GlideImageLoader.with(applicationContext))
         setContentView(R.layout.activity_view_picture)
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
 

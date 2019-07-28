@@ -142,7 +142,7 @@ class CollectionViewFragment :
         if (requestCode == PICTURE_ACTIVITY_REQUEST) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 // Changes occurred: notify update; self-update occurs automatically in onResume()
-                MainFragmentManager.notifyAlbumUpdateFromCollectionView()
+                MainFragmentManager.notifyCollectionsChanged()
             }
         }
     }
@@ -260,7 +260,7 @@ class CollectionViewFragment :
 
         fun refresh() {
             refreshFragment()
-            MainFragmentManager.notifyAlbumUpdateFromCollectionView()  // to update cover
+            MainFragmentManager.notifyCollectionsChanged()  // to update cover
         }
 
         // sanity check that selected type is valid
@@ -547,6 +547,7 @@ class CollectionViewFragment :
         CollectionManager.fetchFromStorage(activity!!) {
             // When done async fetch, refresh fragment to view up-to-date contents
             refreshFragment()
+            MainFragmentManager.notifyCollectionsChanged()
             mSwipeRefreshLayout.isRefreshing = false
         }
     }

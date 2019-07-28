@@ -49,6 +49,11 @@ class CropActivity : BottomActionsActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        // If handling on-disk item, but it was moved, get out.
+        val path = mImageUri.path
+        if (path != null && !Storage.fileExists(path)) finish()
+
         Aesthetic.resume(this)
     }
 

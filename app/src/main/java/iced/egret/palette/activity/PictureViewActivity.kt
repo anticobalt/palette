@@ -35,6 +35,8 @@ class PictureViewActivity : BottomActionsActivity() {
     private var itemPosition = -1
 
     private val mPictures = mutableListOf<Picture>()
+    private val currentPicture : Picture
+        get() = mPictures[itemPosition]
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +51,11 @@ class PictureViewActivity : BottomActionsActivity() {
         buildViewPager()
         buildBottomActions()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!Storage.fileExists(currentPicture.filePath)) finish()
     }
 
     /**

@@ -35,7 +35,7 @@ object MainFragmentManager {
         }
     }
 
-    fun notifyAlbumUpdateFromCollectionView() {
+    fun notifyCollectionsChanged() {
         (fragments[PINNED_COLLECTIONS] as PinnedCollectionsFragment).refreshFragment()
     }
 

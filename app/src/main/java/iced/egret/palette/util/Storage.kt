@@ -219,7 +219,10 @@ object Storage {
         saveJsonToDisk(json, albumsFileName)
     }
 
-    fun getAlbumsFromDisk(): MutableList<Album> {
+    /**
+     * Uses initially retrieved Pictures to rebuild Albums from JSON.
+     */
+    private fun getAlbumsFromDisk(): MutableList<Album> {
         val json = readJsonFromDisk(albumsFileName)
         val type = object : TypeToken<ArrayList<AlbumData>>() {}.type
         if (json != null) {

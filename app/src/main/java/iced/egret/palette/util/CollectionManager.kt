@@ -56,6 +56,7 @@ object CollectionManager : CoroutineScope {
         private set(value) = mCollectionStack.push(value)
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
+    val pictureCache = mutableMapOf<String, Picture>()
 
     fun setupIfRequired() {
         if (!ready) {
@@ -66,6 +67,7 @@ object CollectionManager : CoroutineScope {
 
     private fun setup() {
 
+        pictureCache.putAll(Storage.retrievedPictures)
         root = Storage.retrievedFolders.firstOrNull() ?: return
         val displayedFolders = findFolderByPath(STORAGE_PATH)?.folders
                 ?: root.folders  // uncharted territory
@@ -434,6 +436,7 @@ object CollectionManager : CoroutineScope {
             Storage.saveAlbumsToDisk(albums)
         }
 
+        pictureCache[file.path] = picture
         return file
     }
 
@@ -448,6 +451,11 @@ object CollectionManager : CoroutineScope {
 
         val files = Storage.moveFile(picture.filePath, folderFile, sdCardFile, contentResolver)
                 ?: return null
+
+        // Update cache
+        pictureCache.remove(picture.filePath)
+        pictureCache[files.second.path] = picture
+
         picture.filePath = files.second.path
         return files
     }
@@ -503,6 +511,11 @@ object CollectionManager : CoroutineScope {
     fun renamePicture(picture: Picture, newName: String, sdCardFile: DocumentFile?): Pair<File, File>? {
         val files = Storage.renameFile(picture.filePath, newName, sdCardFile)
                 ?: return null
+
+        // Update cache
+        pictureCache.remove(picture.filePath)
+        pictureCache[files.second.path] = picture
+
         picture.name = newName
         picture.filePath = files.second.path
         Storage.saveAlbumsToDisk(albums)
@@ -518,6 +531,10 @@ object CollectionManager : CoroutineScope {
         // Pair<Original, New>
         val files = Storage.moveFileToRecycleBin(picture.filePath, sdCardFile)
                 ?: return null
+
+        // Update cache
+        pictureCache.remove(picture.filePath)
+
         findFolderByPath(picture.fileLocation)?.removePicture(picture)
         return files.first
     }
@@ -546,6 +563,10 @@ object CollectionManager : CoroutineScope {
         // Pair<RecycleBin File, Original File>
         val files = Storage.restoreFileFromRecycleBin(picture.filePath, sdCardFile, contentResolver)
                 ?: return null
+
+        // Update cache
+        pictureCache[files.second.path] = picture
+
         picture.filePath = files.second.path
         getParentFolder(picture)?.addPicture(picture, toFront = true)
         return files.second

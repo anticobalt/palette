@@ -12,7 +12,7 @@ import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
 import iced.egret.palette.model.Picture
 import kotlinx.android.synthetic.main.activity_view_picture.*
-import kotlinx.android.synthetic.main.item_view_picture_big.view.*
+import kotlinx.android.synthetic.main.item_view_picture_ssiv.view.*
 import kotlinx.android.synthetic.main.item_view_picture_gestures.view.*
 import java.lang.ref.WeakReference
 
@@ -50,7 +50,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
         if (trueZoomOn && picture.isJpgOrPng) {
             layoutItem = LayoutInflater
                     .from(container.context)
-                    .inflate(R.layout.item_view_picture_big, container, false)
+                    .inflate(R.layout.item_view_picture_ssiv, container, false)
             buildSSIV(layoutItem, picture)
         } else {
             layoutItem = LayoutInflater

@@ -123,7 +123,7 @@ class MainActivity : BasicAestheticActivity() {
         fragments[leftIndex] = PinnedCollectionsFragment()
         fragments[rightIndex] = CollectionViewFragment()
 
-        val frames = listOf(R.id.linksFragment, R.id.contentsFragment)
+        val frames = listOf(R.id.leftFragmentContainer, R.id.rightFragmentContainer)
         assert(frames.size == fragments.size)
 
         // bind fragments
@@ -257,7 +257,7 @@ class MainActivity : BasicAestheticActivity() {
         (fragments[leftIndex] as PinnedCollectionsFragment).refreshFragment()
     }
 
-    fun notifyAlbumDeletedFromPinnedCollections() {
+    fun notifyPinnedAlbumDeleted() {
         val current = CollectionManager.currentCollection
         val allCollections = CollectionManager.getCollections()
         if (current != null && !allCollections.contains(current)) {
@@ -267,7 +267,6 @@ class MainActivity : BasicAestheticActivity() {
     }
 
     fun buildCollectionView(collection: Collection) {
-
         val cvFragment = fragments[rightIndex] as CollectionViewFragment
         findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
         CollectionManager.clearStack()
@@ -277,9 +276,7 @@ class MainActivity : BasicAestheticActivity() {
             else -> CollectionManager.launch(collection)
         }
 
-        fragments[rightIndex] = cvFragment
         cvFragment.refreshFragment()
-
     }
 
 }

@@ -15,12 +15,12 @@
         <FrameLayout
             android:layout_width="@dimen/banner_width"
             android:layout_height="match_parent"
-            android:id="@+id/linksFragment" />
+            android:id="@+id/leftFragmentContainer" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/contentsFragment" />
+            android:id="@+id/rightFragmentContainer" />
 
     </androidx.slidingpanelayout.widget.SlidingPaneLayout>
 

@@ -262,18 +262,16 @@ object CollectionManager : CoroutineScope {
      * @return Adapter needs to be updated (true) or not (false)
      */
     fun launch(item: Coverable, position: Int = -1, callingFragment: Fragment? = null, requestCode: Int = -1): Boolean {
-        if (!item.terminal) {
+        if (item !is TerminalCoverable) {
             if (item as? Collection != null) {
                 currentCollection = item
                 return true
             }
-        } else {
-            if (item as? TerminalCoverable != null) {
-                val intent = Intent(callingFragment?.context, item.activity)
-                val key = callingFragment?.getString(R.string.intent_item_key)
-                intent.putExtra(key, position)
-                callingFragment?.startActivityForResult(intent, requestCode)
-            }
+        } else if (callingFragment != null) {
+            val intent = Intent(callingFragment.context, item.activity)
+            val key = callingFragment.getString(R.string.intent_item_key)
+            intent.putExtra(key, position)
+            callingFragment.startActivityForResult(intent, requestCode)
         }
         return false
     }

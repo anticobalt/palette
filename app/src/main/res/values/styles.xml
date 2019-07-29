@@ -7,23 +7,18 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.ColorBackground" parent="AppTheme">
-        <item name="android:windowBackground">@color/grey</item>
-    </style>
-
-    <style name="AppTheme.ColorBackground.NoDefaultActionBar" parent="AppTheme.ColorBackground">
+    <style name="AppTheme.NoDefaultActionBar">
         <!-- Disables default action bar, allowing you to specify your own toolbar in the layout. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.ColorBackground.NoDefaultActionBar.ActionMode" parent="AppTheme.ColorBackground.NoDefaultActionBar">
+    <style name="AppTheme.NoDefaultActionBar.ActionMode">
         <!-- Make ActionMode toolbar overlap existing toolbars -->
         <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">

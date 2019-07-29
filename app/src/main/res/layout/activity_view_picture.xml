@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:background="@color/grey"
     tools:context=".activity.PictureViewActivity">
 
     <include
-        layout="@layout/appbar_view_picture"
         android:id="@+id/appbar"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent" />
+        layout="@layout/appbar_view_picture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <iced.egret.palette.StoicViewPager
         android:id="@+id/viewpager"
@@ -18,7 +19,7 @@
         android:layout_height="fill_parent" />
 
     <include
-        layout="@layout/bottom_actions_view_picture"
-        android:id="@+id/bottomActions" />
+        android:id="@+id/bottomActions"
+        layout="@layout/bottom_actions_view_picture" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

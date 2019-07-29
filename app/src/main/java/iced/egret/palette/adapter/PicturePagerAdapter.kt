@@ -79,7 +79,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
         if (picture.isJpgOrPng) {
             ssImageView.orientation = SubsamplingScaleImageView.ORIENTATION_USE_EXIF
             ssImageView.setImage(ImageSource.uri(picture.uri))
-            ssImageView.setOnImageEventListener(object: SubsamplingScaleImageView.DefaultOnImageEventListener() {
+            ssImageView.setOnImageEventListener(object : SubsamplingScaleImageView.DefaultOnImageEventListener() {
                 override fun onImageLoaded() {
                     super.onImageLoaded()
                     staticImageView.visibility = View.INVISIBLE
@@ -93,7 +93,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
         // Allow onImageViewClick() gesture while SSIV is loading
         val gestureDetector = GestureDetector(
                 staticImageView.context,
-                object: GestureDetector.SimpleOnGestureListener() {
+                object : GestureDetector.SimpleOnGestureListener() {
                     override fun onSingleTapUp(e: MotionEvent?): Boolean {
                         onImageViewClick()
                         return super.onSingleTapUp(e)

@@ -27,21 +27,25 @@ import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
 
 class PictureViewActivity : BottomActionsActivity() {
 
-    private lateinit var sharedPrefs: SharedPreferences
-    private var barBackgroundColor: Int = Color.BLACK
-    private var barIconColor: Int = Color.WHITE
+    private lateinit var mSharedPrefs: SharedPreferences
+    private var mBarBackgroundColor: Int = Color.BLACK
+    private var mBarIconColor: Int = Color.WHITE
 
-    private var uiHidden = false
-    private var itemPosition = -1
+    private var mUiHidden = false
+    private var mActivePage = -1
+
+    private var mViewPagerPosition = 0
+    private var mViewPagerOffsetPixels = 0
 
     private val mPictures = mutableListOf<Picture>()
-    private val currentPicture : Picture
-        get() = mPictures[itemPosition]
+    private val mCurrentPicture: Picture
+        get() = mPictures[mActivePage]
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_picture)
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         if (!getStartPosition()) return
 
@@ -55,7 +59,7 @@ class PictureViewActivity : BottomActionsActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!Storage.fileExists(currentPicture.filePath)) finish()
+        if (!Storage.fileExists(mCurrentPicture.filePath)) finish()
     }
 
     /**
@@ -63,8 +67,8 @@ class PictureViewActivity : BottomActionsActivity() {
      * @return Success (true) or failure (false)
      */
     private fun getStartPosition(): Boolean {
-        itemPosition = intent.getIntExtra(getString(R.string.intent_item_key), -1)
-        return if (itemPosition == -1) {
+        mActivePage = intent.getIntExtra(getString(R.string.intent_item_key), -1)
+        return if (mActivePage == -1) {
             toast(R.string.intent_extra_error)
             false
         } else {
@@ -77,17 +81,17 @@ class PictureViewActivity : BottomActionsActivity() {
      */
     private fun setColors() {
 
-        val usePrimary = sharedPrefs.getBoolean(getString(R.string.flipper_toolbar_color_key), false)
+        val usePrimary = mSharedPrefs.getBoolean(getString(R.string.flipper_toolbar_color_key), false)
         if (usePrimary) {
-            barBackgroundColor = sharedPrefs.getInt(getString(R.string.primary_color_key),
+            mBarBackgroundColor = mSharedPrefs.getInt(getString(R.string.primary_color_key),
                     ContextCompat.getColor(this, R.color.colorPrimary))
         }  // else use default
 
-        barIconColor = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), barIconColor)
+        mBarIconColor = mSharedPrefs.getInt(getString(R.string.toolbar_item_color_key), mBarIconColor)
 
         // make translucent
-        barBackgroundColor = getTranslucentColor(barBackgroundColor)
-        barIconColor = getTranslucentColor(barIconColor)
+        mBarBackgroundColor = getTranslucentColor(mBarBackgroundColor)
+        mBarIconColor = getTranslucentColor(mBarIconColor)
     }
 
     private fun getTranslucentColor(color: Int): Int {
@@ -110,16 +114,16 @@ class PictureViewActivity : BottomActionsActivity() {
         appbar.setPadding(0, getStatusBarHeight(), 0, 0)
 
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
-        appbar.background = getGradientToTransparent(barBackgroundColor, GradientDrawable.Orientation.TOP_BOTTOM)
+        appbar.background = getGradientToTransparent(mBarBackgroundColor, GradientDrawable.Orientation.TOP_BOTTOM)
 
         // Universal fix for appbar being behind ImageView due to elevation=0dp in XML.
         // Setting translationZ=0.1dp doesn't work on some devices (e.g. Nexus5).
         appbar.bringToFront()
 
         // https://stackoverflow.com/a/33534039
-        toolbar.overflowIcon?.setTint(barIconColor)
-        toolbar.navigationIcon?.setTint(barIconColor)
-        toolbarTitle.setTextColor(barIconColor)
+        toolbar.overflowIcon?.setTint(mBarIconColor)
+        toolbar.navigationIcon?.setTint(mBarIconColor)
+        toolbarTitle.setTextColor(mBarIconColor)
 
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""  // toolbarTitle is handling title
@@ -144,7 +148,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun setToolbarTitle() {
-        toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[itemPosition].name
+        toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[mActivePage].name
     }
 
     override fun buildBottomActions() {
@@ -152,10 +156,10 @@ class PictureViewActivity : BottomActionsActivity() {
         bottomActions.setPadding(0, 0, 0, getNavigationBarHeight())
 
         // color bar and bar actions
-        bottomActions.background = getGradientToTransparent(barBackgroundColor, GradientDrawable.Orientation.BOTTOM_TOP)
+        bottomActions.background = getGradientToTransparent(mBarBackgroundColor, GradientDrawable.Orientation.BOTTOM_TOP)
         for (touchable in bottomActions.touchables) {
             if (touchable is ImageButton) {
-                touchable.imageTintList = ColorStateList.valueOf(barIconColor)
+                touchable.imageTintList = ColorStateList.valueOf(mBarIconColor)
             }
         }
 
@@ -163,7 +167,7 @@ class PictureViewActivity : BottomActionsActivity() {
         bottomActions.setOnTouchListener { _, _ -> true }
 
         bottomActions.details.setOnClickListener {
-            DialogGenerator.pictureDetails(this, mPictures[itemPosition])
+            DialogGenerator.pictureDetails(this, mPictures[mActivePage])
         }
         bottomActions.home_folder.setOnClickListener {
 
@@ -186,7 +190,7 @@ class PictureViewActivity : BottomActionsActivity() {
     private fun buildViewPager() {
         fetchPictures()
         viewpager.adapter = PicturePagerAdapter(mPictures, this)
-        viewpager.currentItem = itemPosition
+        viewpager.currentItem = mActivePage
         viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
             /**
@@ -202,7 +206,7 @@ class PictureViewActivity : BottomActionsActivity() {
              */
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
                 // If moving right
-                if (itemPosition == position) {
+                if (mActivePage == position) {
                     if (positionOffset > 0.5) setPage(position + 1)
                     else setPage(position)
                 }
@@ -211,6 +215,8 @@ class PictureViewActivity : BottomActionsActivity() {
                     if (positionOffset < 0.5) setPage(position)
                     else setPage(position + 1)
                 }
+                mViewPagerPosition = position
+                mViewPagerOffsetPixels = positionOffsetPixels
             }
         })
     }
@@ -222,7 +228,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun setPage(position: Int) {
-        itemPosition = position
+        mActivePage = position
         setToolbarTitle()
     }
 
@@ -232,7 +238,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val trueZoomOn = sharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
+        val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
         val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
         trueZoomItem.isChecked = trueZoomOn
         return super.onPrepareOptionsMenu(menu)
@@ -246,7 +252,7 @@ class PictureViewActivity : BottomActionsActivity() {
             }
             R.id.switchTrueZoom -> {
                 item.isChecked = !item.isChecked
-                sharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
+                mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
                 refreshViewPager()
                 true
             }
@@ -270,7 +276,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun startCropActivity() {
-        val imageUri = CollectionManager.getCurrentCollectionPictures()[itemPosition].uri
+        val imageUri = CollectionManager.getCurrentCollectionPictures()[mActivePage].uri
         // setting initial crop padding doesn't working in XML for whatever reason
         CropImage.activity(imageUri)
                 .setInitialCropWindowPaddingRatio(0f)
@@ -289,7 +295,7 @@ class PictureViewActivity : BottomActionsActivity() {
     private fun initiateMove() {
         DialogGenerator.moveTo(this) {
             val destination = it
-            val oldPicture = CollectionManager.getCurrentCollectionPictures()[itemPosition]
+            val oldPicture = CollectionManager.getCurrentCollectionPictures()[mActivePage]
 
             if (oldPicture.fileLocation == destination.path) {
                 toast(R.string.already_exists_error)
@@ -312,7 +318,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun initiateRename() {
-        val picture = mPictures[itemPosition]
+        val picture = mPictures[mActivePage]
         val nameList = picture.name.split(".")
         val nameWithoutExtension = nameList.dropLast(1).joinToString(".")
         val extension = nameList.last()
@@ -339,7 +345,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun initiateMoveToRecycleBin() {
-        val picture = mPictures[itemPosition]
+        val picture = mPictures[mActivePage]
         DialogGenerator.moveToRecycleBin(this, "picture") {
             // Need sdCardFile to delete from SD card (if required)
             val failCount = CollectionManager.movePicturesToRecycleBin(listOf(picture), getSdCardDocumentFile()) {
@@ -349,8 +355,7 @@ class PictureViewActivity : BottomActionsActivity() {
                 toast("Picture moved to recycle bin")
                 setResult(RESULT_OK)
                 finish()
-            }
-            else toast("Failed to move picture to recycle bin!")
+            } else toast("Failed to move picture to recycle bin!")
         }
     }
 
@@ -358,7 +363,7 @@ class PictureViewActivity : BottomActionsActivity() {
         // For regular immersive mode, add SYSTEM_UI_FLAG_IMMERSIVE.
         // For "sticky immersive," add SYSTEM_UI_FLAG_IMMERSIVE_STICKY instead.
         // For "lean back" mode, have neither.
-        uiHidden = true
+        mUiHidden = true
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
                 // Set the content to appear under the system bars so that the
                 // content doesn't resize when the system bars hide and show.
@@ -375,14 +380,14 @@ class PictureViewActivity : BottomActionsActivity() {
      * except for the ones that make the content appear under the system bars.
      */
     private fun showSystemUI() {
-        uiHidden = false
+        mUiHidden = false
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 
     fun toggleUIs() {
-        if (uiHidden) {
+        if (mUiHidden) {
             showSystemUI()
             bottomActions.animate().translationY(0f)
             appbar.animate().translationY(0f)

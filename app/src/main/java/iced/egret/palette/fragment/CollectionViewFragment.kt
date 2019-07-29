@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.transition.Visibility
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
@@ -19,6 +18,9 @@ import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.activity.RecycleBinActivity
 import iced.egret.palette.activity.SettingsActivity
+import iced.egret.palette.delegate.AlbumViewDelegate
+import iced.egret.palette.delegate.CollectionViewDelegate
+import iced.egret.palette.delegate.FolderViewDelegate
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.model.Folder
@@ -38,7 +40,7 @@ import java.io.File
  * Automatically requests CollectionManager to get fresh data when returning from another activity
  * or app.
  */
-open class CollectionViewFragment :
+open class CollectionViewFragment() :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
@@ -50,7 +52,12 @@ open class CollectionViewFragment :
     }
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
-    protected lateinit var mMaster : MainActivity
+    private lateinit var mMaster: MainActivity
+    private var delegate : CollectionViewDelegate = FolderViewDelegate()  // default
+        set(value) {
+            value.listener = this
+            field = value
+        }
 
     private var mRootView: View? = null
     private lateinit var mCollectionRecyclerView: RecyclerView
@@ -63,6 +70,11 @@ open class CollectionViewFragment :
     protected var mSelectedContentType: String? = null
     private var mShouldUpdateContents = true
 
+    fun onDelegateAlert(alert: CollectionViewDelegate.ActionAlert) {
+        if (alert.message.isNotEmpty()) toast(alert.message)
+        if (alert.success) refreshActivity()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         mRootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
@@ -72,6 +84,7 @@ open class CollectionViewFragment :
         mMaster = activity as MainActivity
 
         fetchContents()
+        buildDelegate()
         buildToolbar()
         buildRecyclerView()
         mSwipeRefreshLayout.setOnRefreshListener(this)
@@ -168,6 +181,7 @@ open class CollectionViewFragment :
             }
             true
         }
+        delegate.onBuildToolbar()
     }
 
     /**
@@ -182,6 +196,17 @@ open class CollectionViewFragment :
         } else text = title
 
         mToolbar.toolbarTitle.text = text
+    }
+
+    private fun buildDelegate() {
+        when (CollectionManager.currentCollection)     {
+            is Folder -> {
+                if (delegate !is FolderViewDelegate) delegate = FolderViewDelegate()
+            }
+            is Album -> {
+                if (delegate !is AlbumViewDelegate) delegate = AlbumViewDelegate()
+            }
+        }
     }
 
     /**
@@ -253,15 +278,11 @@ open class CollectionViewFragment :
         }
         Painter.paintDrawable(selectAll.icon)
 
+        delegate.onCreateActionMode(mode, menu, mSelectedContentType!!)
         return true
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-
-        fun refresh() {
-            refreshFragment()
-            mMaster.notifyCollectionsChanged()  // to update cover
-        }
 
         // sanity check that selected type is valid
         CollectionManager.getContentsMap()[mSelectedContentType] ?: return false
@@ -289,14 +310,14 @@ open class CollectionViewFragment :
                     val albumString = if (destinations.size > 1) "albums" else "album"
                     CollectionManager.addContentToAllAlbums(coverables, destinations)
                     toast("Added ${coverables.size} $typeString to ${destinations.size} $albumString.")
-                    refresh()
+                    refreshActivity()
                 }
             }
             R.id.actionMove -> {
                 DialogGenerator.moveTo(context!!) {
                     @Suppress("UNCHECKED_CAST")  // assume internal consistency
                     movePictures(coverables as List<Picture>, it, typeString)
-                    refresh()
+                    refreshActivity()
                 }
             }
             R.id.actionDelete -> {
@@ -305,15 +326,7 @@ open class CollectionViewFragment :
                         DialogGenerator.moveToRecycleBin(context!!, typeString) {
                             @Suppress("UNCHECKED_CAST")  // assume internal consistency
                             recyclePictures(coverables as List<Picture>, typeString)
-                            refresh()
-                        }
-                    }
-                    CollectionManager.FOLDER_KEY -> {
-                        DialogGenerator.deleteAlbum(context!!) {
-                            CollectionManager.deleteAlbumsByRelativePosition(
-                                    adapter.selectedPositions, deleteFromCurrent = true)
-                            toast("Deleted ${adapter.selectedItemCount} $typeString")
-                            refresh()
+                            refreshActivity()
                         }
                     }
                 }
@@ -322,6 +335,8 @@ open class CollectionViewFragment :
             else -> {
             }
         }
+
+        delegate.onActionItemClicked(mode, item, adapter, context!!, mSelectedContentType!!)
         return true
     }
 
@@ -341,6 +356,8 @@ open class CollectionViewFragment :
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
         mode.menu.findItem(R.id.actionMove).isVisible = false
         mode.menu.findItem(R.id.actionDelete).isVisible = false
+
+        delegate.onDestroyActionMode(mode)
     }
 
     private fun inferContentType(content: Coverable): String? {
@@ -452,22 +469,21 @@ open class CollectionViewFragment :
     }
 
     protected open fun onFabClick() {
-        Snackbar.make(view!!, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        delegate.onFabClick(context!!, mContents)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.gotoRecycleBin -> {
                 startActivity(Intent(this.context, RecycleBinActivity::class.java))
-                true
             }
             R.id.gotoSettings -> {
                 startActivity(Intent(this.context, SettingsActivity::class.java))
-                true
             }
             else -> super.onOptionsItemSelected(item)
         }
+        delegate.onOptionsItemSelected(item)
+        return true
     }
 
 
@@ -496,6 +512,12 @@ open class CollectionViewFragment :
         setToolbarTitle()
         adapter.updateDataSet(mContentItems)
         mActionModeHelper.destroyActionModeIfCan()
+        buildDelegate()
+    }
+
+    private fun refreshActivity() {
+        refreshFragment()
+        mMaster.notifyCollectionsChanged()  // to update cover
     }
 
     /**

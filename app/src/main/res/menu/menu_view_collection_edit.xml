@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="AppCompatResource">
+    <!-- Ignore AppCompatResource for showAsAction because they don't work on ActionMode -->
 
     <item
         android:id="@+id/actionToggleSelectAll"
         android:icon="@drawable/ic_select_all_black_24dp"
         android:orderInCategory="1"
         android:title="@string/action_toggle_select_all"
-        app:showAsAction="always" />
+        android:showAsAction="always" />
 
 
     <item
@@ -15,7 +17,7 @@
         android:title="@string/label_album_actions"
         android:orderInCategory="2"
         android:icon="@drawable/ic_photo_album_black_24dp"
-        app:showAsAction="ifRoom"
+        android:showAsAction="ifRoom"
         android:visible="false">
         <menu>
             <item
@@ -33,7 +35,7 @@
         android:id="@+id/actionMove"
         android:orderInCategory="3"
         android:title="@string/action_move"
-        app:showAsAction="never"
+        android:showAsAction="never"
         android:visible="false" />
 
     <item
@@ -41,7 +43,7 @@
         android:orderInCategory="4"
         android:icon="@drawable/ic_delete_black_24dp"
         android:title="@string/action_delete"
-        app:showAsAction="never"
+        android:showAsAction="never"
         android:visible="false" />
 
 </menu>

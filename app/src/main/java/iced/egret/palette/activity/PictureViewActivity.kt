@@ -180,6 +180,9 @@ class PictureViewActivity : BottomActionsActivity() {
 
     }
 
+    /**
+     * Higher offscreenPageLimit -> more lag when scrolling if in true zoom mode
+     */
     private fun buildViewPager() {
         fetchPictures()
         viewpager.adapter = PicturePagerAdapter(mPictures, this)

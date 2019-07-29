@@ -4,8 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.view.View
 import android.widget.ImageView
 import androidx.exifinterface.media.ExifInterface
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.signature.MediaStoreSignature
 import iced.egret.palette.recyclerview_component.CoverViewHolder
@@ -56,10 +58,19 @@ interface Coverable {
         return null
     }
 
+    fun getPlaceholderDrawable(imageView: ImageView) : Drawable {
+        val progressDrawable = CircularProgressDrawable(imageView.context)
+        progressDrawable.strokeWidth = 5f
+        progressDrawable.centerRadius = 40f
+        progressDrawable.start()
+        return progressDrawable
+    }
+
 }
 
 interface TerminalCoverable : Coverable {
     override val terminal: Boolean
         get() = true
     val activity: Class<out Activity>
+    fun loadInto(view: View)
 }

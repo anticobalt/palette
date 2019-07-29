@@ -2,11 +2,17 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/gestureFrameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- optimizeDisplay = auto-zoom when image is large -->
+    <ImageView
+        android:id="@+id/staticImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="ContentDescription" />
+
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/ssImageView"
         android:layout_width="match_parent"

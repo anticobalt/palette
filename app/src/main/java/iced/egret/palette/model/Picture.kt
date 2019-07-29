@@ -5,8 +5,8 @@ import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import androidx.exifinterface.media.ExifInterface
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
 import iced.egret.palette.recyclerview_component.CoverViewHolder
@@ -155,7 +155,10 @@ class Picture(override var name: String, override var filePath: String) : Termin
                     Glide.with(holder.itemView.context)
                             .load(cover["uri"])
                             .centerCrop()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(getPlaceholderDrawable(imageView))
                             .error(R.drawable.ic_broken_image_black_128dp)
+
             // Build image with signature if possible
             buildGlideImage(glide, imageView, cover["uri"])
         }
@@ -166,18 +169,19 @@ class Picture(override var name: String, override var filePath: String) : Termin
 
     }
 
-    fun loadPictureInto(imageView: ImageView) {
-        val progressDrawable = CircularProgressDrawable(imageView.context)
-        progressDrawable.strokeWidth = 5f
-        progressDrawable.centerRadius = 40f
-        progressDrawable.start()
+    override fun loadInto(view: View) {
+        when (view) {
+            is ImageView -> {
+                val glide = Glide
+                        .with(view.context)
+                        .load(uri)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(getPlaceholderDrawable(view))
+                buildGlideImage(glide, view, uri)
+            }
+        }
 
-        val glide = Glide
-                .with(imageView.context)
-                .load(uri)
-                .placeholder(progressDrawable)
 
-        buildGlideImage(glide, imageView, uri)
     }
 
 }

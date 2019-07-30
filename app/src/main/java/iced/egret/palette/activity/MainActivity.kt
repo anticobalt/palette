@@ -14,8 +14,8 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
+import iced.egret.palette.fragment.LinksFragment
 import iced.egret.palette.fragment.ListFragment
-import iced.egret.palette.fragment.PinnedCollectionsFragment
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
@@ -120,7 +120,7 @@ class MainActivity : BasicAestheticActivity() {
 
     private fun makeFragments() {
 
-        fragments[leftIndex] = PinnedCollectionsFragment()
+        fragments[leftIndex] = LinksFragment()
         fragments[rightIndex] = CollectionViewFragment()
 
         val frames = listOf(R.id.leftFragmentContainer, R.id.rightFragmentContainer)
@@ -139,7 +139,7 @@ class MainActivity : BasicAestheticActivity() {
     private fun updateFragments(fragments: List<Fragment>) {
         loop@ for (fragment in fragments) {
             val index: Int = when (fragment) {
-                is PinnedCollectionsFragment -> leftIndex
+                is LinksFragment -> leftIndex
                 is CollectionViewFragment -> rightIndex
                 else -> continue@loop
             }
@@ -254,7 +254,7 @@ class MainActivity : BasicAestheticActivity() {
     }
 
     fun notifyCollectionsChanged() {
-        (fragments[leftIndex] as PinnedCollectionsFragment).refreshFragment()
+        (fragments[leftIndex] as LinksFragment).refreshFragment()
     }
 
     fun notifyPinnedAlbumDeleted() {

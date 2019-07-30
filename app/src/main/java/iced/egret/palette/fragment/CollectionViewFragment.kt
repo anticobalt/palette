@@ -16,8 +16,6 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
-import iced.egret.palette.activity.RecycleBinActivity
-import iced.egret.palette.activity.SettingsActivity
 import iced.egret.palette.delegate.AlbumViewDelegate
 import iced.egret.palette.delegate.CollectionViewDelegate
 import iced.egret.palette.delegate.FolderViewDelegate
@@ -474,15 +472,6 @@ open class CollectionViewFragment() :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.gotoRecycleBin -> {
-                startActivity(Intent(this.context, RecycleBinActivity::class.java))
-            }
-            R.id.gotoSettings -> {
-                startActivity(Intent(this.context, SettingsActivity::class.java))
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
         delegate.onOptionsItemSelected(item, context!!, CollectionManager.currentCollection!!)
         return true
     }

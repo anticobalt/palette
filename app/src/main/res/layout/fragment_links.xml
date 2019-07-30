@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <include layout="@layout/appbar_list_fragment" />
+
+    <androidx.slidingpanelayout.widget.SlidingPaneLayout
+        android:id="@+id/slidingPaneLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+
+        <LinearLayout
+            android:id="@+id/sideActionsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal" >
+
+            <ImageButton
+                android:id="@+id/settings"
+                android:layout_width="@dimen/side_icon_size"
+                android:layout_height="@dimen/side_icon_size"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_settings_black_24dp"
+                android:background="?android:selectableItemBackground"
+                android:contentDescription="@string/action_settings" />
+
+            <ImageButton
+                android:id="@+id/recycleBin"
+                android:layout_width="@dimen/side_icon_size"
+                android:layout_height="@dimen/side_icon_size"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_delete_variant_black_24dp"
+                android:background="?android:selectableItemBackground"
+                android:contentDescription="@string/recycle_bin" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/pinnedCollectionsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
+    </androidx.slidingpanelayout.widget.SlidingPaneLayout>
+
+    <include
+        layout="@layout/blocker"
+        android:id="@+id/blocker" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

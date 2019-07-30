@@ -3,5 +3,7 @@
     <dimen name="tile_height">128dp</dimen>
     <dimen name="banner_width">256dp</dimen>
     <dimen name="banner_height">96dp</dimen>
+    <dimen name="side_icon_size">36dp</dimen>
+    <dimen name="sliding_pane_left_width">328dp</dimen>
     <dimen name="bottom_sheet_corner_radius">10dp</dimen>
 </resources>

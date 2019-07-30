@@ -12,6 +12,8 @@ import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
  * Fragments in a single Activity. List objects are selectable. Toolbar has a TextView inside
  * (allowing for more granular control of the title's display), so it has to be themed manually,
  * unlike more basic Toolbars.
+ *
+ * Toolbar menu items are themed automatically. ActionMode's are not.
  */
 abstract class ListFragment : Fragment() {
 

@@ -1,15 +1,23 @@
 package iced.egret.palette.fragment
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
+import iced.egret.palette.activity.RecycleBinActivity
 import iced.egret.palette.activity.SettingsActivity
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
@@ -21,16 +29,16 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
-import kotlinx.android.synthetic.main.fragment_pinned_collections.*
+import kotlinx.android.synthetic.main.fragment_links.*
 
-class PinnedCollectionsFragment :
+class LinksFragment :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener {
 
     companion object SaveDataKeys {
-        const val selectedType = "PinnedCollectionFragment_ST"
+        const val selectedType = "LinksFragment_ST"
     }
 
     private lateinit var mMaster: MainActivity
@@ -45,11 +53,15 @@ class PinnedCollectionsFragment :
     private var mSelectedContentType: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mRootView = inflater.inflate(R.layout.fragment_pinned_collections, container, false)
+        mRootView = inflater.inflate(R.layout.fragment_links, container, false)
         mRecyclerView = mRootView!!.findViewById(R.id.recyclerView)
         mMaster = activity as MainActivity
+
         buildToolbar()
         buildRecyclerView()
+        buildSideActions()
+        styleSlidePane()
+        styleExtraThemeElements()
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
         return mRootView
     }
@@ -98,6 +110,7 @@ class PinnedCollectionsFragment :
 
     override fun onResume() {
         super.onResume()
+        styleExtraThemeElements()
         // Don't refresh if currently selecting stuff
         // FIXME: redundant if onCreate() was previously called
         if (mSelectedContentType == null) refreshFragment()
@@ -110,7 +123,7 @@ class PinnedCollectionsFragment :
     private fun buildToolbar() {
         mToolbar = mRootView!!.findViewById(R.id.toolbar)
         mToolbar.toolbarTitle.text = getString(R.string.app_name)
-        mToolbar.inflateMenu(R.menu.menu_pinned_collections)
+        mToolbar.inflateMenu(R.menu.menu_links)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
@@ -133,9 +146,6 @@ class PinnedCollectionsFragment :
             R.id.actionCreateAlbum -> {
                 DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
             }
-            R.id.gotoSettings -> {
-                startActivity(Intent(this.context, SettingsActivity::class.java))
-            }
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -149,12 +159,44 @@ class PinnedCollectionsFragment :
         mRecyclerView.adapter = adapter
     }
 
+    private fun buildSideActions() {
+        val sideLayout = mRootView!!.findViewById<LinearLayout>(R.id.sideActionsLayout)
+
+        sideLayout.findViewById<ImageButton>(R.id.settings).setOnClickListener {
+            startActivity(Intent(this.context, SettingsActivity::class.java))
+        }
+        sideLayout.findViewById<ImageButton>(R.id.recycleBin).setOnClickListener {
+            startActivity(Intent(this.context, RecycleBinActivity::class.java))
+        }
+    }
+
+    private fun styleSlidePane() {
+        val slider = mRootView!!.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)
+        slider.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
+        slider.setShadowResourceLeft(R.drawable.shadow)
+    }
+
+    // Style themed stuff that isn't handled by Aesthetic or other inherited classes.
+    private fun styleExtraThemeElements() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val accentColor = prefs.getInt(getString(R.string.accent_color_key), R.color.colorAccent)
+        val iconColor = prefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+
+        val sideLayout = mRootView!!.findViewById<LinearLayout>(R.id.sideActionsLayout)
+        sideLayout.background = ColorDrawable(accentColor)
+        for (touchable in sideLayout.touchables) {
+            if (touchable is ImageButton) {
+                touchable.imageTintList = ColorStateList.valueOf(iconColor)
+            }
+        }
+    }
+
     /**
      * Straight from https://github.com/davideas/FlexibleAdapter/wiki/5.x-%7C-ActionModeHelper
      */
     private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
         // this = ActionMode.Callback instance
-        mActionModeHelper = object : ToolbarActionModeHelper(adapter, R.menu.menu_pinned_collections_edit, this) {
+        mActionModeHelper = object : ToolbarActionModeHelper(adapter, R.menu.menu_links_edit, this) {
             // Override to customize the title
             override fun updateContextTitle(count: Int) {
                 // You can use the internal mActionMode instance

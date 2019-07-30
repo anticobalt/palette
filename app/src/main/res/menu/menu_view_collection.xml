@@ -9,16 +9,4 @@
         android:visible="false"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/gotoRecycleBin"
-        android:orderInCategory="99"
-        android:title="@string/recycle_bin"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/gotoSettings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
-
 </menu>

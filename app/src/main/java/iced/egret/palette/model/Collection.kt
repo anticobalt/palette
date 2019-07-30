@@ -16,12 +16,14 @@ import iced.egret.palette.recyclerview_component.CoverViewHolder
  * - size
  * - totalSize
  */
-abstract class Collection(override var name: String, val path: String) : Coverable {
+abstract class Collection(override var name: String, path: String) : Coverable {
 
     override val terminal = false
     override val cover = mutableMapOf<String, Any>(
             "id" to R.drawable.default_collection_cover
     )
+    var path = path
+        protected set
 
     abstract var _pictures: MutableList<Picture>  // internal
     abstract val pictures: List<Picture>  // external
@@ -70,6 +72,7 @@ abstract class Collection(override var name: String, val path: String) : Coverab
 
 
     abstract fun getContents(): List<Coverable>
+    abstract fun rename(name: String)
 
     fun findPictureByPath(path: String): Picture? {
         return _pictures.find { picture -> picture.filePath == path }

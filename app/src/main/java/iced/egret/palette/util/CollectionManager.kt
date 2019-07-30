@@ -171,7 +171,7 @@ object CollectionManager : CoroutineScope {
         val position: Int
         if (addToCurrent && currentCollection is Album) {  // only albums can have albums
             val currentAlbum = currentCollection as Album
-            newAlbum = Album(name, path = "${currentAlbum.path}/$name")
+            newAlbum = Album(name, path = "${currentAlbum.path}/$name", parent = currentAlbum)
             position = currentAlbum.albums.size
             currentAlbum.addAlbum(newAlbum)
         } else {
@@ -181,6 +181,11 @@ object CollectionManager : CoroutineScope {
         }
         Storage.saveAlbumsToDisk(albums)
         return position
+    }
+
+    fun renameCollection(collection: Collection, newName: String) {
+        collection.rename(newName)
+        Storage.saveAlbumsToDisk(albums)
     }
 
     /**

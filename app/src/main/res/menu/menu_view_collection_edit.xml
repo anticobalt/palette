@@ -11,7 +11,6 @@
         android:title="@string/action_toggle_select_all"
         android:showAsAction="always" />
 
-
     <item
         android:id="@+id/albumActions"
         android:title="@string/label_album_actions"

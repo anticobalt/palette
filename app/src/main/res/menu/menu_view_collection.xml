@@ -3,8 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/gotoRecycleBin"
+        android:id="@+id/actionRename"
         android:orderInCategory="1"
+        android:title="@string/action_rename"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/gotoRecycleBin"
+        android:orderInCategory="99"
         android:title="@string/recycle_bin"
         app:showAsAction="never" />
 

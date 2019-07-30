@@ -19,7 +19,7 @@ import iced.egret.palette.R
  *
  * Backing fields _folders, _albums, and _pictures only used when adding/deleting internally.
  */
-class Album(name: String, path: String) : Collection(name, path) {
+class Album(name: String, path: String, val parent: Album? = null) : Collection(name, path) {
 
     companion object {
         const val NAME_MAX_LENGTH = 25
@@ -38,6 +38,26 @@ class Album(name: String, path: String) : Collection(name, path) {
     private var _folders: MutableList<Folder> = ArrayList()
     val folders: List<Folder>
         get() = _folders
+
+    override fun rename(name: String) {
+        this.name = name
+        path = (path.split("/").dropLast(1).joinToString("/") + "/" + name)
+                .trim('/')  // remove leading "/" if exists
+
+        for (album in _albums) {
+            album.onParentPathChange(path)
+        }
+    }
+
+    /**
+     * Update path due to parent path change, and call recursively on children.
+     */
+    private fun onParentPathChange(parentPath: String) {
+        path = "$parentPath/$name"
+        for (album in albums) {
+            album.onParentPathChange(path)
+        }
+    }
 
     override val contentsMap: Map<String, List<Coverable>>
         get() {

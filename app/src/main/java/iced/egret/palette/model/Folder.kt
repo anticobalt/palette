@@ -82,6 +82,10 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
         return (folders + pictures)
     }
 
+    override fun rename(name: String) {
+        // TODO
+    }
+
     fun addFolder(newFolder: Folder) {
         _folders.add(newFolder)
         size += 1

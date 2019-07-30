@@ -31,8 +31,9 @@ object DialogGenerator {
     fun createAlbum(context: Context, albumExists: (CharSequence) -> Boolean, onConfirm: (CharSequence) -> Unit) {
         MaterialDialog(context).show {
             title(R.string.title_album_form)
-            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH, waitForPositiveButton = false,
-                    inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES) { dialog, text ->
+            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH,
+                    waitForPositiveButton = false, inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+            { dialog, text ->
                 val isValid = !albumExists(text)
                 dialog.getInputField().error = if (isValid) {
                     null
@@ -42,6 +43,29 @@ object DialogGenerator {
                 dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
             }
             positiveButton(R.string.action_create_album) {
+                onConfirm(this.getInputField().text)
+            }
+            negativeButton()
+        }
+    }
+
+    fun renameAlbum(context: Context, oldName: String, nameUsed: (CharSequence) -> Boolean,
+                    onConfirm: (CharSequence) -> Unit) {
+
+        MaterialDialog(context).show {
+            title(R.string.action_rename)
+            input(hintRes = R.string.hint_set_name, prefill = oldName, maxLength = Album.NAME_MAX_LENGTH,
+                    waitForPositiveButton = false, inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+            { dialog, text ->
+                val isValid = !nameUsed(text)
+                dialog.getInputField().error = if (isValid) {
+                    null
+                } else {
+                    "Album with name already exists"
+                }
+                dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
+            }
+            positiveButton {
                 onConfirm(this.getInputField().text)
             }
             negativeButton()
@@ -137,7 +161,7 @@ object DialogGenerator {
     fun moveTo(context: Context, onConfirm: (File) -> Unit) {
         val filter: FileFilter = { it.path.startsWith("/storage") }
         MaterialDialog(context).show {
-            folderChooser(emptyTextRes = R.string.folder_empty, filter = filter) { dialog, file ->
+            folderChooser(emptyTextRes = R.string.folder_empty, filter = filter) { _, file ->
                 onConfirm(file)
             }
             negativeButton()

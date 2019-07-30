@@ -170,6 +170,7 @@ open class CollectionViewFragment() :
      */
     protected open fun buildToolbar() {
         mToolbar = mRootView!!.findViewById(R.id.toolbar)
+        mToolbar.menu.clear()
         mToolbar.inflateMenu(R.menu.menu_view_collection)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
@@ -181,7 +182,7 @@ open class CollectionViewFragment() :
             }
             true
         }
-        delegate.onBuildToolbar()
+        delegate.onBuildToolbar(mToolbar)
     }
 
     /**
@@ -482,7 +483,7 @@ open class CollectionViewFragment() :
             }
             else -> super.onOptionsItemSelected(item)
         }
-        delegate.onOptionsItemSelected(item)
+        delegate.onOptionsItemSelected(item, context!!, CollectionManager.currentCollection!!)
         return true
     }
 
@@ -509,10 +510,10 @@ open class CollectionViewFragment() :
 
     fun refreshFragment() {
         fetchContents()
-        setToolbarTitle()
         adapter.updateDataSet(mContentItems)
         mActionModeHelper.destroyActionModeIfCan()
         buildDelegate()
+        buildToolbar()  // updates title and delegate's menu items
     }
 
     private fun refreshActivity() {

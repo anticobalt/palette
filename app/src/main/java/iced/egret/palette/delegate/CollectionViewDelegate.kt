@@ -4,8 +4,10 @@ import android.content.Context
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.fragment.CollectionViewFragment
+import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Coverable
 
 /**
@@ -22,13 +24,13 @@ abstract class CollectionViewDelegate {
 
     var listener: CollectionViewFragment? = null
 
-    abstract fun onBuildToolbar()
+    abstract fun onBuildToolbar(toolbar: Toolbar)
     abstract fun onCreateActionMode(mode: ActionMode, menu: Menu, selectedContentType: String): Boolean
     abstract fun onActionItemClicked(mode: ActionMode, item: MenuItem, adapter: FlexibleAdapter<*>,
                                      context: Context, selectedContentType: String): Boolean
 
     abstract fun onDestroyActionMode(mode: ActionMode)
-    abstract fun onOptionsItemSelected(item: MenuItem): Boolean
+    abstract fun onOptionsItemSelected(item: MenuItem, context: Context, currentCollection: Collection): Boolean
     abstract fun onFabClick(context: Context, contents: List<Coverable>)
 
     protected fun alert(actionAlert: ActionAlert) {

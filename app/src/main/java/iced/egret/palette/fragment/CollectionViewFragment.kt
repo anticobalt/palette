@@ -157,7 +157,7 @@ open class CollectionViewFragment :
         if (requestCode == PICTURE_ACTIVITY_REQUEST) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 // Changes occurred: notify update; self-update occurs automatically in onResume()
-                mMaster.notifyCollectionsChanged()
+                mShouldUpdateContents = true
             }
         }
     }

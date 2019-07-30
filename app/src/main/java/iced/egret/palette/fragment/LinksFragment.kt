@@ -24,6 +24,7 @@ import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.recyclerview_component.CoverableItem
 import iced.egret.palette.recyclerview_component.PinnedCollectionsItem
+import iced.egret.palette.recyclerview_component.RecyclerViewMargin
 import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
@@ -31,11 +32,16 @@ import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_links.*
 
+/**
+ * Has links to other activities and pinned collections, organized inside a SlidePaneLayout.
+ * Also listens to the SlidePaneLayout it resides in.
+ */
 class LinksFragment :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
-        FlexibleAdapter.OnItemLongClickListener {
+        FlexibleAdapter.OnItemLongClickListener,
+        SlidingPaneLayout.PanelSlideListener {
 
     companion object SaveDataKeys {
         const val selectedType = "LinksFragment_ST"
@@ -53,6 +59,7 @@ class LinksFragment :
     private var mSelectedContentType: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
         mRootView = inflater.inflate(R.layout.fragment_links, container, false)
         mRecyclerView = mRootView!!.findViewById(R.id.recyclerView)
         mMaster = activity as MainActivity
@@ -62,6 +69,8 @@ class LinksFragment :
         buildSideActions()
         styleSlidePane()
         styleExtraThemeElements()
+
+        mMaster.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout).setPanelSlideListener(this)
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
         return mRootView
     }
@@ -158,6 +167,9 @@ class LinksFragment :
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
         adapter = FlexibleAdapter(mCollectionItems, this, true)
         mRecyclerView.adapter = adapter
+
+        val marginInPx = resources.getDimensionPixelSize(R.dimen.banner_margin)
+        mRecyclerView.addItemDecoration(RecyclerViewMargin(marginInPx))
     }
 
     private fun buildSideActions() {
@@ -420,5 +432,14 @@ class LinksFragment :
         }
 
     }
+
+    override fun onPanelSlide(panel: View, slideOffset: Float) {}
+
+    override fun onPanelClosed(panel: View) {
+        // Close own panel when activity's panel is closed
+        slidingPaneLayout.closePane()
+    }
+
+    override fun onPanelOpened(panel: View) {}
 
 }

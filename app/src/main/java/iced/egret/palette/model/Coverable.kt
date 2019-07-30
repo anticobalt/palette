@@ -58,7 +58,7 @@ interface Coverable {
         return null
     }
 
-    fun getPlaceholderDrawable(imageView: ImageView) : Drawable {
+    fun getPlaceholderDrawable(imageView: ImageView): Drawable {
         val progressDrawable = CircularProgressDrawable(imageView.context)
         progressDrawable.strokeWidth = 5f
         progressDrawable.centerRadius = 40f

@@ -137,6 +137,7 @@ class LinksFragment :
             val found = CollectionManager.albums.find { album -> album.name == name.toString() }
             return found != null
         }
+
         fun onCreateNewAlbum(charSequence: CharSequence) {
             CollectionManager.createNewAlbum(charSequence.toString())
             refreshFragment()

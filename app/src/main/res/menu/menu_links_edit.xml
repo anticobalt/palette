@@ -1,5 +1,5 @@
-<menu xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="AppCompatResource">
     <!-- Ignore AppCompatResource for showAsAction because they don't work on ActionMode -->
 
@@ -7,23 +7,23 @@
         android:id="@+id/actionToggleSelectAll"
         android:icon="@drawable/ic_select_all_black_24dp"
         android:orderInCategory="1"
-        android:title="@string/action_toggle_select_all"
-        android:showAsAction="always" />
+        android:showAsAction="always"
+        android:title="@string/action_toggle_select_all" />
 
     <item
         android:id="@+id/actionHide"
         android:icon="@drawable/ic_visibility_off_black_24dp"
         android:orderInCategory="2"
+        android:showAsAction="ifRoom"
         android:title="@string/action_hide"
-        android:visible="false"
-        android:showAsAction="ifRoom" />
+        android:visible="false" />
 
     <item
         android:id="@+id/actionDeleteAlbum"
         android:icon="@drawable/ic_delete_black_24dp"
         android:orderInCategory="3"
+        android:showAsAction="ifRoom"
         android:title="@string/action_delete"
-        android:visible="false"
-        android:showAsAction="ifRoom" />
+        android:visible="false" />
 
 </menu>

@@ -97,14 +97,18 @@ class AlbumViewDelegate : CollectionViewDelegate() {
         fun nameInUse(name: CharSequence): Boolean {
             val parent = currentCollection.parent
             if (parent != null) {
-                return parent.albums.find {album -> album.name == name.toString()
-                        && album != currentCollection } != null
-            }
-            else {
-                return CollectionManager.albums.find {album -> album.name == name.toString()
-                        && album != currentCollection } != null
+                return parent.albums.find { album ->
+                    album.name == name.toString()
+                            && album != currentCollection
+                } != null
+            } else {
+                return CollectionManager.albums.find { album ->
+                    album.name == name.toString()
+                            && album != currentCollection
+                } != null
             }
         }
+
         fun rename(charSequence: CharSequence) {
             CollectionManager.renameCollection(currentCollection, charSequence.toString())
             alert(ActionAlert("", true))

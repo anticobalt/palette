@@ -4,8 +4,8 @@
 
     <item
         android:id="@+id/switchTrueZoom"
-        android:title="@string/switch_true_zoom"
         android:checkable="true"
+        android:title="@string/switch_true_zoom"
         app:showAsAction="never" />
 
     <item

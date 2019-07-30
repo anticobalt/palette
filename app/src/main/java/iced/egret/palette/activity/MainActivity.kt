@@ -33,7 +33,9 @@ class MainActivity : BasicAestheticActivity() {
     class DummyFragment : ListFragment() {
         override fun setClicksBlocked(doBlock: Boolean) {}
         override fun onAllFragmentsCreated() {}
-        override fun onBackPressed(): Boolean { return false }
+        override fun onBackPressed(): Boolean {
+            return false
+        }
     }
 
     private var hasPermission = false

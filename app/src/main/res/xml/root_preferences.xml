@@ -1,55 +1,55 @@
-<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        app:title="@string/appearance_header"
-        app:iconSpaceReserved="false">
+        app:iconSpaceReserved="false"
+        app:title="@string/appearance_header">
 
         <!--
         Didn't use normal Preference + MaterialDialogs ColorPicker because
         there's a bug where the title of the dialog is highlighted on launch.
         -->
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            app:key="@string/primary_color_key"
-            app:title="@string/primary_color_preference"
             android:defaultValue="@color/colorPrimary"
-            app:iconSpaceReserved="false"
             app:colorChoices="@array/theme_colors"
-            app:numColumns="6" />
+            app:iconSpaceReserved="false"
+            app:key="@string/primary_color_key"
+            app:numColumns="6"
+            app:title="@string/primary_color_preference" />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            app:key="@string/accent_color_key"
-            app:title="@string/accent_color_preference"
             android:defaultValue="@color/colorAccent"
-            app:iconSpaceReserved="false"
             app:colorChoices="@array/theme_colors"
-            app:numColumns="6" />
+            app:iconSpaceReserved="false"
+            app:key="@string/accent_color_key"
+            app:numColumns="6"
+            app:title="@string/accent_color_preference" />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            app:key="@string/toolbar_item_color_key"
-            app:title="@string/toolbar_item_color_preference"
             android:defaultValue="@color/white"
-            app:iconSpaceReserved="false"
             app:colorChoices="@array/text_colors"
-            app:numColumns="6" />
+            app:iconSpaceReserved="false"
+            app:key="@string/toolbar_item_color_key"
+            app:numColumns="6"
+            app:title="@string/toolbar_item_color_preference" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="@string/flipper_header"
-        app:iconSpaceReserved="false">
+        app:iconSpaceReserved="false"
+        app:title="@string/flipper_header">
 
         <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
             app:key="@string/flipper_toolbar_color_key"
-            app:title="@string/flipper_toolbar_color_preference"
             app:summary="@string/flipper_toolbar_color_summary"
-            app:iconSpaceReserved="false" />
+            app:title="@string/flipper_toolbar_color_preference" />
 
         <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
             app:key="@string/true_zoom_key"
-            app:title="@string/true_zoom_title"
             app:summary="@string/true_zoom_summary"
-            app:iconSpaceReserved="false" />
+            app:title="@string/true_zoom_title" />
 
     </PreferenceCategory>
 

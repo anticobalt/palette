@@ -128,7 +128,7 @@ class Picture(override var name: String, override var filePath: String) : Termin
         return parser.format(date)
     }
 
-    private fun parseOrientation(rawInt: Int) : String {
+    private fun parseOrientation(rawInt: Int): String {
         return when (rawInt) {
             ExifInterface.ORIENTATION_NORMAL -> "Normal"
             ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> "Flipped horizontally"

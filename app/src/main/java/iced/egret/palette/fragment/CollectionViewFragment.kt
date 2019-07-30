@@ -38,7 +38,7 @@ import java.io.File
  * Automatically requests CollectionManager to get fresh data when returning from another activity
  * or app.
  */
-open class CollectionViewFragment() :
+open class CollectionViewFragment :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
@@ -51,7 +51,7 @@ open class CollectionViewFragment() :
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private lateinit var mMaster: MainActivity
-    private var delegate : CollectionViewDelegate = FolderViewDelegate()  // default
+    private var delegate: CollectionViewDelegate = FolderViewDelegate()  // default
         set(value) {
             value.listener = this
             field = value
@@ -198,7 +198,7 @@ open class CollectionViewFragment() :
     }
 
     private fun buildDelegate() {
-        when (CollectionManager.currentCollection)     {
+        when (CollectionManager.currentCollection) {
             is Folder -> {
                 if (delegate !is FolderViewDelegate) delegate = FolderViewDelegate()
             }

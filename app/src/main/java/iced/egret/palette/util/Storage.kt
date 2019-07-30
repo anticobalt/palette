@@ -281,7 +281,7 @@ object Storage {
      * @param location Has trailing file separator (i.e. "/")
      */
     internal fun saveBitmapToDisk(bitmap: Bitmap, name: String, location: String,
-                         sdCardFile: DocumentFile?, contentResolver: ContentResolver): File? {
+                                  sdCardFile: DocumentFile?, contentResolver: ContentResolver): File? {
 
         val extension = name.split(".").last().toLowerCase()
         val file: File
@@ -405,7 +405,7 @@ object Storage {
      * @return Old and new file if successfully moved, null otherwise
      */
     internal fun moveFile(sourcePath: String, destinationParent: File, sdCardFile: DocumentFile?,
-                 contentResolver: ContentResolver?, newName: String? = null): Pair<File, File>? {
+                          contentResolver: ContentResolver?, newName: String? = null): Pair<File, File>? {
         val sourceFile = File(sourcePath)
         val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver, newName)
                 ?: return null
@@ -423,7 +423,7 @@ object Storage {
      * @return The copy of the File, or null if failed.
      */
     internal fun copyFile(sourceFile: File, destinationParent: File, sdCardFile: DocumentFile?,
-                 contentResolver: ContentResolver?, newName: String? = null): File? {
+                          contentResolver: ContentResolver?, newName: String? = null): File? {
 
         val name = newName ?: sourceFile.name
         val destinationLocation = destinationParent.path.removeSuffix("/") + "/"
@@ -480,7 +480,7 @@ object Storage {
     }
 
     internal fun restoreFileFromRecycleBin(pathInBin: String, sdCardFile: DocumentFile?,
-                                  contentResolver: ContentResolver): Pair<File, File>? {
+                                           contentResolver: ContentResolver): Pair<File, File>? {
 
         val nameInBin = pathInBin.split("/").last()
         val oldPath = recycleBin.oldLocations[nameInBin] ?: return null

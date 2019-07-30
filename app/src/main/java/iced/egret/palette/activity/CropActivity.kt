@@ -11,7 +11,6 @@ import android.util.Pair
 import android.view.MenuItem
 import android.widget.Button
 import androidx.preference.PreferenceManager
-import com.afollestad.aesthetic.Aesthetic
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import iced.egret.palette.R
@@ -25,7 +24,7 @@ import kotlinx.android.synthetic.main.bottom_actions_crop.view.*
 import java.io.File
 import java.io.IOException
 
-class CropActivity : BottomActionsActivity() {
+class CropActivity : BasicAestheticActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -33,7 +32,6 @@ class CropActivity : BottomActionsActivity() {
     private lateinit var mOptions: CropImageOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Aesthetic.attach(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crop)
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -53,13 +51,6 @@ class CropActivity : BottomActionsActivity() {
         // If handling on-disk item, but it was moved, get out.
         val path = mImageUri.path
         if (path != null && !Storage.fileExists(path)) finish()
-
-        Aesthetic.resume(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Aesthetic.pause(this)
     }
 
     private fun buildCropView() {
@@ -81,8 +72,7 @@ class CropActivity : BottomActionsActivity() {
         }
     }
 
-    override fun buildBottomActions() {
-        super.buildBottomActions()
+    private fun buildBottomActions() {
 
         // color bar and bar actions
         val barBgColor = sharedPreferences.getInt(getString(R.string.primary_color_key), Color.BLACK)

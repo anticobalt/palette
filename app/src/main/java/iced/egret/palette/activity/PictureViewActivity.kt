@@ -18,6 +18,7 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.Device
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_view_picture.*
@@ -25,7 +26,7 @@ import kotlinx.android.synthetic.main.appbar_view_picture.*
 import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
 
 
-class PictureViewActivity : BottomActionsActivity() {
+class PictureViewActivity : BaseActivity() {
 
     private lateinit var mSharedPrefs: SharedPreferences
     private var mBarBackgroundColor: Int = Color.BLACK
@@ -111,7 +112,7 @@ class PictureViewActivity : BottomActionsActivity() {
     }
 
     private fun buildActionBar() {
-        appbar.setPadding(0, getStatusBarHeight(), 0, 0)
+        appbar.setPadding(0, Device.getStatusBarHeight(resources), 0, 0)
 
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
         appbar.background = getGradientToTransparent(mBarBackgroundColor, GradientDrawable.Orientation.TOP_BOTTOM)
@@ -129,13 +130,6 @@ class PictureViewActivity : BottomActionsActivity() {
         supportActionBar?.title = ""  // toolbarTitle is handling title
     }
 
-    private fun getStatusBarHeight(): Int {
-        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        return if (resourceId > 0) {
-            resources.getDimensionPixelSize(resourceId)
-        } else 0
-    }
-
     /**
      * E.g. orientation of BOTTOM_TOP with color=red has red on bottom.
      * @return a linear gradient that can be directly set as view background
@@ -151,9 +145,9 @@ class PictureViewActivity : BottomActionsActivity() {
         toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[mActivePage].name
     }
 
-    override fun buildBottomActions() {
-        super.buildBottomActions()
-        bottomActions.setPadding(0, 0, 0, getNavigationBarHeight())
+    private fun buildBottomActions() {
+
+        bottomActions.setPadding(0, 0, 0, Device.getNavigationBarHeight(resources))
 
         // color bar and bar actions
         bottomActions.background = getGradientToTransparent(mBarBackgroundColor, GradientDrawable.Orientation.BOTTOM_TOP)

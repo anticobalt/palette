@@ -8,10 +8,12 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
+import iced.egret.palette.HackySlidingPaneLayout
 import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.LinksFragment
@@ -23,12 +25,13 @@ import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Permission
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_links.*
 
 const val EXTERNAL_CODE = 100
 const val PICTURE_ACTIVITY_REQUEST = 1
 const val SD_CARD_WRITE_REQUEST = 2
 
-class MainActivity : BasicAestheticActivity() {
+class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanelSlideListener {
 
     class DummyFragment : ListFragment() {
         override fun setClicksBlocked(doBlock: Boolean) {}
@@ -70,6 +73,27 @@ class MainActivity : BasicAestheticActivity() {
         }
 
     }
+
+    override fun onSlidingPanelReady() {
+        if (slidingPaneLayout.isOpen) {
+            fragments[rightIndex].navigationDrawable.progress = 1f
+        }
+    }
+
+    fun togglePanel() {
+        if (slidingPaneLayout.isOpen) slidingPaneLayout.closePane()
+        else slidingPaneLayout.openPane()
+    }
+
+    override fun onPanelClosed(panel: View) {
+        fragments[leftIndex].slider.closePane()
+    }
+
+    override fun onPanelSlide(panel: View, slideOffset: Float) {
+        fragments[rightIndex].navigationDrawable.progress = slideOffset
+    }
+
+    override fun onPanelOpened(panel: View) {}
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(onScreenCollection, CollectionManager.currentCollection?.path)
@@ -116,7 +140,7 @@ class MainActivity : BasicAestheticActivity() {
             val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
             CollectionManager.unwindStack(navigateToPath)
         }
-        styleSlidingPane()
+        buildSlidingPane()
         checkSdWriteAccess()
     }
 
@@ -149,7 +173,7 @@ class MainActivity : BasicAestheticActivity() {
         }
     }
 
-    private fun styleSlidingPane() {
+    private fun buildSlidingPane() {
         // convert dp to px: https://stackoverflow.com/a/4275969
         val dpParallax = 60
         val scale = resources.displayMetrics.density
@@ -158,6 +182,8 @@ class MainActivity : BasicAestheticActivity() {
         slidingPaneLayout.parallaxDistance = pxParallax  // make left move when scrolling right
         slidingPaneLayout.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
         slidingPaneLayout.setShadowResourceLeft(R.drawable.shadow)
+
+        slidingPaneLayout.setPanelSlideListener(this)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

@@ -10,7 +10,7 @@
     <include layout="@layout/appbar_list_fragment" />
 
     <androidx.slidingpanelayout.widget.SlidingPaneLayout
-        android:id="@+id/slidingPaneLayout"
+        android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">

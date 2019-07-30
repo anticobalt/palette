@@ -1,6 +1,11 @@
 package iced.egret.palette.fragment
 
 import android.graphics.Color
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -17,16 +22,24 @@ import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
  */
 abstract class ListFragment : Fragment() {
 
-    protected lateinit var mToolbar: Toolbar
+    lateinit var toolbar: Toolbar
+    lateinit var navigationDrawable : DrawerArrowDrawable
 
     abstract fun setClicksBlocked(doBlock: Boolean)
     abstract fun onAllFragmentsCreated()
     abstract fun onBackPressed(): Boolean
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        navigationDrawable = DrawerArrowDrawable(context!!)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     private fun setToolbarTextColor() {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.context)
         val color = sharedPrefs!!.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
-        mToolbar.toolbarTitle.setTextColor(color)
+        toolbar.toolbarTitle.setTextColor(color)
+
+        navigationDrawable.color = color  // Only DrawerArrowDrawable's own color function works
     }
 
     override fun onResume() {

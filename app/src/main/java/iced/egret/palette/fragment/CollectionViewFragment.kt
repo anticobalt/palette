@@ -38,7 +38,7 @@ import java.io.File
  * Automatically requests CollectionManager to get fresh data when returning from another activity
  * or app.
  */
-open class CollectionViewFragment :
+class CollectionViewFragment :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
@@ -49,9 +49,8 @@ open class CollectionViewFragment :
         const val selectedType = "CollectionViewFragment_ST"
     }
 
-    private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private lateinit var mMaster: MainActivity
-    private var delegate: CollectionViewDelegate = FolderViewDelegate()  // default
+    private var mDelegate: CollectionViewDelegate = FolderViewDelegate()  // default
         set(value) {
             value.listener = this
             field = value
@@ -62,11 +61,13 @@ open class CollectionViewFragment :
     private lateinit var mFloatingActionButton: FloatingActionButton
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
-    protected var mContents = mutableListOf<Coverable>()
+    private var mContents = mutableListOf<Coverable>()
     private var mContentItems = mutableListOf<CollectionViewItem>()
-    lateinit var adapter: FlexibleAdapter<CollectionViewItem>
-    protected var mSelectedContentType: String? = null
-    private var mShouldUpdateContents = true
+
+    private lateinit var mAdapter: FlexibleAdapter<CollectionViewItem>
+    private lateinit var mActionModeHelper: ToolbarActionModeHelper
+    private var mSelectedContentType: String? = null
+    private var mReturningFromStop = false
 
     fun onDelegateAlert(alert: CollectionViewDelegate.ActionAlert) {
         if (alert.message.isNotEmpty()) toast(alert.message)
@@ -75,7 +76,9 @@ open class CollectionViewFragment :
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        super.onCreateView(inflater, container, savedInstanceState)
         mRootView = inflater.inflate(R.layout.fragment_view_collection, container, false)
+
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
         mSwipeRefreshLayout = mRootView!!.findViewById(R.id.swipeRefreshLayout)
@@ -87,9 +90,6 @@ open class CollectionViewFragment :
         buildRecyclerView()
         mSwipeRefreshLayout.setOnRefreshListener(this)
         mFloatingActionButton.setOnClickListener { onFabClick() }
-
-        // Already got updated contents, so don't do it again
-        mShouldUpdateContents = false
 
         return mRootView
 
@@ -113,13 +113,13 @@ open class CollectionViewFragment :
             isolateContent(mSelectedContentType!!)
 
             // Must restore adapter and helper AFTER type isolation to keep position ints consistent
-            adapter.onRestoreInstanceState(savedInstanceState)
-            mActionModeHelper.restoreSelection(mToolbar)
+            mAdapter.onRestoreInstanceState(savedInstanceState)
+            mActionModeHelper.restoreSelection(toolbar)
 
             // Re-select all previously selected items
-            for (i in 0 until adapter.currentItems.size) {
-                if (i in adapter.selectedPositionsAsSet) {
-                    adapter.currentItems[i].setSelection(true)
+            for (i in 0 until mAdapter.currentItems.size) {
+                if (i in mAdapter.selectedPositionsAsSet) {
+                    mAdapter.currentItems[i].setSelection(true)
                 }
             }
         }
@@ -133,11 +133,13 @@ open class CollectionViewFragment :
         // Never refresh if currently selecting stuff.
         // If not selecting, refresh if onCreate() not called.
         if (mSelectedContentType != null) return
-        if (mShouldUpdateContents) showUpdatedContents()
+        if (mReturningFromStop) {
+            showUpdatedContents()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        adapter.onSaveInstanceState(outState)
+        mAdapter.onSaveInstanceState(outState)
         outState.putString(selectedType, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
@@ -149,7 +151,7 @@ open class CollectionViewFragment :
     override fun onStop() {
         super.onStop()
         // Assume need to update onStart().
-        mShouldUpdateContents = true
+        mReturningFromStop = true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -157,7 +159,7 @@ open class CollectionViewFragment :
         if (requestCode == PICTURE_ACTIVITY_REQUEST) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 // Changes occurred: notify update; self-update occurs automatically in onResume()
-                mShouldUpdateContents = true
+                mReturningFromStop = true
             }
         }
     }
@@ -166,44 +168,59 @@ open class CollectionViewFragment :
     /**
      * Makes default toolbar and fills with items and title
      */
-    protected open fun buildToolbar() {
-        mToolbar = mRootView!!.findViewById(R.id.toolbar)
-        mToolbar.menu.clear()
-        mToolbar.inflateMenu(R.menu.menu_view_collection)
-        mToolbar.setOnMenuItemClickListener {
+    private fun buildToolbar() {
+
+        // Inflate menu items
+        toolbar = mRootView!!.findViewById(R.id.toolbar)
+        toolbar.menu.clear()
+        toolbar.inflateMenu(R.menu.menu_view_collection)
+        toolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
+
+        // Build toggle navigation icon
+        toolbar.navigation.setImageDrawable(navigationDrawable)
+        toolbar.navigation.setOnClickListener {
+            mMaster.togglePanel()
+        }
+
+        // Set title
         setToolbarTitle()
-        mToolbar.toolbarTitle.setOnLongClickListener {
+        toolbar.toolbarTitle.setOnLongClickListener {
             if (CollectionManager.currentCollection != null) {
                 DialogGenerator.showCollectionDetails(context!!, CollectionManager.currentCollection!!)
             }
             true
         }
-        delegate.onBuildToolbar(mToolbar)
+
+        // Delegate other operations
+        mDelegate.onBuildToolbar(toolbar)
     }
 
     /**
      * Sets toolbar's title to current Collection name
      */
-    fun setToolbarTitle(title: String = "") {
+    private fun setToolbarTitle(title: String = "") {
         var text: String
         if (title.isEmpty()) {
             val collection = CollectionManager.currentCollection
-            text = collection?.path?.split("/")?.joinToString(" / ") ?: getString(R.string.app_name)
+            text = collection?.path?.split("/")
+                    ?.joinToString(" / ")
+                    ?.trim(' ')
+                    ?: getString(R.string.app_name)
             if (text.isEmpty()) text = getString(R.string.root_name)
         } else text = title
 
-        mToolbar.toolbarTitle.text = text
+        toolbar.toolbarTitle.text = text
     }
 
     private fun buildDelegate() {
         when (CollectionManager.currentCollection) {
             is Folder -> {
-                if (delegate !is FolderViewDelegate) delegate = FolderViewDelegate()
+                if (mDelegate !is FolderViewDelegate) mDelegate = FolderViewDelegate()
             }
             is Album -> {
-                if (delegate !is AlbumViewDelegate) delegate = AlbumViewDelegate()
+                if (mDelegate !is AlbumViewDelegate) mDelegate = AlbumViewDelegate()
             }
         }
     }
@@ -217,11 +234,11 @@ open class CollectionViewFragment :
         val manager = GridLayoutManager(activity, numColumns)
 
         fetchContents()
-        adapter = FlexibleAdapter(mContentItems, this, true)
+        mAdapter = FlexibleAdapter(mContentItems, this, true)
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
 
         mCollectionRecyclerView.layoutManager = manager
-        mCollectionRecyclerView.adapter = adapter
+        mCollectionRecyclerView.adapter = mAdapter
     }
 
     /**
@@ -229,7 +246,7 @@ open class CollectionViewFragment :
      */
     private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
         //this = ActionMode.Callback instance
-        mActionModeHelper = object : ToolbarActionModeHelper(adapter, R.menu.menu_view_collection_edit, this as ActionMode.Callback) {
+        mActionModeHelper = object : ToolbarActionModeHelper(mAdapter, R.menu.menu_view_collection_edit, this as ActionMode.Callback) {
             // Override to customize the title
             override fun updateContextTitle(count: Int) {
                 // You can use the internal mActionMode instance
@@ -277,7 +294,7 @@ open class CollectionViewFragment :
         }
         Painter.paintDrawable(selectAll.icon)
 
-        delegate.onCreateActionMode(mode, menu, mSelectedContentType!!)
+        mDelegate.onCreateActionMode(mode, menu, mSelectedContentType!!)
         return true
     }
 
@@ -286,7 +303,7 @@ open class CollectionViewFragment :
         // sanity check that selected type is valid
         CollectionManager.getContentsMap()[mSelectedContentType] ?: return false
 
-        val coverables = adapter.selectedPositions.map { index ->
+        val coverables = mAdapter.selectedPositions.map { index ->
             CollectionManager.getContentsMap()[mSelectedContentType]!![index]
         }
 
@@ -335,7 +352,7 @@ open class CollectionViewFragment :
             }
         }
 
-        delegate.onActionItemClicked(mode, item, adapter, context!!, mSelectedContentType!!)
+        mDelegate.onActionItemClicked(mode, item, mAdapter, context!!, mSelectedContentType!!)
         return true
     }
 
@@ -346,7 +363,7 @@ open class CollectionViewFragment :
     override fun onDestroyActionMode(mode: ActionMode) {
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
-        adapter.currentItems.map { item -> item.setSelection(false) }
+        mAdapter.currentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         mMaster.restoreAllFragments()
@@ -356,7 +373,7 @@ open class CollectionViewFragment :
         mode.menu.findItem(R.id.actionMove).isVisible = false
         mode.menu.findItem(R.id.actionDelete).isVisible = false
 
-        delegate.onDestroyActionMode(mode)
+        mDelegate.onDestroyActionMode(mode)
     }
 
     private fun inferContentType(content: Coverable): String? {
@@ -390,7 +407,7 @@ open class CollectionViewFragment :
                 // removing this type
                 val removeType: String = inferContentType(mContents[index])!!
                 val removeTypeList = CollectionManager.getContentsMap()[removeType]!!
-                adapter.removeRange(adapterOffset, removeTypeList.size)
+                mAdapter.removeRange(adapterOffset, removeTypeList.size)
                 // next type is now at position adapterOffset after remove, so don't increment
                 index += removeTypeList.size
             }
@@ -400,23 +417,23 @@ open class CollectionViewFragment :
     private fun restoreAllContent() {
         for (i in 0 until mContentItems.size) {
             val item = mContentItems[i]
-            if (!adapter.contains(item)) {
-                adapter.addItem(i, item)
+            if (!mAdapter.contains(item)) {
+                mAdapter.addItem(i, item)
             }
         }
     }
 
     private fun selectAll() {
-        adapter.currentItems.map { item -> item.setSelection(true) }
-        adapter.selectAll()
-        mActionModeHelper.updateContextTitle(adapter.selectedItemCount)
+        mAdapter.currentItems.map { item -> item.setSelection(true) }
+        mAdapter.selectAll()
+        mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
-        val clickedItem = adapter.getItem(absolutePosition) as? CoverableItem
+        val clickedItem = mAdapter.getItem(absolutePosition) as? CoverableItem
                 ?: return true
 
-        return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
+        return if (mAdapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, clickedItem)
         } else {
             val coverable = mContents[absolutePosition]
@@ -448,11 +465,11 @@ open class CollectionViewFragment :
             mSelectedContentType = inferContentType(mContents[absolutePosition]) ?: return
             isolateContent(mSelectedContentType!!)
             // adapter only holds one type now, so global == relative
-            relativePosition = adapter.getGlobalPositionOf(mContentItems[absolutePosition])
+            relativePosition = mAdapter.getGlobalPositionOf(mContentItems[absolutePosition])
         } else {
             relativePosition = absolutePosition
         }
-        mActionModeHelper.onLongClick(mToolbar, relativePosition, mContentItems[absolutePosition])
+        mActionModeHelper.onLongClick(toolbar, relativePosition, mContentItems[absolutePosition])
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {
@@ -467,12 +484,12 @@ open class CollectionViewFragment :
         }
     }
 
-    protected open fun onFabClick() {
-        delegate.onFabClick(context!!, mContents)
+    protected fun onFabClick() {
+        mDelegate.onFabClick(context!!, mContents)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        delegate.onOptionsItemSelected(item, context!!, CollectionManager.currentCollection!!)
+        mDelegate.onOptionsItemSelected(item, context!!, CollectionManager.currentCollection!!)
         return true
     }
 
@@ -499,7 +516,7 @@ open class CollectionViewFragment :
 
     fun refreshFragment() {
         fetchContents()
-        adapter.updateDataSet(mContentItems)
+        mAdapter.updateDataSet(mContentItems)
         mActionModeHelper.destroyActionModeIfCan()
         buildDelegate()
         buildToolbar()  // updates title and delegate's menu items

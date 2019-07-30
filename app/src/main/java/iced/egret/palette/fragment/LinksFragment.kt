@@ -34,14 +34,12 @@ import kotlinx.android.synthetic.main.fragment_links.*
 
 /**
  * Has links to other activities and pinned collections, organized inside a SlidePaneLayout.
- * Also listens to the SlidePaneLayout it resides in.
  */
 class LinksFragment :
         ListFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
-        FlexibleAdapter.OnItemLongClickListener,
-        SlidingPaneLayout.PanelSlideListener {
+        FlexibleAdapter.OnItemLongClickListener {
 
     companion object SaveDataKeys {
         const val selectedType = "LinksFragment_ST"
@@ -54,13 +52,15 @@ class LinksFragment :
     private var mCollections = mutableListOf<Collection>()
     private var mCollectionItems = mutableListOf<PinnedCollectionsItem>()
 
-    lateinit var adapter: FlexibleAdapter<PinnedCollectionsItem>
+    private lateinit var mAdapter: FlexibleAdapter<PinnedCollectionsItem>
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        super.onCreateView(inflater, container, savedInstanceState)
         mRootView = inflater.inflate(R.layout.fragment_links, container, false)
+
         mRecyclerView = mRootView!!.findViewById(R.id.recyclerView)
         mMaster = activity as MainActivity
 
@@ -70,13 +70,12 @@ class LinksFragment :
         styleSlidePane()
         styleExtraThemeElements()
 
-        mMaster.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout).setPanelSlideListener(this)
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
         return mRootView
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        adapter.onSaveInstanceState(outState)
+        mAdapter.onSaveInstanceState(outState)
         outState.putString(selectedType, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
@@ -92,13 +91,13 @@ class LinksFragment :
             isolateContent(mSelectedContentType!!)
 
             // Must restore adapter and helper AFTER type isolation to keep position ints consistent
-            adapter.onRestoreInstanceState(savedInstanceState)
-            mActionModeHelper.restoreSelection(mToolbar)
+            mAdapter.onRestoreInstanceState(savedInstanceState)
+            mActionModeHelper.restoreSelection(toolbar)
 
             // Re-select all previously selected items
-            for (i in 0 until adapter.currentItems.size) {
-                if (i in adapter.selectedPositionsAsSet) {
-                    adapter.currentItems[i].setSelection(true)
+            for (i in 0 until mAdapter.currentItems.size) {
+                if (i in mAdapter.selectedPositionsAsSet) {
+                    mAdapter.currentItems[i].setSelection(true)
                 }
             }
         }
@@ -130,11 +129,17 @@ class LinksFragment :
     }
 
     private fun buildToolbar() {
-        mToolbar = mRootView!!.findViewById(R.id.toolbar)
-        mToolbar.toolbarTitle.text = getString(R.string.app_name)
-        mToolbar.inflateMenu(R.menu.menu_links)
-        mToolbar.setOnMenuItemClickListener {
+        toolbar = mRootView!!.findViewById(R.id.toolbar)
+        toolbar.toolbarTitle.text = getString(R.string.app_name)
+        toolbar.inflateMenu(R.menu.menu_links)
+        toolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
+        }
+
+        toolbar.navigation.setImageDrawable(navigationDrawable)
+        toolbar.navigation.setOnClickListener {
+            if (slider.isOpen) slider.closePane()
+            else slider.openPane()
         }
     }
 
@@ -165,8 +170,8 @@ class LinksFragment :
     private fun buildRecyclerView() {
         fetchContents()
         mRecyclerView.layoutManager = GridLayoutManager(activity, 1)
-        adapter = FlexibleAdapter(mCollectionItems, this, true)
-        mRecyclerView.adapter = adapter
+        mAdapter = FlexibleAdapter(mCollectionItems, this, true)
+        mRecyclerView.adapter = mAdapter
 
         val marginInPx = resources.getDimensionPixelSize(R.dimen.banner_margin)
         mRecyclerView.addItemDecoration(RecyclerViewMargin(marginInPx))
@@ -184,7 +189,7 @@ class LinksFragment :
     }
 
     private fun styleSlidePane() {
-        val slider = mRootView!!.findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)
+        val slider = mRootView!!.findViewById<SlidingPaneLayout>(R.id.slider)
         slider.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
         slider.setShadowResourceLeft(R.drawable.shadow)
     }
@@ -209,7 +214,7 @@ class LinksFragment :
      */
     private fun initializeActionModeHelper(@Visibility.Mode mode: Int) {
         // this = ActionMode.Callback instance
-        mActionModeHelper = object : ToolbarActionModeHelper(adapter, R.menu.menu_links_edit, this) {
+        mActionModeHelper = object : ToolbarActionModeHelper(mAdapter, R.menu.menu_links_edit, this) {
             // Override to customize the title
             override fun updateContextTitle(count: Int) {
                 // You can use the internal mActionMode instance
@@ -253,7 +258,7 @@ class LinksFragment :
             }
             R.id.actionDeleteAlbum -> {
                 val callback = callback@{
-                    CollectionManager.deleteAlbumsByRelativePosition(adapter.selectedPositions)
+                    CollectionManager.deleteAlbumsByRelativePosition(mAdapter.selectedPositions)
                     refreshFragment()
                     mMaster.notifyPinnedAlbumDeleted()
                 }
@@ -270,7 +275,7 @@ class LinksFragment :
     override fun onDestroyActionMode(mode: ActionMode) {
         // ToolbarActionModeHelper doesn't have references to CoverableItems,
         // so can't clear all selections visually
-        adapter.currentItems.map { item -> item.setSelection(false) }
+        mAdapter.currentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         (activity as MainActivity).restoreAllFragments()
@@ -280,10 +285,10 @@ class LinksFragment :
     }
 
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
-        val clickedItem = adapter.getItem(absolutePosition) as? CoverableItem
+        val clickedItem = mAdapter.getItem(absolutePosition) as? CoverableItem
                 ?: return false
 
-        return if (adapter.mode != SelectableAdapter.Mode.IDLE) {
+        return if (mAdapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(absolutePosition, clickedItem)
         } else {
             openCollectionViewPanel(absolutePosition)
@@ -316,11 +321,11 @@ class LinksFragment :
             mSelectedContentType = inferContentType(mCollections[absolutePosition]) ?: return
             isolateContent(mSelectedContentType!!)
             // adapter only holds one type now, so global == relative
-            relativePosition = adapter.getGlobalPositionOf(mCollectionItems[absolutePosition])
+            relativePosition = mAdapter.getGlobalPositionOf(mCollectionItems[absolutePosition])
         } else {
             relativePosition = absolutePosition
         }
-        mActionModeHelper.onLongClick(mToolbar, relativePosition, mCollectionItems[absolutePosition])
+        mActionModeHelper.onLongClick(toolbar, relativePosition, mCollectionItems[absolutePosition])
     }
 
     private fun inferContentType(collection: Collection): String? {
@@ -372,7 +377,7 @@ class LinksFragment :
             } else {
                 // removing this type
                 val removeTypeList = getAllOfSameType(mCollections[index])
-                adapter.removeRange(adapterOffset, removeTypeList.size)
+                mAdapter.removeRange(adapterOffset, removeTypeList.size)
                 // next type is now at position adapterOffset after remove, so don't increment
                 index += removeTypeList.size
             }
@@ -382,16 +387,16 @@ class LinksFragment :
     private fun restoreAllContent() {
         for (i in 0 until mCollectionItems.size) {
             val item = mCollectionItems[i]
-            if (!adapter.contains(item)) {
-                adapter.addItem(i, item)
+            if (!mAdapter.contains(item)) {
+                mAdapter.addItem(i, item)
             }
         }
     }
 
     private fun selectAll() {
-        adapter.currentItems.map { item -> item.setSelection(true) }
-        adapter.selectAll()
-        mActionModeHelper.updateContextTitle(adapter.selectedItemCount)
+        mAdapter.currentItems.map { item -> item.setSelection(true) }
+        mAdapter.selectAll()
+        mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {
@@ -406,7 +411,7 @@ class LinksFragment :
 
     fun refreshFragment() {
         fetchContents()
-        adapter.updateDataSet(mCollectionItems)
+        mAdapter.updateDataSet(mCollectionItems)
         mActionModeHelper.destroyActionModeIfCan()
     }
 
@@ -432,14 +437,5 @@ class LinksFragment :
         }
 
     }
-
-    override fun onPanelSlide(panel: View, slideOffset: Float) {}
-
-    override fun onPanelClosed(panel: View) {
-        // Close own panel when activity's panel is closed
-        slidingPaneLayout.closePane()
-    }
-
-    override fun onPanelOpened(panel: View) {}
 
 }

@@ -1,14 +1,14 @@
-package iced.egret.palette.view
+package iced.egret.palette.itemdecoration
 
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * Used to add uniform margin to all recycler view items.
+ * Used to add uniform margin to PinnedCollectionItems. Assumes one column.
  * Copied from https://stackoverflow.com/a/44964515
  */
-class RecyclerViewMargin(private val space : Int) : RecyclerView.ItemDecoration() {
+class PinnedCollectionMargin(private val space : Int) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect, view: View,
                        parent: RecyclerView, state: RecyclerView.State) {

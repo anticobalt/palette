@@ -19,13 +19,13 @@ import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.delegate.AlbumViewDelegate
 import iced.egret.palette.delegate.CollectionViewDelegate
 import iced.egret.palette.delegate.FolderViewDelegate
+import iced.egret.palette.flexible.CollectionViewItem
+import iced.egret.palette.flexible.CoverableItem
+import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
-import iced.egret.palette.flexible.CollectionViewItem
-import iced.egret.palette.flexible.CoverableItem
-import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter

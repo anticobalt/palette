@@ -1,4 +1,4 @@
-package iced.egret.palette.view
+package iced.egret.palette.layout
 
 import android.content.Context
 import android.util.AttributeSet

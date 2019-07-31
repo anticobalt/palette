@@ -23,8 +23,8 @@ import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.flexible.CoverableItem
-import iced.egret.palette.flexible.PinnedCollectionsItem
-import iced.egret.palette.view.RecyclerViewMargin
+import iced.egret.palette.flexible.PinnedCollectionItem
+import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
@@ -50,9 +50,9 @@ class LinksFragment :
     private lateinit var mRecyclerView: RecyclerView
 
     private var mCollections = mutableListOf<Collection>()
-    private var mCollectionItems = mutableListOf<PinnedCollectionsItem>()
+    private var mCollectionItems = mutableListOf<PinnedCollectionItem>()
 
-    private lateinit var mAdapter: FlexibleAdapter<PinnedCollectionsItem>
+    private lateinit var mAdapter: FlexibleAdapter<PinnedCollectionItem>
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
 
@@ -174,7 +174,7 @@ class LinksFragment :
         mRecyclerView.adapter = mAdapter
 
         val marginInPx = resources.getDimensionPixelSize(R.dimen.banner_margin)
-        mRecyclerView.addItemDecoration(RecyclerViewMargin(marginInPx))
+        mRecyclerView.addItemDecoration(PinnedCollectionMargin(marginInPx))
     }
 
     private fun buildSideActions() {
@@ -425,14 +425,14 @@ class LinksFragment :
         // Fetch folders
         for (folder in CollectionManager.folders) {
             mCollections.add(folder)
-            val contentItem = PinnedCollectionsItem(folder)
+            val contentItem = PinnedCollectionItem(folder)
             mCollectionItems.add(contentItem)
         }
 
         // Fetch albums
         for (album in CollectionManager.albums) {
             mCollections.add(album)
-            val contentItem = PinnedCollectionsItem(album)
+            val contentItem = PinnedCollectionItem(album)
             mCollectionItems.add(contentItem)
         }
 

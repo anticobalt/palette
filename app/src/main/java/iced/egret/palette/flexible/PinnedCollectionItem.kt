@@ -9,10 +9,10 @@ import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.Painter
 
-class PinnedCollectionsItem(obj: Coverable) : CoverableItem(obj) {
+class PinnedCollectionItem(obj: Coverable) : CoverableItem(obj) {
 
     override fun getLayoutRes(): Int {
-        return R.layout.item_pinned_collections
+        return R.layout.item_pinned_collection
     }
 
     override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>): CoverViewHolder {

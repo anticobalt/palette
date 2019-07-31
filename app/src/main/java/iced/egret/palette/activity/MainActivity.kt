@@ -13,7 +13,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
-import iced.egret.palette.view.HackySlidingPaneLayout
+import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.LinksFragment

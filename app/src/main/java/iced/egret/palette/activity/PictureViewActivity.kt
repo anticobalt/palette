@@ -92,7 +92,6 @@ class PictureViewActivity : BaseActivity() {
 
         // make translucent
         mBarBackgroundColor = getTranslucentColor(mBarBackgroundColor)
-        mBarIconColor = getTranslucentColor(mBarIconColor)
     }
 
     private fun getTranslucentColor(color: Int): Int {
@@ -117,7 +116,7 @@ class PictureViewActivity : BaseActivity() {
         // setting AppBarLayout background instead of toolbar makes entire hide animation show
         appbar.background = getGradientToTransparent(mBarBackgroundColor, GradientDrawable.Orientation.TOP_BOTTOM)
 
-        // Universal fix for appbar being behind ImageView due to elevation=0dp in XML.
+        // Universal fix for appbar being behind ImageView.
         // Setting translationZ=0.1dp doesn't work on some devices (e.g. Nexus5).
         appbar.bringToFront()
 

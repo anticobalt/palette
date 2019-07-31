@@ -1,4 +1,4 @@
-package iced.egret.palette
+package iced.egret.palette.view
 
 import android.content.Context
 import android.graphics.Canvas

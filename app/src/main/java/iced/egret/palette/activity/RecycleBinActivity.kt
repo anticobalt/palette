@@ -14,8 +14,8 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
 import iced.egret.palette.model.Picture
-import iced.egret.palette.recyclerview_component.CollectionViewItem
-import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
+import iced.egret.palette.flexible.CollectionViewItem
+import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter

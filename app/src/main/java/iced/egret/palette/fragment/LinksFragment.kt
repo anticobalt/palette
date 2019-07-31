@@ -22,10 +22,10 @@ import iced.egret.palette.activity.SettingsActivity
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
-import iced.egret.palette.recyclerview_component.CoverableItem
-import iced.egret.palette.recyclerview_component.PinnedCollectionsItem
-import iced.egret.palette.recyclerview_component.RecyclerViewMargin
-import iced.egret.palette.recyclerview_component.ToolbarActionModeHelper
+import iced.egret.palette.flexible.CoverableItem
+import iced.egret.palette.flexible.PinnedCollectionsItem
+import iced.egret.palette.view.RecyclerViewMargin
+import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter

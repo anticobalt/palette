@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import iced.egret.palette.R
 import iced.egret.palette.activity.PictureViewActivity
-import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.flexible.CoverViewHolder
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*

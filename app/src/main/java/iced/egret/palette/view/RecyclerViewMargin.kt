@@ -1,4 +1,4 @@
-package iced.egret.palette.recyclerview_component
+package iced.egret.palette.view
 
 import android.graphics.Rect
 import android.view.View

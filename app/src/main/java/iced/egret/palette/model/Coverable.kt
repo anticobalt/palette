@@ -10,7 +10,7 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.signature.MediaStoreSignature
-import iced.egret.palette.recyclerview_component.CoverViewHolder
+import iced.egret.palette.flexible.CoverViewHolder
 import java.io.File
 import java.io.FileNotFoundException
 

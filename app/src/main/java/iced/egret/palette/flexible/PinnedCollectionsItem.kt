@@ -1,4 +1,4 @@
-package iced.egret.palette.recyclerview_component
+package iced.egret.palette.flexible
 
 import android.view.View
 import android.widget.ImageView

@@ -7,7 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageButton
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -178,7 +178,7 @@ class LinksFragment :
     }
 
     private fun buildSideActions() {
-        val sideLayout = mRootView!!.findViewById<LinearLayout>(R.id.sideActionsLayout)
+        val sideLayout = mRootView!!.findViewById<ConstraintLayout>(R.id.sideActionsLayout)
 
         sideLayout.findViewById<ImageButton>(R.id.settings).setOnClickListener {
             startActivity(Intent(this.context, SettingsActivity::class.java))
@@ -191,7 +191,7 @@ class LinksFragment :
     private fun styleSlidePane() {
         val slider = mRootView!!.findViewById<SlidingPaneLayout>(R.id.slider)
         slider.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
-        slider.setShadowResourceLeft(R.drawable.shadow)
+        slider.setShadowResourceLeft(R.drawable.shadow_left_fixed)
     }
 
     // Style themed stuff that isn't handled by Aesthetic or other inherited classes.
@@ -200,7 +200,7 @@ class LinksFragment :
         val accentColor = prefs.getInt(getString(R.string.accent_color_key), R.color.colorAccent)
         val iconColor = prefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
 
-        val sideLayout = mRootView!!.findViewById<LinearLayout>(R.id.sideActionsLayout)
+        val sideLayout = mRootView!!.findViewById<ConstraintLayout>(R.id.sideActionsLayout)
         sideLayout.background = ColorDrawable(accentColor)
         for (touchable in sideLayout.touchables) {
             if (touchable is ImageButton) {

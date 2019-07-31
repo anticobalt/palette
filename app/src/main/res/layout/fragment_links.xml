@@ -15,12 +15,19 @@
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/sideActionsLayout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@drawable/shadow_bottom"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <ImageButton
                 android:id="@+id/settings"
@@ -32,7 +39,10 @@
                 android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/action_settings"
                 android:scaleType="fitXY"
-                android:src="@drawable/ic_settings_black_24dp" />
+                android:src="@drawable/ic_settings_black_24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/recycleBin"
@@ -44,9 +54,12 @@
                 android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/recycle_bin"
                 android:scaleType="fitXY"
-                android:src="@drawable/ic_delete_variant_black_24dp" />
+                android:src="@drawable/ic_delete_variant_black_24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <FrameLayout
             android:id="@+id/pinnedCollectionsLayout"

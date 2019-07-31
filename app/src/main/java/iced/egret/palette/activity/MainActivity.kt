@@ -181,7 +181,7 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
 
         slidingPaneLayout.parallaxDistance = pxParallax  // make left move when scrolling right
         slidingPaneLayout.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
-        slidingPaneLayout.setShadowResourceLeft(R.drawable.shadow)
+        slidingPaneLayout.setShadowResourceLeft(R.drawable.shadow_left_fixed)
 
         slidingPaneLayout.setPanelSlideListener(this)
     }

@@ -58,7 +58,6 @@ abstract class Collection(override var name: String, path: String) : Coverable {
                     Glide.with(holder.itemView.context)
                             .load(imageReference)
                             .centerCrop()
-                            .placeholder(getPlaceholderDrawable(holder.ivItem))
                             .error(R.drawable.ic_broken_image_black_24dp)
 
             // Load image with signature if possible

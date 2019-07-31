@@ -156,7 +156,6 @@ class Picture(override var name: String, override var filePath: String) : Termin
                             .load(cover["uri"])
                             .centerCrop()
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(getPlaceholderDrawable(imageView))
                             .error(R.drawable.ic_broken_image_black_128dp)
 
             // Build image with signature if possible

@@ -28,19 +28,42 @@ import java.io.File
  */
 object DialogGenerator {
 
-    fun createAlbum(context: Context, albumExists: (CharSequence) -> Boolean, onConfirm: (CharSequence) -> Unit) {
+    private fun hasInvalidCharacters(sequence: CharSequence) : Boolean {
+        val invalidSymbols = setOf('|', '/', '\\', '\'', '"', '?', '*', '<', '>', '+', '=', ':')
+        return sequence.any { char -> char in invalidSymbols }
+    }
+
+    private fun albumNameError(name: CharSequence, nameInUse: (CharSequence) -> Boolean) : String? {
+        return when {
+            nameInUse(name) -> "Album with name already exists"
+            hasInvalidCharacters(name) -> "Invalid characters"
+            name.firstOrNull() == ' ' -> "Cannot start with space"
+            name.lastOrNull() == ' ' -> "Cannot end with space"
+            name.isEmpty() -> "Empty name not allowed"
+            else -> null
+        }
+    }
+
+    private fun fileNameError(name: CharSequence) : String? {
+        return when {
+            hasInvalidCharacters(name) -> "Invalid characters"
+            name.firstOrNull() == ' ' -> "Cannot start with space"
+            name.lastOrNull() == ' ' -> "Cannot end with space"
+            name.isEmpty() -> "Empty name not allowed"
+            else -> null
+        }
+    }
+
+    fun createAlbum(context: Context, nameUsed: (CharSequence) -> Boolean, onConfirm: (CharSequence) -> Unit) {
         MaterialDialog(context).show {
             title(R.string.title_album_form)
-            input(hintRes = R.string.hint_set_name, maxLength = Album.NAME_MAX_LENGTH,
-                    waitForPositiveButton = false, inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
-            { dialog, text ->
-                val isValid = !albumExists(text)
-                dialog.getInputField().error = if (isValid) {
-                    null
-                } else {
-                    "Album with name already exists"
-                }
-                dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
+            input(hintRes = R.string.hint_set_name,
+                    maxLength = Album.NAME_MAX_LENGTH,
+                    waitForPositiveButton = false,
+                    inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES) { dialog, text ->
+                val error = albumNameError(text, nameUsed)
+                dialog.getInputField().error = error
+                dialog.setActionButtonEnabled(WhichButton.POSITIVE, error == null)
             }
             positiveButton(R.string.action_create_album) {
                 onConfirm(this.getInputField().text)
@@ -54,16 +77,14 @@ object DialogGenerator {
 
         MaterialDialog(context).show {
             title(R.string.action_rename)
-            input(hintRes = R.string.hint_set_name, prefill = oldName, maxLength = Album.NAME_MAX_LENGTH,
-                    waitForPositiveButton = false, inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
-            { dialog, text ->
-                val isValid = !nameUsed(text)
-                dialog.getInputField().error = if (isValid) {
-                    null
-                } else {
-                    "Album with name already exists"
-                }
-                dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
+            input(hintRes = R.string.hint_set_name,
+                    prefill = oldName,
+                    maxLength = Album.NAME_MAX_LENGTH,
+                    waitForPositiveButton = false,
+                    inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES) { dialog, text ->
+                val error = albumNameError(text, nameUsed)
+                dialog.getInputField().error = error
+                dialog.setActionButtonEnabled(WhichButton.POSITIVE, error == null)
             }
             positiveButton {
                 onConfirm(this.getInputField().text)
@@ -136,7 +157,11 @@ object DialogGenerator {
             noAutoDismiss()
             title(R.string.action_save_file)
             // TODO: custom view to separate extension and name fields
-            input(prefill = name)
+            input(prefill = name, waitForPositiveButton = false) { dialog, text ->
+                val error = fileNameError(text)
+                dialog.getInputField().error = error
+                dialog.setActionButtonEnabled(WhichButton.POSITIVE, error == null)
+            }
             negativeButton {
                 dismiss()
             }

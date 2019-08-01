@@ -60,6 +60,7 @@ class PictureViewActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!validState()) finish()
         if (!Storage.fileExists(mCurrentPicture.filePath)) finish()
     }
 
@@ -75,6 +76,13 @@ class PictureViewActivity : BaseActivity() {
         } else {
             true
         }
+    }
+
+    /**
+     * Check that CollectionManager is setup properly
+     */
+    private fun validState() : Boolean {
+        return mActivePage < mPictures.size
     }
 
     /**

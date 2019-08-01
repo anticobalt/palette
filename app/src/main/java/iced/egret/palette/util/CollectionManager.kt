@@ -91,15 +91,15 @@ object CollectionManager : CoroutineScope {
 
     }
 
-    fun fetchFromStorage(context: Context, callback: (Boolean) -> Unit) {
+    fun fetchFromStorage(context: Context, callback: () -> Unit) {
         launch {
             val updateKit = withContext(coroutineContext) {
                 Storage.getUpdateKit(context)
             }
-            val updates = updatePicturesFromKit(updateKit)
+            updatePicturesFromKit(updateKit)
             cleanAlbums()
             Storage.saveAlbumsToDisk(albums)
-            withContext(Dispatchers.Main) { callback(updates) }
+            withContext(Dispatchers.Main) { callback() }
         }
     }
 
@@ -111,9 +111,8 @@ object CollectionManager : CoroutineScope {
      *
      * @return If something updated (true) or not (false)
      */
-    private fun updatePicturesFromKit(updateKit: Storage.UpdateKit) : Boolean {
+    private fun updatePicturesFromKit(updateKit: Storage.UpdateKit) {
 
-        var updatesDone = false
         val addedPictures = updateKit.toAdd.filterIsInstance<Picture>()
         val removedPaths = updateKit.toRemove
 
@@ -123,7 +122,6 @@ object CollectionManager : CoroutineScope {
             if (folder != null && folder.findPictureByPath(picture.filePath) == null) {
                 picture.parent = folder
                 folder.addPicture(picture, toFront = true)
-                updatesDone = true
             }
         }
 
@@ -135,11 +133,8 @@ object CollectionManager : CoroutineScope {
             if (folder != null && picture != null) {
                 // Returns false if Picture previously removed by in-app operations.
                 folder.removePicture(picture)
-                updatesDone = true
             }
         }
-
-        return updatesDone
     }
 
     fun getCollections(): MutableList<Collection> {

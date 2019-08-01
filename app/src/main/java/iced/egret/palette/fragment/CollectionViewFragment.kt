@@ -278,7 +278,8 @@ class CollectionViewFragment :
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
             // May start activity for result if required
-            CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
+            val updates = CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
+            if (updates) onCurrentContentsChanged()
             false
         }
     }
@@ -449,8 +450,7 @@ class CollectionViewFragment :
                 DialogGenerator.moveTo(context!!) {
                     @Suppress("UNCHECKED_CAST")  // assume internal consistency
                     movePictures(coverables as List<Picture>, it, typeString)
-                    mMaster.notifyCollectionsChanged()
-                    fetchContents()
+                    onCurrentContentsChanged()
                     mActionModeHelper.destroyActionModeIfCan()
                 }
             }
@@ -460,15 +460,14 @@ class CollectionViewFragment :
                         DialogGenerator.moveToRecycleBin(context!!, typeString) {
                             @Suppress("UNCHECKED_CAST")  // assume internal consistency
                             recyclePictures(coverables as List<Picture>, typeString)
-                            fetchContents()
+                            onCurrentContentsChanged()
                             mActionModeHelper.destroyActionModeIfCan()
                         }
                     }
                 }
 
             }
-            else -> {
-            }
+            else -> {}
         }
 
         mDelegate.onActionItemClicked(mode, item, mAdapter, context!!, mSelectedContentType!!)
@@ -607,11 +606,8 @@ class CollectionViewFragment :
      */
     private fun showUpdatedContents() {
         CollectionManager.fetchFromStorage(activity!!) {
-            // When done async fetch, refresh fragment to view up-to-date contents if required
-            val updatesExists = it
-            if (updatesExists) {
-                onCurrentContentsChanged()
-            }
+            // When done async fetch, refresh fragment to view up-to-date contents
+            onCurrentContentsChanged()
             mSwipeRefreshLayout.isRefreshing = false
         }
     }

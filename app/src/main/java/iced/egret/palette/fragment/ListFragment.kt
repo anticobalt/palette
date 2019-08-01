@@ -1,5 +1,6 @@
 package iced.egret.palette.fragment
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,6 +25,7 @@ abstract class ListFragment : Fragment() {
 
     lateinit var toolbar: Toolbar
     lateinit var navigationDrawable : DrawerArrowDrawable
+    protected lateinit var sharedPrefs : SharedPreferences
 
     abstract fun setClicksBlocked(doBlock: Boolean)
     abstract fun onAllFragmentsCreated()
@@ -31,12 +33,12 @@ abstract class ListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         navigationDrawable = DrawerArrowDrawable(context!!)
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.context)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    private fun setToolbarTextColor() {
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.context)
-        val color = sharedPrefs!!.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
+    protected open fun setToolbarItemColor() {
+        val color = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
         toolbar.toolbarTitle.setTextColor(color)
 
         navigationDrawable.color = color  // Only DrawerArrowDrawable's own color function works
@@ -45,7 +47,7 @@ abstract class ListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Allow updating whenever returning to fragment from Settings
-        setToolbarTextColor()
+        setToolbarItemColor()
     }
 
 }

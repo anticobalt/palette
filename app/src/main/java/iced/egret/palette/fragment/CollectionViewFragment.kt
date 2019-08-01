@@ -133,6 +133,7 @@ class CollectionViewFragment :
      */
     override fun onResume() {
         super.onResume()
+        styleFab()
         // Never refresh if currently selecting stuff.
         // If not selecting, refresh if onCreate() not called.
         if (mSelectedContentType != null) {
@@ -214,6 +215,11 @@ class CollectionViewFragment :
         } else text = title
 
         toolbar.toolbarTitle.text = text
+    }
+
+    private fun styleFab() {
+        val color = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        mFloatingActionButton.drawable.setTint(color)
     }
 
     private fun buildDelegate() {

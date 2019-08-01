@@ -1,21 +1,39 @@
 package iced.egret.palette.activity
 
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.MenuItem
 import androidx.preference.PreferenceFragmentCompat
 import com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
 import iced.egret.palette.R
+import kotlinx.android.synthetic.main.appbar.*
 
-class SettingsActivity : BasicAestheticActivity() {
+class SettingsActivity : BasicThemedActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        buildToolbar()
+        styleToolbar()
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings, SettingsFragment())
                 .commit()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun buildToolbar() {
+        toolbar.title = getString(R.string.title_activity_settings)
+        toolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
+    }
+
+    private fun styleToolbar() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val itemColor = prefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+
+        toolbar.setTitleTextColor(itemColor)
+        toolbar.navigationIcon?.setTint(itemColor)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -74,7 +92,8 @@ class SettingsActivity : BasicAestheticActivity() {
         }
 
         private fun applyTheme() {
-            (this.activity!! as BasicAestheticActivity).applyTheme(primaryColor, accentColor, toolbarItemColor)
+            (this.activity!! as BasicThemedActivity).applyTheme(primaryColor, accentColor, toolbarItemColor)
+            (this.activity!! as SettingsActivity).styleToolbar()
         }
 
     }

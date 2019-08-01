@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
@@ -166,11 +165,17 @@ class LinksFragment :
         slider.setShadowResourceLeft(R.drawable.shadow_left_fixed)
     }
 
-    // Style themed stuff that isn't handled by Aesthetic or other inherited classes.
+    override fun setToolbarItemColor() {
+        super.setToolbarItemColor()
+        val iconColor = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        toolbar.menu.findItem(R.id.actionCreateAlbum).icon.setTint(iconColor)
+    }
+
+
+    // Style themed stuff that isn't handled by theming library or other inherited classes.
     private fun styleExtraThemeElements() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        val accentColor = prefs.getInt(getString(R.string.accent_color_key), R.color.colorAccent)
-        val iconColor = prefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        val accentColor = sharedPrefs.getInt(getString(R.string.accent_color_key), R.color.cyanea_accent_reference)
+        val iconColor = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
 
         val sideLayout = mRootView!!.findViewById<ConstraintLayout>(R.id.sideActionsLayout)
         sideLayout.background = ColorDrawable(accentColor)

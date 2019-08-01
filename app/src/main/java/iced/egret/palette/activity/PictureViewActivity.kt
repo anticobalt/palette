@@ -85,7 +85,7 @@ class PictureViewActivity : BaseActivity() {
         val usePrimary = mSharedPrefs.getBoolean(getString(R.string.flipper_toolbar_color_key), false)
         if (usePrimary) {
             mBarBackgroundColor = mSharedPrefs.getInt(getString(R.string.primary_color_key),
-                    ContextCompat.getColor(this, R.color.colorPrimary))
+                    ContextCompat.getColor(this, R.color.cyanea_primary_reference))
         }  // else use default
 
         mBarIconColor = mSharedPrefs.getInt(getString(R.string.toolbar_item_color_key), mBarIconColor)

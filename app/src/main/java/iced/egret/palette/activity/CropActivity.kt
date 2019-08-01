@@ -3,13 +3,12 @@ package iced.egret.palette.activity
 import android.app.Activity
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Pair
 import android.view.MenuItem
-import android.widget.Button
+import android.widget.TextView
 import androidx.preference.PreferenceManager
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
@@ -19,12 +18,12 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_crop.*
 import kotlinx.android.synthetic.main.activity_view_picture.bottomActions
-import kotlinx.android.synthetic.main.appbar_list_fragment.*
+import kotlinx.android.synthetic.main.appbar.*
 import kotlinx.android.synthetic.main.bottom_actions_crop.view.*
 import java.io.File
 import java.io.IOException
 
-class CropActivity : BasicAestheticActivity() {
+class CropActivity : BasicThemedActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -51,6 +50,9 @@ class CropActivity : BasicAestheticActivity() {
         // If handling on-disk item, but it was moved, get out.
         val path = mImageUri.path
         if (path != null && !Storage.fileExists(path)) finish()
+
+        styleToolbar()
+        styleBottomBar()
     }
 
     private fun buildCropView() {
@@ -66,23 +68,12 @@ class CropActivity : BasicAestheticActivity() {
         toolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
         toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
     }
 
     private fun buildBottomActions() {
-
-        // color bar and bar actions
-        val barBgColor = sharedPreferences.getInt(getString(R.string.primary_color_key), Color.BLACK)
-        val barTextColor = sharedPreferences.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
-        bottomActions.background = ColorDrawable(barBgColor)
-        for (touchable in bottomActions.touchables) {
-            if (touchable is Button) {
-                touchable.setTextColor(barTextColor)
-            }
-        }
 
         bottomActions.ratio_free.setOnClickListener {
             // FIXME: side-effect: crop window fills whole screen if set from true to false
@@ -108,6 +99,28 @@ class CropActivity : BasicAestheticActivity() {
         bottomActions.ratio_reset.setOnClickListener {
             cropImageView.clearAspectRatio()
             cropImageView.resetCropRect()  // expand to fill whole image
+        }
+    }
+
+    private fun styleToolbar() {
+        val itemColor = sharedPreferences.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        toolbar.setTitleTextColor(itemColor)
+
+        toolbar.navigationIcon?.setTint(itemColor)
+        toolbar.menu.findItem(R.id.crop_image_menu_rotate_right).icon.setTint(itemColor)
+        toolbar.menu.findItem(R.id.crop_image_menu_flip).icon.setTint(itemColor)
+        toolbar.menu.findItem(R.id.crop_image_menu_crop).icon.setTint(itemColor)
+    }
+
+    private fun styleBottomBar() {
+        val barBgColor = sharedPreferences.getInt(getString(R.string.primary_color_key), R.color.translucentBlack)
+        val barTextColor = sharedPreferences.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+
+        bottomActions.background = ColorDrawable(barBgColor)
+        for (touchable in bottomActions.touchables) {
+            if (touchable is TextView) {
+                touchable.setTextColor(barTextColor)
+            }
         }
     }
 

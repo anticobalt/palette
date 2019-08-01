@@ -41,7 +41,7 @@ const val SD_CARD_WRITE_REQUEST = 2
  * - Panel listening
  * - Fragment management
  */
-class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanelSlideListener {
+class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSlideListener {
 
     class DummyFragment : ListFragment() {
         override fun setClicksBlocked(doBlock: Boolean) {}

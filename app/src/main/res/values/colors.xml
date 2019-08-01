@@ -6,9 +6,8 @@
     colorPrimaryDark is a placeholder that has to exist for compiling,
     but will be replaced by Aesthetic based on the value of colorPrimary.
     -->
-    <color name="colorPrimary">@color/dodger_blue</color>
-    <color name="colorPrimaryDark">@color/space</color>
-    <color name="colorAccent">@color/fashion_red</color>
+    <color name="cyanea_primary_reference">@color/dodger_blue</color>
+    <color name="cyanea_accent_reference">@color/fashion_red</color>
 
     <!-- For themes -->
     <color name="dodger_blue">#5B67FF</color>

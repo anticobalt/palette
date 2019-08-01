@@ -10,7 +10,7 @@
         there's a bug where the title of the dialog is highlighted on launch.
         -->
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            android:defaultValue="@color/colorPrimary"
+            android:defaultValue="@color/cyanea_primary_reference"
             app:colorChoices="@array/theme_colors"
             app:iconSpaceReserved="false"
             app:key="@string/primary_color_key"
@@ -18,7 +18,7 @@
             app:title="@string/primary_color_preference" />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
-            android:defaultValue="@color/colorAccent"
+            android:defaultValue="@color/cyanea_accent_reference"
             app:colorChoices="@array/theme_colors"
             app:iconSpaceReserved="false"
             app:key="@string/accent_color_key"

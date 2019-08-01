@@ -2,6 +2,7 @@ package iced.egret.palette.activity
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -13,15 +14,15 @@ import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
-import iced.egret.palette.model.Picture
 import iced.egret.palette.flexible.CollectionViewItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
+import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Storage
 
-class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
+class RecycleBinActivity : BasicThemedActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
@@ -40,9 +41,14 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         buildRecyclerView()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_recycle_bin, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        styleToolbar()
     }
 
     private fun fetchContents() {
@@ -87,10 +93,18 @@ class RecycleBinActivity : BasicAestheticActivity(), ActionMode.Callback,
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
-        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
         mToolbar.setNavigationOnClickListener {
             onBackPressed()
         }
+    }
+
+    private fun styleToolbar() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val itemColor = prefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+
+        mToolbar.setTitleTextColor(itemColor)
+        mToolbar.navigationIcon?.setTint(itemColor)
+        mToolbar.menu.findItem(R.id.actionEmpty).icon.setTint(itemColor)
     }
 
     private fun buildRecyclerView() {

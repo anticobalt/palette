@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "iced.egret.palette"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

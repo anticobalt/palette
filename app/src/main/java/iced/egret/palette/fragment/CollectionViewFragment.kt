@@ -71,7 +71,14 @@ class CollectionViewFragment :
 
     fun onDelegateAlert(alert: CollectionViewDelegate.ActionAlert) {
         if (alert.message.isNotEmpty()) toast(alert.message)
-        if (alert.success) refreshActivity()
+
+        if (alert.success) {
+            // Update everything (short of remaking menus) b/c delegate doesn't specify what exactly changed.
+            fetchContents()
+            mAdapter.updateDataSet(mContentItems)
+            setToolbarTitle()
+            mMaster.notifyCollectionsChanged()
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -95,32 +102,34 @@ class CollectionViewFragment :
 
     }
 
-    /**
-     * Where all the save state loading is done.
-     * Must be done after MainActivity is finished creation,
-     * as fragment relies on it to load the correct viewing Collection
-     */
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         mMaster.notifyFragmentCreationFinished(this)
+    }
 
-        if (savedInstanceState != null) {
+    /**
+     * Called after MainActivity done loading collection, so safe to restore state here.
+     */
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
 
-            // If selected content type is saved, restore it, otherwise get out
-            val contentType = savedInstanceState.getString(selectedType, "")
-            if (contentType.isEmpty()) return
-            mSelectedContentType = contentType
-            isolateContent(mSelectedContentType!!)
+        //If selected content type is saved, restore it, otherwise get out
+        if (savedInstanceState == null) return
+        val contentType = savedInstanceState.getString(selectedType, "")
+        if (contentType.isEmpty()) return
 
-            // Must restore adapter and helper AFTER type isolation to keep position ints consistent
-            mAdapter.onRestoreInstanceState(savedInstanceState)
-            mActionModeHelper.restoreSelection(toolbar)
+        // Isolate internal contents and self
+        mSelectedContentType = contentType
+        isolateContent(mSelectedContentType!!)
 
-            // Re-select all previously selected items
-            for (i in 0 until mAdapter.currentItems.size) {
-                if (i in mAdapter.selectedPositionsAsSet) {
-                    mAdapter.currentItems[i].setSelection(true)
-                }
+        // Must restore adapter and helper AFTER type isolation to keep position ints consistent
+        mAdapter.onRestoreInstanceState(savedInstanceState)
+        mActionModeHelper.restoreSelection(toolbar)
+
+        // Re-select all previously selected items
+        for (i in 0 until mAdapter.currentItems.size) {
+            if (i in mAdapter.selectedPositionsAsSet) {
+                mAdapter.currentItems[i].setSelection(true)
             }
         }
     }
@@ -132,7 +141,10 @@ class CollectionViewFragment :
         super.onResume()
         // Never refresh if currently selecting stuff.
         // If not selecting, refresh if onCreate() not called.
-        if (mSelectedContentType != null) return
+        if (mSelectedContentType != null) {
+            mMaster.isolateFragment(this)
+            return
+        }
         if (mReturningFromStop) {
             showUpdatedContents()
         }
@@ -326,14 +338,17 @@ class CollectionViewFragment :
                     val albumString = if (destinations.size > 1) "albums" else "album"
                     CollectionManager.addContentToAllAlbums(coverables, destinations)
                     toast("Added ${coverables.size} $typeString to ${destinations.size} $albumString.")
-                    refreshActivity()
+                    mMaster.notifyCollectionsChanged()
+                    mActionModeHelper.destroyActionModeIfCan()
                 }
             }
             R.id.actionMove -> {
                 DialogGenerator.moveTo(context!!) {
                     @Suppress("UNCHECKED_CAST")  // assume internal consistency
                     movePictures(coverables as List<Picture>, it, typeString)
-                    refreshActivity()
+                    mMaster.notifyCollectionsChanged()
+                    fetchContents()
+                    mActionModeHelper.destroyActionModeIfCan()
                 }
             }
             R.id.actionDelete -> {
@@ -342,7 +357,8 @@ class CollectionViewFragment :
                         DialogGenerator.moveToRecycleBin(context!!, typeString) {
                             @Suppress("UNCHECKED_CAST")  // assume internal consistency
                             recyclePictures(coverables as List<Picture>, typeString)
-                            refreshActivity()
+                            fetchContents()
+                            mActionModeHelper.destroyActionModeIfCan()
                         }
                     }
                 }
@@ -441,10 +457,7 @@ class CollectionViewFragment :
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
             // May start activity for result if required
-            val updates = CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
-            if (updates) {
-                refreshFragment()
-            }
+            CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
             false
         }
     }
@@ -507,24 +520,37 @@ class CollectionViewFragment :
     private fun returnToParentCollection(): Boolean {
         val newContents = CollectionManager.revertToParent()
         return if (newContents != null) {
-            refreshFragment()
+            onNavigation()
             true
         } else {
             false
         }
     }
 
-    fun refreshFragment() {
+    private fun onNavigation() {
         fetchContents()
         mAdapter.updateDataSet(mContentItems)
-        mActionModeHelper.destroyActionModeIfCan()
-        buildDelegate()
-        buildToolbar()  // updates title and delegate's menu items
+        setToolbarTitle()
     }
 
-    private fun refreshActivity() {
-        refreshFragment()
-        mMaster.notifyCollectionsChanged()  // to update cover
+    /**
+     * Called when collection hasn't changed, but its contents have.
+     */
+    private fun onCurrentContentsChanged() {
+        fetchContents()
+        mAdapter.updateDataSet(mContentItems)
+        mMaster.notifyCollectionsChanged()
+    }
+
+    /**
+     * Called when the root collection changes. Menu items and the like have to be rebuilt to
+     * satisfy new collection type.
+     */
+    fun onTopCollectionChanged() {
+        fetchContents()
+        mAdapter.updateDataSet(mContentItems)
+        buildDelegate()
+        buildToolbar()  // updates title and delegate's menu items
     }
 
     /**
@@ -547,9 +573,11 @@ class CollectionViewFragment :
      */
     private fun showUpdatedContents() {
         CollectionManager.fetchFromStorage(activity!!) {
-            // When done async fetch, refresh fragment to view up-to-date contents
-            refreshFragment()
-            mMaster.notifyCollectionsChanged()
+            // When done async fetch, refresh fragment to view up-to-date contents if required
+            val updatesExists = it
+            if (updatesExists) {
+                onCurrentContentsChanged()
+            }
             mSwipeRefreshLayout.isRefreshing = false
         }
     }

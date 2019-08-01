@@ -13,11 +13,11 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
-import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.LinksFragment
 import iced.egret.palette.fragment.ListFragment
+import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
@@ -282,7 +282,7 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
     }
 
     fun notifyCollectionsChanged() {
-        (fragments[leftIndex] as LinksFragment).refreshFragment()
+        (fragments[leftIndex] as LinksFragment).onCollectionsUpdated()
     }
 
     fun notifyPinnedAlbumDeleted() {
@@ -290,8 +290,9 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
         val allCollections = CollectionManager.getCollections()
         if (current != null && !allCollections.contains(current)) {
             CollectionManager.resetStack()
+            // Top collection might have been the one that was deleted
+            (fragments[rightIndex] as CollectionViewFragment).onTopCollectionChanged()
         }
-        (fragments[rightIndex] as CollectionViewFragment).refreshFragment()
     }
 
     fun buildCollectionView(collection: Collection) {
@@ -304,7 +305,7 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
             else -> CollectionManager.launch(collection)
         }
 
-        cvFragment.refreshFragment()
+        cvFragment.onTopCollectionChanged()
     }
 
 }

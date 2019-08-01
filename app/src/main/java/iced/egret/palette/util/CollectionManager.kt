@@ -91,15 +91,15 @@ object CollectionManager : CoroutineScope {
 
     }
 
-    fun fetchFromStorage(context: Context, callback: () -> Unit) {
+    fun fetchFromStorage(context: Context, callback: (Boolean) -> Unit) {
         launch {
             val updateKit = withContext(coroutineContext) {
                 Storage.getUpdateKit(context)
             }
-            updatePicturesFromKit(updateKit)
+            val updates = updatePicturesFromKit(updateKit)
             cleanAlbums()
             Storage.saveAlbumsToDisk(albums)
-            withContext(Dispatchers.Main) { callback() }
+            withContext(Dispatchers.Main) { callback(updates) }
         }
     }
 
@@ -108,9 +108,12 @@ object CollectionManager : CoroutineScope {
      * in-app operations. These changes are properly reflected on disk, but Storage isn't alerted
      * about them, so UpdateKit reports them as added/deleted externally.
      * Extra overhead to make Storage keep track of those things is probably not worth it.
+     *
+     * @return If something updated (true) or not (false)
      */
-    private fun updatePicturesFromKit(updateKit: Storage.UpdateKit) {
+    private fun updatePicturesFromKit(updateKit: Storage.UpdateKit) : Boolean {
 
+        var updatesDone = false
         val addedPictures = updateKit.toAdd.filterIsInstance<Picture>()
         val removedPaths = updateKit.toRemove
 
@@ -120,6 +123,7 @@ object CollectionManager : CoroutineScope {
             if (folder != null && folder.findPictureByPath(picture.filePath) == null) {
                 picture.parent = folder
                 folder.addPicture(picture, toFront = true)
+                updatesDone = true
             }
         }
 
@@ -131,9 +135,11 @@ object CollectionManager : CoroutineScope {
             if (folder != null && picture != null) {
                 // Returns false if Picture previously removed by in-app operations.
                 folder.removePicture(picture)
+                updatesDone = true
             }
-
         }
+
+        return updatesDone
     }
 
     fun getCollections(): MutableList<Collection> {

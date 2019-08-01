@@ -19,13 +19,13 @@ import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.RecycleBinActivity
 import iced.egret.palette.activity.SettingsActivity
+import iced.egret.palette.flexible.CoverableItem
+import iced.egret.palette.flexible.PinnedCollectionItem
+import iced.egret.palette.flexible.ToolbarActionModeHelper
+import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
-import iced.egret.palette.flexible.CoverableItem
-import iced.egret.palette.flexible.PinnedCollectionItem
-import iced.egret.palette.itemdecoration.PinnedCollectionMargin
-import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
@@ -74,38 +74,40 @@ class LinksFragment :
         return mRootView
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        mAdapter.onSaveInstanceState(outState)
-        outState.putString(selectedType, mSelectedContentType)
-        super.onSaveInstanceState(outState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        (activity as MainActivity).notifyFragmentCreationFinished(this)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
 
-        if (savedInstanceState != null) {
-            // If selected content type is saved, restore it, otherwise get out
-            val contentType = savedInstanceState.getString(selectedType, "")
-            if (contentType.isEmpty()) return
-            mSelectedContentType = contentType
-            isolateContent(mSelectedContentType!!)
+        // If selected content type is saved, restore it, otherwise get out
+        if (savedInstanceState == null) return
+        val contentType = savedInstanceState.getString(selectedType, "")
+        if (contentType.isEmpty()) return
 
-            // Must restore adapter and helper AFTER type isolation to keep position ints consistent
-            mAdapter.onRestoreInstanceState(savedInstanceState)
-            mActionModeHelper.restoreSelection(toolbar)
+        // Isolate contents
+        mSelectedContentType = contentType
+        isolateContent(mSelectedContentType!!)
 
-            // Re-select all previously selected items
-            for (i in 0 until mAdapter.currentItems.size) {
-                if (i in mAdapter.selectedPositionsAsSet) {
-                    mAdapter.currentItems[i].setSelection(true)
-                }
+        // Must restore adapter and helper AFTER type isolation to keep position ints consistent
+        mAdapter.onRestoreInstanceState(savedInstanceState)
+        mActionModeHelper.restoreSelection(toolbar)
+
+        // Re-select all previously selected items
+        for (i in 0 until mAdapter.currentItems.size) {
+            if (i in mAdapter.selectedPositionsAsSet) {
+                mAdapter.currentItems[i].setSelection(true)
             }
         }
+
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        (activity as MainActivity).notifyFragmentCreationFinished(this)
+    override fun onResume() {
+        super.onResume()
+        styleExtraThemeElements()
+        if (mSelectedContentType != null) mMaster.isolateFragment(this)
     }
 
     override fun onAllFragmentsCreated() {
@@ -116,12 +118,10 @@ class LinksFragment :
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        styleExtraThemeElements()
-        // Don't refresh if currently selecting stuff
-        // FIXME: redundant if onCreate() was previously called
-        if (mSelectedContentType == null) refreshFragment()
+    override fun onSaveInstanceState(outState: Bundle) {
+        mAdapter.onSaveInstanceState(outState)
+        outState.putString(selectedType, mSelectedContentType)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onBackPressed(): Boolean {
@@ -154,7 +154,7 @@ class LinksFragment :
 
         fun onCreateNewAlbum(charSequence: CharSequence) {
             CollectionManager.createNewAlbum(charSequence.toString())
-            refreshFragment()
+            onCollectionsUpdated()
         }
 
         when (item.itemId) {
@@ -257,12 +257,12 @@ class LinksFragment :
                 selectAll()
             }
             R.id.actionDeleteAlbum -> {
-                val callback = callback@{
+                DialogGenerator.deleteAlbum(context!!) {
                     CollectionManager.deleteAlbumsByRelativePosition(mAdapter.selectedPositions)
-                    refreshFragment()
+                    onCollectionsUpdated()
                     mMaster.notifyPinnedAlbumDeleted()
+                    mActionModeHelper.destroyActionModeIfCan()
                 }
-                DialogGenerator.deleteAlbum(context ?: return false, onConfirm = callback)
             }
         }
         return true
@@ -409,10 +409,9 @@ class LinksFragment :
         }
     }
 
-    fun refreshFragment() {
+    fun onCollectionsUpdated() {
         fetchContents()
         mAdapter.updateDataSet(mCollectionItems)
-        mActionModeHelper.destroyActionModeIfCan()
     }
 
     /**

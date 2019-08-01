@@ -19,18 +19,6 @@ class PinnedCollectionItem(obj: Coverable) : CoverableItem(obj) {
         return CoverViewHolder(view, adapter)
     }
 
-    override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,
-                                holder: CoverViewHolder,
-                                position: Int,
-                                payloads: MutableList<Any>?) {
-
-        // bind holder as normal
-        super.bindViewHolder(adapter, holder, position, payloads)
-
-        // Darken a little, so that white text is readable
-        Painter.darken(holder.ivItem ?: return, Painter.DARKEN_SLIGHT)
-    }
-
     /**
      * Turn indicator on or off based on current visibility
      */

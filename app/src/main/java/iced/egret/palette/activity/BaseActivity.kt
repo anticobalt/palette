@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import iced.egret.palette.R
 import java.io.File
@@ -40,5 +41,7 @@ abstract class BaseActivity : AppCompatActivity() {
         mediaScanIntent.data = uri
         sendBroadcast(mediaScanIntent)
     }
+
+    fun idToColor(colorResId: Int) = ContextCompat.getColor(this, colorResId)
 
 }

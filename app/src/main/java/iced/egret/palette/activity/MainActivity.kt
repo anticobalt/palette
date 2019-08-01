@@ -1,6 +1,7 @@
 package iced.egret.palette.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.View
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -63,6 +65,7 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
     private val rightIndex = 1
 
     private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var pmSharedPrefs: SharedPreferences
 
     companion object SaveDataKeys {
         const val onScreenCollection = "on-screen-collection"
@@ -163,11 +166,15 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
     }
 
     private fun buildApp(savedInstanceState: Bundle?) {
+
+        sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        pmSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+        if (isFirstRun()) applyDefaultPreferences()
+
         Storage.setupIfRequired(this)
         CollectionManager.setupIfRequired()
         Painter.setup(this)
-
-        sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         if (savedInstanceState == null) {
             // Don't make fragments again if rotating device,
@@ -182,6 +189,23 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
         }
         buildSlidingPane()
         checkSdWriteAccess()
+    }
+
+    private fun isFirstRun() : Boolean {
+        val key = "isFirstRun"
+        val firstRun = sharedPrefs.getBoolean(key, true)
+        sharedPrefs.edit().putBoolean(key, false).apply()
+        return firstRun
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private fun applyDefaultPreferences() {
+        pmSharedPrefs
+                .edit()
+                .putInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
+                .putInt(getString(R.string.primary_color_key), idToColor(R.color.cyanea_primary_reference))
+                .putInt(getString(R.string.accent_color_key), idToColor(R.color.cyanea_accent_reference))
+                .commit()
     }
 
     private fun makeFragments() {

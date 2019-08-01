@@ -37,6 +37,16 @@ import java.io.File
  * Meat of the app. Shows Collection contents and allows navigation through them.
  * Automatically requests CollectionManager to get fresh data when returning from another activity
  * or app.
+ *
+ * General order of functions:
+ * - Lifecycle
+ * - UI builders
+ * - Click and gesture handlers
+ * - ActionMode
+ * - Content manipulation
+ * - State manipulation and refreshers
+ * - Management by MainActivity
+ * - Aliases
  */
 class CollectionViewFragment :
         ListFragment(),
@@ -44,10 +54,6 @@ class CollectionViewFragment :
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener,
         SwipeRefreshLayout.OnRefreshListener {
-
-    companion object SaveDataKeys {
-        const val selectedType = "CollectionViewFragment_ST"
-    }
 
     private lateinit var mMaster: MainActivity
     private var mDelegate: CollectionViewDelegate = FolderViewDelegate()  // default
@@ -68,18 +74,6 @@ class CollectionViewFragment :
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
     private var mReturningFromStop = false
-
-    fun onDelegateAlert(alert: CollectionViewDelegate.ActionAlert) {
-        if (alert.message.isNotEmpty()) toast(alert.message)
-
-        if (alert.success) {
-            // Update everything (short of remaking menus) b/c delegate doesn't specify what exactly changed.
-            fetchContents()
-            mAdapter.updateDataSet(mContentItems)
-            setToolbarTitle()
-            mMaster.notifyCollectionsChanged()
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -154,10 +148,6 @@ class CollectionViewFragment :
         mAdapter.onSaveInstanceState(outState)
         outState.putString(selectedType, mSelectedContentType)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onAllFragmentsCreated() {
-        // This fragment is always created last, so this function is not required.
     }
 
     override fun onStop() {
@@ -268,6 +258,113 @@ class CollectionViewFragment :
                     getString(R.string.action_selected_many, count)
             }
         }.withDefaultMode(mode)
+    }
+
+    override fun onItemClick(view: View, absolutePosition: Int): Boolean {
+        val clickedItem = mAdapter.getItem(absolutePosition) as? CoverableItem
+                ?: return true
+
+        return if (mAdapter.mode != SelectableAdapter.Mode.IDLE) {
+            mActionModeHelper.onClick(absolutePosition, clickedItem)
+        } else {
+            val coverable = mContents[absolutePosition]
+            val relativePosition =
+                    CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
+                            ?: return false
+            // May start activity for result if required
+            CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
+            false
+        }
+    }
+
+    /**
+     * @param absolutePosition the actual position amongst all on-screen items
+     * relativePosition is absolutePosition while ignoring all other types
+     *
+     * All positions refer to arrangement before click handling.
+     */
+    override fun onItemLongClick(absolutePosition: Int) {
+        val relativePosition: Int
+
+        // Isolate the content type BEFORE ActionMode is created, so that the correct
+        // relative position can be noted by the ActionModeHelper (instead of global position,
+        // which unnecessarily accounts for temporarily remove types)
+        if (mSelectedContentType == null) {
+            mSelectedContentType = inferContentType(mContents[absolutePosition]) ?: return
+            isolateContent(mSelectedContentType!!)
+            // adapter only holds one type now, so global == relative
+            relativePosition = mAdapter.getGlobalPositionOf(mContentItems[absolutePosition])
+        } else {
+            relativePosition = absolutePosition
+        }
+        mActionModeHelper.onLongClick(toolbar, relativePosition, mContentItems[absolutePosition])
+    }
+
+    private fun inferContentType(content: Coverable): String? {
+        return when (content) {
+            is Folder -> CollectionManager.FOLDER_KEY
+            is Album -> CollectionManager.ALBUM_KEY
+            is Picture -> CollectionManager.PICTURE_KEY
+            else -> null
+        }
+    }
+
+    private fun isolateContent(isolateType: String) {
+        // sanity check; all code after should never fail
+        for (item in mContents) {
+            inferContentType(item) ?: return
+        }
+
+        var index = 0
+        var adapterOffset = 0
+        val isolateTypeList = CollectionManager.getContentsMap()[isolateType]!!
+
+        // Jump to this first item of each type and batch remove all of its type if required.
+        // This only works because items of the same type are guaranteed to be successive
+        // inside mContents, since it is copied from CollectionManager.
+        while (index < mContents.size) {
+            if (mContents[index] in isolateTypeList) {
+                // keeping this type
+                index += isolateTypeList.size
+                adapterOffset += isolateTypeList.size
+            } else {
+                // removing this type
+                val removeType: String = inferContentType(mContents[index])!!
+                val removeTypeList = CollectionManager.getContentsMap()[removeType]!!
+                mAdapter.removeRange(adapterOffset, removeTypeList.size)
+                // next type is now at position adapterOffset after remove, so don't increment
+                index += removeTypeList.size
+            }
+        }
+    }
+
+    private fun restoreAllContent() {
+        for (i in 0 until mContentItems.size) {
+            val item = mContentItems[i]
+            if (!mAdapter.contains(item)) {
+                mAdapter.addItem(i, item)
+            }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        mDelegate.onOptionsItemSelected(item, context!!, CollectionManager.currentCollection!!)
+        return true
+    }
+
+    private fun onFabClick() {
+        mDelegate.onFabClick(context!!, mContents)
+    }
+
+    override fun onRefresh() {
+        showUpdatedContents()
+    }
+
+    /**
+     * @return handled here (true) or not (false)
+     */
+    override fun onBackPressed(): Boolean {
+        return returnToParentCollection()
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -392,50 +489,15 @@ class CollectionViewFragment :
         mDelegate.onDestroyActionMode(mode)
     }
 
-    private fun inferContentType(content: Coverable): String? {
-        return when (content) {
-            is Folder -> CollectionManager.FOLDER_KEY
-            is Album -> CollectionManager.ALBUM_KEY
-            is Picture -> CollectionManager.PICTURE_KEY
-            else -> null
-        }
-    }
+    fun onDelegateAlert(alert: CollectionViewDelegate.ActionAlert) {
+        if (alert.message.isNotEmpty()) toast(alert.message)
 
-    private fun isolateContent(isolateType: String) {
-        // sanity check; all code after should never fail
-        for (item in mContents) {
-            inferContentType(item) ?: return
-        }
-
-        var index = 0
-        var adapterOffset = 0
-        val isolateTypeList = CollectionManager.getContentsMap()[isolateType]!!
-
-        // Jump to this first item of each type and batch remove all of its type if required.
-        // This only works because items of the same type are guaranteed to be successive
-        // inside mContents, since it is copied from CollectionManager.
-        while (index < mContents.size) {
-            if (mContents[index] in isolateTypeList) {
-                // keeping this type
-                index += isolateTypeList.size
-                adapterOffset += isolateTypeList.size
-            } else {
-                // removing this type
-                val removeType: String = inferContentType(mContents[index])!!
-                val removeTypeList = CollectionManager.getContentsMap()[removeType]!!
-                mAdapter.removeRange(adapterOffset, removeTypeList.size)
-                // next type is now at position adapterOffset after remove, so don't increment
-                index += removeTypeList.size
-            }
-        }
-    }
-
-    private fun restoreAllContent() {
-        for (i in 0 until mContentItems.size) {
-            val item = mContentItems[i]
-            if (!mAdapter.contains(item)) {
-                mAdapter.addItem(i, item)
-            }
+        if (alert.success) {
+            // Update everything (short of remaking menus) b/c delegate doesn't specify what exactly changed.
+            fetchContents()
+            mAdapter.updateDataSet(mContentItems)
+            setToolbarTitle()
+            mMaster.notifyCollectionsChanged()
         }
     }
 
@@ -445,73 +507,38 @@ class CollectionViewFragment :
         mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
     }
 
-    override fun onItemClick(view: View, absolutePosition: Int): Boolean {
-        val clickedItem = mAdapter.getItem(absolutePosition) as? CoverableItem
-                ?: return true
-
-        return if (mAdapter.mode != SelectableAdapter.Mode.IDLE) {
-            mActionModeHelper.onClick(absolutePosition, clickedItem)
-        } else {
-            val coverable = mContents[absolutePosition]
-            val relativePosition =
-                    CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
-                            ?: return false
-            // May start activity for result if required
-            CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
-            false
+    private fun movePictures(pictures: List<Picture>, destination: File, typeString: String) {
+        val failedCounter = CollectionManager.movePictures(pictures, destination,
+                getSdCardDocumentFile(), activity!!.contentResolver) { sourceFile, movedFile ->
+            broadcastMediaChanged(sourceFile)
+            broadcastMediaChanged(movedFile)
         }
+        if (failedCounter > 0) toast("Failed to move $failedCounter!")
+        else toast("${pictures.size} $typeString moved")
+    }
+
+    private fun recyclePictures(pictures: List<Picture>, typeString: String) {
+        val failedCounter = CollectionManager.movePicturesToRecycleBin(pictures, getSdCardDocumentFile()) {
+            // If moved a Picture successfully, broadcast change
+            broadcastMediaChanged(it)
+        }
+        if (failedCounter > 0) toast("Failed to move $failedCounter!")
+        else toast("${pictures.size} $typeString moved to recycle bin")
     }
 
     /**
-     * @param absolutePosition the actual position amongst all on-screen items
-     * relativePosition is absolutePosition while ignoring all other types
-     *
-     * All positions refer to arrangement before click handling.
+     * Get new data from Collection Manager.
      */
-    override fun onItemLongClick(absolutePosition: Int) {
-        val relativePosition: Int
+    private fun fetchContents() {
+        mContents.clear()
+        mContentItems.clear()
 
-        // Isolate the content type BEFORE ActionMode is created, so that the correct
-        // relative position can be noted by the ActionModeHelper (instead of global position,
-        // which unnecessarily accounts for temporarily remove types)
-        if (mSelectedContentType == null) {
-            mSelectedContentType = inferContentType(mContents[absolutePosition]) ?: return
-            isolateContent(mSelectedContentType!!)
-            // adapter only holds one type now, so global == relative
-            relativePosition = mAdapter.getGlobalPositionOf(mContentItems[absolutePosition])
-        } else {
-            relativePosition = absolutePosition
+        val contentsMap = CollectionManager.getContentsMap()
+        for ((type, coverables) in contentsMap) {
+            val coverableItems = coverables.map { content -> CollectionViewItem(content) }
+            mContents.addAll(coverables)
+            mContentItems.addAll(coverableItems)
         }
-        mActionModeHelper.onLongClick(toolbar, relativePosition, mContentItems[absolutePosition])
-    }
-
-    override fun setClicksBlocked(doBlock: Boolean) {
-        if (doBlock) {
-            rvCollectionItems.visibility = View.GONE
-            fab.hide()
-            blocker.visibility = View.VISIBLE
-        } else {
-            rvCollectionItems.visibility = View.VISIBLE
-            fab.show()
-            blocker.visibility = View.GONE
-        }
-    }
-
-    protected fun onFabClick() {
-        mDelegate.onFabClick(context!!, mContents)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        mDelegate.onOptionsItemSelected(item, context!!, CollectionManager.currentCollection!!)
-        return true
-    }
-
-
-    /**
-     * @return handled here (true) or not (false)
-     */
-    override fun onBackPressed(): Boolean {
-        return returnToParentCollection()
     }
 
     /**
@@ -553,18 +580,19 @@ class CollectionViewFragment :
         buildToolbar()  // updates title and delegate's menu items
     }
 
-    /**
-     * Get new data from Collection Manager.
-     */
-    private fun fetchContents() {
-        mContents.clear()
-        mContentItems.clear()
+    override fun onAllFragmentsCreated() {
+        // This fragment is always created last, so this function is not required.
+    }
 
-        val contentsMap = CollectionManager.getContentsMap()
-        for ((type, coverables) in contentsMap) {
-            val coverableItems = coverables.map { content -> CollectionViewItem(content) }
-            mContents.addAll(coverables)
-            mContentItems.addAll(coverableItems)
+    override fun setClicksBlocked(doBlock: Boolean) {
+        if (doBlock) {
+            rvCollectionItems.visibility = View.GONE
+            fab.hide()
+            blocker.visibility = View.VISIBLE
+        } else {
+            rvCollectionItems.visibility = View.VISIBLE
+            fab.show()
+            blocker.visibility = View.GONE
         }
     }
 
@@ -582,29 +610,6 @@ class CollectionViewFragment :
         }
     }
 
-    override fun onRefresh() {
-        showUpdatedContents()
-    }
-
-    private fun movePictures(pictures: List<Picture>, destination: File, typeString: String) {
-        val failedCounter = CollectionManager.movePictures(pictures, destination,
-                getSdCardDocumentFile(), activity!!.contentResolver) { sourceFile, movedFile ->
-            broadcastMediaChanged(sourceFile)
-            broadcastMediaChanged(movedFile)
-        }
-        if (failedCounter > 0) toast("Failed to move $failedCounter!")
-        else toast("${pictures.size} $typeString moved")
-    }
-
-    private fun recyclePictures(pictures: List<Picture>, typeString: String) {
-        val failedCounter = CollectionManager.movePicturesToRecycleBin(pictures, getSdCardDocumentFile()) {
-            // If moved a Picture successfully, broadcast change
-            broadcastMediaChanged(it)
-        }
-        if (failedCounter > 0) toast("Failed to move $failedCounter!")
-        else toast("${pictures.size} $typeString moved to recycle bin")
-    }
-
     private fun getSdCardDocumentFile(): DocumentFile? {
         return mMaster.getSdCardDocumentFile()
     }
@@ -613,8 +618,12 @@ class CollectionViewFragment :
         mMaster.broadcastMediaChanged(file)
     }
 
-    protected fun toast(message: String) {
+    private fun toast(message: String) {
         mMaster.toast(message)
+    }
+
+    companion object SaveDataKeys {
+        const val selectedType = "CollectionViewFragment_ST"
     }
 
 }

@@ -31,6 +31,16 @@ const val EXTERNAL_CODE = 100
 const val PICTURE_ACTIVITY_REQUEST = 1
 const val SD_CARD_WRITE_REQUEST = 2
 
+/**
+ * Holds a SlidingPaneLayout with two fragments inside each panel, and listens to it.
+ *
+ * General order of functions:
+ * - Lifecycle
+ * - Permissions
+ * - UI builders
+ * - Panel listening
+ * - Fragment management
+ */
 class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanelSlideListener {
 
     class DummyFragment : ListFragment() {
@@ -74,27 +84,6 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
 
     }
 
-    override fun onSlidingPanelReady() {
-        if (slidingPaneLayout.isOpen) {
-            fragments[rightIndex].navigationDrawable.progress = 1f
-        }
-    }
-
-    fun togglePanel() {
-        if (slidingPaneLayout.isOpen) slidingPaneLayout.closePane()
-        else slidingPaneLayout.openPane()
-    }
-
-    override fun onPanelClosed(panel: View) {
-        fragments[leftIndex].slider.closePane()
-    }
-
-    override fun onPanelSlide(panel: View, slideOffset: Float) {
-        fragments[rightIndex].navigationDrawable.progress = slideOffset
-    }
-
-    override fun onPanelOpened(panel: View) {}
-
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(onScreenCollection, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
@@ -109,16 +98,67 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
         super.onStop()
     }
 
-    /**
-     * Note that argument fragment has finished onCreateView(),
-     * and thus its views can be indirectly manipulated e.g. via isolateFragment().
-     */
-    fun notifyFragmentCreationFinished(finishedFragment: ListFragment) {
-        finishedFragments.add(finishedFragment)
-        if (finishedFragments.toSet() == fragments.toSet()) {
-            for (fragment in finishedFragments) {
-                fragment.onAllFragmentsCreated()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+
+                // Get write access to SD card, and save SD card URI to preferences.
+                // https://stackoverflow.com/a/43317703
+                SD_CARD_WRITE_REQUEST -> {
+                    val sdTreeUri = intent?.data
+                    if (sdTreeUri == null) {
+                        toast("Failed to gain SD card access!")
+                        return
+                    }
+
+                    // Try to get SD card
+                    val directory = DocumentFile.fromTreeUri(this, sdTreeUri)
+                    if (directory?.name == null) {
+                        toast("Failed to connect with SD card!")
+                        return
+                    }
+
+                    val modeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    grantUriPermission(packageName, sdTreeUri, modeFlags)
+                    contentResolver.takePersistableUriPermission(sdTreeUri, modeFlags)
+
+                    with(sharedPrefs.edit()) {
+                        putString(getString(R.string.sd_card_uri_key), sdTreeUri.toString())
+                        apply()
+                    }
+
+                }
             }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            EXTERNAL_CODE -> {
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    val dialog = MaterialDialog(this)
+                    dialog.cancelable(false)
+                    dialog.show {
+                        title(R.string.title_permission_error)
+                        message(R.string.message_permission_error)
+                        positiveButton(R.string.confirm) {
+                            finish()
+                        }
+                    }
+                } else {
+                    buildApp(null)
+                }
+            }
+        }
+    }
+
+    private fun checkSdWriteAccess() {
+        val sdTreeUri = sharedPrefs.getString(getString(R.string.sd_card_uri_key), null)
+        if (sdTreeUri == null) {
+            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_CARD_WRITE_REQUEST)
         }
     }
 
@@ -186,69 +226,27 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
         slidingPaneLayout.setPanelSlideListener(this)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when (requestCode) {
-            EXTERNAL_CODE -> {
-                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val dialog = MaterialDialog(this)
-                    dialog.cancelable(false)
-                    dialog.show {
-                        title(R.string.title_permission_error)
-                        message(R.string.message_permission_error)
-                        positiveButton(R.string.confirm) {
-                            finish()
-                        }
-                    }
-                } else {
-                    buildApp(null)
-                }
-            }
+    override fun onSlidingPanelReady() {
+        if (slidingPaneLayout.isOpen) {
+            fragments[rightIndex].navigationDrawable.progress = 1f
         }
     }
 
-    private fun checkSdWriteAccess() {
-        val sdTreeUri = sharedPrefs.getString(getString(R.string.sd_card_uri_key), null)
-        if (sdTreeUri == null) {
-            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_CARD_WRITE_REQUEST)
-        }
+    fun togglePanel() {
+        if (slidingPaneLayout.isOpen) slidingPaneLayout.closePane()
+        else slidingPaneLayout.openPane()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-
-                // Get write access to SD card, and save SD card URI to preferences.
-                // https://stackoverflow.com/a/43317703
-                SD_CARD_WRITE_REQUEST -> {
-                    val sdTreeUri = intent?.data
-                    if (sdTreeUri == null) {
-                        toast("Failed to gain SD card access!")
-                        return
-                    }
-
-                    // Try to get SD card
-                    val directory = DocumentFile.fromTreeUri(this, sdTreeUri)
-                    if (directory?.name == null) {
-                        toast("Failed to connect with SD card!")
-                        return
-                    }
-
-                    val modeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                    grantUriPermission(packageName, sdTreeUri, modeFlags)
-                    contentResolver.takePersistableUriPermission(sdTreeUri, modeFlags)
-
-                    with(sharedPrefs.edit()) {
-                        putString(getString(R.string.sd_card_uri_key), sdTreeUri.toString())
-                        apply()
-                    }
-
-                }
-            }
-        }
+    override fun onPanelClosed(panel: View) {
+        fragments[leftIndex].slider.closePane()
     }
+
+    override fun onPanelSlide(panel: View, slideOffset: Float) {
+        fragments[rightIndex].navigationDrawable.progress = slideOffset
+    }
+
+    override fun onPanelOpened(panel: View) {}
+
 
     override fun onBackPressed() {
         if (hasPermission) {
@@ -257,6 +255,19 @@ class MainActivity : BasicAestheticActivity(), HackySlidingPaneLayout.HackyPanel
             val success = (currentFragment).onBackPressed()
             if (!success) {
                 moveTaskToBack(true)  // don't destroy
+            }
+        }
+    }
+
+    /**
+     * Note that argument fragment has finished onCreateView(),
+     * and thus its views can be indirectly manipulated e.g. via isolateFragment().
+     */
+    fun notifyFragmentCreationFinished(finishedFragment: ListFragment) {
+        finishedFragments.add(finishedFragment)
+        if (finishedFragments.toSet() == fragments.toSet()) {
+            for (fragment in finishedFragments) {
+                fragment.onAllFragmentsCreated()
             }
         }
     }

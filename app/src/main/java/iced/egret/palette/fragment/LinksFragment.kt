@@ -34,6 +34,14 @@ import kotlinx.android.synthetic.main.fragment_links.*
 
 /**
  * Has links to other activities and pinned collections, organized inside a SlidePaneLayout.
+ *
+ * General order of functions:
+ * - Lifecycle
+ * - UI builders
+ * - Click handlers
+ * - ActionMode
+ * - Management by MainActivity
+ * - Refreshers
  */
 class LinksFragment :
         ListFragment(),
@@ -110,22 +118,10 @@ class LinksFragment :
         if (mSelectedContentType != null) mMaster.isolateFragment(this)
     }
 
-    override fun onAllFragmentsCreated() {
-        // Handles blocking in the case where ActionMode is created before other fragments created.
-        // See onCreateActionMode() for other case.
-        if (mActionModeHelper.getActionMode() != null) {
-            (activity as MainActivity).isolateFragment(this)
-        }
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         mAdapter.onSaveInstanceState(outState)
         outState.putString(selectedType, mSelectedContentType)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onBackPressed(): Boolean {
-        return false  // not handled here
     }
 
     private fun buildToolbar() {
@@ -141,30 +137,6 @@ class LinksFragment :
             if (slider.isOpen) slider.closePane()
             else slider.openPane()
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        val context = context!!
-
-        fun albumExists(name: CharSequence): Boolean {
-            val found = CollectionManager.albums.find { album -> album.name == name.toString() }
-            return found != null
-        }
-
-        fun onCreateNewAlbum(charSequence: CharSequence) {
-            CollectionManager.createNewAlbum(charSequence.toString())
-            onCollectionsUpdated()
-        }
-
-        when (item.itemId) {
-            R.id.actionCreateAlbum -> {
-                DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-
-        return true
     }
 
     private fun buildRecyclerView() {
@@ -226,64 +198,6 @@ class LinksFragment :
         }.withDefaultMode(mode)
     }
 
-    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-        // Handles blocking in the case where ActionMode is created after other fragments created.
-        (activity as MainActivity).isolateFragment(this)
-
-        // Make items visible depending on selected content.
-        // Painting has to be done here for ActionMode icons, because XML app:iconTint
-        // doesn't work on items not visible on activity start.
-        when (mSelectedContentType) {
-            CollectionManager.FOLDER_KEY -> {
-                val item = menu.findItem(R.id.actionHide)
-                item.isVisible = true
-                Painter.paintDrawable(item.icon)
-            }
-            CollectionManager.ALBUM_KEY -> {
-                val item = menu.findItem(R.id.actionDeleteAlbum)
-                item.isVisible = true
-                Painter.paintDrawable(item.icon)
-            }
-        }
-        val selectAll = menu.findItem(R.id.actionToggleSelectAll)
-        Painter.paintDrawable(selectAll.icon)
-
-        return true
-    }
-
-    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.actionToggleSelectAll -> {
-                selectAll()
-            }
-            R.id.actionDeleteAlbum -> {
-                DialogGenerator.deleteAlbum(context!!) {
-                    CollectionManager.deleteAlbumsByRelativePosition(mAdapter.selectedPositions)
-                    onCollectionsUpdated()
-                    mMaster.notifyPinnedAlbumDeleted()
-                    mActionModeHelper.destroyActionModeIfCan()
-                }
-            }
-        }
-        return true
-    }
-
-    override fun onPrepareActionMode(p0: ActionMode, p1: Menu): Boolean {
-        return true
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode) {
-        // ToolbarActionModeHelper doesn't have references to CoverableItems,
-        // so can't clear all selections visually
-        mAdapter.currentItems.map { item -> item.setSelection(false) }
-        restoreAllContent()
-        mSelectedContentType = null  // nothing isolated
-        (activity as MainActivity).restoreAllFragments()
-
-        mode.menu.findItem(R.id.actionHide).isVisible = false
-        mode.menu.findItem(R.id.actionDeleteAlbum).isVisible = false
-    }
-
     override fun onItemClick(view: View, absolutePosition: Int): Boolean {
         val clickedItem = mAdapter.getItem(absolutePosition) as? CoverableItem
                 ?: return false
@@ -294,15 +208,6 @@ class LinksFragment :
             openCollectionViewPanel(absolutePosition)
             false
         }
-    }
-
-    /**
-     * Set up and slide open right panel.
-     *
-     * @param referencePosition Index of Collection to open with
-     */
-    private fun openCollectionViewPanel(referencePosition: Int) {
-        mMaster.buildCollectionView(mCollections[referencePosition])
     }
 
     /**
@@ -393,10 +298,104 @@ class LinksFragment :
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val context = context!!
+
+        fun albumExists(name: CharSequence): Boolean {
+            val found = CollectionManager.albums.find { album -> album.name == name.toString() }
+            return found != null
+        }
+
+        fun onCreateNewAlbum(charSequence: CharSequence) {
+            CollectionManager.createNewAlbum(charSequence.toString())
+            onCollectionsUpdated()
+        }
+
+        when (item.itemId) {
+            R.id.actionCreateAlbum -> {
+                DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+
+        return true
+    }
+
+    override fun onBackPressed(): Boolean {
+        return false  // not handled here
+    }
+
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        // Handles blocking in the case where ActionMode is created after other fragments created.
+        (activity as MainActivity).isolateFragment(this)
+
+        // Make items visible depending on selected content.
+        // Painting has to be done here for ActionMode icons, because XML app:iconTint
+        // doesn't work on items not visible on activity start.
+        when (mSelectedContentType) {
+            CollectionManager.FOLDER_KEY -> {
+                val item = menu.findItem(R.id.actionHide)
+                item.isVisible = true
+                Painter.paintDrawable(item.icon)
+            }
+            CollectionManager.ALBUM_KEY -> {
+                val item = menu.findItem(R.id.actionDeleteAlbum)
+                item.isVisible = true
+                Painter.paintDrawable(item.icon)
+            }
+        }
+        val selectAll = menu.findItem(R.id.actionToggleSelectAll)
+        Painter.paintDrawable(selectAll.icon)
+
+        return true
+    }
+
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.actionToggleSelectAll -> {
+                selectAll()
+            }
+            R.id.actionDeleteAlbum -> {
+                DialogGenerator.deleteAlbum(context!!) {
+                    CollectionManager.deleteAlbumsByRelativePosition(mAdapter.selectedPositions)
+                    onCollectionsUpdated()
+                    mMaster.notifyPinnedAlbumDeleted()
+                    mActionModeHelper.destroyActionModeIfCan()
+                }
+            }
+        }
+        return true
+    }
+
+    override fun onPrepareActionMode(p0: ActionMode, p1: Menu): Boolean {
+        return true
+    }
+
+    override fun onDestroyActionMode(mode: ActionMode) {
+        // ToolbarActionModeHelper doesn't have references to CoverableItems,
+        // so can't clear all selections visually
+        mAdapter.currentItems.map { item -> item.setSelection(false) }
+        restoreAllContent()
+        mSelectedContentType = null  // nothing isolated
+        (activity as MainActivity).restoreAllFragments()
+
+        mode.menu.findItem(R.id.actionHide).isVisible = false
+        mode.menu.findItem(R.id.actionDeleteAlbum).isVisible = false
+    }
+
     private fun selectAll() {
         mAdapter.currentItems.map { item -> item.setSelection(true) }
         mAdapter.selectAll()
         mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
+    }
+
+    override fun onAllFragmentsCreated() {
+        // Handles blocking in the case where ActionMode is created before other fragments created.
+        // See onCreateActionMode() for other case.
+        if (mActionModeHelper.getActionMode() != null) {
+            (activity as MainActivity).isolateFragment(this)
+        }
     }
 
     override fun setClicksBlocked(doBlock: Boolean) {
@@ -409,9 +408,12 @@ class LinksFragment :
         }
     }
 
-    fun onCollectionsUpdated() {
-        fetchContents()
-        mAdapter.updateDataSet(mCollectionItems)
+    /**
+     * Set up and slide open right panel.
+     * @param referencePosition Index of Collection to open with
+     */
+    private fun openCollectionViewPanel(referencePosition: Int) {
+        mMaster.buildCollectionView(mCollections[referencePosition])
     }
 
     /**
@@ -435,6 +437,11 @@ class LinksFragment :
             mCollectionItems.add(contentItem)
         }
 
+    }
+
+    fun onCollectionsUpdated() {
+        fetchContents()
+        mAdapter.updateDataSet(mCollectionItems)
     }
 
 }

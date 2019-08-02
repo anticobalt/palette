@@ -103,7 +103,7 @@ class CropActivity : BasicThemedActivity() {
     }
 
     private fun styleToolbar() {
-        val itemColor = sharedPreferences.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        val itemColor = getColorInt(ColorType.ITEM)
         toolbar.setTitleTextColor(itemColor)
 
         toolbar.navigationIcon?.setTint(itemColor)
@@ -113,8 +113,8 @@ class CropActivity : BasicThemedActivity() {
     }
 
     private fun styleBottomBar() {
-        val barBgColor = sharedPreferences.getInt(getString(R.string.primary_color_key), R.color.translucentBlack)
-        val barTextColor = sharedPreferences.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        val barBgColor = getColorInt(ColorType.PRIMARY)
+        val barTextColor = getColorInt(ColorType.ITEM)
 
         bottomActions.background = ColorDrawable(barBgColor)
         for (touchable in bottomActions.touchables) {

@@ -30,7 +30,7 @@ class SettingsActivity : BasicThemedActivity() {
 
     private fun styleToolbar() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val itemColor = prefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        val itemColor = getColorInt(ColorType.ITEM)
 
         toolbar.setTitleTextColor(itemColor)
         toolbar.navigationIcon?.setTint(itemColor)

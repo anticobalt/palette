@@ -15,6 +15,7 @@ import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
+import iced.egret.palette.activity.BaseActivity
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.RecycleBinActivity
 import iced.egret.palette.activity.SettingsActivity
@@ -41,6 +42,7 @@ import kotlinx.android.synthetic.main.fragment_links.*
  * - ActionMode
  * - Management by MainActivity
  * - Refreshers
+ * - Aliases
  */
 class LinksFragment :
         ListFragment(),
@@ -167,15 +169,15 @@ class LinksFragment :
 
     override fun setToolbarItemColor() {
         super.setToolbarItemColor()
-        val iconColor = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        val iconColor = getColorInt(BaseActivity.ColorType.ITEM)
         toolbar.menu.findItem(R.id.actionCreateAlbum).icon.setTint(iconColor)
     }
 
 
     // Style themed stuff that isn't handled by theming library or other inherited classes.
     private fun styleExtraThemeElements() {
-        val accentColor = sharedPrefs.getInt(getString(R.string.accent_color_key), R.color.cyanea_accent_reference)
-        val iconColor = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), R.color.white)
+        val accentColor = getColorInt(BaseActivity.ColorType.ACCENT)
+        val iconColor = getColorInt(BaseActivity.ColorType.ITEM)
 
         val sideLayout = mRootView!!.findViewById<ConstraintLayout>(R.id.sideActionsLayout)
         sideLayout.background = ColorDrawable(accentColor)
@@ -447,6 +449,10 @@ class LinksFragment :
     fun onCollectionsUpdated() {
         fetchContents()
         mAdapter.updateDataSet(mCollectionItems)
+    }
+
+    private fun getColorInt(type: BaseActivity.ColorType) : Int {
+        return mMaster.getColorInt(type)
     }
 
 }

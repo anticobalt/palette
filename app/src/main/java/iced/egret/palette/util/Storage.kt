@@ -410,9 +410,14 @@ object Storage {
         val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver, newName)
                 ?: return null
 
-        // Deletion fails silently, so copied file can still be broadcasted (which is absolutely
-        // necessary unless you want to reboot the device).
-        deleteFile(sourceFile, sdCardFile)
+        val success = deleteFile(sourceFile, sdCardFile)
+        if (!success) {
+            // Undo copy; assumption is that if you could copy to destination,
+            // you can delete from it as well.
+            deleteFile(newFile, sdCardFile)
+            return null
+        }
+
         return Pair(sourceFile, newFile)
     }
 

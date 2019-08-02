@@ -20,7 +20,7 @@ import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.RecycleBinActivity
 import iced.egret.palette.activity.SettingsActivity
 import iced.egret.palette.flexible.CoverableItem
-import iced.egret.palette.flexible.PinnedCollectionItem
+import iced.egret.palette.flexible.BannerCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.model.Album
@@ -59,9 +59,9 @@ class LinksFragment :
     private lateinit var mRecyclerView: RecyclerView
 
     private var mCollections = mutableListOf<Collection>()
-    private var mCollectionItems = mutableListOf<PinnedCollectionItem>()
+    private var mCollectionItems = mutableListOf<BannerCoverableItem>()
 
-    private lateinit var mAdapter: FlexibleAdapter<PinnedCollectionItem>
+    private lateinit var mAdapter: FlexibleAdapter<BannerCoverableItem>
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
 
@@ -433,14 +433,14 @@ class LinksFragment :
         // Fetch folders
         for (folder in CollectionManager.folders) {
             mCollections.add(folder)
-            val contentItem = PinnedCollectionItem(folder)
+            val contentItem = BannerCoverableItem(folder)
             mCollectionItems.add(contentItem)
         }
 
         // Fetch albums
         for (album in CollectionManager.albums) {
             mCollections.add(album)
-            val contentItem = PinnedCollectionItem(album)
+            val contentItem = BannerCoverableItem(album)
             mCollectionItems.add(contentItem)
         }
 

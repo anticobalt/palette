@@ -20,8 +20,8 @@ import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.delegate.AlbumViewDelegate
 import iced.egret.palette.delegate.CollectionViewDelegate
 import iced.egret.palette.delegate.FolderViewDelegate
-import iced.egret.palette.flexible.CollectionViewItem
 import iced.egret.palette.flexible.CoverableItem
+import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
@@ -69,9 +69,9 @@ class CollectionViewFragment :
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     private var mContents = mutableListOf<Coverable>()
-    private var mContentItems = mutableListOf<CollectionViewItem>()
+    private var mContentItems = mutableListOf<GridCoverableItem>()
 
-    private lateinit var mAdapter: FlexibleAdapter<CollectionViewItem>
+    private lateinit var mAdapter: FlexibleAdapter<GridCoverableItem>
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
     private var mReturningFromStop = false
@@ -541,7 +541,7 @@ class CollectionViewFragment :
 
         val contentsMap = CollectionManager.getContentsMap()
         for ((type, coverables) in contentsMap) {
-            val coverableItems = coverables.map { content -> CollectionViewItem(content) }
+            val coverableItems = coverables.map { content -> GridCoverableItem(content) }
             mContents.addAll(coverables)
             mContentItems.addAll(coverableItems)
         }

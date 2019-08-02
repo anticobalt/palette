@@ -1,19 +1,27 @@
 package iced.egret.palette.flexible
 
+import android.view.View
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import eu.davidea.flexibleadapter.items.IFlexible
+import iced.egret.palette.R
 import iced.egret.palette.model.Coverable
+import iced.egret.palette.util.Painter
 
 /**
  * An item with IFlexible functionality.
  */
-abstract class CoverableItem(protected val obj: Coverable) :
+abstract class CoverableItem(protected val obj: Coverable, private var defaultTint: Int?) :
         AbstractFlexibleItem<CoverViewHolder>() {
 
     var viewHolder: CoverViewHolder? = null
-    protected var isSelected = false
+    private var isSelected = false
+
+    override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>): CoverViewHolder {
+        return CoverViewHolder(view, adapter)
+    }
 
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,
                                 holder: CoverViewHolder,
@@ -42,7 +50,12 @@ abstract class CoverableItem(protected val obj: Coverable) :
     /**
      * Turn indicator on or off based on current visibility
      */
-    abstract fun toggleSelection()
+    fun toggleSelection() {
+        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark)
+                ?: return
+        if (statusView.visibility == View.GONE) setSelection(true)
+        else setSelection(false)
+    }
 
     /**
      * Update isSelected property, and try to draw selection indicator.
@@ -51,8 +64,30 @@ abstract class CoverableItem(protected val obj: Coverable) :
      *
      * @param selected turn on (true) or off (false)
      */
-    abstract fun setSelection(selected: Boolean)
+    fun setSelection(selected: Boolean) {
+        isSelected = selected
+        val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark)
+                ?: return
 
-    protected abstract fun setIcon()
+        if (selected) {
+            statusView.visibility = View.VISIBLE
+            Painter.darken(viewHolder?.ivItem ?: return, Painter.DARKEN_MODERATE)
+        } else {
+            statusView.visibility = View.GONE
+            Painter.darken(viewHolder?.ivItem ?: return, defaultTint)
+        }
+    }
 
+    /**
+     * Set the little icon that indicates the type of the Coverable.
+     */
+    private fun setIcon() {
+        val typeView = viewHolder?.itemView?.findViewById<ImageView>(R.id.typeIcon)
+                ?: return
+        if (obj.icon == null) {
+            typeView.setImageDrawable(null)
+        } else {
+            typeView.setImageResource(obj.icon ?: return)
+        }
+    }
 }

@@ -19,8 +19,8 @@ import iced.egret.palette.activity.BaseActivity
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.RecycleBinActivity
 import iced.egret.palette.activity.SettingsActivity
-import iced.egret.palette.flexible.CoverableItem
 import iced.egret.palette.flexible.BannerCoverableItem
+import iced.egret.palette.flexible.CoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.model.Album
@@ -334,8 +334,10 @@ class LinksFragment :
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        mMaster.colorActionMode()
+
         // Handles blocking in the case where ActionMode is created after other fragments created.
-        (activity as MainActivity).isolateFragment(this)
+        mMaster.isolateFragment(this)
 
         // Make items visible depending on selected content.
         // Painting has to be done here for ActionMode icons, because XML app:iconTint

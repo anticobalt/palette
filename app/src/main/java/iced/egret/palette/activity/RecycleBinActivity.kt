@@ -60,6 +60,7 @@ class RecycleBinActivity : GridCoverableActivity() {
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        super.onCreateActionMode(mode, menu)
         Painter.paintDrawable(menu.findItem(R.id.actionRestore).icon)
         Painter.paintDrawable(menu.findItem(R.id.actionDelete).icon)
         return true

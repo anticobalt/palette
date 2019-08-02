@@ -11,6 +11,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
+import androidx.appcompat.widget.ActionBarContextView
+import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
@@ -315,6 +317,15 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
         for (fragment in finishedFragments) {
             fragment.setClicksBlocked(false)
         }
+    }
+
+    /**
+     * One ActionMode per Activity, so fragments will ask activity to style it.
+     * From https://stackoverflow.com/a/45955606
+     */
+    fun colorActionMode() {
+        window.decorView.findViewById<ActionBarContextView?>(R.id.action_mode_bar)
+                ?.setBackgroundColor(ContextCompat.getColor(this, R.color.space))
     }
 
     fun notifyCollectionsChanged() {

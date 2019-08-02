@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.ActionMode
 import android.view.Menu
 import android.view.View
+import androidx.appcompat.widget.ActionBarContextView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Visibility
@@ -89,6 +91,15 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
                 else getString(R.string.action_selected_many, count)
             }
         }.withDefaultMode(mode)
+    }
+
+    /**
+     * From https://stackoverflow.com/a/45955606
+     */
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        window.decorView.findViewById<ActionBarContextView?>(R.id.action_mode_bar)
+                ?.setBackgroundColor(ContextCompat.getColor(this, R.color.space))
+        return true
     }
 
     override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {

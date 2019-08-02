@@ -376,6 +376,8 @@ class CollectionViewFragment :
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+
+        mMaster.colorActionMode()
         mMaster.isolateFragment(this)
 
         // Always visible

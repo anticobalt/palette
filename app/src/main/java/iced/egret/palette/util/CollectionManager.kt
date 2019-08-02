@@ -58,7 +58,12 @@ object CollectionManager : CoroutineScope {
         get() = currentCollection?.getContents() ?: listOf()
     val pictureCache = mutableMapOf<String, Picture>()
 
+    /**
+     * Ready = Don't need to remake collections.
+     * Unconditionally clear collection stack on call.
+     */
     fun setupIfRequired() {
+        mCollectionStack.clear()
         if (!ready) {
             setup()
             ready = true

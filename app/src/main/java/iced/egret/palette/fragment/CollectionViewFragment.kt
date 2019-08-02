@@ -280,7 +280,7 @@ class CollectionViewFragment :
                             ?: return false
             // May start activity for result if required
             val updates = CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
-            if (updates) onCurrentContentsChanged()
+            if (updates) onNavigation()
             false
         }
     }

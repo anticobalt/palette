@@ -206,6 +206,7 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
                 .putInt(getString(R.string.primary_color_key), idToColor(R.color.cyanea_primary_reference))
                 .putInt(getString(R.string.accent_color_key), idToColor(R.color.cyanea_accent_reference))
                 .commit()
+        applyTheme()
     }
 
     private fun makeFragments() {

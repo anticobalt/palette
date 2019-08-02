@@ -4,6 +4,8 @@
     <dimen name="banner_height">96dp</dimen>
     <dimen name="banner_margin">12dp</dimen>
     <dimen name="side_icon_size">36dp</dimen>
+    <dimen name="side_icon_margin">10dp</dimen>
+    <dimen name="side_icon_total_width">56dp</dimen>
     <dimen name="sliding_pane_left_width">308dp</dimen>
     <dimen name="bottom_sheet_corner_radius">10dp</dimen>
 </resources>

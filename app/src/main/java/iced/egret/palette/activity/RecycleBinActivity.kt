@@ -1,6 +1,5 @@
 package iced.egret.palette.activity
 
-import android.preference.PreferenceManager
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -14,10 +13,9 @@ import iced.egret.palette.util.Storage
 
 class RecycleBinActivity : GridCoverableActivity() {
 
-    override var menuRes = R.menu.menu_recycle_bin_edit
+    override var actionModeMenuRes = R.menu.menu_recycle_bin_edit
 
     override fun buildToolbar() {
-        mToolbar = findViewById(R.id.toolbar)
         mToolbar.inflateMenu(R.menu.menu_recycle_bin)
         mToolbar.title = getString(R.string.recycle_bin)
         mToolbar.setOnMenuItemClickListener {
@@ -29,9 +27,7 @@ class RecycleBinActivity : GridCoverableActivity() {
     }
 
     override fun styleToolbar() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val itemColor = getColorInt(ColorType.ITEM)
-
         mToolbar.setTitleTextColor(itemColor)
         mToolbar.navigationIcon?.setTint(itemColor)
         mToolbar.menu.findItem(R.id.actionEmpty).icon.setTint(itemColor)

@@ -381,7 +381,7 @@ class CollectionViewFragment :
         mMaster.isolateFragment(this)
 
         // Always visible
-        val selectAll = menu.findItem(R.id.actionToggleSelectAll)
+        val selectAll = menu.findItem(R.id.actionSelectAll)
 
         // Conditional
         val albumActions = menu.findItem(R.id.albumActions)
@@ -431,7 +431,7 @@ class CollectionViewFragment :
         val typeString = if (coverables.size > 1) typePlural else typeSingular
 
         when (item.itemId) {
-            R.id.actionToggleSelectAll -> {
+            R.id.actionSelectAll -> {
                 selectAll()
             }
             R.id.albumActions -> {

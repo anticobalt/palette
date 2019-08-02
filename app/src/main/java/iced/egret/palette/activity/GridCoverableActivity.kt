@@ -1,7 +1,9 @@
 package iced.egret.palette.activity
 
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.ActionMode
 import android.view.Menu
 import android.view.View
@@ -20,6 +22,7 @@ import iced.egret.palette.model.Picture
 
 /**
  * Basic themed activity with selectable and long-clickable GridCoverableItems.
+ * All lateinits are initialized here for safety.
  */
 abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
@@ -32,7 +35,7 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
     protected var mContents = mutableListOf<Picture>()
     protected var mContentItems = mutableListOf<GridCoverableItem>()
 
-    abstract var menuRes: Int
+    abstract var actionModeMenuRes: Int
 
     abstract fun fetchContents()
     abstract fun buildToolbar()
@@ -40,7 +43,9 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recycle_bin)
+        setContentView(R.layout.activity_grid_coverable)
+        mToolbar = findViewById(R.id.toolbar)
+
         fetchContents()
         buildToolbar()
         buildRecyclerView()
@@ -75,7 +80,7 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
         val manager = GridLayoutManager(this, numColumns)
 
         mAdapter = FlexibleAdapter(mContentItems, this, true)
-        initializeActionModeHelper(SelectableAdapter.Mode.IDLE, menuRes)
+        initializeActionModeHelper(SelectableAdapter.Mode.IDLE, actionModeMenuRes)
         mRecyclerView = findViewById(R.id.recyclerView)
         mRecyclerView.layoutManager = manager
         mRecyclerView.adapter = mAdapter

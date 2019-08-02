@@ -4,11 +4,11 @@
     <!-- Ignore AppCompatResource for showAsAction because they don't work on ActionMode -->
 
     <item
-        android:id="@+id/actionToggleSelectAll"
+        android:id="@+id/actionSelectAll"
         android:icon="@drawable/ic_select_all_black_24dp"
         android:orderInCategory="1"
         android:showAsAction="always"
-        android:title="@string/action_toggle_select_all" />
+        android:title="@string/action_select_all" />
 
     <item
         android:id="@+id/actionHide"

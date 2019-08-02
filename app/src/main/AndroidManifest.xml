@@ -40,6 +40,9 @@
             android:name=".activity.RecycleBinActivity"
             android:label="@string/recycle_bin"
             android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
+        <activity android:name=".activity.NewPicturesActivity"
+            android:label="@string/new_pictures"
+            android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
     </application>
 
 </manifest>

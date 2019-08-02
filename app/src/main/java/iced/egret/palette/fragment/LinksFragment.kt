@@ -15,10 +15,7 @@ import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
-import iced.egret.palette.activity.BaseActivity
-import iced.egret.palette.activity.MainActivity
-import iced.egret.palette.activity.RecycleBinActivity
-import iced.egret.palette.activity.SettingsActivity
+import iced.egret.palette.activity.*
 import iced.egret.palette.flexible.BannerCoverableItem
 import iced.egret.palette.flexible.CoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
@@ -158,6 +155,9 @@ class LinksFragment :
         }
         sideLayout.findViewById<ImageButton>(R.id.recycleBin).setOnClickListener {
             startActivity(Intent(this.context, RecycleBinActivity::class.java))
+        }
+        sideLayout.findViewById<ImageButton>(R.id.newPictures).setOnClickListener {
+            startActivity(Intent(this.context, NewPicturesActivity::class.java))
         }
     }
 
@@ -354,7 +354,7 @@ class LinksFragment :
                 Painter.paintDrawable(item.icon)
             }
         }
-        val selectAll = menu.findItem(R.id.actionToggleSelectAll)
+        val selectAll = menu.findItem(R.id.actionSelectAll)
         Painter.paintDrawable(selectAll.icon)
 
         return true
@@ -362,7 +362,7 @@ class LinksFragment :
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.actionToggleSelectAll -> {
+            R.id.actionSelectAll -> {
                 selectAll()
             }
             R.id.actionDeleteAlbum -> {

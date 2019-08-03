@@ -1,10 +1,14 @@
 package iced.egret.palette.activity
 
 import android.view.ActionMode
+import android.view.Menu
 import android.view.MenuItem
 import iced.egret.palette.R
 import iced.egret.palette.flexible.GridCoverableItem
+import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.Painter
 
 class NewPicturesActivity : GridCoverableActivity() {
 
@@ -17,16 +21,16 @@ class NewPicturesActivity : GridCoverableActivity() {
         }
     }
 
-    override fun fetchContents() {
-        mContents.clear()
-        mContentItems.clear()
-        mContents.addAll(CollectionManager.bufferPictures)
-        mContentItems.addAll(mContents.map { content -> GridCoverableItem(content) })
-    }
-
     private fun refresh() {
         fetchContents()
         mAdapter.updateDataSet(mContentItems)
+    }
+
+    override fun fetchContents() {
+        mContents.clear()
+        mContentItems.clear()
+        mContents.addAll(CollectionManager.getBufferPictures())
+        mContentItems.addAll(mContents.map { content -> GridCoverableItem(content) })
     }
 
     override fun buildToolbar() {
@@ -47,23 +51,52 @@ class NewPicturesActivity : GridCoverableActivity() {
         mToolbar.menu.findItem(R.id.actionClearAll).icon.setTint(itemColor)
     }
 
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        super.onCreateActionMode(mode, menu)
+        Painter.paintDrawable(menu.findItem(R.id.actionSelectAll).icon)
+        Painter.paintDrawable(menu.findItem(R.id.actionClear).icon)
+        return true
+    }
+
     override fun onActionItemClicked(mode: ActionMode, menuItem: MenuItem): Boolean {
+
+        val selected = mAdapter.selectedPositions.map { i -> mContents[i] }
+
         when (menuItem.itemId) {
-            R.id.actionSelectAll -> {
-            }
-            R.id.actionClear -> {
-            }
+            R.id.actionSelectAll -> selectAll()
+            R.id.actionClear -> processClear(selected)
         }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.actionClearAll -> {
-            }
+            R.id.actionClearAll -> processClear(mContents)
             else -> return super.onOptionsItemSelected(item)
         }
         return true
+    }
+
+    private fun selectAll() {
+        mAdapter.currentItems.map { item -> item.setSelection(true) }
+        mAdapter.selectAll()
+        mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
+    }
+
+    private fun processClear(pictures: List<Picture>) {
+        if (pictures.isEmpty()) return
+        val typeString = if (pictures.size == 1) "picture" else "pictures"
+
+        DialogGenerator.clear(this, typeString) {
+            val set = pictures.toSet()
+            CollectionManager.removeFromBufferPictures(pictures)
+            mContents.removeAll(pictures)
+            mContentItems.removeAll { item -> item.coverable in set }
+
+            mAdapter.updateDataSet(mContentItems)
+            mActionModeHelper.destroyActionModeIfCan()
+
+        }
     }
 
 }

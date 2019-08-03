@@ -57,8 +57,8 @@ object CollectionManager : CoroutineScope {
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
-    val pictureCache = mutableMapOf<String, Picture>()
-    val bufferPictures = mutableListOf<Picture>()
+    private val mPictureCache = mutableMapOf<String, Picture>()
+    private val mBufferPictures = mutableListOf<Picture>()
 
     /**
      * Ready = Don't need to remake collections.
@@ -74,14 +74,14 @@ object CollectionManager : CoroutineScope {
 
     private fun setup() {
 
-        pictureCache.putAll(Storage.knownPictures)
+        mPictureCache.putAll(Storage.knownPictures)
         root = Storage.initialFolders.firstOrNull() ?: return
         val displayedFolders = findFolderByPath(STORAGE_PATH)?.folders
                 ?: root.folders  // uncharted territory
 
         mCollectionStack.clear()
         mCollections.clear()
-        bufferPictures.clear()
+        mBufferPictures.clear()
 
         // Add Folders
         mCollections.addAll(displayedFolders)
@@ -94,7 +94,7 @@ object CollectionManager : CoroutineScope {
         }
 
         mCollections.addAll(Storage.initialAlbums)
-        bufferPictures.addAll(Storage.initialBufferPictures)
+        mBufferPictures.addAll(Storage.initialBufferPictures)
 
     }
 
@@ -109,7 +109,7 @@ object CollectionManager : CoroutineScope {
             updatePicturesFromKit(updateKit)
             cleanAlbums()
             Storage.saveAlbumsToDisk(albums)
-            Storage.saveBufferPicturesToDisk(bufferPictures)
+            Storage.saveBufferPicturesToDisk(mBufferPictures)
 
             // On UI thread
             withContext(Dispatchers.Main) { callback() }
@@ -139,7 +139,7 @@ object CollectionManager : CoroutineScope {
                 toPrependToBuffer.add(picture)  // keep order
             }
         }
-        bufferPictures.addAll(0, toPrependToBuffer)
+        mBufferPictures.addAll(0, toPrependToBuffer)
 
         for (path in removedPaths) {
             val parentPath = path.split("/").dropLast(1).joinToString("/")
@@ -149,13 +149,22 @@ object CollectionManager : CoroutineScope {
             if (folder != null && picture != null) {
                 // Doesn't enter here if Picture previously removed by in-app operations
                 folder.removePicture(picture)
-                bufferPictures.remove(picture)
+                mBufferPictures.remove(picture)
             }
         }
     }
 
     fun writeCache() {
-        Storage.savePictureCacheToDisk(pictureCache)
+        Storage.savePictureCacheToDisk(mPictureCache)
+    }
+
+    fun getBufferPictures(): List<Picture> {
+        return mBufferPictures.toList()
+    }
+
+    fun removeFromBufferPictures(pictures: List<Picture>) {
+        mBufferPictures.removeAll(pictures)
+        Storage.saveBufferPicturesToDisk(mBufferPictures)
     }
 
     fun getCollections(): MutableList<Collection> {
@@ -461,7 +470,7 @@ object CollectionManager : CoroutineScope {
             Storage.saveAlbumsToDisk(albums)
         }
 
-        pictureCache[file.path] = picture
+        mPictureCache[file.path] = picture
         return file
     }
 
@@ -478,8 +487,8 @@ object CollectionManager : CoroutineScope {
                 ?: return null
 
         // Update cache
-        pictureCache.remove(picture.filePath)
-        pictureCache[files.second.path] = picture
+        mPictureCache.remove(picture.filePath)
+        mPictureCache[files.second.path] = picture
 
         picture.filePath = files.second.path
         return files
@@ -538,8 +547,8 @@ object CollectionManager : CoroutineScope {
                 ?: return null
 
         // Update cache
-        pictureCache.remove(picture.filePath)
-        pictureCache[files.second.path] = picture
+        mPictureCache.remove(picture.filePath)
+        mPictureCache[files.second.path] = picture
 
         picture.name = newName
         picture.filePath = files.second.path
@@ -557,8 +566,8 @@ object CollectionManager : CoroutineScope {
         val files = Storage.moveFileToRecycleBin(picture.filePath, sdCardFile)
                 ?: return null
 
-        pictureCache.remove(picture.filePath)
-        bufferPictures.removeAll { pic -> pic.filePath == files.first.path }  // remove if in buffer
+        mPictureCache.remove(picture.filePath)
+        mBufferPictures.removeAll { pic -> pic.filePath == files.first.path }  // remove if in buffer
         findFolderByPath(picture.fileLocation)?.removePicture(picture)
         return files.first
     }
@@ -575,7 +584,7 @@ object CollectionManager : CoroutineScope {
         if (failCounter != pictures.size) {
             cleanAlbums()
             Storage.saveAlbumsToDisk(albums)
-            Storage.saveBufferPicturesToDisk(bufferPictures)
+            Storage.saveBufferPicturesToDisk(mBufferPictures)
             Storage.recycleBin.saveLocationsToDisk()
         }
 
@@ -589,8 +598,8 @@ object CollectionManager : CoroutineScope {
         val files = Storage.restoreFileFromRecycleBin(picture.filePath, sdCardFile, contentResolver)
                 ?: return null
 
-        pictureCache[files.second.path] = picture
-        bufferPictures.add(0, picture)  // always add to buffer
+        mPictureCache[files.second.path] = picture
+        mBufferPictures.add(0, picture)  // always add to buffer
         picture.filePath = files.second.path
         getParentFolder(picture)?.addPicture(picture, toFront = true)
         return files.second

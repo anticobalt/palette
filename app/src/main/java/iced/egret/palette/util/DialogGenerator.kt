@@ -235,4 +235,16 @@ object DialogGenerator {
         dialog.show()
     }
 
+    fun clear(context: Context, typeString: String, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(R.string.action_clear)
+            message(text = "Clear $typeString? ${typeString.capitalize()} won't be deleted, " +
+                    "but this action is irreversible.")
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
+        }
+    }
+
 }

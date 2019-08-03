@@ -13,7 +13,7 @@ import iced.egret.palette.util.Painter
 /**
  * An item with IFlexible functionality.
  */
-abstract class CoverableItem(protected val obj: Coverable, private var defaultTint: Int?) :
+abstract class CoverableItem(val coverable: Coverable, private var defaultTint: Int?) :
         AbstractFlexibleItem<CoverViewHolder>() {
 
     var viewHolder: CoverViewHolder? = null
@@ -28,8 +28,8 @@ abstract class CoverableItem(protected val obj: Coverable, private var defaultTi
                                 position: Int,
                                 payloads: MutableList<Any>?) {
         viewHolder = holder
-        obj.loadCoverInto(holder)
-        holder.tvItem?.text = obj.name
+        coverable.loadCoverInto(holder)
+        holder.tvItem?.text = coverable.name
 
         // set the icon to discern type
         setIcon()
@@ -40,11 +40,11 @@ abstract class CoverableItem(protected val obj: Coverable, private var defaultTi
 
     override fun equals(other: Any?): Boolean {
         if (other !is CoverableItem) return false
-        return this.obj == other.obj
+        return this.coverable == other.coverable && this.layoutRes == other.layoutRes
     }
 
     override fun hashCode(): Int {
-        return obj.hashCode()
+        return coverable.hashCode()
     }
 
     /**
@@ -84,10 +84,10 @@ abstract class CoverableItem(protected val obj: Coverable, private var defaultTi
     private fun setIcon() {
         val typeView = viewHolder?.itemView?.findViewById<ImageView>(R.id.typeIcon)
                 ?: return
-        if (obj.icon == null) {
+        if (coverable.icon == null) {
             typeView.setImageDrawable(null)
         } else {
-            typeView.setImageResource(obj.icon ?: return)
+            typeView.setImageResource(coverable.icon ?: return)
         }
     }
 }

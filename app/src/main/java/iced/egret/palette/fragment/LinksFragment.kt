@@ -51,7 +51,7 @@ class LinksFragment :
         const val selectedType = "LinksFragment_ST"
     }
 
-    private lateinit var mMaster: MainActivity
+    private lateinit var mActivity: MainActivity
     private var mRootView: View? = null
     private lateinit var mRecyclerView: RecyclerView
 
@@ -68,7 +68,7 @@ class LinksFragment :
         mRootView = inflater.inflate(R.layout.fragment_links, container, false)
 
         mRecyclerView = mRootView!!.findViewById(R.id.recyclerView)
-        mMaster = activity as MainActivity
+        mActivity = activity as MainActivity
 
         buildToolbar()
         buildRecyclerView()
@@ -113,7 +113,7 @@ class LinksFragment :
     override fun onResume() {
         super.onResume()
         styleExtraThemeElements()
-        if (mSelectedContentType != null) mMaster.isolateFragment(this)
+        if (mSelectedContentType != null) mActivity.isolateFragment(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -334,10 +334,10 @@ class LinksFragment :
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-        mMaster.colorActionMode()
+        mActivity.colorActionMode()
 
         // Handles blocking in the case where ActionMode is created after other fragments created.
-        mMaster.isolateFragment(this)
+        mActivity.isolateFragment(this)
 
         // Make items visible depending on selected content.
         // Painting has to be done here for ActionMode icons, because XML app:iconTint
@@ -369,7 +369,7 @@ class LinksFragment :
                 DialogGenerator.deleteAlbum(context!!) {
                     CollectionManager.deleteAlbumsByRelativePosition(mAdapter.selectedPositions)
                     onCollectionsUpdated()
-                    mMaster.notifyPinnedAlbumDeleted()
+                    mActivity.notifyPinnedAlbumDeleted()
                     mActionModeHelper.destroyActionModeIfCan()
                 }
             }
@@ -422,7 +422,7 @@ class LinksFragment :
      * @param referencePosition Index of Collection to open with
      */
     private fun openCollectionViewPanel(referencePosition: Int) {
-        mMaster.buildCollectionView(mCollections[referencePosition])
+        mActivity.buildCollectionView(mCollections[referencePosition])
     }
 
     /**
@@ -454,7 +454,7 @@ class LinksFragment :
     }
 
     private fun getColorInt(type: BaseActivity.ColorType) : Int {
-        return mMaster.getColorInt(type)
+        return mActivity.getColorInt(type)
     }
 
 }

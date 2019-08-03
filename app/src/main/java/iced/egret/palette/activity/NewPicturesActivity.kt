@@ -3,15 +3,30 @@ package iced.egret.palette.activity
 import android.view.ActionMode
 import android.view.MenuItem
 import iced.egret.palette.R
+import iced.egret.palette.flexible.GridCoverableItem
+import iced.egret.palette.util.CollectionManager
 
 class NewPicturesActivity : GridCoverableActivity() {
 
     override var actionModeMenuRes = R.menu.menu_new_pictures_edit
 
+    override fun onStart() {
+        super.onStart()
+        CollectionManager.fetchNewMedia(this) {
+            refresh()
+        }
+    }
+
     override fun fetchContents() {
         mContents.clear()
         mContentItems.clear()
+        mContents.addAll(CollectionManager.bufferPictures)
+        mContentItems.addAll(mContents.map { content -> GridCoverableItem(content) })
+    }
 
+    private fun refresh() {
+        fetchContents()
+        mAdapter.updateDataSet(mContentItems)
     }
 
     override fun buildToolbar() {
@@ -34,15 +49,18 @@ class NewPicturesActivity : GridCoverableActivity() {
 
     override fun onActionItemClicked(mode: ActionMode, menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
-            R.id.actionSelectAll -> {}
-            R.id.actionClear -> {}
+            R.id.actionSelectAll -> {
+            }
+            R.id.actionClear -> {
+            }
         }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.actionClearAll -> {}
+            R.id.actionClearAll -> {
+            }
             else -> return super.onOptionsItemSelected(item)
         }
         return true

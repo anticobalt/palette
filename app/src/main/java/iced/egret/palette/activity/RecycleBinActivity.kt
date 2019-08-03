@@ -115,9 +115,6 @@ class RecycleBinActivity : GridCoverableActivity() {
     }
 
     private fun refresh() {
-        // Getting contents again from RecycleBin is more taxing than just tracking
-        // removed items inside the activity, but keeps the storage as the single source
-        // of truth, and prevents potential sync errors.
         discardOutdatedContents()
         mAdapter.updateDataSet(mContentItems)
         mActionModeHelper.destroyActionModeIfCan()

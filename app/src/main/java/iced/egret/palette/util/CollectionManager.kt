@@ -56,7 +56,9 @@ object CollectionManager : CoroutineScope {
         private set(value) = mCollectionStack.push(value)
     val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
+
     val pictureCache = mutableMapOf<String, Picture>()
+    val bufferPictures = mutableListOf<Picture>()
 
     /**
      * Ready = Don't need to remake collections.
@@ -72,14 +74,14 @@ object CollectionManager : CoroutineScope {
 
     private fun setup() {
 
-        pictureCache.putAll(Storage.retrievedPictures)
-        root = Storage.retrievedFolders.firstOrNull() ?: return
+        pictureCache.putAll(Storage.knownPictures)
+        root = Storage.initialFolders.firstOrNull() ?: return
         val displayedFolders = findFolderByPath(STORAGE_PATH)?.folders
                 ?: root.folders  // uncharted territory
 
-        // defensive
         mCollectionStack.clear()
         mCollections.clear()
+        bufferPictures.clear()
 
         // Add Folders
         mCollections.addAll(displayedFolders)
@@ -91,19 +93,25 @@ object CollectionManager : CoroutineScope {
             unwindStack(PRACTICAL_MAIN_STORAGE_PATH)
         }
 
-        // Add Albums
-        mCollections.addAll(Storage.retrievedAlbums)
+        mCollections.addAll(Storage.initialAlbums)
+        bufferPictures.addAll(Storage.initialBufferPictures)
 
     }
 
-    fun fetchFromStorage(context: Context, callback: () -> Unit) {
+    /**
+     * Gets fresh data from disk, updates state, saves it to disk,
+     * and does UI callback.
+     */
+    fun fetchNewMedia(context: Context, callback: () -> Unit) {
         launch {
-            val updateKit = withContext(coroutineContext) {
-                Storage.getUpdateKit(context)
-            }
+            // On IO thread
+            val updateKit = Storage.getUpdateKit(context)
             updatePicturesFromKit(updateKit)
             cleanAlbums()
             Storage.saveAlbumsToDisk(albums)
+            Storage.saveBufferPicturesToDisk(bufferPictures)
+
+            // On UI thread
             withContext(Dispatchers.Main) { callback() }
         }
     }
@@ -120,6 +128,7 @@ object CollectionManager : CoroutineScope {
 
         val addedPictures = updateKit.toAdd.filterIsInstance<Picture>()
         val removedPaths = updateKit.toRemove
+        val toPrependToBuffer = mutableListOf<Picture>()
 
         for (picture in addedPictures) {
             val folder = getParentFolder(picture)
@@ -127,8 +136,10 @@ object CollectionManager : CoroutineScope {
             if (folder != null && folder.findPictureByPath(picture.filePath) == null) {
                 picture.parent = folder
                 folder.addPicture(picture, toFront = true)
+                toPrependToBuffer.add(picture)  // keep order
             }
         }
+        bufferPictures.addAll(0, toPrependToBuffer)
 
         for (path in removedPaths) {
             val parentPath = path.split("/").dropLast(1).joinToString("/")
@@ -136,10 +147,15 @@ object CollectionManager : CoroutineScope {
             val picture = folder?.findPictureByPath(path)
 
             if (folder != null && picture != null) {
-                // Returns false if Picture previously removed by in-app operations.
+                // Doesn't enter here if Picture previously removed by in-app operations
                 folder.removePicture(picture)
+                bufferPictures.remove(picture)
             }
         }
+    }
+
+    fun writeCache() {
+        Storage.savePictureCacheToDisk(pictureCache)
     }
 
     fun getCollections(): MutableList<Collection> {
@@ -541,9 +557,8 @@ object CollectionManager : CoroutineScope {
         val files = Storage.moveFileToRecycleBin(picture.filePath, sdCardFile)
                 ?: return null
 
-        // Update cache
         pictureCache.remove(picture.filePath)
-
+        bufferPictures.removeAll { pic -> pic.filePath == files.first.path }  // remove if in buffer
         findFolderByPath(picture.fileLocation)?.removePicture(picture)
         return files.first
     }
@@ -560,6 +575,7 @@ object CollectionManager : CoroutineScope {
         if (failCounter != pictures.size) {
             cleanAlbums()
             Storage.saveAlbumsToDisk(albums)
+            Storage.saveBufferPicturesToDisk(bufferPictures)
             Storage.recycleBin.saveLocationsToDisk()
         }
 
@@ -573,9 +589,8 @@ object CollectionManager : CoroutineScope {
         val files = Storage.restoreFileFromRecycleBin(picture.filePath, sdCardFile, contentResolver)
                 ?: return null
 
-        // Update cache
         pictureCache[files.second.path] = picture
-
+        bufferPictures.add(0, picture)  // always add to buffer
         picture.filePath = files.second.path
         getParentFolder(picture)?.addPicture(picture, toFront = true)
         return files.second

@@ -37,6 +37,7 @@ const val SD_CARD_WRITE_REQUEST = 2
 
 /**
  * Holds a SlidingPaneLayout with two fragments inside each panel, and listens to it.
+ * Also handles permissions and starts up the app's shared state.
  *
  * General order of functions:
  * - Lifecycle
@@ -193,7 +194,7 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
         checkSdWriteAccess()
     }
 
-    private fun isFirstRun() : Boolean {
+    private fun isFirstRun(): Boolean {
         val key = "isFirstRun"
         val firstRun = sharedPrefs.getBoolean(key, true)
         sharedPrefs.edit().putBoolean(key, false).apply()

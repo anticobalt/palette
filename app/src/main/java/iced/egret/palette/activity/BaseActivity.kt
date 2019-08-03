@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import iced.egret.palette.R
+import iced.egret.palette.util.CollectionManager
 import java.io.File
 
 abstract class BaseActivity : AppCompatActivity() {

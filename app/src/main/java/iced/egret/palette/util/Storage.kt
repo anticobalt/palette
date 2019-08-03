@@ -29,62 +29,25 @@ import kotlin.collections.ArrayList
  */
 object Storage {
 
-    private const val rootCacheFileName = "root-cache.json"
-    private const val albumsFileName = "albums.json"
+    private var contentBuilder = ContentBuilder()
+    private var gson = Gson()
 
-    private var ready = false
-    private lateinit var fileDirectory: File
+    val initialFolders: List<Folder>
+        get() = contentBuilder.folders
+    val initialAlbums: List<Album>
+        get() = contentBuilder.albums
+    val initialBufferPictures : List<Picture>
+        get() = contentBuilder.bufferPictures
+
+    val knownPictures = linkedMapOf<String, Picture>()
     lateinit var recycleBin: RecycleBin
         private set
 
-    // Only updated when reading directly from disk
-    val retrievedFolders = mutableListOf<Folder>()
-    val retrievedAlbums = mutableListOf<Album>()
-    val retrievedPictures = mutableMapOf<String, Picture>()
-
-    private var gson = Gson()
-
-    /**
-     * Abstraction of changes to on-disk items.
-     *
-     * @property toAdd set of FileObjects, because these are brand new
-     * @property toRemove a set of paths, because these have to be searched for and removed
-     */
-    class UpdateKit(add: Set<FileObject>? = null, remove: Set<String>? = null) {
-        val toAdd = add ?: mutableSetOf<FileObject>()
-        val toRemove = remove ?: mutableSetOf<String>()
-    }
-
-    class RecycleBin(directory: File) {
-        val name = "recycle-bin"
-        private val locationsName = "recycle-restore-locations"
-        val file = File(directory, name)
-        val valid: Boolean
-            get() = file.isDirectory && file.canRead()
-        val contents: List<Picture>
-            get() = file.listFiles().map { file -> Picture(file.path.split("/").last(), file.path) }
-        val oldLocations = mutableMapOf<String, String>()
-
-        init {
-            file.mkdir()
-        }
-
-        fun saveLocationsToDisk() {
-            cleanLocations()
-            saveJsonToDisk(gson.toJson(oldLocations), locationsName)
-        }
-
-        fun loadLocationsFromDisk() {
-            val json = readJsonFromDisk(locationsName) ?: return
-            val type = object : TypeToken<HashMap<String, String>>() {}.type
-            oldLocations.clear()
-            oldLocations.putAll(gson.fromJson<HashMap<String, String>>(json, type))
-        }
-
-        private fun cleanLocations() {
-            if (file.listFiles().isEmpty()) oldLocations.clear()
-        }
-    }
+    private var ready = false
+    private const val pictureCacheFileName = "pictures-cache.json"
+    private const val pictureBufferFileName = "pictures-buffer.json"
+    private const val albumsFileName = "albums.json"
+    private lateinit var fileDirectory: File
 
     fun setupIfRequired(activity: Activity) {
         if (!ready) {
@@ -93,96 +56,18 @@ object Storage {
         }
     }
 
-    private fun setup(activity: Activity) {
-        fileDirectory = activity.filesDir
-        retrievedFolders.clear()
-        retrievedAlbums.clear()
-        retrievedFolders.addAll(getPictureFoldersMediaStore(activity))
-        retrievedAlbums.addAll(getAlbumsFromDisk())
+    private fun setup(context: Context) {
+        fileDirectory = context.filesDir
+        contentBuilder.run(context)
+        knownPictures.putAll(contentBuilder.pictures)
         recycleBin = RecycleBin(fileDirectory)
         recycleBin.loadLocationsFromDisk()
     }
 
-    /**
-     * Gets images from Android's default gallery API
-     * API access stuff from https://stackoverflow.com/a/36815451
-     */
-    private fun getPictureFoldersMediaStore(activity: Activity): ArrayList<Folder> {
-
-        val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val cursor: Cursor?
-        val columnIndexData: Int
-        val projection = arrayOf(MediaColumns.DATA)
-        val sortBy = MediaStore.Images.ImageColumns.DATE_MODIFIED + " DESC"
-        val rootFolders = ArrayList<Folder>()
-
-        cursor = activity.contentResolver.query(uri, projection, null, null, sortBy)
-        columnIndexData = cursor!!.getColumnIndexOrThrow(MediaColumns.DATA)
-
-        val rootLevelIndex = 0
-        var absolutePathOfImage: String
-        var pathLevels: List<String>
-        var rootPath: String
-        var parentFolder: Folder?
-        var childFolder: Folder?
-        var folderPath: String
-
-        while (cursor.moveToNext()) {
-
-            // get image path
-            absolutePathOfImage = cursor.getString(columnIndexData)
-            pathLevels = absolutePathOfImage.split("/")
-            rootPath = pathLevels[rootLevelIndex]
-
-            // check if root already created (in most cases, yes)
-            parentFolder = rootFolders.find { root -> root.filePath == rootPath }
-            if (parentFolder == null) {
-                parentFolder = Folder(rootPath, rootPath)
-                rootFolders.add(parentFolder)
-            }
-
-            // add additional folders as required, in linked-list-like fashion
-            var levelInt = rootLevelIndex + 1
-            for (level in pathLevels.subList(rootLevelIndex + 1, pathLevels.size - 1)) {
-
-                folderPath = pathLevels.subList(0, levelInt + 1).joinToString("/")
-
-                childFolder = parentFolder!!.folders.find { folder -> folder.filePath == folderPath }
-                if (childFolder == null) {
-                    childFolder = Folder(level, folderPath, parent = parentFolder)
-                    parentFolder.addFolder(childFolder)
-                }
-                parentFolder = childFolder
-
-                levelInt++
-
-            }
-
-            // Ensure file exists on disk.
-            // MediaStore will return non-existent images if removal was not broadcasted correctly.
-            val file = File(absolutePathOfImage)
-            if (!file.exists()) {
-                val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-                intent.data = Uri.fromFile(file)
-                activity.sendBroadcast(intent)
-            }
-
-            // add picture, parentFolder guaranteed to exist
-            val picture = Picture(pathLevels[pathLevels.size - 1], absolutePathOfImage)
-            parentFolder!!.addPicture(picture)
-            retrievedPictures[absolutePathOfImage] = picture
-
-        }
-
-        cursor.close()
-        return rootFolders
-
-    }
-
     internal fun getUpdateKit(context: Context): UpdateKit {
 
-        val foundPicturePaths = mutableSetOf<String>()
-        val existingPicturePaths = retrievedPictures.keys
+        val foundPicturePaths = mutableListOf<String>()
+        val existingPicturePaths = contentBuilder.pictures.keys
 
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(MediaColumns.DATA)
@@ -195,17 +80,20 @@ object Storage {
         }
         cursor.close()
 
+        // addedPaths is a list to preserve order.
+        // In general, collection difference works the same as set difference,
+        // except duplicates are removed as well: not an issue as all paths are unique.
         val addedPaths = foundPicturePaths - existingPicturePaths
-        val addedPictures = mutableSetOf<Picture>()
         val removedPaths = existingPicturePaths - foundPicturePaths
 
+        val addedPictures = mutableListOf<Picture>()
         for (path in addedPaths) {
             val name = path.split("/").last()
             val picture = Picture(name, path)
             addedPictures.add(picture)
-            retrievedPictures[path] = picture
+            knownPictures[path] = picture
         }
-        for (path in removedPaths) retrievedPictures.remove(path)
+        for (path in removedPaths) knownPictures.remove(path)
 
         return UpdateKit(addedPictures, removedPaths)
     }
@@ -219,38 +107,14 @@ object Storage {
         saveJsonToDisk(json, albumsFileName)
     }
 
-    /**
-     * Uses initially retrieved Pictures to rebuild Albums from JSON.
-     */
-    private fun getAlbumsFromDisk(): MutableList<Album> {
-        val json = readJsonFromDisk(albumsFileName)
-        val type = object : TypeToken<ArrayList<AlbumData>>() {}.type
-        if (json != null) {
-            val albumsData = gson.fromJson<ArrayList<AlbumData>>(json, type)
-            val albums = ArrayList<Album>()
-            for (data in albumsData) {
-                val album = data.toFullClass(existingPictures = retrievedPictures)
-                albums.add(album)
-                cleanAlbum(album)
-            }
-            return albums
-        }
-        return arrayListOf()
+    internal fun savePictureCacheToDisk(cache: Map<String, Picture>) {
+        val json = gson.toJson(cache.keys)
+        saveJsonToDisk(json, pictureCacheFileName)
     }
 
-    fun saveFolderToDisk(folder: Folder) {
-        val rootData = folder.toDataClass()
-        val json = gson.toJson(rootData)
-        saveJsonToDisk(json, rootCacheFileName)
-    }
-
-    fun getFolderFromDisk(): Folder? {
-        val json = readJsonFromDisk(rootCacheFileName)
-        if (json != null) {
-            val rootData = gson.fromJson(json, FolderData::class.java)
-            return rootData.toFullClass()
-        }
-        return null
+    internal fun saveBufferPicturesToDisk(pictures: List<Picture>) {
+        val json = gson.toJson(pictures.map {picture -> picture.filePath })
+        saveJsonToDisk(json, pictureBufferFileName)
     }
 
     private fun saveJsonToDisk(json: String, fileName: String) {
@@ -266,7 +130,7 @@ object Storage {
         return try {
             File(fileDirectory, fileName).bufferedReader().readText()
         } catch (e: FileNotFoundException) {
-            Log.i("collection-manager", "couldn't find $fileName when trying to read")
+            Log.i("palette/storage", "couldn't find $fileName when trying to read in")
             null
         }
     }
@@ -322,7 +186,6 @@ object Storage {
         }
 
         return file
-
     }
 
     /**
@@ -648,6 +511,218 @@ object Storage {
             if (!fileExists(picture.filePath)) {
                 album.removePicture(picture)
             }
+        }
+    }
+
+    /**
+     * Gets all albums/folders/media from disk ONCE, ideally when app is created.
+     */
+    private class ContentBuilder {
+        var ran = false
+
+        // Purposely set as lateinit to prevent usage before run() is called
+        lateinit var folders: List<Folder>
+        lateinit var albums: List<Album>
+        lateinit var pictures : LinkedHashMap<String, Picture>
+        lateinit var bufferPictures: List<Picture>
+
+        fun run(context: Context) {
+            if (!ran) {
+                ran = true
+                pictures = linkedMapOf()
+                folders = getPictureFoldersMediaStore(context)
+                albums = getAlbumsFromDisk()
+                bufferPictures = getAllBufferPictures()
+            }
+        }
+
+        /**
+         * Gets images from Android's default gallery API
+         * API access stuff from https://stackoverflow.com/a/36815451
+         */
+        private fun getPictureFoldersMediaStore(context: Context): List<Folder> {
+
+            val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val cursor: Cursor?
+            val columnIndexData: Int
+            val projection = arrayOf(MediaColumns.DATA)
+            val sortBy = MediaStore.Images.ImageColumns.DATE_MODIFIED + " DESC"
+            val rootFolders = ArrayList<Folder>()
+
+            cursor = context.contentResolver.query(uri, projection, null, null, sortBy)
+            columnIndexData = cursor!!.getColumnIndexOrThrow(MediaColumns.DATA)
+
+            val rootLevelIndex = 0
+            var absolutePathOfImage: String
+            var pathLevels: List<String>
+            var rootPath: String
+            var parentFolder: Folder?
+            var childFolder: Folder?
+            var folderPath: String
+
+            while (cursor.moveToNext()) {
+
+                // get image path
+                absolutePathOfImage = cursor.getString(columnIndexData)
+                pathLevels = absolutePathOfImage.split("/")
+                rootPath = pathLevels[rootLevelIndex]
+
+                // check if root already created (in most cases, yes)
+                parentFolder = rootFolders.find { root -> root.filePath == rootPath }
+                if (parentFolder == null) {
+                    parentFolder = Folder(rootPath, rootPath)
+                    rootFolders.add(parentFolder)
+                }
+
+                // add additional folders as required, in linked-list-like fashion
+                var levelInt = rootLevelIndex + 1
+                for (level in pathLevels.subList(rootLevelIndex + 1, pathLevels.size - 1)) {
+
+                    folderPath = pathLevels.subList(0, levelInt + 1).joinToString("/")
+
+                    childFolder = parentFolder!!.folders.find { folder -> folder.filePath == folderPath }
+                    if (childFolder == null) {
+                        childFolder = Folder(level, folderPath, parent = parentFolder)
+                        parentFolder.addFolder(childFolder)
+                    }
+                    parentFolder = childFolder
+
+                    levelInt++
+
+                }
+
+                // Ensure file exists on disk.
+                // MediaStore will return non-existent images if removal was not broadcasted correctly.
+                val file = File(absolutePathOfImage)
+                if (!file.exists()) {
+                    val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                    intent.data = Uri.fromFile(file)
+                    context.sendBroadcast(intent)
+                }
+
+                // add picture, parentFolder guaranteed to exist
+                val picture = Picture(pathLevels[pathLevels.size - 1], absolutePathOfImage)
+                parentFolder!!.addPicture(picture)
+                pictures[absolutePathOfImage] = picture
+
+            }
+
+            cursor.close()
+            return rootFolders
+
+        }
+
+        /**
+         * Uses initially retrieved Pictures to rebuild Albums from JSON.
+         */
+        private fun getAlbumsFromDisk(): List<Album> {
+            val json = readJsonFromDisk(albumsFileName)
+            val type = object : TypeToken<ArrayList<AlbumData>>() {}.type
+            if (json != null) {
+                val albumsData = gson.fromJson<ArrayList<AlbumData>>(json, type)
+                val albums = ArrayList<Album>()
+                for (data in albumsData) {
+                    val album = data.toFullClass(existingPictures = pictures)
+                    albums.add(album)
+                    cleanAlbum(album)
+                }
+                return albums
+            }
+            return arrayListOf()
+        }
+
+        /**
+         * Get buffer pictures as saved in index file + anything new since last time
+         * pictures cached was saved.
+         *
+         * Since this function is supposed to run once on app start, assumption is that the last
+         * time the cache was saved was the last time the app was open.
+         */
+        private fun getAllBufferPictures() : List<Picture> {
+            val fromPreviousSession = getBufferPicturesFromDisk()
+            val newToSession = getNewPicturePaths().map {
+                path -> Picture(path.split("/").last(), path)
+            }
+            return newToSession + fromPreviousSession
+        }
+
+        /**
+         * Gets all buffer pictures listed on save index file that still exist.
+         */
+        private fun getBufferPicturesFromDisk(): List<Picture> {
+            val json = readJsonFromDisk(pictureBufferFileName)
+            val type = object : TypeToken<List<String>>() {}.type
+            val buffer = mutableListOf<Picture>()
+            if (json == null) return listOf()
+
+            val bufferPaths = gson.fromJson<List<String>>(json, type)
+            for (path in bufferPaths) {
+                // If Picture on disk, add to buffer
+                val picture = pictures[path]
+                if (picture != null) buffer.add(picture)
+            }
+            return buffer
+        }
+
+        /**
+         * Get paths for all Pictures that are not listed in the cache, in order.
+         * @return new paths, or empty list if cache doesn't exist (i.e. fresh install)
+         */
+        private fun getNewPicturePaths(): List<String> {
+            return pictures.keys.toList() - (getPathsFromPictureCache() ?: return listOf())
+        }
+
+        private fun getPathsFromPictureCache(): Set<String>? {
+            val json = readJsonFromDisk(pictureCacheFileName)
+            if (json != null) {
+                val type = object : TypeToken<HashSet<String>>() {}.type
+                return gson.fromJson(json, type)
+            }
+            return null
+        }
+    }
+
+    /**
+     * Abstraction of changes to on-disk items.
+     *
+     * @property toAdd list of FileObjects in MediaStore order, because these are brand new
+     * @property toRemove a set of paths, because these have to be searched for and removed
+     */
+    internal class UpdateKit(add: List<FileObject>? = null, remove: Set<String>? = null) {
+        val toAdd = add ?: mutableListOf()
+        val toRemove = remove ?: mutableSetOf()
+    }
+
+    class RecycleBin(directory: File) {
+
+        val name = "recycle-bin"
+        private val locationsName = "recycle-restore-locations"
+        val file = File(directory, name)
+        val oldLocations = mutableMapOf<String, String>()
+
+        val valid: Boolean
+            get() = file.isDirectory && file.canRead()
+        val contents: List<Picture>
+            get() = file.listFiles().map { file -> Picture(file.path.split("/").last(), file.path) }
+
+        init {
+            file.mkdir()
+        }
+
+        fun saveLocationsToDisk() {
+            cleanLocations()
+            saveJsonToDisk(gson.toJson(oldLocations), locationsName)
+        }
+
+        fun loadLocationsFromDisk() {
+            val json = readJsonFromDisk(locationsName) ?: return
+            val type = object : TypeToken<HashMap<String, String>>() {}.type
+            oldLocations.clear()
+            oldLocations.putAll(gson.fromJson<HashMap<String, String>>(json, type))
+        }
+
+        private fun cleanLocations() {
+            if (file.listFiles().isEmpty()) oldLocations.clear()
         }
     }
 

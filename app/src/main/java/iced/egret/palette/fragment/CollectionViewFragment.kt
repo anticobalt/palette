@@ -56,7 +56,7 @@ class CollectionViewFragment :
         FlexibleAdapter.OnItemLongClickListener,
         SwipeRefreshLayout.OnRefreshListener {
 
-    private lateinit var mMaster: MainActivity
+    private lateinit var mActivity: MainActivity
     private var mDelegate: CollectionViewDelegate = FolderViewDelegate()  // default
         set(value) {
             value.listener = this
@@ -84,7 +84,7 @@ class CollectionViewFragment :
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
         mSwipeRefreshLayout = mRootView!!.findViewById(R.id.swipeRefreshLayout)
-        mMaster = activity as MainActivity
+        mActivity = activity as MainActivity
 
         fetchContents()
         buildDelegate()
@@ -99,7 +99,7 @@ class CollectionViewFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mMaster.notifyFragmentCreationFinished(this)
+        mActivity.notifyFragmentCreationFinished(this)
     }
 
     /**
@@ -138,7 +138,7 @@ class CollectionViewFragment :
         // Never refresh if currently selecting stuff.
         // If not selecting, refresh if onCreate() not called.
         if (mSelectedContentType != null) {
-            mMaster.isolateFragment(this)
+            mActivity.isolateFragment(this)
             return
         }
         if (mReturningFromStop) {
@@ -154,6 +154,7 @@ class CollectionViewFragment :
 
     override fun onStop() {
         super.onStop()
+        CollectionManager.writeCache()
         // Assume need to update onStart().
         mReturningFromStop = true
     }
@@ -185,7 +186,7 @@ class CollectionViewFragment :
         // Build toggle navigation icon
         toolbar.navigation.setImageDrawable(navigationDrawable)
         toolbar.navigation.setOnClickListener {
-            mMaster.togglePanel()
+            mActivity.togglePanel()
         }
 
         // Set title
@@ -377,8 +378,8 @@ class CollectionViewFragment :
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
 
-        mMaster.colorActionMode()
-        mMaster.isolateFragment(this)
+        mActivity.colorActionMode()
+        mActivity.isolateFragment(this)
 
         // Always visible
         val selectAll = menu.findItem(R.id.actionSelectAll)
@@ -445,7 +446,7 @@ class CollectionViewFragment :
                     val albumString = if (destinations.size > 1) "albums" else "album"
                     CollectionManager.addContentToAllAlbums(coverables, destinations)
                     toast("Added ${coverables.size} $typeString to ${destinations.size} $albumString.")
-                    mMaster.notifyCollectionsChanged()
+                    mActivity.notifyCollectionsChanged()
                     mActionModeHelper.destroyActionModeIfCan()
                 }
             }
@@ -470,7 +471,8 @@ class CollectionViewFragment :
                 }
 
             }
-            else -> {}
+            else -> {
+            }
         }
 
         mDelegate.onActionItemClicked(mode, item, mAdapter, context!!, mSelectedContentType!!)
@@ -487,7 +489,7 @@ class CollectionViewFragment :
         mAdapter.currentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
-        mMaster.restoreAllFragments()
+        mActivity.restoreAllFragments()
 
         mode.menu.findItem(R.id.albumActions).isVisible = false
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
@@ -505,7 +507,7 @@ class CollectionViewFragment :
             fetchContents()
             mAdapter.updateDataSet(mContentItems)
             setToolbarTitle()
-            mMaster.notifyCollectionsChanged()
+            mActivity.notifyCollectionsChanged()
         }
     }
 
@@ -574,7 +576,7 @@ class CollectionViewFragment :
     private fun onCurrentContentsChanged() {
         fetchContents()
         mAdapter.updateDataSet(mContentItems)
-        mMaster.notifyCollectionsChanged()
+        mActivity.notifyCollectionsChanged()
     }
 
     /**
@@ -608,7 +610,7 @@ class CollectionViewFragment :
      * Queries CollectionManager to get fresh data from disk, and shows it.
      */
     private fun showUpdatedContents() {
-        CollectionManager.fetchFromStorage(activity!!) {
+        CollectionManager.fetchNewMedia(activity!!) {
             // When done async fetch, refresh fragment to view up-to-date contents
             onCurrentContentsChanged()
             mSwipeRefreshLayout.isRefreshing = false
@@ -616,19 +618,19 @@ class CollectionViewFragment :
     }
 
     private fun getSdCardDocumentFile(): DocumentFile? {
-        return mMaster.getSdCardDocumentFile()
+        return mActivity.getSdCardDocumentFile()
     }
 
     private fun broadcastMediaChanged(file: File) {
-        mMaster.broadcastMediaChanged(file)
+        mActivity.broadcastMediaChanged(file)
     }
 
     private fun toast(message: String) {
-        mMaster.toast(message)
+        mActivity.toast(message)
     }
 
-    private fun getColorInt(type: BaseActivity.ColorType) : Int {
-        return mMaster.getColorInt(type)
+    private fun getColorInt(type: BaseActivity.ColorType): Int {
+        return mActivity.getColorInt(type)
     }
 
     companion object SaveDataKeys {

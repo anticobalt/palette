@@ -150,7 +150,7 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
                     dialog.show {
                         title(R.string.title_permission_error)
                         message(R.string.message_permission_error)
-                        positiveButton(R.string.confirm) {
+                        positiveButton {
                             finish()
                         }
                     }

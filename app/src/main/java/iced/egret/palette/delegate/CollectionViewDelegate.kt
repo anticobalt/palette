@@ -20,7 +20,7 @@ import iced.egret.palette.model.Coverable
  */
 abstract class CollectionViewDelegate {
 
-    data class ActionAlert(val message: String, val success: Boolean)
+    data class ActionAlert(val success: Boolean)
 
     var listener: CollectionViewFragment? = null
 

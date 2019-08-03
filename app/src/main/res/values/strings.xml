@@ -77,6 +77,10 @@
     <!-- Successes -->
     <string name="file_save_success">File saved</string>
     <string name="file_move_success">File moved</string>
+    <string name="success_move_generic">Successfully moved</string>
+    <string name="success_add_generic">Successfully added</string>
+    <string name="success_delete_generic">Successfully deleted</string>
+    <string name="success_move_to_recycle">Successfully moved to recycle bin</string>
 
     <!-- Errors -->
     <string name="title_permission_error">Permission request failed!</string>
@@ -101,7 +105,7 @@
     <string name="title_remove">Remove</string>
     <string name="message_replace_file">File with this name already exists. Are you sure you want to replace it?</string>
     <string name="folder_empty">Folder is empty!</string>
-    <string name="confirm">Okay</string>
+    <string name="warning_generic">Are you sure?</string>
 
     <!-- For picture details -->
     <string name="title_path">File Path</string>

@@ -224,6 +224,7 @@ object CollectionManager : CoroutineScope {
     /**
      * @param positions relative positions of albums within albums list
      */
+    @Deprecated(message = "Use deleteAlbums() instead.")
     fun deleteAlbumsByRelativePosition(positions: List<Int>, deleteFromCurrent: Boolean = false) {
         val indices = positions.toSet()
 
@@ -246,9 +247,18 @@ object CollectionManager : CoroutineScope {
         Storage.saveAlbumsToDisk(albums)
     }
 
+    fun deleteAlbums(albums: List<Album>, fromCurrent: Boolean) {
+        if (fromCurrent) {
+            val currentAlbum = (currentCollection as? Album) ?: return  // should always succeed
+            currentAlbum.removeAlbums(albums)
+        }
+        else mCollections.removeAll(albums)
+        Storage.saveAlbumsToDisk(this.albums)
+    }
+
     /**
      * Adds given contents to all given albums. Does not add if already exists in collection.
-     *
+     * TODO: remove cases for adding folders and albums
      */
     fun addContentToAllAlbums(contents: List<Coverable>, albums: List<Album>) {
         if (contents.isEmpty()) return

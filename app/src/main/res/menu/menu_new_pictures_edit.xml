@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/actionSelectAll"
-        android:title="@string/action_select_all"
         android:icon="@drawable/ic_select_all_black_24dp"
+        android:title="@string/action_select_all"
         app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/actionClear"
-        android:title="@string/action_clear_all"
         android:icon="@drawable/ic_clear_black_24dp"
+        android:title="@string/action_clear_all"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/actionAddToAlbum"
+        android:title="@string/action_add_to_album"
+        android:orderInCategory="98"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/actionMove"
+        android:title="@string/action_move"
+        android:orderInCategory="99"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/actionDelete"
+        android:title="@string/action_delete"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
 </menu>

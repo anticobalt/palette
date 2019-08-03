@@ -17,10 +17,7 @@ import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
-import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.Device
-import iced.egret.palette.util.DialogGenerator
-import iced.egret.palette.util.Storage
+import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_view_picture.*
 import kotlinx.android.synthetic.main.appbar_view_picture.*
 import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
@@ -294,69 +291,25 @@ class PictureViewActivity : BaseActivity() {
     }
 
     private fun initiateMove() {
-        DialogGenerator.moveTo(this) {
-            val destination = it
-            val oldPicture = CollectionManager.getCurrentCollectionPictures()[mActivePage]
-
-            if (oldPicture.fileLocation == destination.path) {
-                toast(R.string.already_exists_error)
-                return@moveTo
-            }
-
-            val failCount = CollectionManager.movePictures(listOf(oldPicture), destination,
-                    getSdCardDocumentFile(), contentResolver) { sourceFile, movedFile ->
-                broadcastMediaChanged(sourceFile)
-                broadcastMediaChanged(movedFile)
-            }
-            if (failCount == 0) {
-                toast(R.string.file_move_success)
-                setResult(RESULT_OK)
-                finish()
-            } else {
-                toast(R.string.move_fail_error)
-            }
+        val picture = mPictures[mActivePage]
+        CoverableMutator.move(listOf(picture), this) {
+            setResult(RESULT_OK)
+            finish()
         }
     }
 
     private fun initiateRename() {
         val picture = mPictures[mActivePage]
-        val nameList = picture.name.split(".")
-        val nameWithoutExtension = nameList.dropLast(1).joinToString(".")
-        val extension = nameList.last()
-
-        DialogGenerator.nameFile(this, nameWithoutExtension) { charSequence, dialog ->
-            val newName = "$charSequence.$extension"
-            if (Storage.fileExists(newName, picture.parentFilePath)) {
-                toast(R.string.already_exists_error)
-            } else {
-                val files = CollectionManager.renamePicture(picture, newName, getSdCardDocumentFile())
-                if (files == null) {
-                    toast(R.string.edit_fail_error)  // either no SD card access, or OS-level rename error
-                } else {
-                    // File by old name is technically it's own file
-                    broadcastMediaChanged(files.first)
-                    broadcastMediaChanged(files.second)
-                    toast(R.string.file_save_success)
-                    dialog.dismiss()  // nameFile dialog has no auto-dismiss, so do it manually
-                    setToolbarTitle()  // to update name
-                }
-            }
-
+        CoverableMutator.rename(picture, this) {
+            setToolbarTitle()  // to update name
         }
     }
 
     private fun initiateMoveToRecycleBin() {
         val picture = mPictures[mActivePage]
-        DialogGenerator.moveToRecycleBin(this, "picture") {
-            // Need sdCardFile to delete from SD card (if required)
-            val failCount = CollectionManager.movePicturesToRecycleBin(listOf(picture), getSdCardDocumentFile()) {
-                broadcastMediaChanged(it)
-            }
-            if (failCount == 0) {
-                toast("Picture moved to recycle bin")
-                setResult(RESULT_OK)
-                finish()
-            } else toast("Failed to move picture to recycle bin!")
+        CoverableMutator.delete(listOf(picture), this) {
+            setResult(RESULT_OK)
+            finish()
         }
     }
 

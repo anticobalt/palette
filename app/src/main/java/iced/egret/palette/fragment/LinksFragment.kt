@@ -24,7 +24,7 @@ import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_links.*
@@ -306,26 +306,10 @@ class LinksFragment :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        val context = context!!
-
-        fun albumExists(name: CharSequence): Boolean {
-            val found = CollectionManager.albums.find { album -> album.name == name.toString() }
-            return found != null
-        }
-
-        fun onCreateNewAlbum(charSequence: CharSequence) {
-            CollectionManager.createNewAlbum(charSequence.toString())
-            onCollectionsUpdated()
-        }
-
         when (item.itemId) {
-            R.id.actionCreateAlbum -> {
-                DialogGenerator.createAlbum(context, ::albumExists, ::onCreateNewAlbum)
-            }
+            R.id.actionCreateAlbum -> createAlbum()
             else -> super.onOptionsItemSelected(item)
         }
-
         return true
     }
 
@@ -362,17 +346,8 @@ class LinksFragment :
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.actionSelectAll -> {
-                selectAll()
-            }
-            R.id.actionDeleteAlbum -> {
-                DialogGenerator.deleteAlbum(context!!) {
-                    CollectionManager.deleteAlbumsByRelativePosition(mAdapter.selectedPositions)
-                    onCollectionsUpdated()
-                    mActivity.notifyPinnedAlbumDeleted()
-                    mActionModeHelper.destroyActionModeIfCan()
-                }
-            }
+            R.id.actionSelectAll -> selectAll()
+            R.id.actionDeleteAlbum -> deleteAlbum()
         }
         return true
     }
@@ -391,6 +366,20 @@ class LinksFragment :
 
         mode.menu.findItem(R.id.actionHide).isVisible = false
         mode.menu.findItem(R.id.actionDeleteAlbum).isVisible = false
+    }
+
+    private fun createAlbum() {
+        CoverableMutator.createTopAlbum(context!!) {
+            onCollectionsUpdated()
+        }
+    }
+
+    private fun deleteAlbum() {
+        CoverableMutator.deleteTopAlbums(mAdapter.selectedPositions, context!!) {
+            onCollectionsUpdated()
+            mActivity.notifyPinnedAlbumDeleted()
+            mActionModeHelper.destroyActionModeIfCan()
+        }
     }
 
     private fun selectAll() {
@@ -453,7 +442,7 @@ class LinksFragment :
         mAdapter.updateDataSet(mCollectionItems)
     }
 
-    private fun getColorInt(type: BaseActivity.ColorType) : Int {
+    private fun getColorInt(type: BaseActivity.ColorType): Int {
         return mActivity.getColorInt(type)
     }
 

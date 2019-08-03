@@ -3,6 +3,7 @@ package iced.egret.palette.activity
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import com.jaredrummler.cyanea.tinting.MenuTint
 import iced.egret.palette.R
 import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.model.Picture
@@ -47,24 +48,25 @@ class NewPicturesActivity : GridCoverableActivity() {
     override fun styleToolbar() {
         val itemColor = getColorInt(ColorType.ITEM)
         mToolbar.setTitleTextColor(itemColor)
-        mToolbar.navigationIcon?.setTint(itemColor)
-        mToolbar.menu.findItem(R.id.actionClearAll).icon.setTint(itemColor)
+        //mToolbar.navigationIcon?.setTint(itemColor)
+        //mToolbar.menu.findItem(R.id.actionClearAll).icon.setTint(itemColor)
+        MenuTint(mToolbar.menu, itemColor, tintOverflowIcon = true, tintNavigationIcon = true).apply(this)
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         super.onCreateActionMode(mode, menu)
-        Painter.paintDrawable(menu.findItem(R.id.actionSelectAll).icon)
-        Painter.paintDrawable(menu.findItem(R.id.actionClear).icon)
+        MenuTint(menu, Painter.currentDrawableColor, tintOverflowIcon = true, tintNavigationIcon = true).apply(this)
         return true
     }
 
     override fun onActionItemClicked(mode: ActionMode, menuItem: MenuItem): Boolean {
-
         val selected = mAdapter.selectedPositions.map { i -> mContents[i] }
-
         when (menuItem.itemId) {
             R.id.actionSelectAll -> selectAll()
             R.id.actionClear -> processClear(selected)
+            R.id.actionMove -> {}
+            R.id.actionAddToAlbum -> {}
+            R.id.actionDelete -> {}
         }
         return true
     }
@@ -85,9 +87,8 @@ class NewPicturesActivity : GridCoverableActivity() {
 
     private fun processClear(pictures: List<Picture>) {
         if (pictures.isEmpty()) return
-        val typeString = if (pictures.size == 1) "picture" else "pictures"
 
-        DialogGenerator.clear(this, typeString) {
+        DialogGenerator.clear(this) {
             val set = pictures.toSet()
             CollectionManager.removeFromBufferPictures(pictures)
             mContents.removeAll(pictures)

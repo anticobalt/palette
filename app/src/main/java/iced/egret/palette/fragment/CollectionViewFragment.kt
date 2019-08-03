@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -28,11 +27,11 @@ import iced.egret.palette.model.Coverable
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
-import java.io.File
 
 /**
  * Meat of the app. Shows Collection contents and allows navigation through them.
@@ -427,52 +426,16 @@ class CollectionViewFragment :
             CollectionManager.getContentsMap()[mSelectedContentType]!![index]
         }
 
-        val typePlural = mSelectedContentType!!.toLowerCase()
-        val typeSingular = typePlural.dropLast(1)  // only works on s-appending plurals
-        val typeString = if (coverables.size > 1) typePlural else typeSingular
-
         when (item.itemId) {
-            R.id.actionSelectAll -> {
-                selectAll()
-            }
+            R.id.actionSelectAll -> selectAll()
             R.id.albumActions -> {
                 // No changes, don't refresh, so exit immediately.
                 // Must return true for submenus to popup.
                 return true
             }
-            R.id.actionAddToAlbum -> {
-                DialogGenerator.addToAlbum(context!!) { indices, albums ->
-                    val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
-                    val albumString = if (destinations.size > 1) "albums" else "album"
-                    CollectionManager.addContentToAllAlbums(coverables, destinations)
-                    toast("Added ${coverables.size} $typeString to ${destinations.size} $albumString.")
-                    mActivity.notifyCollectionsChanged()
-                    mActionModeHelper.destroyActionModeIfCan()
-                }
-            }
-            R.id.actionMove -> {
-                DialogGenerator.moveTo(context!!) {
-                    @Suppress("UNCHECKED_CAST")  // assume internal consistency
-                    movePictures(coverables as List<Picture>, it, typeString)
-                    onCurrentContentsChanged()
-                    mActionModeHelper.destroyActionModeIfCan()
-                }
-            }
-            R.id.actionDelete -> {
-                when (mSelectedContentType) {
-                    CollectionManager.PICTURE_KEY -> {
-                        DialogGenerator.moveToRecycleBin(context!!, typeString) {
-                            @Suppress("UNCHECKED_CAST")  // assume internal consistency
-                            recyclePictures(coverables as List<Picture>, typeString)
-                            onCurrentContentsChanged()
-                            mActionModeHelper.destroyActionModeIfCan()
-                        }
-                    }
-                }
-
-            }
-            else -> {
-            }
+            R.id.actionAddToAlbum -> addToAlbum(coverables)
+            R.id.actionMove -> move(coverables)
+            R.id.actionDelete -> delete(coverables)
         }
 
         mDelegate.onActionItemClicked(mode, item, mAdapter, context!!, mSelectedContentType!!)
@@ -500,8 +463,6 @@ class CollectionViewFragment :
     }
 
     fun onDelegateAlert(alert: CollectionViewDelegate.ActionAlert) {
-        if (alert.message.isNotEmpty()) toast(alert.message)
-
         if (alert.success) {
             // Update everything (short of remaking menus) b/c delegate doesn't specify what exactly changed.
             fetchContents()
@@ -517,23 +478,31 @@ class CollectionViewFragment :
         mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
     }
 
-    private fun movePictures(pictures: List<Picture>, destination: File, typeString: String) {
-        val failedCounter = CollectionManager.movePictures(pictures, destination,
-                getSdCardDocumentFile(), activity!!.contentResolver) { sourceFile, movedFile ->
-            broadcastMediaChanged(sourceFile)
-            broadcastMediaChanged(movedFile)
+    private fun addToAlbum(coverables: List<Coverable>) {
+        CoverableMutator.addToAlbum(coverables, context!!) {
+            mActivity.notifyCollectionsChanged()
+            mActionModeHelper.destroyActionModeIfCan()
         }
-        if (failedCounter > 0) toast("Failed to move $failedCounter!")
-        else toast("${pictures.size} $typeString moved")
     }
 
-    private fun recyclePictures(pictures: List<Picture>, typeString: String) {
-        val failedCounter = CollectionManager.movePicturesToRecycleBin(pictures, getSdCardDocumentFile()) {
-            // If moved a Picture successfully, broadcast change
-            broadcastMediaChanged(it)
+    private fun move(coverables: List<Coverable>) {
+        @Suppress("UNCHECKED_CAST")  // assume internal consistency
+        CoverableMutator.move(coverables as List<Picture>, context!!) {
+            onCurrentContentsChanged()
+            mActionModeHelper.destroyActionModeIfCan()
         }
-        if (failedCounter > 0) toast("Failed to move $failedCounter!")
-        else toast("${pictures.size} $typeString moved to recycle bin")
+    }
+
+    private fun delete(coverables: List<Coverable>) {
+        when (mSelectedContentType) {
+            CollectionManager.PICTURE_KEY -> {
+                @Suppress("UNCHECKED_CAST")  // assume internal consistency
+                CoverableMutator.delete(coverables as List<Picture>, context!!) {
+                    onCurrentContentsChanged()
+                    mActionModeHelper.destroyActionModeIfCan()
+                }
+            }
+        }
     }
 
     /**
@@ -615,18 +584,6 @@ class CollectionViewFragment :
             onCurrentContentsChanged()
             mSwipeRefreshLayout.isRefreshing = false
         }
-    }
-
-    private fun getSdCardDocumentFile(): DocumentFile? {
-        return mActivity.getSdCardDocumentFile()
-    }
-
-    private fun broadcastMediaChanged(file: File) {
-        mActivity.broadcastMediaChanged(file)
-    }
-
-    private fun toast(message: String) {
-        mActivity.toast(message)
     }
 
     private fun getColorInt(type: BaseActivity.ColorType): Int {

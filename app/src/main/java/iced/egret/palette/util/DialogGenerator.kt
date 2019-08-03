@@ -2,6 +2,7 @@ package iced.egret.palette.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Environment
 import android.text.InputType
 import android.view.View
 import android.widget.TextView
@@ -117,10 +118,10 @@ object DialogGenerator {
         }
     }
 
-    fun removeFromAlbum(context: Context, type: String, onConfirm: () -> Unit) {
+    fun removeFromAlbum(context: Context, onConfirm: () -> Unit) {
         MaterialDialog(context).show {
             title(R.string.title_remove)
-            message(text = "Remove the selected $type from this album?")
+            message(R.string.warning_generic)
             negativeButton()
             positiveButton {
                 onConfirm()
@@ -128,10 +129,10 @@ object DialogGenerator {
         }
     }
 
-    fun moveToRecycleBin(context: Context, type: String, onConfirm: () -> Unit) {
+    fun moveToRecycleBin(context: Context, onConfirm: () -> Unit) {
         MaterialDialog(context).show {
             title(R.string.action_delete)
-            message(text = "Move $type to the recycle bin?")
+            message(text = "Move to the recycle bin?")
             negativeButton()
             positiveButton {
                 onConfirm()
@@ -183,13 +184,17 @@ object DialogGenerator {
         }
     }
 
-    fun moveTo(context: Context, onConfirm: (File) -> Unit) {
+    fun moveTo(context: Context, initialPath: String? = null, onConfirm: (File) -> Unit) {
         val filter: FileFilter = { it.path.startsWith("/storage") }
+        val initial = if (initialPath == null) Environment.getExternalStorageDirectory() else File(initialPath)
         MaterialDialog(context).show {
-            folderChooser(emptyTextRes = R.string.folder_empty, filter = filter) { _, file ->
+            folderChooser(
+                    emptyTextRes = R.string.folder_empty,
+                    initialDirectory = initial,
+                    filter = filter) { _, file ->
                 onConfirm(file)
+                negativeButton()
             }
-            negativeButton()
         }
     }
 
@@ -235,11 +240,10 @@ object DialogGenerator {
         dialog.show()
     }
 
-    fun clear(context: Context, typeString: String, onConfirm: () -> Unit) {
+    fun clear(context: Context, onConfirm: () -> Unit) {
         MaterialDialog(context).show {
             title(R.string.action_clear)
-            message(text = "Clear $typeString? ${typeString.capitalize()} won't be deleted, " +
-                    "but this action is irreversible.")
+            message(R.string.warning_generic)
             negativeButton()
             positiveButton {
                 onConfirm()

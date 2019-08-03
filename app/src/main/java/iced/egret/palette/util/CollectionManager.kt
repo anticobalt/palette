@@ -137,6 +137,7 @@ object CollectionManager : CoroutineScope {
                 picture.parent = folder
                 folder.addPicture(picture, toFront = true)
                 toPrependToBuffer.add(picture)  // keep order
+                mPictureCache[picture.filePath] = picture
             }
         }
         mBufferPictures.addAll(0, toPrependToBuffer)
@@ -150,6 +151,7 @@ object CollectionManager : CoroutineScope {
                 // Doesn't enter here if Picture previously removed by in-app operations
                 folder.removePicture(picture)
                 mBufferPictures.remove(picture)
+                mPictureCache.remove(picture.filePath)
             }
         }
     }

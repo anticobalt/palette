@@ -640,9 +640,10 @@ object Storage {
          */
         private fun getAllBufferPictures() : List<Picture> {
             val fromPreviousSession = getBufferPicturesFromDisk()
-            val newToSession = getNewPicturePaths().map {
-                path -> Picture(path.split("/").last(), path)
-            }
+            val fromPreviousSessionAsSet = fromPreviousSession.toSet()
+            val newToSession = getNewPicturePaths()
+                    .mapNotNull { path -> pictures[path] }  // Get the Pictures
+                    .filter { picture -> picture !in fromPreviousSessionAsSet }  // Remove duplicates
             return newToSession + fromPreviousSession
         }
 

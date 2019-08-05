@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="@color/grey"
-    tools:context=".activity.PictureViewActivity">
+    tools:context=".activity.MainPagerActivity">
 
     <include
         android:id="@+id/appbar"
-        layout="@layout/appbar_view_picture"
+        layout="@layout/appbar_picture_pager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -18,8 +19,11 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
-    <include
-        android:id="@+id/bottomActions"
-        layout="@layout/bottom_actions_view_picture" />
+    <LinearLayout
+        android:id="@+id/bottomBarWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

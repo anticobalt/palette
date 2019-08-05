@@ -8,7 +8,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import iced.egret.palette.R
-import iced.egret.palette.activity.PictureViewActivity
+import iced.egret.palette.activity.MainPagerActivity
 import iced.egret.palette.flexible.CoverViewHolder
 import java.io.File
 import java.text.SimpleDateFormat
@@ -51,7 +51,7 @@ class Picture(override var name: String, override var filePath: String) : Termin
         )
 
     override val icon: Nothing? = null
-    override val activity = PictureViewActivity::class.java
+    override val activity = MainPagerActivity::class.java
     override var parent: FileObject? = null
     override val deletable = true
 

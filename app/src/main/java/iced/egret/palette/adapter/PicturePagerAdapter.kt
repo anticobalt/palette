@@ -7,14 +7,14 @@ import androidx.viewpager.widget.PagerAdapter
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import iced.egret.palette.R
-import iced.egret.palette.activity.PictureViewActivity
+import iced.egret.palette.activity.PicturePagerActivity
 import iced.egret.palette.model.Picture
-import kotlinx.android.synthetic.main.activity_view_picture.*
+import kotlinx.android.synthetic.main.activity_picture_pager.*
 import kotlinx.android.synthetic.main.item_view_picture_gestures.view.*
 import kotlinx.android.synthetic.main.item_view_picture_true_zoom.view.*
 import java.lang.ref.WeakReference
 
-class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: PictureViewActivity) : PagerAdapter() {
+class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: PicturePagerActivity) : PagerAdapter() {
 
     private class DummyTouchListener : View.OnTouchListener {
         override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {

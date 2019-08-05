@@ -21,7 +21,7 @@
     <string name="primary_color_key">com.iced.egret.palette.PRIMARY_COLOR</string>
     <string name="accent_color_key">com.iced.egret.palette.ACCENT_COLOR</string>
     <string name="toolbar_item_color_key">com.iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
-    <string name="flipper_toolbar_color_key">com.iced.egret.palette.FLIPPER_TOOLBAR_COLOR</string>
+    <string name="pager_toolbar_color_key">com.iced.egret.palette.PAGER_TOOLBAR_COLOR</string>
     <string name="true_zoom_key">com.iced.egret.palette.TRUE_ZOOM</string>
 
     <!-- Preference names -->
@@ -29,12 +29,12 @@
     <string name="primary_color_preference">Primary Color</string>
     <string name="accent_color_preference">Accent Color</string>
     <string name="toolbar_item_color_preference">Toolbar Item Color</string>
-    <string name="flipper_header">Picture Flipper</string>
-    <string name="flipper_toolbar_color_preference">Primary Color in Toolbars</string>
+    <string name="pager_header">Picture Pager</string>
+    <string name="pager_toolbar_color_preference">Primary Color in Toolbars</string>
     <string name="true_zoom_title">True Zoom</string>
 
     <!-- Preference summaries -->
-    <string name="flipper_toolbar_color_summary">Turn off to use default black color</string>
+    <string name="pager_toolbar_color_summary">Turn off to use default black color</string>
     <string name="true_zoom_summary">
         Show pictures as-is. Enabling allows large pictures to be viewed clearly, at the cost of increased load times.
         Disables rotation gestures.

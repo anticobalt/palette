@@ -17,9 +17,8 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_crop.*
-import kotlinx.android.synthetic.main.activity_view_picture.bottomActions
 import kotlinx.android.synthetic.main.appbar.*
-import kotlinx.android.synthetic.main.bottom_actions_crop.view.*
+import kotlinx.android.synthetic.main.bottom_bar_crop.view.*
 import java.io.File
 import java.io.IOException
 
@@ -41,7 +40,7 @@ class CropActivity : BasicThemedActivity() {
 
         buildCropView()
         buildToolbar()
-        buildBottomActions()
+        buildBottomBar()
     }
 
     override fun onResume() {
@@ -73,30 +72,30 @@ class CropActivity : BasicThemedActivity() {
         }
     }
 
-    private fun buildBottomActions() {
+    private fun buildBottomBar() {
 
-        bottomActions.ratio_free.setOnClickListener {
+        bottomBarWrapper.ratio_free.setOnClickListener {
             // FIXME: side-effect: crop window fills whole screen if set from true to false
             cropImageView.setFixedAspectRatio(false)
         }
-        bottomActions.ratio_1x1.setOnClickListener {
+        bottomBarWrapper.ratio_1x1.setOnClickListener {
             cropImageView.setAspectRatio(1, 1)
         }
-        bottomActions.ratio_4x3.setOnClickListener {
+        bottomBarWrapper.ratio_4x3.setOnClickListener {
             if (cropImageView.aspectRatio == Pair(4, 3)) {
                 cropImageView.setAspectRatio(3, 4)
             } else {
                 cropImageView.setAspectRatio(4, 3)
             }
         }
-        bottomActions.ratio_16x9.setOnClickListener {
+        bottomBarWrapper.ratio_16x9.setOnClickListener {
             if (cropImageView.aspectRatio == Pair(16, 9)) {
                 cropImageView.setAspectRatio(9, 16)
             } else {
                 cropImageView.setAspectRatio(16, 9)
             }
         }
-        bottomActions.ratio_reset.setOnClickListener {
+        bottomBarWrapper.ratio_reset.setOnClickListener {
             cropImageView.clearAspectRatio()
             cropImageView.resetCropRect()  // expand to fill whole image
         }
@@ -116,8 +115,8 @@ class CropActivity : BasicThemedActivity() {
         val barBgColor = getColorInt(ColorType.PRIMARY)
         val barTextColor = getColorInt(ColorType.ITEM)
 
-        bottomActions.background = ColorDrawable(barBgColor)
-        for (touchable in bottomActions.touchables) {
+        bottomBarWrapper.background = ColorDrawable(barBgColor)
+        for (touchable in bottomBarWrapper.touchables) {
             if (touchable is TextView) {
                 touchable.setTextColor(barTextColor)
             }

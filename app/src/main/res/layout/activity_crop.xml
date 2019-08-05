@@ -16,7 +16,7 @@
         android:layout_weight="1" />
 
     <include
-        android:id="@+id/bottomActions"
-        layout="@layout/bottom_actions_crop" />
+        android:id="@+id/bottomBarWrapper"
+        layout="@layout/bottom_bar_crop" />
 
 </LinearLayout>

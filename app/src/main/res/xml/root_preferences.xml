@@ -37,13 +37,13 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/flipper_header">
+        app:title="@string/pager_header">
 
         <androidx.preference.SwitchPreferenceCompat
             app:iconSpaceReserved="false"
-            app:key="@string/flipper_toolbar_color_key"
-            app:summary="@string/flipper_toolbar_color_summary"
-            app:title="@string/flipper_toolbar_color_preference" />
+            app:key="@string/pager_toolbar_color_key"
+            app:summary="@string/pager_toolbar_color_summary"
+            app:title="@string/pager_toolbar_color_preference" />
 
         <androidx.preference.SwitchPreferenceCompat
             app:iconSpaceReserved="false"

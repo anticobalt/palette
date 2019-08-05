@@ -13,21 +13,29 @@ import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
-import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
-import iced.egret.palette.util.*
-import kotlinx.android.synthetic.main.activity_view_picture.*
-import kotlinx.android.synthetic.main.appbar_view_picture.*
-import kotlinx.android.synthetic.main.bottom_actions_view_picture.view.*
+import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.Device
+import iced.egret.palette.util.Storage
+import kotlinx.android.synthetic.main.activity_picture_pager.*
+import kotlinx.android.synthetic.main.appbar_picture_pager.*
 
+/**
+ * Allows image flipping via ViewPager. Translucent top and bottom bars with seamless transition
+ * between system's and app's bars; all toolbar menu actions in overflow.
+ * Themed by reading shared preferences, to make translucency possible.
+ */
+abstract class PicturePagerActivity : BaseActivity() {
 
-class PictureViewActivity : BaseActivity() {
+    abstract val bottomBarRes : Int?
+    abstract val menuRes : Int
 
-    private lateinit var mSharedPrefs: SharedPreferences
+    protected lateinit var mSharedPrefs: SharedPreferences
     private var mBarBackgroundColor: Int = Color.BLACK
     private var mBarIconColor: Int = Color.WHITE
+    protected lateinit var mBottomBar: View
 
     private var mUiHidden = false
     private var mActivePage = -1
@@ -36,13 +44,13 @@ class PictureViewActivity : BaseActivity() {
     private var mViewPagerOffsetPixels = 0
 
     private val mPictures = mutableListOf<Picture>()
-    private val mCurrentPicture: Picture
+    protected val mCurrentPicture: Picture
         get() = mPictures[mActivePage]
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_view_picture)
+        setContentView(R.layout.activity_picture_pager)
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         if (!getStartPosition()) return
@@ -51,7 +59,7 @@ class PictureViewActivity : BaseActivity() {
         buildSystemBars()
         buildActionBar()
         buildViewPager()
-        buildBottomActions()
+        if (bottomBarRes != null) buildBottomBar()
 
     }
 
@@ -87,7 +95,7 @@ class PictureViewActivity : BaseActivity() {
      */
     private fun setColors() {
 
-        val usePrimary = mSharedPrefs.getBoolean(getString(R.string.flipper_toolbar_color_key), false)
+        val usePrimary = mSharedPrefs.getBoolean(getString(R.string.pager_toolbar_color_key), false)
         if (usePrimary) {
             mBarBackgroundColor = mSharedPrefs.getInt(getString(R.string.primary_color_key),
                     ContextCompat.getColor(this, R.color.cyanea_primary_reference))
@@ -145,42 +153,35 @@ class PictureViewActivity : BaseActivity() {
         return gradientDrawable
     }
 
-    private fun setToolbarTitle() {
+    protected fun setToolbarTitle() {
         toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[mActivePage].name
     }
 
-    private fun buildBottomActions() {
+    private fun buildBottomBar() {
+        if (bottomBarRes == null) return
 
-        bottomActions.setPadding(0, 0, 0, Device.getNavigationBarHeight(resources))
+        // Need to inflate into wrapper with layout_gravity=bottom for it show on bottom
+        mBottomBar = layoutInflater.inflate(bottomBarRes!!, findViewById(R.id.bottomBarWrapper))
+
+        mBottomBar.setPadding(0, 0, 0, Device.getNavigationBarHeight(resources))
 
         // color bar and bar actions
-        bottomActions.background = getGradientToTransparent(mBarBackgroundColor, GradientDrawable.Orientation.BOTTOM_TOP)
-        for (touchable in bottomActions.touchables) {
+        mBottomBar.background = getGradientToTransparent(mBarBackgroundColor, GradientDrawable.Orientation.BOTTOM_TOP)
+        for (touchable in mBottomBar.touchables) {
             if (touchable is ImageButton) {
                 touchable.imageTintList = ColorStateList.valueOf(mBarIconColor)
             }
         }
 
         // prevent propagation of touch events on bottom action bar
-        bottomActions.setOnTouchListener { _, _ -> true }
+        mBottomBar.setOnTouchListener { _, _ -> true }
 
-        bottomActions.details.setOnClickListener {
-            DialogGenerator.pictureDetails(this, mPictures[mActivePage])
-        }
-        bottomActions.home_folder.setOnClickListener {
-
-        }
-        bottomActions.share.setOnClickListener {
-
-        }
-        bottomActions.crop.setOnClickListener {
-            startCropActivity()
-        }
-        bottomActions.delete.setOnClickListener {
-            initiateMoveToRecycleBin()
-        }
+        setBottomBarListeners()
 
     }
+
+    // Override if have bottom bar, ignore otherwise
+    open fun setBottomBarListeners() {}
 
     /**
      * Higher offscreenPageLimit -> more lag when scrolling if in true zoom mode
@@ -219,7 +220,7 @@ class PictureViewActivity : BaseActivity() {
         })
     }
 
-    private fun refreshViewPager() {
+    protected fun refreshViewPager() {
         val currentPage = viewpager.currentItem
         viewpager.adapter = viewpager.adapter
         viewpager.currentItem = currentPage
@@ -231,35 +232,14 @@ class PictureViewActivity : BaseActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_picture, menu)
+        menuInflater.inflate(menuRes, menu)
         return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
-        val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
-        trueZoomItem.isChecked = trueZoomOn
-        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retVal = when (item?.itemId) {
             android.R.id.home -> {
                 onBackPressed()
-                true
-            }
-            R.id.switchTrueZoom -> {
-                item.isChecked = !item.isChecked
-                mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
-                refreshViewPager()
-                true
-            }
-            R.id.actionMove -> {
-                initiateMove()
-                true
-            }
-            R.id.actionRename -> {
-                initiateRename()
                 true
             }
             else -> false
@@ -273,41 +253,10 @@ class PictureViewActivity : BaseActivity() {
         mPictures.addAll(CollectionManager.getCurrentCollectionPictures())
     }
 
-    private fun startCropActivity() {
-        val imageUri = CollectionManager.getCurrentCollectionPictures()[mActivePage].uri
-        // setting initial crop padding doesn't working in XML for whatever reason
-        CropImage.activity(imageUri)
-                .setInitialCropWindowPaddingRatio(0f)
-                .start(this, CropActivity::class.java)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             toast(R.string.file_save_success)
-            setResult(RESULT_OK)
-            finish()
-        }
-    }
-
-    private fun initiateMove() {
-        val picture = mPictures[mActivePage]
-        CoverableMutator.move(listOf(picture), this) {
-            setResult(RESULT_OK)
-            finish()
-        }
-    }
-
-    private fun initiateRename() {
-        val picture = mPictures[mActivePage]
-        CoverableMutator.rename(picture, this) {
-            setToolbarTitle()  // to update name
-        }
-    }
-
-    private fun initiateMoveToRecycleBin() {
-        val picture = mPictures[mActivePage]
-        CoverableMutator.delete(listOf(picture), this) {
             setResult(RESULT_OK)
             finish()
         }
@@ -343,12 +292,12 @@ class PictureViewActivity : BaseActivity() {
     fun toggleUIs() {
         if (mUiHidden) {
             showSystemUI()
-            bottomActions.animate().translationY(0f)
+            if (bottomBarRes != null) mBottomBar.animate().translationY(0f)
             appbar.animate().translationY(0f)
         } else {
             hideSystemUI()
             // bottomActions and appbar are padded, so translating by height causes disappearance
-            bottomActions.animate().translationY(bottomActions.height.toFloat())
+            if (bottomBarRes != null) mBottomBar.animate().translationY(mBottomBar.height.toFloat())
             appbar.animate().translationY(-appbar.height.toFloat())
         }
     }

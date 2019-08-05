@@ -26,39 +26,8 @@
                 android:layout_width="@dimen/side_icon_total_width"
                 android:layout_height="10dp"
                 android:background="@drawable/shadow_bottom"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                />
-
-            <ImageButton
-                android:id="@+id/settings"
-                android:layout_width="@dimen/side_icon_size"
-                android:layout_height="@dimen/side_icon_size"
-                android:layout_marginLeft="@dimen/side_icon_margin"
-                android:layout_marginTop="@dimen/side_icon_margin"
-                android:layout_marginRight="@dimen/side_icon_margin"
-                android:background="?android:selectableItemBackground"
-                android:contentDescription="@string/action_settings"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_settings_black_24dp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/recycleBin"
-                android:layout_width="@dimen/side_icon_size"
-                android:layout_height="@dimen/side_icon_size"
-                android:layout_marginLeft="@dimen/side_icon_margin"
-                android:layout_marginTop="@dimen/side_icon_margin"
-                android:layout_marginRight="@dimen/side_icon_margin"
-                android:background="?android:selectableItemBackground"
-                android:contentDescription="@string/recycle_bin"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_delete_variant_black_24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/settings" />
 
             <ImageButton
                 android:id="@+id/waitingRoom"
@@ -73,7 +42,37 @@
                 android:src="@drawable/ic_new_releases_black_24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recycleBin" />
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/recycleBin"
+                android:layout_width="@dimen/side_icon_size"
+                android:layout_height="@dimen/side_icon_size"
+                android:layout_marginLeft="@dimen/side_icon_margin"
+                android:layout_marginRight="@dimen/side_icon_margin"
+                android:layout_marginBottom="@dimen/side_icon_margin"
+                android:background="?android:selectableItemBackground"
+                android:contentDescription="@string/recycle_bin"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_delete_variant_black_24dp"
+                app:layout_constraintBottom_toTopOf="@id/settings"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
+                android:id="@+id/settings"
+                android:layout_width="@dimen/side_icon_size"
+                android:layout_height="@dimen/side_icon_size"
+                android:layout_marginLeft="@dimen/side_icon_margin"
+                android:layout_marginRight="@dimen/side_icon_margin"
+                android:layout_marginBottom="@dimen/side_icon_margin"
+                android:background="?android:selectableItemBackground"
+                android:contentDescription="@string/action_settings"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_settings_black_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

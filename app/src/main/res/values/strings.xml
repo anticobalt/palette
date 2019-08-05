@@ -137,4 +137,7 @@
     <string name="ratio_free">Free</string>
     <string name="ratio_reset">Reset</string>
 
+    <!-- Misc -->
+    <string name="empty_list">Nothing to see here</string>
+
 </resources>

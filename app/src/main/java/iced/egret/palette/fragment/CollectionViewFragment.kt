@@ -12,6 +12,7 @@ import androidx.transition.Visibility
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
 import iced.egret.palette.activity.BaseActivity
 import iced.egret.palette.activity.MainActivity
@@ -246,9 +247,11 @@ class CollectionViewFragment :
         fetchContents()
         mAdapter = FlexibleAdapter(mContentItems, this, true)
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
-
         mCollectionRecyclerView.layoutManager = manager
         mCollectionRecyclerView.adapter = mAdapter
+
+        // Need to supply explicit view in fragment
+        EmptyViewHelper.create(mAdapter, mRootView!!.findViewById(R.id.empty_view))
     }
 
     /**

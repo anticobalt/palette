@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
+import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
 import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.StateBuilder
+import kotlinx.android.synthetic.main.view_empty.*
 
 /**
  * Basic themed activity with selectable and long-clickable GridCoverableItems.
@@ -94,6 +96,7 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
 
         mAdapter = FlexibleAdapter(mContentItems, this, true)
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE, actionModeMenuRes)
+        EmptyViewHelper.create(mAdapter, empty_view)
         mRecyclerView = findViewById(R.id.recyclerView)
         mRecyclerView.layoutManager = manager
         mRecyclerView.adapter = mAdapter

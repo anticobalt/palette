@@ -49,7 +49,19 @@
             app:iconSpaceReserved="false"
             app:key="@string/true_zoom_key"
             app:summary="@string/true_zoom_summary"
-            app:title="@string/true_zoom_title" />
+            app:title="@string/true_zoom_preference" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/waiting_room_header">
+
+        <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="@string/waiting_room_autoclear_key"
+            app:summary="@string/waiting_room_autoclear_summary"
+            app:title="@string/waiting_room_autoclear_preference" />
 
     </PreferenceCategory>
 

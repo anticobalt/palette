@@ -13,6 +13,9 @@ class WaitingRoomPagerActivity : PicturePagerActivity() {
     override val bottomBarRes = R.layout.bottom_bar_waiting_room_pager
     override val menuRes = R.menu.menu_waiting_room_pager
 
+    private val autoClear : Boolean
+        get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
+
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
         val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
@@ -80,7 +83,7 @@ class WaitingRoomPagerActivity : PicturePagerActivity() {
     }
 
     private fun clearAndFinish() {
-        CollectionManager.removeFromBufferPictures(listOf(mCurrentPicture))
+        if (autoClear) CollectionManager.removeFromBufferPictures(listOf(mCurrentPicture))
         setResult(RESULT_OK)
         finish()
     }

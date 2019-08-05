@@ -1,11 +1,9 @@
 package iced.egret.palette.activity
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.Menu
-import androidx.preference.PreferenceManager
 import com.jaredrummler.cyanea.CyaneaResources
 import com.jaredrummler.cyanea.app.BaseCyaneaActivity
 import com.jaredrummler.cyanea.delegate.CyaneaDelegate
@@ -22,7 +20,6 @@ import iced.egret.palette.R
  */
 abstract class BasicThemedActivity : BaseActivity(), BaseCyaneaActivity {
 
-    private lateinit var sharedPreferences: SharedPreferences
     private val delegate: CyaneaDelegate by lazy {
         CyaneaDelegate.create(this, cyanea, getThemeResId())
     }
@@ -38,7 +35,6 @@ abstract class BasicThemedActivity : BaseActivity(), BaseCyaneaActivity {
     override fun onCreate(savedInstanceState: Bundle?) {
         delegate.onCreate(savedInstanceState)
         super.onCreate(savedInstanceState)
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -77,7 +73,7 @@ abstract class BasicThemedActivity : BaseActivity(), BaseCyaneaActivity {
     }
 
     private fun getColor(resource: Int, defaultColor: Int): Int {
-        return sharedPreferences.getInt(getString(resource), defaultColor)
+        return defSharedPreferences.getInt(getString(resource), defaultColor)
     }
 
 }

@@ -11,17 +11,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import iced.egret.palette.R
-import iced.egret.palette.util.CollectionManager
 import java.io.File
 
 abstract class BaseActivity : AppCompatActivity() {
 
     enum class ColorType { PRIMARY, ACCENT, ITEM }
-    private lateinit var sharedPreferences : SharedPreferences
+    protected lateinit var defSharedPreferences : SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        defSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
     fun toast(message: String) {
@@ -67,7 +66,7 @@ abstract class BaseActivity : AppCompatActivity() {
             ColorType.ACCENT -> R.color.cyanea_accent
             ColorType.ITEM -> R.color.white
         }
-        return sharedPreferences.getInt(getString(keyRef), idToColor(defaultRef))
+        return defSharedPreferences.getInt(getString(keyRef), idToColor(defaultRef))
     }
 
 }

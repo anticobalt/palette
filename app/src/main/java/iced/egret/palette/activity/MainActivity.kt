@@ -9,7 +9,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.View
 import androidx.appcompat.widget.ActionBarContextView
 import androidx.core.content.ContextCompat
@@ -63,11 +62,11 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
     private val rightIndex = 1
 
     private lateinit var sharedPrefs: SharedPreferences
-    private lateinit var pmSharedPrefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         hasPermission = permissions
                 .map { permission -> Permission.isAccepted(this, permission) }
@@ -161,10 +160,7 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
 
     private fun buildApp(savedInstanceState: Bundle?) {
 
-        sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        pmSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
-
-        if (isFirstRun()) applyDefaultPreferences()
+        if (isFirstRun()) applyDefaultSettings()
 
         if (savedInstanceState == null) {
             // First start of activity
@@ -188,8 +184,8 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
     }
 
     @SuppressLint("ApplySharedPref")
-    private fun applyDefaultPreferences() {
-        pmSharedPrefs
+    private fun applyDefaultSettings() {
+        defSharedPreferences
                 .edit()
                 .putInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
                 .putInt(getString(R.string.primary_color_key), idToColor(R.color.cyanea_primary_reference))

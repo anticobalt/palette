@@ -23,6 +23,7 @@
     <string name="toolbar_item_color_key">com.iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
     <string name="pager_toolbar_color_key">com.iced.egret.palette.PAGER_TOOLBAR_COLOR</string>
     <string name="true_zoom_key">com.iced.egret.palette.TRUE_ZOOM</string>
+    <string name="waiting_room_autoclear_key">iced.egret.palette.AUTO_CLEAR</string>
 
     <!-- Preference names -->
     <string name="appearance_header">Appearance</string>
@@ -31,13 +32,19 @@
     <string name="toolbar_item_color_preference">Toolbar Item Color</string>
     <string name="pager_header">Picture Pager</string>
     <string name="pager_toolbar_color_preference">Primary Color in Toolbars</string>
-    <string name="true_zoom_title">True Zoom</string>
+    <string name="true_zoom_preference">True Zoom</string>
+    <string name="waiting_room_header">Waiting Room</string>
+    <string name="waiting_room_autoclear_preference">Automatically Clear After Organizing</string>
 
     <!-- Preference summaries -->
     <string name="pager_toolbar_color_summary">Turn off to use default black color</string>
     <string name="true_zoom_summary">
         Show pictures as-is. Enabling allows large pictures to be viewed clearly, at the cost of increased load times.
         Disables rotation gestures.
+    </string>
+    <string name="waiting_room_autoclear_summary">
+        Enable to automatically clear items after moving them or adding them to albums.
+        Disable to always clear manually.
     </string>
 
     <!-- Actions -->

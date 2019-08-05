@@ -16,6 +16,9 @@ class WaitingRoomActivity : GridCoverableActivity() {
 
     override var actionModeMenuRes = R.menu.menu_waiting_room_edit
 
+    private val autoClear : Boolean
+        get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
+
     override fun onStart() {
         super.onStart()
         CollectionManager.fetchNewMedia(this) {
@@ -110,15 +113,20 @@ class WaitingRoomActivity : GridCoverableActivity() {
 
     private fun processMove(pictures: List<Picture>) {
         CoverableMutator.move(pictures, this) {
-            clear(pictures)
-            mAdapter.updateDataSet(mContentItems)
+            if (autoClear) {
+                clear(pictures)
+                mAdapter.updateDataSet(mContentItems)
+            }
             mActionModeHelper.destroyActionModeIfCan()
         }
     }
 
     private fun processAddToAlbum(pictures: List<Picture>) {
         CoverableMutator.addToAlbum(pictures, this) {
-            clear(pictures)
+            if (autoClear) {
+                clear(pictures)
+                mAdapter.updateDataSet(mContentItems)
+            }
             mAdapter.updateDataSet(mContentItems)
             mActionModeHelper.destroyActionModeIfCan()
         }
@@ -126,7 +134,6 @@ class WaitingRoomActivity : GridCoverableActivity() {
 
     private fun processDelete(pictures: List<Picture>) {
         CoverableMutator.delete(pictures, this) {
-            clear(pictures)
             mAdapter.updateDataSet(mContentItems)
             mActionModeHelper.destroyActionModeIfCan()
         }

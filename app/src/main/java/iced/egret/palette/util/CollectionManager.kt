@@ -62,17 +62,19 @@ object CollectionManager : CoroutineScope {
 
     /**
      * Ready = Don't need to remake collections.
-     * Unconditionally clear collection stack on call.
      */
-    fun setupIfRequired() {
-        mCollectionStack.clear()
+    internal fun setup(path: String?) {
         if (!ready) {
-            setup()
+            buildFromScratch(path)
             ready = true
+        }
+        else if (path != null){
+            clearStack()
+            unwindStack(path)
         }
     }
 
-    private fun setup() {
+    private fun buildFromScratch(path: String?) {
 
         mPictureCache.putAll(Storage.knownPictures)
         root = Storage.initialFolders.firstOrNull() ?: return
@@ -90,7 +92,7 @@ object CollectionManager : CoroutineScope {
             baseStorage.name = MAIN_STORAGE_NAME
             mCollections.remove(baseStorage)
             mCollections.add(0, baseStorage)
-            unwindStack(PRACTICAL_MAIN_STORAGE_PATH)
+            unwindStack(path ?: PRACTICAL_MAIN_STORAGE_PATH)
         }
 
         mCollections.addAll(Storage.initialAlbums)
@@ -356,7 +358,7 @@ object CollectionManager : CoroutineScope {
      * Given a path to a Collection, use it to set a stack state.
      * If can't unwind completely, do it as much as possible, then return.
      */
-    fun unwindStack(path: String) {
+    private fun unwindStack(path: String) {
         val levels = path.split("/")
         var levelIndex = 0
         var collectionsOnLevel = (albums as List<Collection>) + root

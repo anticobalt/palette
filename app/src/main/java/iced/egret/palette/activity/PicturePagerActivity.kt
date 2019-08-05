@@ -18,6 +18,7 @@ import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Device
+import iced.egret.palette.util.StateBuilder
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_picture_pager.*
 import kotlinx.android.synthetic.main.appbar_picture_pager.*
@@ -53,7 +54,8 @@ abstract class PicturePagerActivity : BaseActivity() {
         setContentView(R.layout.activity_picture_pager)
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
 
-        if (!getStartPosition()) return
+        if (!setStartPosition(savedInstanceState)) return
+        setState(savedInstanceState)
 
         setColors()
         buildSystemBars()
@@ -65,16 +67,26 @@ abstract class PicturePagerActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!validState()) finish()
         if (!Storage.fileExists(mCurrentPicture.filePath)) finish()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(COLLECTION, CollectionManager.currentCollection?.path)
+        outState.putInt(INDEX, mActivePage)
+        super.onSaveInstanceState(outState)
+    }
+
     /**
-     * Get the starting position of the ViewPager i.e. index of picture
+     * Set the starting position of the ViewPager i.e. index of picture.
      * @return Success (true) or failure (false)
      */
-    private fun getStartPosition(): Boolean {
+    private fun setStartPosition(savedInstanceState: Bundle?): Boolean {
         mActivePage = intent.getIntExtra(getString(R.string.intent_item_key), -1)
+
+        if (savedInstanceState != null) {
+            mActivePage = savedInstanceState.getInt(INDEX, -1)
+        }
+
         return if (mActivePage == -1) {
             toast(R.string.intent_extra_error)
             false
@@ -83,11 +95,14 @@ abstract class PicturePagerActivity : BaseActivity() {
         }
     }
 
-    /**
-     * Check that CollectionManager is setup properly
-     */
-    private fun validState() : Boolean {
-        return mActivePage < mPictures.size
+    private fun setState(savedInstanceState: Bundle?) {
+        // Build state if activity restarted. Don't if entering for the first time
+        // (b/c it is already built by another activity).
+        // Supply saved Collection path to unwind stack properly.
+        if (savedInstanceState != null) {
+            val path = savedInstanceState.getString(COLLECTION)
+            StateBuilder.build(this, path)
+        }
     }
 
     /**
@@ -300,6 +315,11 @@ abstract class PicturePagerActivity : BaseActivity() {
             if (bottomBarRes != null) mBottomBar.animate().translationY(mBottomBar.height.toFloat())
             appbar.animate().translationY(-appbar.height.toFloat())
         }
+    }
+
+    companion object SaveDataKeys {
+        const val COLLECTION = "current-collection"
+        const val INDEX = "media-index"
     }
 
 }

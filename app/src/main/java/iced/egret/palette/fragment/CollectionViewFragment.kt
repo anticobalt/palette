@@ -15,7 +15,7 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.BaseActivity
 import iced.egret.palette.activity.MainActivity
-import iced.egret.palette.activity.PICTURE_ACTIVITY_REQUEST
+import iced.egret.palette.activity.MainActivity.Constants.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.delegate.AlbumViewDelegate
 import iced.egret.palette.delegate.CollectionViewDelegate
 import iced.egret.palette.delegate.FolderViewDelegate

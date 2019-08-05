@@ -25,15 +25,10 @@ import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Permission
-import iced.egret.palette.util.Storage
+import iced.egret.palette.util.StateBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_links.*
-
-const val EXTERNAL_CODE = 100
-const val PICTURE_ACTIVITY_REQUEST = 1
-const val SD_CARD_WRITE_REQUEST = 2
 
 /**
  * Holds a SlidingPaneLayout with two fragments inside each panel, and listens to it.
@@ -70,10 +65,6 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var pmSharedPrefs: SharedPreferences
 
-    companion object SaveDataKeys {
-        const val onScreenCollection = "on-screen-collection"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -91,7 +82,7 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(onScreenCollection, CollectionManager.currentCollection?.path)
+        outState.putString(ON_SCREEN_COLLECTION_KEY, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
     }
 
@@ -175,20 +166,15 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
 
         if (isFirstRun()) applyDefaultPreferences()
 
-        Storage.setupIfRequired(this)
-        CollectionManager.setupIfRequired()
-        Painter.setup(this)
-
         if (savedInstanceState == null) {
-            // Don't make fragments again if rotating device,
-            // because they're automatically remade
+            // First start of activity
+            StateBuilder.build(this, null)
             makeFragments()
         } else {
-            // Save the remade fragments (which are technically different)
+            val navigateToPath = savedInstanceState.getString(ON_SCREEN_COLLECTION_KEY)
+            StateBuilder.build(this, navigateToPath)
+            // Save the remade fragments (which are technically different).
             updateFragments(supportFragmentManager.fragments)
-            // Try to restore Collection being viewed
-            val navigateToPath = savedInstanceState.getString(onScreenCollection) ?: return
-            CollectionManager.unwindStack(navigateToPath)
         }
         buildSlidingPane()
         checkSdWriteAccess()
@@ -354,6 +340,13 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
         }
 
         cvFragment.onTopCollectionChanged()
+    }
+
+    companion object Constants {
+        const val ON_SCREEN_COLLECTION_KEY = "on-screen-collection"
+        const val EXTERNAL_CODE = 100
+        const val PICTURE_ACTIVITY_REQUEST = 1
+        const val SD_CARD_WRITE_REQUEST = 2
     }
 
 }

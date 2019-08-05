@@ -1,9 +1,7 @@
 package iced.egret.palette.activity
 
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.ActionMode
 import android.view.Menu
 import android.view.View
@@ -19,9 +17,12 @@ import iced.egret.palette.R
 import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.model.Picture
+import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.StateBuilder
 
 /**
  * Basic themed activity with selectable and long-clickable GridCoverableItems.
+ * Works with and assumes the existence of a valid CollectionManager, unless activity was stopped.
  * All lateinits are initialized here for safety.
  */
 abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callback,
@@ -44,6 +45,7 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_grid_coverable)
+        setState(savedInstanceState)
         mToolbar = findViewById(R.id.toolbar)
 
         fetchContents()
@@ -58,6 +60,7 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
 
     override fun onSaveInstanceState(outState: Bundle) {
         mAdapter.onSaveInstanceState(outState)
+        outState.putString(COLLECTION, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
     }
 
@@ -71,6 +74,16 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
             if (i in mAdapter.selectedPositionsAsSet) {
                 mAdapter.currentItems[i].setSelection(true)
             }
+        }
+    }
+
+    private fun setState(savedInstanceState: Bundle?) {
+        // Build state if activity restarted. Don't if entering for the first time
+        // (b/c it is already built by another activity).
+        // Supply saved Collection path to unwind stack properly.
+        if (savedInstanceState != null) {
+            val path = savedInstanceState.getString(COLLECTION)
+            StateBuilder.build(this, path)
         }
     }
 
@@ -124,6 +137,10 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
 
     override fun onItemLongClick(position: Int) {
         mActionModeHelper.onLongClick(mToolbar, position, mContentItems[position])
+    }
+
+    companion object SaveDataKeys {
+        const val COLLECTION = "current-collection"
     }
 
 }

@@ -15,6 +15,7 @@ import com.theartofdev.edmodo.cropper.CropImageOptions
 import iced.egret.palette.R
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.StateBuilder
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_crop.*
 import kotlinx.android.synthetic.main.appbar.*
@@ -33,6 +34,7 @@ class CropActivity : BasicThemedActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crop)
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        setState(savedInstanceState)
 
         val bundle = intent.getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE)
         mImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE)
@@ -52,6 +54,21 @@ class CropActivity : BasicThemedActivity() {
 
         styleToolbar()
         styleBottomBar()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(PicturePagerActivity.COLLECTION, CollectionManager.currentCollection?.path)
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun setState(savedInstanceState: Bundle?) {
+        // Build state if activity restarted. Don't if entering for the first time
+        // (b/c it is already built by another activity).
+        // Supply saved Collection path to unwind stack properly.
+        if (savedInstanceState != null) {
+            val path = savedInstanceState.getString(COLLECTION)
+            StateBuilder.build(this, path)
+        }
     }
 
     private fun buildCropView() {
@@ -246,6 +263,10 @@ class CropActivity : BasicThemedActivity() {
 
     private fun showAccessDeniedToast() {
         toast(R.string.access_denied_error)
+    }
+
+    companion object SaveDataKeys {
+        const val COLLECTION = "current-collection"
     }
 
 }

@@ -49,9 +49,9 @@ object Storage {
     private const val albumsFileName = "albums.json"
     private lateinit var fileDirectory: File
 
-    fun setupIfRequired(activity: Activity) {
+    fun setupIfRequired(context: Context) {
         if (!ready) {
-            setup(activity)
+            setup(context)
             ready = true
         }
     }

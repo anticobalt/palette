@@ -8,6 +8,7 @@ import iced.egret.palette.R
 import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 
@@ -48,8 +49,6 @@ class NewPicturesActivity : GridCoverableActivity() {
     override fun styleToolbar() {
         val itemColor = getColorInt(ColorType.ITEM)
         mToolbar.setTitleTextColor(itemColor)
-        //mToolbar.navigationIcon?.setTint(itemColor)
-        //mToolbar.menu.findItem(R.id.actionClearAll).icon.setTint(itemColor)
         MenuTint(mToolbar.menu, itemColor, tintOverflowIcon = true, tintNavigationIcon = true).apply(this)
     }
 
@@ -64,16 +63,16 @@ class NewPicturesActivity : GridCoverableActivity() {
         when (menuItem.itemId) {
             R.id.actionSelectAll -> selectAll()
             R.id.actionClear -> processClear(selected)
-            R.id.actionMove -> {}
-            R.id.actionAddToAlbum -> {}
-            R.id.actionDelete -> {}
+            R.id.actionMove -> processMove(selected)
+            R.id.actionAddToAlbum -> processAddToAlbum(selected)
+            R.id.actionDelete -> processDelete(selected)
         }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.actionClearAll -> processClear(mContents)
+            R.id.actionClearAll -> processClearAll()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
@@ -87,17 +86,51 @@ class NewPicturesActivity : GridCoverableActivity() {
 
     private fun processClear(pictures: List<Picture>) {
         if (pictures.isEmpty()) return
-
         DialogGenerator.clear(this) {
-            val set = pictures.toSet()
-            CollectionManager.removeFromBufferPictures(pictures)
-            mContents.removeAll(pictures)
-            mContentItems.removeAll { item -> item.coverable in set }
-
+            clear(pictures)
             mAdapter.updateDataSet(mContentItems)
             mActionModeHelper.destroyActionModeIfCan()
-
         }
+    }
+
+    private fun processClearAll() {
+        if (mContents.isEmpty()) return
+        DialogGenerator.clearAll(this) {
+            clear(mContents)
+            mAdapter.updateDataSet(mContentItems)
+            mActionModeHelper.destroyActionModeIfCan()
+        }
+    }
+
+    private fun processMove(pictures: List<Picture>) {
+        CoverableMutator.move(pictures, this) {
+            clear(pictures)
+            mAdapter.updateDataSet(mContentItems)
+            mActionModeHelper.destroyActionModeIfCan()
+        }
+    }
+
+    private fun processAddToAlbum(pictures: List<Picture>) {
+        CoverableMutator.addToAlbum(pictures, this) {
+            clear(pictures)
+            mAdapter.updateDataSet(mContentItems)
+            mActionModeHelper.destroyActionModeIfCan()
+        }
+    }
+
+    private fun processDelete(pictures: List<Picture>) {
+        CoverableMutator.delete(pictures, this) {
+            clear(pictures)
+            mAdapter.updateDataSet(mContentItems)
+            mActionModeHelper.destroyActionModeIfCan()
+        }
+    }
+
+    private fun clear(pictures: List<Picture>) {
+        val set = pictures.toSet()
+        CollectionManager.removeFromBufferPictures(pictures)
+        mContents.removeAll(pictures)
+        mContentItems.removeAll { item -> item.coverable in set }
     }
 
 }

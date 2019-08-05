@@ -251,4 +251,15 @@ object DialogGenerator {
         }
     }
 
+    fun clearAll(context: Context, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(R.string.action_clear_all)
+            message(R.string.warning_generic)
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
+        }
+    }
+
 }

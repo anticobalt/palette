@@ -265,11 +265,16 @@ object Storage {
 
     /**
      * Try to copy to destination, then delete original. Abort if copy fails.
+     * Since moving is technically copy + delete, moving to the same file will delete the file,
+     * so don't do it: just signal success.
      * @return Old and new file if successfully moved, null otherwise
      */
     internal fun moveFile(sourcePath: String, destinationParent: File, sdCardFile: DocumentFile?,
                           contentResolver: ContentResolver?, newName: String? = null): Pair<File, File>? {
+
         val sourceFile = File(sourcePath)
+        if (sourceFile.parentFile == destinationParent) return Pair(sourceFile, sourceFile)
+
         val newFile = copyFile(sourceFile, destinationParent, sdCardFile, contentResolver, newName)
                 ?: return null
 

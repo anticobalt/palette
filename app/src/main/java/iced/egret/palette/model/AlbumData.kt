@@ -12,15 +12,15 @@ data class AlbumData(val name: String,
 
         val album = Album(name, path)
         val folders = foldersData.map { data -> data.toFullClass() } as MutableList<Folder>
-        val albums = albumsData.map { data -> data.toFullClass() } as MutableList<Album>
+        val albums = albumsData.map { data -> data.toFullClass(existingPictures) } as MutableList<Album>
         val pictures = arrayListOf<Picture>()
 
+        // Link up pictures in album that exist on disk
         for (path in picturePaths) {
-            var picture = existingPictures[path]
-            if (picture == null) {
-                picture = Picture(path.split("/").last(), path)
+            val picture = existingPictures[path]
+            if (picture != null) {
+                pictures.add(picture)
             }
-            pictures.add(picture)
         }
 
         album.addFolders(folders)

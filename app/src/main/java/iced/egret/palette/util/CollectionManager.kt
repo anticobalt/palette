@@ -487,9 +487,7 @@ object CollectionManager : CoroutineScope {
     }
 
     /**
-     * Moves picture on disk, and updates Folders. If Folder updating fails (which should
-     * never happen), the moved file is still returned.
-     *
+     * Moves picture on disk and updates cache.
      * @return The old and new Files, or null if move fails.
      */
     private fun movePicture(picture: Picture, folderFile: File, sdCardFile: DocumentFile?,
@@ -507,24 +505,24 @@ object CollectionManager : CoroutineScope {
     }
 
     /**
-     * Old and new folders are the same for all pictures, so find them once and save them.
+     * Handles pictures with different old locations but same new location.
+     * Can't cache newFolder because it may be deleted when "moving" a picture to the same
+     * location (if that picture was the only one in the folder).
      */
     fun movePictures(pictures: List<Picture>, folderFile: File, sdCardFile: DocumentFile?,
                      contentResolver: ContentResolver, afterEachMoved: (File, File) -> Unit): Int {
 
         var failCount = 0
         var i = 0
-        var oldFolder: Folder? = null
-        var newFolder: Folder? = null
+        var oldFolder: Folder
+        var newFolder: Folder
 
         for (picture in pictures) {
 
             // Look for existing folder
-            if (oldFolder == null) {
-                oldFolder = findFolderByPath(picture.fileLocation)
-                        // something terrible happened, abort
-                        ?: return failCount + pictures.size - i  // remaining items fail
-            }
+            oldFolder = findFolderByPath(picture.fileLocation)
+                    // something terrible happened, abort
+                    ?: return failCount + pictures.size - i  // remaining items fail
 
             // Move file and update Picture properties
             val files = movePicture(picture, folderFile, sdCardFile, contentResolver)
@@ -537,11 +535,9 @@ object CollectionManager : CoroutineScope {
                 oldFolder.removePicture(picture)
 
                 // Find new folder or make it
-                if (newFolder == null) {
-                    newFolder = getParentFolder(picture)
-                            // something terrible happened, abort
-                            ?: return failCount + pictures.size - i  // remaining items fail
-                }
+                newFolder = getParentFolder(picture)
+                        // something terrible happened, abort
+                        ?: return failCount + pictures.size - i  // remaining items fail
 
                 newFolder.addPicture(picture, toFront = true)
             }

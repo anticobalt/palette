@@ -13,7 +13,7 @@
     <string name="pictures">Pictures</string>
     <string name="root_name">Root</string>
     <string name="recycle_bin">Recycle Bin</string>
-    <string name="new_pictures">New Pictures</string>
+    <string name="waiting_room">Waiting Room</string>
 
     <!-- Preference keys -->
     <string name="preference_file_key">com.iced.egret.palette.PREFERENCES_KEY</string>

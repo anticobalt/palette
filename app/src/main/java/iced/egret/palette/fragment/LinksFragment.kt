@@ -156,8 +156,8 @@ class LinksFragment :
         sideLayout.findViewById<ImageButton>(R.id.recycleBin).setOnClickListener {
             startActivity(Intent(this.context, RecycleBinActivity::class.java))
         }
-        sideLayout.findViewById<ImageButton>(R.id.newPictures).setOnClickListener {
-            startActivity(Intent(this.context, NewPicturesActivity::class.java))
+        sideLayout.findViewById<ImageButton>(R.id.waitingRoom).setOnClickListener {
+            startActivity(Intent(this.context, WaitingRoomActivity::class.java))
         }
     }
 

@@ -40,8 +40,8 @@
             android:name=".activity.RecycleBinActivity"
             android:label="@string/recycle_bin"
             android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
-        <activity android:name=".activity.NewPicturesActivity"
-            android:label="@string/new_pictures"
+        <activity android:name=".activity.WaitingRoomActivity"
+            android:label="@string/waiting_room"
             android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
     </application>
 

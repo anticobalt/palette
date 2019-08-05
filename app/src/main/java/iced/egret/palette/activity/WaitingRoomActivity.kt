@@ -12,7 +12,7 @@ import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 
-class NewPicturesActivity : GridCoverableActivity() {
+class WaitingRoomActivity : GridCoverableActivity() {
 
     override var actionModeMenuRes = R.menu.menu_new_pictures_edit
 
@@ -37,7 +37,7 @@ class NewPicturesActivity : GridCoverableActivity() {
 
     override fun buildToolbar() {
         mToolbar.inflateMenu(R.menu.menu_new_pictures)
-        mToolbar.title = getString(R.string.new_pictures)
+        mToolbar.title = getString(R.string.waiting_room)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }

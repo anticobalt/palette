@@ -61,14 +61,14 @@
                 app:layout_constraintTop_toBottomOf="@id/settings" />
 
             <ImageButton
-                android:id="@+id/newPictures"
+                android:id="@+id/waitingRoom"
                 android:layout_width="@dimen/side_icon_size"
                 android:layout_height="@dimen/side_icon_size"
                 android:layout_marginLeft="@dimen/side_icon_margin"
                 android:layout_marginTop="@dimen/side_icon_margin"
                 android:layout_marginRight="@dimen/side_icon_margin"
                 android:background="?android:selectableItemBackground"
-                android:contentDescription="@string/new_pictures"
+                android:contentDescription="@string/waiting_room"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_new_releases_black_24dp"
                 app:layout_constraintEnd_toEndOf="parent"

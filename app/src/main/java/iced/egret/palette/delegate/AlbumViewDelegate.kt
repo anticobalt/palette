@@ -77,7 +77,7 @@ class AlbumViewDelegate : CollectionViewDelegate() {
         when (selectedContentType) {
             CollectionManager.ALBUM_KEY -> {
                 @Suppress("UNCHECKED_CAST")
-                CoverableMutator.delete(coverables as List<Album>, false, context) {
+                CoverableMutator.delete(coverables as List<Album>, true, context) {
                     alert(ActionAlert(true))
                 }
             }

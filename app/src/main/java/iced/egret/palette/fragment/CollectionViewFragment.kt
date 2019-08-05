@@ -473,6 +473,7 @@ class CollectionViewFragment :
             mAdapter.updateDataSet(mContentItems)
             setToolbarTitle()
             mActivity.notifyCollectionsChanged()
+            mActionModeHelper.destroyActionModeIfCan()
         }
     }
 

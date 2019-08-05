@@ -6,13 +6,13 @@ import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
-import kotlinx.android.synthetic.main.bottom_bar_view_picture.view.*
+import kotlinx.android.synthetic.main.bottom_bar_main_pager.view.*
 
 
 class MainPagerActivity : PicturePagerActivity() {
 
-    override val bottomBarRes = R.layout.bottom_bar_view_picture
-    override val menuRes = R.menu.menu_picture
+    override val bottomBarRes = R.layout.bottom_bar_main_pager
+    override val menuRes = R.menu.menu_main_pager
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)

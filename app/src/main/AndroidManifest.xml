@@ -26,6 +26,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.RecycleBinActivity"
+            android:label="@string/recycle_bin"
+            android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
+        <activity
+            android:name=".activity.WaitingRoomActivity"
+            android:label="@string/waiting_room"
+            android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
+        <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoDefaultActionBar" />
@@ -33,16 +41,12 @@
             android:name=".activity.MainPagerActivity"
             android:theme="@style/AppTheme.NoDefaultActionBar" />
         <activity
+            android:name=".activity.WaitingRoomPagerActivity"
+            android:theme="@style/AppTheme.NoDefaultActionBar" />
+        <activity
             android:name=".activity.CropActivity"
             android:label="@string/title_activity_crop"
             android:theme="@style/AppTheme.NoDefaultActionBar" />
-        <activity
-            android:name=".activity.RecycleBinActivity"
-            android:label="@string/recycle_bin"
-            android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
-        <activity android:name=".activity.WaitingRoomActivity"
-            android:label="@string/waiting_room"
-            android:theme="@style/AppTheme.NoDefaultActionBar.ActionMode" />
     </application>
 
 </manifest>

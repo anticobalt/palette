@@ -14,7 +14,7 @@ import iced.egret.palette.util.Painter
 
 class WaitingRoomActivity : GridCoverableActivity() {
 
-    override var actionModeMenuRes = R.menu.menu_new_pictures_edit
+    override var actionModeMenuRes = R.menu.menu_waiting_room_edit
 
     override fun onStart() {
         super.onStart()
@@ -36,7 +36,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
     }
 
     override fun buildToolbar() {
-        mToolbar.inflateMenu(R.menu.menu_new_pictures)
+        mToolbar.inflateMenu(R.menu.menu_waiting_room)
         mToolbar.title = getString(R.string.waiting_room)
         mToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)

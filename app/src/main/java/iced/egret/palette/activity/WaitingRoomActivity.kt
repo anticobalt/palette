@@ -134,6 +134,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
 
     private fun processDelete(pictures: List<Picture>) {
         CoverableMutator.delete(pictures, this) {
+            clear(pictures)
             mAdapter.updateDataSet(mContentItems)
             mActionModeHelper.destroyActionModeIfCan()
         }

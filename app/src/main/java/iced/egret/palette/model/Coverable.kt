@@ -1,6 +1,5 @@
 package iced.egret.palette.model
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -71,6 +70,5 @@ interface Coverable {
 interface TerminalCoverable : Coverable {
     override val terminal: Boolean
         get() = true
-    val activity: Class<out Activity>
     fun loadInto(view: View)
 }

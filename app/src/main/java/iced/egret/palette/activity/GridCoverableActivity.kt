@@ -132,8 +132,16 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
      * @return True if click should be handled by selection mode, false otherwise.
      */
     override fun onItemClick(view: View?, position: Int): Boolean {
-        return mActionModeHelper.onClick(position, mContentItems[position])
+        return if (mAdapter.mode != SelectableAdapter.Mode.IDLE) {
+            mActionModeHelper.onClick(position, mContentItems[position])
+        }
+        else {
+            onIdleItemClick(position)
+            false
+        }
     }
+
+    abstract fun onIdleItemClick(position: Int)
 
     override fun onItemLongClick(position: Int) {
         mActionModeHelper.onLongClick(mToolbar, position, mContentItems[position])

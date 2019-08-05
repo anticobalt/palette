@@ -78,6 +78,12 @@ class WaitingRoomActivity : GridCoverableActivity() {
         return true
     }
 
+    override fun onIdleItemClick(position: Int) {
+        val launchPack = CollectionManager.PagerLaunchPack(position, callingActivity = this,
+                newActivityClass = WaitingRoomPagerActivity::class.java)
+        CollectionManager.launch(mContents[position], launchPack)
+    }
+
     private fun selectAll() {
         mAdapter.currentItems.map { item -> item.setSelection(true) }
         mAdapter.selectAll()

@@ -39,12 +39,12 @@ abstract class PicturePagerActivity : BaseActivity() {
     protected lateinit var mBottomBar: View
 
     private var mUiHidden = false
-    private var mActivePage = -1
+    protected var mActivePage = -1
 
     private var mViewPagerPosition = 0
     private var mViewPagerOffsetPixels = 0
 
-    private val mPictures = mutableListOf<Picture>()
+    protected val mPictures = mutableListOf<Picture>()
     protected val mCurrentPicture: Picture
         get() = mPictures[mActivePage]
 
@@ -169,7 +169,7 @@ abstract class PicturePagerActivity : BaseActivity() {
     }
 
     protected fun setToolbarTitle() {
-        toolbarTitle.text = CollectionManager.getCurrentCollectionPictures()[mActivePage].name
+        toolbarTitle.text = mCurrentPicture.name
     }
 
     private fun buildBottomBar() {
@@ -263,10 +263,7 @@ abstract class PicturePagerActivity : BaseActivity() {
         else super.onOptionsItemSelected(item)
     }
 
-    private fun fetchPictures() {
-        mPictures.clear()
-        mPictures.addAll(CollectionManager.getCurrentCollectionPictures())
-    }
+    abstract fun fetchPictures()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

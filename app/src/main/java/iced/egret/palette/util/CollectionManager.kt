@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import iced.egret.palette.R
+import iced.egret.palette.activity.BaseActivity
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import kotlinx.coroutines.CoroutineScope
@@ -311,17 +312,26 @@ object CollectionManager : CoroutineScope {
      *
      * @return Adapter needs to be updated (true) or not (false)
      */
-    fun launch(item: Coverable, position: Int = -1, callingFragment: Fragment? = null, requestCode: Int = -1): Boolean {
-        if (item !is TerminalCoverable) {
-            if (item as? Collection != null) {
+    fun launch(item: Coverable, lp: PagerLaunchPack? = null): Boolean {
+        when {
+            item !is TerminalCoverable -> if (item as? Collection != null) {
                 currentCollection = item
                 return true
             }
-        } else if (callingFragment != null) {
-            val intent = Intent(callingFragment.context, item.activity)
-            val key = callingFragment.getString(R.string.intent_item_key)
-            intent.putExtra(key, position)
-            callingFragment.startActivityForResult(intent, requestCode)
+            lp != null -> {
+                if (lp.callingFragment != null) {
+                    val intent = Intent(lp.callingFragment.context, lp.newActivityClass)
+                    val key = lp.callingFragment.getString(R.string.intent_item_key)
+                    intent.putExtra(key, lp.position)
+                    lp.callingFragment.startActivityForResult(intent, lp.requestCode)
+                }
+                else if (lp.callingActivity != null) {
+                    val intent = Intent(lp.callingActivity, lp.newActivityClass)
+                    val key = lp.callingActivity.getString(R.string.intent_item_key)
+                    intent.putExtra(key, lp.position)
+                    lp.callingActivity.startActivityForResult(intent, lp.requestCode)
+                }
+            }
         }
         return false
     }
@@ -654,4 +664,9 @@ object CollectionManager : CoroutineScope {
         }
     }
 
+    data class PagerLaunchPack(val position: Int,
+                               val callingActivity: BaseActivity? = null,
+                               val callingFragment: Fragment? = null,
+                               val newActivityClass: Class<out BaseActivity>?,
+                               val requestCode: Int = -1)
 }

@@ -4,6 +4,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
+import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.bottom_bar_main_pager.view.*
@@ -33,6 +34,11 @@ class MainPagerActivity : PicturePagerActivity() {
         mBottomBar.delete.setOnClickListener {
             initiateMoveToRecycleBin()
         }
+    }
+
+    override fun fetchPictures() {
+        mPictures.clear()
+        mPictures.addAll(CollectionManager.getCurrentCollectionPictures())
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

@@ -88,6 +88,10 @@ class RecycleBinActivity : GridCoverableActivity() {
         return true
     }
 
+    override fun onIdleItemClick(position: Int) {
+        // TODO
+    }
+
     override fun fetchContents() {
         mContents.clear()
         mContentItems.clear()

@@ -16,6 +16,7 @@ import iced.egret.palette.R
 import iced.egret.palette.activity.BaseActivity
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.MainActivity.Constants.PICTURE_ACTIVITY_REQUEST
+import iced.egret.palette.activity.MainPagerActivity
 import iced.egret.palette.delegate.AlbumViewDelegate
 import iced.egret.palette.delegate.CollectionViewDelegate
 import iced.egret.palette.delegate.FolderViewDelegate
@@ -279,7 +280,10 @@ class CollectionViewFragment :
                     CollectionManager.getContentsMap()[inferContentType(coverable)]?.indexOf(coverable)
                             ?: return false
             // May start activity for result if required
-            val updates = CollectionManager.launch(coverable, relativePosition, this, PICTURE_ACTIVITY_REQUEST)
+            val launchPack = CollectionManager.PagerLaunchPack(relativePosition,
+                    callingFragment = this, newActivityClass = MainPagerActivity::class.java,
+                    requestCode = PICTURE_ACTIVITY_REQUEST)
+            val updates = CollectionManager.launch(coverable, launchPack)
             if (updates) onNavigation()
             false
         }

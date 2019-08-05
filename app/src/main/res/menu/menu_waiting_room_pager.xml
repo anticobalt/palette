@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/switchTrueZoom"
+        android:checkable="true"
+        android:title="@string/switch_true_zoom"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/actionMove"
+        android:title="@string/action_move"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/actionRename"
+        android:title="@string/action_rename"
+        app:showAsAction="never" />
+
+</menu>

@@ -126,7 +126,15 @@ object CoverableMutator {
                 broadcastMediaChanged(context, sourceFile)
                 broadcastMediaChanged(context, movedFile)
             }
-            if (failedCounter > 0) toast(context, "Failed to move $failedCounter!")
+            if (failedCounter > 0) {
+                if (pictures.size > 1) {
+                    toast(context, "Failed to move $failedCounter pictures! " +
+                            context.getString(R.string.storage_fail_error_explain))
+                } else {
+                    toast(context, "Failed! " +
+                            context.getString(R.string.storage_fail_error_explain))
+                }
+            }
             else toast(context, R.string.success_move_generic)
             onFinish()
         }
@@ -138,7 +146,16 @@ object CoverableMutator {
                 // If moved a Picture successfully, broadcast change
                 broadcastMediaChanged(context, it)
             }
-            if (failedCounter > 0) toast(context, "Failed to move $failedCounter!")
+            if (failedCounter > 0) {
+                if (pictures.size > 1) {
+                    toast(context, "Failed to move $failedCounter pictures to recycle bin! " +
+                            context.getString(R.string.storage_fail_error_explain))
+                }
+                else {
+                    toast(context, "Failed! " +
+                            context.getString(R.string.storage_fail_error_explain))
+                }
+            }
             else toast(context, R.string.success_move_to_recycle)
             onFinish()
         }

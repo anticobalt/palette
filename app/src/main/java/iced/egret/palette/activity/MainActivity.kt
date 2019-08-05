@@ -264,7 +264,8 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
             val currentFragment = fragments[index]
             val success = (currentFragment).onBackPressed()
             if (!success) {
-                moveTaskToBack(true)  // don't destroy
+                if (index == leftIndex) moveTaskToBack(true)  // don't destroy
+                else if (index == rightIndex) slidingPaneLayout.openPane()
             }
         }
     }

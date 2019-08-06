@@ -26,7 +26,10 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         defSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
-        val config = SlidrConfig.Builder().edge(true).build()
+        val config = SlidrConfig.Builder()
+                .edge(true)
+                .edgeSize(0.30f)
+                .build()
         slidr = Slidr.attach(this, config)
     }
 

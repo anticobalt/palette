@@ -9,8 +9,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import iced.egret.palette.R
 import iced.egret.palette.activity.PicturePagerActivity
 import iced.egret.palette.model.Picture
-import kotlinx.android.synthetic.main.activity_picture_pager.*
-import kotlinx.android.synthetic.main.item_main_pager_gestures.view.*
+import kotlinx.android.synthetic.main.item_main_pager_standard.view.*
 import kotlinx.android.synthetic.main.item_main_pager_true_zoom.view.*
 import java.lang.ref.WeakReference
 
@@ -33,9 +32,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
     }
 
     /**
-     * SSIVs are not compatible with GestureViews, so use both GestureImageView and SSIV,
-     * depending on whether true zoom is required or not.
-     *
+     * Load SSIV or PhotoView.
      * Click listeners have to be set to individual ImageViews, or they won't be detected.
      */
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -55,13 +52,12 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
         } else {
             layoutItem = LayoutInflater
                     .from(container.context)
-                    .inflate(R.layout.item_main_pager_gestures, container, false)
-            buildGestureImageView(layoutItem, picture)
+                    .inflate(R.layout.item_main_pager_standard, container, false)
+            buildStandardImageView(layoutItem, picture)
         }
 
         container.addView(layoutItem)
         return layoutItem
-
     }
 
     /**
@@ -100,27 +96,15 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
                     }
                 }
         )
-        staticImageView.setOnTouchListener(View.OnTouchListener { _, motionEvent ->
+        staticImageView.setOnTouchListener { _, motionEvent ->
             gestureDetector.onTouchEvent(motionEvent)
-        })
-
-        // Reset ViewPager touch listener; GestureView controller sets its own, which prevents
-        // coherent scrolling of other ImageViews.
-        activityReference.get()?.viewpager?.setOnTouchListener(DummyTouchListener())
+        }
     }
 
-    private fun buildGestureImageView(layoutItem: View, picture: Picture) {
-
-        val gestureImageView = layoutItem.gestureImageView
-        picture.loadInto(gestureImageView)
-
-        gestureImageView.controller.settings.isRotationEnabled = true
-        gestureImageView.controller.settings.isRestrictRotation = true
-
-        // Allow scrolling when zoomed in
-        gestureImageView.controller.enableScrollInViewPager(activityReference.get()?.viewpager)
-
-        gestureImageView.setOnClickListener {
+    private fun buildStandardImageView(layoutItem: View, picture: Picture) {
+        val standardImageView = layoutItem.standardImageView
+        picture.loadInto(standardImageView)
+        standardImageView.setOnClickListener {
             onImageViewClick()
         }
     }

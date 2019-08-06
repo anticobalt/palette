@@ -10,6 +10,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
+import com.r0adkll.slidr.Slidr
+import com.r0adkll.slidr.model.SlidrConfig
+import com.r0adkll.slidr.model.SlidrInterface
 import iced.egret.palette.R
 import java.io.File
 
@@ -17,10 +20,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
     enum class ColorType { PRIMARY, ACCENT, ITEM }
     protected lateinit var defSharedPreferences : SharedPreferences
+    protected lateinit var slidr : SlidrInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         defSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val config = SlidrConfig.Builder().edge(true).build()
+        slidr = Slidr.attach(this, config)
     }
 
     fun toast(message: String) {

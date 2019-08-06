@@ -30,8 +30,8 @@ import kotlinx.android.synthetic.main.appbar_picture_pager.*
  */
 abstract class PicturePagerActivity : BaseActivity() {
 
-    abstract val bottomBarRes : Int?
-    abstract val menuRes : Int
+    abstract val bottomBarRes: Int?
+    abstract val menuRes: Int
 
     protected lateinit var mSharedPrefs: SharedPreferences
     private var mBarBackgroundColor: Int = Color.BLACK

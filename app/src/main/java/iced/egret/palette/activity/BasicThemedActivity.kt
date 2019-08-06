@@ -2,6 +2,8 @@ package iced.egret.palette.activity
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import com.jaredrummler.cyanea.CyaneaResources
@@ -40,6 +42,10 @@ abstract class BasicThemedActivity : BaseActivity(), BaseCyaneaActivity {
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         delegate.onPostCreate(savedInstanceState)
+
+        // Cyanea messes with the window background onPostCreate(), which needs to be transparent
+        // to show the previous activity on slide gesture via Slidr, so set it back.
+        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     override fun onStart() {

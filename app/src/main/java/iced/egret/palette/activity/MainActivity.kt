@@ -78,6 +78,7 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
             buildApp(savedInstanceState)
         }
 
+        slidr.lock()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

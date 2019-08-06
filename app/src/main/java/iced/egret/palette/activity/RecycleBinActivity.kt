@@ -89,13 +89,15 @@ class RecycleBinActivity : GridCoverableActivity() {
     }
 
     override fun onIdleItemClick(position: Int) {
-        // TODO
+        val picture = mContents[position]
+        val nameInBin = picture.filePath.split("/").last()
+        DialogGenerator.pictureDetails(this, picture, Storage.recycleBin.oldLocations[nameInBin])
     }
 
     override fun fetchContents() {
         mContents.clear()
         mContentItems.clear()
-        mContents.addAll(Storage.recycleBin.contents)
+        mContents.addAll(Storage.recycleBin.contentsByDateDesc)
         mContentItems.addAll(mContents.map { content -> GridCoverableItem(content) })
     }
 

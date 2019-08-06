@@ -1,6 +1,5 @@
 package iced.egret.palette.util
 
-import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -710,6 +709,8 @@ object Storage {
             get() = file.isDirectory && file.canRead()
         val contents: List<Picture>
             get() = file.listFiles().map { file -> Picture(file.path.split("/").last(), file.path) }
+        val contentsByDateDesc : List<Picture>  // new ones first
+            get() = contents.sortedByDescending { picture -> picture.file.lastModified() }
 
         init {
             file.mkdir()

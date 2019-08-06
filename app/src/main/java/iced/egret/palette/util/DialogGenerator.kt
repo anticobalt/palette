@@ -220,10 +220,13 @@ object DialogGenerator {
         }
     }
 
-    fun pictureDetails(context: Context, picture: Picture) {
+    /**
+     * Show bottom sheet with picture details. Can supply alternate file path to show.
+     */
+    fun pictureDetails(context: Context, picture: Picture, filepath: String? = null) {
 
         fun populateWithMetadata(view: View, picture: Picture) {
-            view.findViewById<TextView>(R.id.path).text = picture.filePath
+            view.findViewById<TextView>(R.id.path).text = filepath ?: picture.filePath
             view.findViewById<TextView>(R.id.type).text = picture.mimeType
             view.findViewById<TextView>(R.id.size).text = picture.fileSize
             @SuppressLint("SetTextI18n")  // is not language specific

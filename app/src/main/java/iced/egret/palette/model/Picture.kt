@@ -36,7 +36,7 @@ import java.util.*
 class Picture(override var name: String, override var filePath: String) : TerminalCoverable, FileObject {
 
     // Getters computed lazily, so that changing path doesn't break everything
-    private val file: File
+    val file: File
         get() = File(filePath)
     val uri: Uri
         get() = Uri.fromFile(file)

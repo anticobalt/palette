@@ -40,7 +40,6 @@
     <string name="pager_toolbar_color_summary">Turn off to use default black color</string>
     <string name="true_zoom_summary">
         Show pictures as-is. Enabling allows large pictures to be viewed clearly, at the cost of increased load times.
-        Disables rotation gestures.
     </string>
     <string name="waiting_room_autoclear_summary">
         Enable to automatically clear items after moving them or adding them to albums.

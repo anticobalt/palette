@@ -53,6 +53,9 @@ class Picture(override var name: String, override var filePath: String) : Termin
     override var parent: FileObject? = null
     override val deletable = true
 
+    override val blurb: String
+        get() = ""
+
     // Image Properties
     val mimeType: String
         get() {
@@ -146,7 +149,7 @@ class Picture(override var name: String, override var filePath: String) : Termin
     override fun loadCoverInto(holder: CoverViewHolder) {
 
         val imageView = holder.ivItem
-        val textView = holder.tvItem
+        val textContainer = holder.textContainer
 
         if (imageView != null) {
             val glide =
@@ -160,8 +163,8 @@ class Picture(override var name: String, override var filePath: String) : Termin
             buildGlideImage(glide, imageView, cover["uri"])
         }
 
-        if (textView != null) {
-            holder.tvItem.visibility = View.INVISIBLE
+        if (textContainer != null) {
+            holder.textContainer.visibility = View.INVISIBLE
         }
 
     }

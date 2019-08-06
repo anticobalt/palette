@@ -2,7 +2,6 @@ package iced.egret.palette.flexible
 
 import android.view.View
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
@@ -13,7 +12,7 @@ class CoverViewHolder(view: View,
                       adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>)
     : FlexibleViewHolder(view, adapter) {
 
-    val tvItem: TextView? = view.findViewById(R.id.label)
+    val textContainer: View? = view.findViewById(R.id.textContainer)
     val ivItem: ImageView? = view.findViewById(R.id.cover)
 
 }

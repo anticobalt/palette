@@ -32,6 +32,8 @@ abstract class Collection(override var name: String, path: String) : Coverable {
     abstract val totalSize: Int
     var size = 0
         protected set
+    override val blurb: String
+        get() = "$totalSize items"
 
     fun isEmpty(): Boolean {
         return size == 0
@@ -64,8 +66,8 @@ abstract class Collection(override var name: String, path: String) : Coverable {
             buildGlideImage(glide, holder.ivItem, imageReference)
 
         }
-        if (holder.tvItem != null) {
-            holder.tvItem.visibility = View.VISIBLE
+        if (holder.textContainer != null) {
+            holder.textContainer.visibility = View.VISIBLE
         }
     }
 

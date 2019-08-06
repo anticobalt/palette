@@ -2,6 +2,7 @@ package iced.egret.palette.flexible
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
@@ -29,7 +30,12 @@ abstract class CoverableItem(val coverable: Coverable, private var defaultTint: 
                                 payloads: MutableList<Any>?) {
         viewHolder = holder
         coverable.loadCoverInto(holder)
-        holder.tvItem?.text = coverable.name
+
+        val textContainer = holder.textContainer
+        if (textContainer != null) {
+            textContainer.findViewById<TextView>(R.id.label)?.text = coverable.name
+            textContainer.findViewById<TextView>(R.id.blurb)?.text = coverable.blurb
+        }
 
         // set the icon to discern type
         setIcon()

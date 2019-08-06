@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/banner_height"
     app:cardCornerRadius="6dp"
-    app:cardElevation="6dp" >
+    app:cardElevation="6dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,20 +18,36 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
-        <TextView
-            android:id="@+id/label"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/textContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="start"
             android:paddingStart="10dp"
             android:paddingTop="5dp"
             android:paddingEnd="10dp"
-            android:paddingBottom="5dp"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintTop_toTopOf="@id/cover" />
+            app:layout_constraintTop_toTopOf="@id/cover">
+
+            <TextView
+                android:id="@+id/label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:singleLine="true"
+                android:textAppearance="@style/BannerMainText"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/blurb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:singleLine="true"
+                android:textAppearance="@style/BannerSubText"
+                app:layout_constraintTop_toBottomOf="@id/label" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/selectCheckmark"

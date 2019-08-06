@@ -53,7 +53,9 @@ class Picture(override var name: String, override var filePath: String) : Termin
     override var parent: FileObject? = null
     override val deletable = true
 
-    override val blurb: String
+    override val longBlurb: String
+        get() = ""
+    override val shortBlurb: String
         get() = ""
 
     // Image Properties

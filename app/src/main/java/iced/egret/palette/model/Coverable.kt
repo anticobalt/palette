@@ -16,7 +16,8 @@ import java.io.FileNotFoundException
 interface Coverable {
     val terminal: Boolean
     var name: String
-    val blurb: String
+    val longBlurb: String
+    val shortBlurb: String
     val cover: MutableMap<String, *>
     val icon: Int?
     fun loadCoverInto(holder: CoverViewHolder)

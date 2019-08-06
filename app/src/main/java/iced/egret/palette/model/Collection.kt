@@ -32,8 +32,18 @@ abstract class Collection(override var name: String, path: String) : Coverable {
     abstract val totalSize: Int
     var size = 0
         protected set
-    override val blurb: String
+
+    override val longBlurb: String
         get() = "$totalSize items"
+    override val shortBlurb: String
+        get() {
+            when {
+                totalSize < 1_000 -> return totalSize.toString()
+                totalSize < 100_000 -> return "~${totalSize / 1_000}K"
+                totalSize < 100_000_000 -> return "~${totalSize / 1_000_000}M"
+            }
+            return "\uD83D\uDCAF"  // you have too many
+        }
 
     fun isEmpty(): Boolean {
         return size == 0

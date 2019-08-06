@@ -2,7 +2,6 @@ package iced.egret.palette.flexible
 
 import android.view.View
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
@@ -31,18 +30,14 @@ abstract class CoverableItem(val coverable: Coverable, private var defaultTint: 
         viewHolder = holder
         coverable.loadCoverInto(holder)
 
-        val textContainer = holder.textContainer
-        if (textContainer != null) {
-            textContainer.findViewById<TextView>(R.id.label)?.text = coverable.name
-            textContainer.findViewById<TextView>(R.id.blurb)?.text = coverable.blurb
-        }
-
-        // set the icon to discern type
-        setIcon()
+        setLabel(holder)
+        setIcon()  // set the icon to discern type
 
         // Update selection indicator on recycling or re-creation
         setSelection(isSelected)
     }
+
+    abstract fun setLabel(holder: CoverViewHolder)
 
     override fun equals(other: Any?): Boolean {
         if (other !is CoverableItem) return false

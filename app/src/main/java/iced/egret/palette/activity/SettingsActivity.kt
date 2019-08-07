@@ -1,23 +1,45 @@
 package iced.egret.palette.activity
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.TaskStackBuilder
 import androidx.preference.PreferenceFragmentCompat
-import com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
 import iced.egret.palette.R
 import kotlinx.android.synthetic.main.appbar.*
 
-class SettingsActivity : SlideActivity() {
+class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
+        val themeKeys = listOf(
+                R.string.primary_color_key,
+                R.string.accent_color_key,
+                R.string.toolbar_item_color_key
+        ).map {id -> getString(id)}
+
+        if (key != null && key in themeKeys) {
+            // Rebuild all activities in stack to refresh theme
+            // https://stackoverflow.com/a/28799124
+            TaskStackBuilder.create(this)
+                    .addNextIntent(Intent(this, MainActivity::class.java))
+                    .addNextIntent(this.intent)
+                    .startActivities()
+            overridePendingTransition(0, 0)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         buildToolbar()
         styleToolbar(toolbar)
+        defSharedPreferences.registerOnSharedPreferenceChangeListener(this)
+
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings, SettingsFragment())
@@ -38,16 +60,7 @@ class SettingsActivity : SlideActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun saveChanges(primaryColor: Int?, accentColor: Int?, toolbarItemColor: Int?) {
-        applyTheme(primaryColor, accentColor, toolbarItemColor)
-        styleToolbar(toolbar, primaryColor, toolbarItemColor)  // pass new state not reflected by disk
-    }
-
     class SettingsFragment : PreferenceFragmentCompat() {
-
-        var primaryColor: Int? = null
-        var accentColor: Int? = null
-        var toolbarItemColor: Int? = null
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             // Setting background color in XML doesn't work
@@ -58,51 +71,6 @@ class SettingsActivity : SlideActivity() {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
-            setOnBeforeChangeListeners()
-        }
-
-        /**
-         * Listeners called before preferences saved to disk.
-         */
-        private fun setOnBeforeChangeListeners() {
-
-            val primaryColorPref = findColorPreference(getString(R.string.primary_color_key))
-            val accentColorPref = findColorPreference(getString(R.string.accent_color_key))
-            val toolbarItemColorPref = findColorPreference(getString(R.string.toolbar_item_color_key))
-
-            primaryColor = primaryColorPref.value
-            accentColor = accentColorPref.value
-            toolbarItemColor = toolbarItemColorPref.value
-
-            primaryColorPref.setOnPreferenceChangeListener { _, newValue ->
-                if (newValue is Int) {
-                    primaryColor = newValue
-                    applyTheme()
-                }
-                true
-            }
-            accentColorPref.setOnPreferenceChangeListener { _, newValue ->
-                if (newValue is Int) {
-                    accentColor = newValue
-                    applyTheme()
-                }
-                true
-            }
-            toolbarItemColorPref.setOnPreferenceChangeListener { _, newValue ->
-                if (newValue is Int) {
-                    toolbarItemColor = newValue
-                    applyTheme()
-                }
-                true
-            }
-        }
-
-        private fun findColorPreference(key: String): ColorPreferenceCompat {
-            return findPreference<ColorPreferenceCompat>(key)!!
-        }
-
-        private fun applyTheme() {
-            (this.activity!! as SettingsActivity).saveChanges(primaryColor, accentColor, toolbarItemColor)
         }
 
     }

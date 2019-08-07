@@ -61,9 +61,9 @@ abstract class BaseActivity : AppCompatActivity() {
     /**
      * Colors a normal support toolbar. Nested items not supported.
      */
-    fun styleToolbar(toolbar: Toolbar, primaryColor: Int? = null, itemColor: Int? = null) {
-        val iPrimaryColor = primaryColor ?: getColorInt(ColorType.PRIMARY)
-        val iItemColor = itemColor ?: getColorInt(ColorType.ITEM)
+    fun styleToolbar(toolbar: Toolbar) {
+        val iPrimaryColor = getColorInt(ColorType.PRIMARY)
+        val iItemColor = getColorInt(ColorType.ITEM)
 
         for (i in 0 until toolbar.menu.size()) {
             val item = toolbar.menu.getItem(i)

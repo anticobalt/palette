@@ -160,14 +160,13 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
 
     private fun buildApp(savedInstanceState: Bundle?) {
 
-        //if (isFirstRun()) applyDefaultSettings()
-        checkSdWriteAccess()
-
         if (savedInstanceState == null) {
             // First start of activity
             StateBuilder.build(this, null) {
                 makeFragments()
                 buildSlidingPane()
+                if (isFirstRun()) applyDefaultSettings()  // may recreate, so must be after UI building
+                checkSdWriteAccess()
                 mainLayout.visibility = View.VISIBLE
             }
         } else {
@@ -195,7 +194,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
                 .putInt(getString(R.string.primary_color_key), idToColor(R.color.colorPrimary))
                 .putInt(getString(R.string.accent_color_key), idToColor(R.color.colorAccent))
                 .commit()
-        //applyTheme()
+        recreate()
     }
 
     private fun setAccentThemeFromSettings() {

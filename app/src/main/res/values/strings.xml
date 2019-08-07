@@ -16,13 +16,13 @@
     <string name="waiting_room">Waiting Room</string>
 
     <!-- Preference keys -->
-    <string name="preference_file_key">com.iced.egret.palette.PREFERENCES_KEY</string>
-    <string name="sd_card_uri_key">com.iced.egret.palette.SD_CARD_URI_KEY</string>
-    <string name="primary_color_key">com.iced.egret.palette.PRIMARY_COLOR</string>
-    <string name="accent_color_key">com.iced.egret.palette.ACCENT_COLOR</string>
-    <string name="toolbar_item_color_key">com.iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
-    <string name="pager_toolbar_color_key">com.iced.egret.palette.PAGER_TOOLBAR_COLOR</string>
-    <string name="true_zoom_key">com.iced.egret.palette.TRUE_ZOOM</string>
+    <string name="preference_file_key">iced.egret.palette.PREFERENCES_KEY</string>
+    <string name="sd_card_uri_key">iced.egret.palette.SD_CARD_URI_KEY</string>
+    <string name="primary_color_key">iced.egret.palette.PRIMARY_COLOR</string>
+    <string name="accent_color_key">iced.egret.palette.ACCENT_COLOR</string>
+    <string name="toolbar_item_color_key">iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
+    <string name="pager_toolbar_color_key">iced.egret.palette.PAGER_TOOLBAR_COLOR</string>
+    <string name="true_zoom_key">iced.egret.palette.TRUE_ZOOM</string>
     <string name="waiting_room_autoclear_key">iced.egret.palette.AUTO_CLEAR</string>
 
     <!-- Preference names -->

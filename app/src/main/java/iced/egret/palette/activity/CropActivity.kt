@@ -45,7 +45,7 @@ class CropActivity : BaseActivity() {
         buildBottomBar()
 
         styleToolbar(toolbar)
-        styleBottomBar()
+        colorBottomBar()
     }
 
     override fun onResume() {
@@ -118,7 +118,7 @@ class CropActivity : BaseActivity() {
         }
     }
 
-    private fun styleBottomBar() {
+    private fun colorBottomBar() {
         val barBgColor = getColorInt(ColorType.PRIMARY)
         val barTextColor = getColorInt(ColorType.ITEM)
 

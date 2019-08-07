@@ -11,36 +11,41 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import iced.egret.palette.R
+import iced.egret.palette.activity.MainActivity
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 
 /**
- * A Fragment that generally shows a list of objects, and shares its display with other such
- * Fragments in a single Activity. List objects are selectable. Toolbar has a TextView inside
- * (allowing for more granular control of the title's display), so it has to be themed manually,
- * unlike more basic Toolbars.
+ * A Fragment that generally shows a list of objects, and sits inside MainActivity along with other
+ * MainFragments. List objects are selectable. Toolbar has a TextView inside (allowing for more
+ * granular control of the title's display).
  *
- * Toolbar menu items are themed automatically. ActionMode's are not.
+ * Coloring has to be done in onResume to show up when returning from SettingsActivity.
  */
-abstract class ListFragment : Fragment() {
+abstract class MainFragment : Fragment() {
 
     lateinit var toolbar: Toolbar
     lateinit var navigationDrawable : DrawerArrowDrawable
-    protected lateinit var sharedPrefs : SharedPreferences
+    private lateinit var sharedPrefs : SharedPreferences
+    protected lateinit var mActivity: MainActivity
 
     abstract fun setClicksBlocked(doBlock: Boolean)
     abstract fun onAllFragmentsCreated()
     abstract fun onBackPressed(): Boolean
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        mActivity = activity as MainActivity
         navigationDrawable = DrawerArrowDrawable(context!!)
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.context)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     protected open fun setToolbarItemColor() {
+        // Basic stuff
+        mActivity.styleToolbar(toolbar)
+
+        // Advanced stuff
         val color = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
         toolbar.toolbarTitle.setTextColor(color)
-
         navigationDrawable.color = color  // Only DrawerArrowDrawable's own color function works
     }
 

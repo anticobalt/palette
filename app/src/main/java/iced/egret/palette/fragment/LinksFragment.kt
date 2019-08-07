@@ -42,7 +42,7 @@ import kotlinx.android.synthetic.main.fragment_links.*
  * - Aliases
  */
 class LinksFragment :
-        ListFragment(),
+        MainFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener {
@@ -51,7 +51,6 @@ class LinksFragment :
         const val selectedType = "LinksFragment_ST"
     }
 
-    private lateinit var mActivity: MainActivity
     private var mRootView: View? = null
     private lateinit var mRecyclerView: RecyclerView
 
@@ -68,13 +67,12 @@ class LinksFragment :
         mRootView = inflater.inflate(R.layout.fragment_links, container, false)
 
         mRecyclerView = mRootView!!.findViewById(R.id.recyclerView)
-        mActivity = activity as MainActivity
 
         buildToolbar()
         buildRecyclerView()
         buildSideActions()
         styleSlidePane()
-        styleExtraThemeElements()
+        colorSideLayout()
 
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
         return mRootView
@@ -112,7 +110,7 @@ class LinksFragment :
 
     override fun onResume() {
         super.onResume()
-        styleExtraThemeElements()
+        colorSideLayout()
         if (mSelectedContentType != null) mActivity.isolateFragment(this)
     }
 
@@ -167,15 +165,7 @@ class LinksFragment :
         slider.setShadowResourceLeft(R.drawable.shadow_left_fixed)
     }
 
-    override fun setToolbarItemColor() {
-        super.setToolbarItemColor()
-        val iconColor = getColorInt(BaseActivity.ColorType.ITEM)
-        toolbar.menu.findItem(R.id.actionCreateAlbum).icon.setTint(iconColor)
-    }
-
-
-    // Style themed stuff that isn't handled by theming library or other inherited classes.
-    private fun styleExtraThemeElements() {
+    private fun colorSideLayout() {
         val accentColor = getColorInt(BaseActivity.ColorType.ACCENT)
         val iconColor = getColorInt(BaseActivity.ColorType.ITEM)
 

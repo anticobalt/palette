@@ -15,7 +15,6 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
 import iced.egret.palette.activity.BaseActivity
-import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.MainActivity.Constants.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.activity.MainPagerActivity
 import iced.egret.palette.delegate.AlbumViewDelegate
@@ -51,13 +50,12 @@ import kotlinx.android.synthetic.main.fragment_view_collection.*
  * - Aliases
  */
 class CollectionViewFragment :
-        ListFragment(),
+        MainFragment(),
         ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener,
         FlexibleAdapter.OnItemLongClickListener,
         SwipeRefreshLayout.OnRefreshListener {
 
-    private lateinit var mActivity: MainActivity
     private var mDelegate: CollectionViewDelegate = FolderViewDelegate()  // default
         set(value) {
             value.listener = this
@@ -85,7 +83,6 @@ class CollectionViewFragment :
         mCollectionRecyclerView = mRootView!!.findViewById(R.id.rvCollectionItems)
         mFloatingActionButton = mRootView!!.findViewById(R.id.fab)
         mSwipeRefreshLayout = mRootView!!.findViewById(R.id.swipeRefreshLayout)
-        mActivity = activity as MainActivity
 
         fetchContents()
         buildDelegate()
@@ -135,7 +132,7 @@ class CollectionViewFragment :
      */
     override fun onResume() {
         super.onResume()
-        styleFab()
+        colorFab()
         // Never refresh if currently selecting stuff.
         // If not selecting, refresh if onCreate() not called.
         if (mSelectedContentType != null) {
@@ -220,7 +217,7 @@ class CollectionViewFragment :
         toolbar.toolbarTitle.text = text
     }
 
-    private fun styleFab() {
+    private fun colorFab() {
         val color = getColorInt(BaseActivity.ColorType.ITEM)
         mFloatingActionButton.drawable.setTint(color)
     }

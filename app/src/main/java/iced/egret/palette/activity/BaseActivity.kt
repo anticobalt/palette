@@ -77,7 +77,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
         for (i in 0 until toolbar.menu.size()) {
             val item = toolbar.menu.getItem(i)
-            item.icon.setTint(iItemColor)
+            item.icon?.setTint(iItemColor)
         }
         toolbar.setTitleTextColor(iItemColor)
         toolbar.navigationIcon?.setTint(iItemColor)

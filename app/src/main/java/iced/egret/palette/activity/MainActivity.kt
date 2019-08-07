@@ -19,7 +19,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.LinksFragment
-import iced.egret.palette.fragment.ListFragment
+import iced.egret.palette.fragment.MainFragment
 import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
@@ -42,7 +42,7 @@ import kotlinx.android.synthetic.main.fragment_links.*
  */
 class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListener {
 
-    class DummyFragment : ListFragment() {
+    class DummyFragment : MainFragment() {
         override fun setClicksBlocked(doBlock: Boolean) {}
         override fun onAllFragmentsCreated() {}
         override fun onBackPressed(): Boolean {
@@ -56,8 +56,8 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    private val fragments = Array<ListFragment>(2) { DummyFragment() }
-    private val finishedFragments = mutableListOf<ListFragment>()
+    private val fragments = Array<MainFragment>(2) { DummyFragment() }
+    private val finishedFragments = mutableListOf<MainFragment>()
     private val leftIndex = 0
     private val rightIndex = 1
 
@@ -224,7 +224,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
                 is CollectionViewFragment -> rightIndex
                 else -> continue@loop
             }
-            this.fragments[index] = fragment as ListFragment
+            this.fragments[index] = fragment as MainFragment
         }
     }
 
@@ -279,7 +279,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
      * Note that argument fragment has finished onCreateView(),
      * and thus its views can be indirectly manipulated e.g. via isolateFragment().
      */
-    fun notifyFragmentCreationFinished(finishedFragment: ListFragment) {
+    fun notifyFragmentCreationFinished(finishedFragment: MainFragment) {
         finishedFragments.add(finishedFragment)
         if (finishedFragments.toSet() == fragments.toSet()) {
             for (fragment in finishedFragments) {
@@ -291,7 +291,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     /**
      * Block click actions for all manipulable fragments except the given one.
      */
-    fun isolateFragment(toIsolateFragment: ListFragment) {
+    fun isolateFragment(toIsolateFragment: MainFragment) {
         for (fragment in finishedFragments) {
             if (fragment != toIsolateFragment) {
                 fragment.setClicksBlocked(true)

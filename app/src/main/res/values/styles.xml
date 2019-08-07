@@ -1,18 +1,20 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Cyanea.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.Cyanea.Light.DarkActionBar" />
+
+    <style name="ErrorTheme" parent="Theme.AppCompat.Light" />
+
+    <style name="AppTheme.BaseActivity">
+        <!-- Disables default action bar, allowing you to specify your own toolbar in the layout. -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- View last activity while doing slide to finish gesture -->
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme.NoDefaultActionBar">
-        <!-- Disables default action bar, allowing you to specify your own toolbar in the layout. -->
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.NoDefaultActionBar.ActionMode">
+    <style name="AppTheme.BaseActivity.ActionMode">
         <!-- Make ActionMode toolbar overlap existing toolbars -->
         <item name="windowActionModeOverlay">true</item>
     </style>

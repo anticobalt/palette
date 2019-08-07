@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.view_empty.*
  * Works with and assumes the existence of a valid CollectionManager, unless activity was stopped.
  * All lateinits are initialized here for safety.
  */
-abstract class GridCoverableActivity : BaseActivity(), ActionMode.Callback,
+abstract class GridCoverableActivity : SlideActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
     protected lateinit var mActionModeHelper: ToolbarActionModeHelper

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="cyanea_primary_reference">@color/dodger_blue</color>
-    <color name="cyanea_accent_reference">@color/fashion_red</color>
+    <color name="colorPrimary">@color/dodger_blue</color>
+    <color name="colorAccent">@color/fashion_red</color>
 
     <!-- For themes -->
     <color name="dodger_blue">#5B67FF</color>
@@ -28,6 +28,5 @@
 
     <!-- Same color as translucent navigation bar -->
     <color name="translucentBlack">#66000000</color>
-    <color name="t_red">#66DD2200</color>
 
 </resources>

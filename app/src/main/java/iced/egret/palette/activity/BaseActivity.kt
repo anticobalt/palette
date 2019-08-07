@@ -11,9 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
-import com.r0adkll.slidr.Slidr
-import com.r0adkll.slidr.model.SlidrConfig
-import com.r0adkll.slidr.model.SlidrInterface
 import iced.egret.palette.R
 import java.io.File
 
@@ -21,17 +18,10 @@ abstract class BaseActivity : AppCompatActivity() {
 
     enum class ColorType { PRIMARY, ACCENT, ITEM }
     protected lateinit var defSharedPreferences : SharedPreferences
-    protected lateinit var slidr : SlidrInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         defSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val config = SlidrConfig.Builder()
-                .edge(true)
-                .edgeSize(0.30f)
-                .build()
-        slidr = Slidr.attach(this, config)
     }
 
     fun toast(message: String) {
@@ -94,8 +84,8 @@ abstract class BaseActivity : AppCompatActivity() {
             ColorType.ITEM -> R.string.toolbar_item_color_key
         }
         val defaultRef = when (type) {
-            ColorType.PRIMARY -> R.color.cyanea_primary_reference
-            ColorType.ACCENT -> R.color.cyanea_accent_reference
+            ColorType.PRIMARY -> R.color.colorPrimary
+            ColorType.ACCENT -> R.color.colorAccent
             ColorType.ITEM -> R.color.white
         }
         return defSharedPreferences.getInt(getString(keyRef), idToColor(defaultRef))

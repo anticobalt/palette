@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.bottom_bar_crop.view.*
 import java.io.File
 import java.io.IOException
 
-class CropActivity : BaseActivity() {
+class CropActivity : SlideActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
 

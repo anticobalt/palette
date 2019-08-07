@@ -11,7 +11,7 @@ import com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
 import iced.egret.palette.R
 import kotlinx.android.synthetic.main.appbar.*
 
-class SettingsActivity : BaseActivity() {
+class SettingsActivity : SlideActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

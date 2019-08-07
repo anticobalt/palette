@@ -9,7 +9,7 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="AppTheme.SplashActivity">
+    <style name="AppTheme.StartActivity">
         <item name="android:windowBackground">@drawable/splash</item>
     </style>
 
@@ -21,28 +21,26 @@
 
     <style name="ErrorTheme" parent="Theme.AppCompat.Light" />
 
+    <!-- For toolbars -->
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
     <style name="ToolbarTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textSize">20sp</item>
     </style>
 
+    <!-- Cover Labels -->
     <style name="BannerMainText" parent="@style/TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">20sp</item>
     </style>
-
     <style name="BannerSubText" parent="@style/TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">12sp</item>
     </style>
-
     <style name="GridMainText" parent="@style/TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">14sp</item>
     </style>
-
     <style name="GridSubText" parent="@style/TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">10sp</item>

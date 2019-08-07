@@ -65,6 +65,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setAccentThemeFromSettings()
         setContentView(R.layout.activity_main)
         sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
@@ -77,8 +78,6 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         } else {
             buildApp(savedInstanceState)
         }
-
-        slidr.lock()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -193,10 +192,29 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         defSharedPreferences
                 .edit()
                 .putInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
-                .putInt(getString(R.string.primary_color_key), idToColor(R.color.cyanea_primary_reference))
-                .putInt(getString(R.string.accent_color_key), idToColor(R.color.cyanea_accent_reference))
+                .putInt(getString(R.string.primary_color_key), idToColor(R.color.colorPrimary))
+                .putInt(getString(R.string.accent_color_key), idToColor(R.color.colorAccent))
                 .commit()
         //applyTheme()
+    }
+
+    private fun setAccentThemeFromSettings() {
+        val resId = when (getColorInt(ColorType.ACCENT)) {
+            idToColor(R.color.dodger_blue) -> R.style.AppTheme_StartActivity_DodgerBlue
+            idToColor(R.color.sea_green) -> R.style.AppTheme_StartActivity_SeaGreen
+            idToColor(R.color.fruit_salad) -> R.style.AppTheme_StartActivity_FruitSalad
+            idToColor(R.color.tangerine) -> R.style.AppTheme_StartActivity_Tangerine
+            idToColor(R.color.lynch) -> R.style.AppTheme_StartActivity_Lynch
+            idToColor(R.color.coffee) -> R.style.AppTheme_StartActivity_Coffee
+            idToColor(R.color.idle_pink) -> R.style.AppTheme_StartActivity_IdlePink
+            idToColor(R.color.boppin_blue) -> R.style.AppTheme_StartActivity_BoppinBlue
+            idToColor(R.color.astral_yellow) -> R.style.AppTheme_StartActivity_AstralYellow
+            idToColor(R.color.myriad_magenta) -> R.style.AppTheme_StartActivity_MyriadMagenta
+            idToColor(R.color.resolute_cyan) -> R.style.AppTheme_StartActivity_ResoluteCyan
+            idToColor(R.color.fashion_red) -> R.style.AppTheme_StartActivity_FashionRed
+            else -> R.style.AppTheme_StartActivity  // fallback, default accent colors
+        }
+        setTheme(resId)
     }
 
     private fun makeFragments() {

@@ -10,7 +10,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import iced.egret.palette.R
@@ -28,7 +27,7 @@ import kotlinx.android.synthetic.main.appbar_picture_pager.*
  * between system's and app's bars; all toolbar menu actions in overflow.
  * Themed by reading shared preferences, to make translucency possible.
  */
-abstract class PicturePagerActivity : BaseActivity() {
+abstract class PicturePagerActivity : SlideActivity() {
 
     abstract val bottomBarRes: Int?
     abstract val menuRes: Int
@@ -112,11 +111,10 @@ abstract class PicturePagerActivity : BaseActivity() {
 
         val usePrimary = mSharedPrefs.getBoolean(getString(R.string.pager_toolbar_color_key), false)
         if (usePrimary) {
-            mBarBackgroundColor = mSharedPrefs.getInt(getString(R.string.primary_color_key),
-                    ContextCompat.getColor(this, R.color.cyanea_primary_reference))
+            mBarBackgroundColor = getColorInt(ColorType.PRIMARY)
         }  // else use default
 
-        mBarIconColor = mSharedPrefs.getInt(getString(R.string.toolbar_item_color_key), mBarIconColor)
+        mBarIconColor = getColorInt(ColorType.ITEM)
 
         // make translucent
         mBarBackgroundColor = getTranslucentColor(mBarBackgroundColor)

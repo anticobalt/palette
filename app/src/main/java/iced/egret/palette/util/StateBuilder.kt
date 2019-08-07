@@ -17,13 +17,11 @@ object StateBuilder : CoroutineScope {
             // On UI thread
             Storage.setupIfRequired(context)
             CollectionManager.setup(path)
-            Painter.setup(context)
         } else {
             launch {
                 // On IO thread, then do UI callback
                 Storage.setupIfRequired(context)
                 CollectionManager.setup(path)
-                Painter.setup(context)
                 withContext(Dispatchers.Main) { callback() }
             }
         }

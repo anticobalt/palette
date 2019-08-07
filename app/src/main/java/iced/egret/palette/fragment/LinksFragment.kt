@@ -41,11 +41,7 @@ import kotlinx.android.synthetic.main.fragment_links.*
  * - Refreshers
  * - Aliases
  */
-class LinksFragment :
-        MainFragment(),
-        ActionMode.Callback,
-        FlexibleAdapter.OnItemClickListener,
-        FlexibleAdapter.OnItemLongClickListener {
+class LinksFragment : MainFragment() {
 
     companion object SaveDataKeys {
         const val selectedType = "LinksFragment_ST"
@@ -74,7 +70,7 @@ class LinksFragment :
         styleSlidePane()
 
         // Color changes force recreation (see SettingsActivity)
-        colorToolbar()
+        colorBars()
         colorSideLayout()
 
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
@@ -355,7 +351,8 @@ class LinksFragment :
         mAdapter.currentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
-        (activity as MainActivity).restoreAllFragments()
+        mActivity.restoreAllFragments()
+        mActivity.undoColorActionMode()
 
         mode.menu.findItem(R.id.actionHide).isVisible = false
         mode.menu.findItem(R.id.actionDeleteAlbum).isVisible = false

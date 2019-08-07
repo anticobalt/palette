@@ -49,12 +49,7 @@ import kotlinx.android.synthetic.main.fragment_view_collection.*
  * - Management by MainActivity
  * - Aliases
  */
-class CollectionViewFragment :
-        MainFragment(),
-        ActionMode.Callback,
-        FlexibleAdapter.OnItemClickListener,
-        FlexibleAdapter.OnItemLongClickListener,
-        SwipeRefreshLayout.OnRefreshListener {
+class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var mDelegate: CollectionViewDelegate = FolderViewDelegate()  // default
         set(value) {
@@ -92,7 +87,7 @@ class CollectionViewFragment :
         mFloatingActionButton.setOnClickListener { onFabClick() }
 
         // Color changes force recreation (see SettingsActivity)
-        colorToolbar()
+        colorBars()
         colorFab()
 
         return mRootView
@@ -460,6 +455,7 @@ class CollectionViewFragment :
         restoreAllContent()
         mSelectedContentType = null  // nothing isolated
         mActivity.restoreAllFragments()
+        mActivity.undoColorActionMode()
 
         mode.menu.findItem(R.id.albumActions).isVisible = false
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false

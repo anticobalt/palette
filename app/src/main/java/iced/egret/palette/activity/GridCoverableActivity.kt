@@ -19,6 +19,7 @@ import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.Painter
 import iced.egret.palette.util.StateBuilder
 import kotlinx.android.synthetic.main.view_empty.*
 
@@ -53,7 +54,7 @@ abstract class GridCoverableActivity : SlideActivity(), ActionMode.Callback,
         buildToolbar()
         buildRecyclerView()
 
-        colorToolbar(mToolbar)
+        colorStandardElements(mToolbar)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -114,8 +115,11 @@ abstract class GridCoverableActivity : SlideActivity(), ActionMode.Callback,
      * From https://stackoverflow.com/a/45955606
      */
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        val color = ContextCompat.getColor(this, R.color.colorActionMode)
         window.decorView.findViewById<ActionBarContextView?>(R.id.action_mode_bar)
-                ?.setBackgroundColor(ContextCompat.getColor(this, R.color.space))
+                ?.setBackgroundColor(color)
+        window.statusBarColor = color
+        window.navigationBarColor = color
         return true
     }
 
@@ -124,6 +128,9 @@ abstract class GridCoverableActivity : SlideActivity(), ActionMode.Callback,
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
+        val primaryColor = getColorInt(ColorType.PRIMARY)
+        window.statusBarColor = Painter.getMaterialDark(primaryColor)
+        window.navigationBarColor = Painter.getMaterialDark(primaryColor)
         mContentItems.map { item -> item.setSelection(false) }
     }
 

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">@color/dodger_blue</color>
-    <color name="colorAccent">@color/fashion_red</color>
+    <color name="colorPrimary">@color/fruit_salad</color>
+    <color name="colorAccent">@color/resolute_cyan</color>
+    <color name="colorActionMode">@color/charcoal</color>
 
     <!-- For themes -->
     <color name="dodger_blue">#5B67FF</color>
@@ -22,9 +23,10 @@
     <color name="black">#000</color>
     <color name="white">#FFF</color>
 
-    <!-- For window backgrounds -->
+    <!-- Static backgrounds -->
     <color name="grey">#525252</color>
     <color name="space">#2D343A</color>
+    <color name="charcoal">#22272C</color>
 
     <!-- Same color as translucent navigation bar -->
     <color name="translucentBlack">#66000000</color>

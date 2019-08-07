@@ -11,6 +11,8 @@
 
     <style name="AppTheme.StartActivity">
         <item name="android:windowBackground">@drawable/splash</item>
+        <item name="colorPrimaryDark">@color/space</item>
+        <item name="android:colorPrimaryDark">@color/space</item>
     </style>
 
     <style name="AppTheme.SlideActivity">

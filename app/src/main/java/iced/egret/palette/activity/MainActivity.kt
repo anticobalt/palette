@@ -9,6 +9,9 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.view.ActionMode
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.ActionBarContextView
 import androidx.core.content.ContextCompat
@@ -24,6 +27,7 @@ import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Permission
 import iced.egret.palette.util.StateBuilder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -41,14 +45,6 @@ import kotlinx.android.synthetic.main.fragment_links.*
  * - Fragment management
  */
 class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListener {
-
-    class DummyFragment : MainFragment() {
-        override fun setClicksBlocked(doBlock: Boolean) {}
-        override fun onAllFragmentsCreated() {}
-        override fun onBackPressed(): Boolean {
-            return false
-        }
-    }
 
     private var hasPermission = false
     private val permissions = arrayOf(
@@ -330,8 +326,17 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
      * From https://stackoverflow.com/a/45955606
      */
     fun colorActionMode() {
+        val color = ContextCompat.getColor(this, R.color.colorActionMode)
         window.decorView.findViewById<ActionBarContextView?>(R.id.action_mode_bar)
-                ?.setBackgroundColor(ContextCompat.getColor(this, R.color.space))
+                ?.setBackgroundColor(color)
+        window.statusBarColor = color
+        window.navigationBarColor = color
+    }
+
+    fun undoColorActionMode() {
+        val primaryColor = getColorInt(ColorType.PRIMARY)
+        window.statusBarColor = Painter.getMaterialDark(primaryColor)
+        window.navigationBarColor = Painter.getMaterialDark(primaryColor)
     }
 
     fun notifyCollectionsChanged() {
@@ -366,6 +371,20 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         const val EXTERNAL_CODE = 100
         const val PICTURE_ACTIVITY_REQUEST = 1
         const val SD_CARD_WRITE_REQUEST = 2
+    }
+
+    class DummyFragment : MainFragment() {
+        override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {return false}
+        override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {return false}
+        override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {return false}
+        override fun onDestroyActionMode(p0: ActionMode?) {}
+        override fun onItemClick(view: View?, position: Int): Boolean {return false}
+        override fun onItemLongClick(position: Int) {}
+        override fun setClicksBlocked(doBlock: Boolean) {}
+        override fun onAllFragmentsCreated() {}
+        override fun onBackPressed(): Boolean {
+            return false
+        }
     }
 
 }

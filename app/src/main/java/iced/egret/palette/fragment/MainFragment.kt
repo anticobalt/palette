@@ -3,6 +3,7 @@ package iced.egret.palette.fragment
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
+import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
@@ -21,11 +23,12 @@ import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
  *
  * Coloring has to be done in onResume to show up when returning from SettingsActivity.
  */
-abstract class MainFragment : Fragment() {
+abstract class MainFragment : Fragment(), ActionMode.Callback,
+        FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
     lateinit var toolbar: Toolbar
-    lateinit var navigationDrawable : DrawerArrowDrawable
-    private lateinit var sharedPrefs : SharedPreferences
+    lateinit var navigationDrawable: DrawerArrowDrawable
+    private lateinit var sharedPrefs: SharedPreferences
     protected lateinit var mActivity: MainActivity
 
     abstract fun setClicksBlocked(doBlock: Boolean)
@@ -43,9 +46,9 @@ abstract class MainFragment : Fragment() {
      * Only needs to be done on creation b/c SettingsActivity recreates activity when
      * theme changes.
      */
-    protected open fun colorToolbar() {
+    protected open fun colorBars() {
         // Basic stuff
-        mActivity.colorToolbar(toolbar)
+        mActivity.colorStandardElements(toolbar)
 
         // Advanced stuff
         val color = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)

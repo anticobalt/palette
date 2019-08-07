@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import iced.egret.palette.R
+import iced.egret.palette.util.Painter
 import java.io.File
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -54,25 +55,24 @@ abstract class BaseActivity : AppCompatActivity() {
         sendBroadcast(mediaScanIntent)
     }
 
-    fun applyTheme(primaryColor: Int?, accentColor: Int?, toolbarItemColor: Int?) {
-
-    }
-
     /**
-     * Colors a normal support toolbar. Nested items not supported.
+     * Colors a normal support toolbar, status bar, and navigation bar. Nested items not supported.
      */
-    fun colorToolbar(toolbar: Toolbar) {
-        val iPrimaryColor = getColorInt(ColorType.PRIMARY)
-        val iItemColor = getColorInt(ColorType.ITEM)
+    fun colorStandardElements(toolbar: Toolbar) {
+        val primaryColor = getColorInt(ColorType.PRIMARY)
+        val itemColor = getColorInt(ColorType.ITEM)
 
         for (i in 0 until toolbar.menu.size()) {
             val item = toolbar.menu.getItem(i)
-            item.icon?.setTint(iItemColor)
+            item.icon?.setTint(itemColor)
         }
-        toolbar.setTitleTextColor(iItemColor)
-        toolbar.navigationIcon?.setTint(iItemColor)
-        toolbar.overflowIcon?.setTint(iItemColor)
-        toolbar.setBackgroundColor(iPrimaryColor)
+        toolbar.setTitleTextColor(itemColor)
+        toolbar.navigationIcon?.setTint(itemColor)
+        toolbar.overflowIcon?.setTint(itemColor)
+        toolbar.setBackgroundColor(primaryColor)
+
+        window.statusBarColor = Painter.getMaterialDark(primaryColor)
+        window.navigationBarColor = Painter.getMaterialDark(primaryColor)
     }
 
     fun idToColor(colorResId: Int) = ContextCompat.getColor(this, colorResId)

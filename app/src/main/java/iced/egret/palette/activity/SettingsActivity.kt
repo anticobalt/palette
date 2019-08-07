@@ -38,6 +38,11 @@ class SettingsActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun saveChanges(primaryColor: Int?, accentColor: Int?, toolbarItemColor: Int?) {
+        applyTheme(primaryColor, accentColor, toolbarItemColor)
+        styleToolbar(toolbar, primaryColor, toolbarItemColor)  // pass new state not reflected by disk
+    }
+
     class SettingsFragment : PreferenceFragmentCompat() {
 
         var primaryColor: Int? = null
@@ -53,10 +58,13 @@ class SettingsActivity : BaseActivity() {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
-            setOnClickListeners()
+            setOnBeforeChangeListeners()
         }
 
-        private fun setOnClickListeners() {
+        /**
+         * Listeners called before preferences saved to disk.
+         */
+        private fun setOnBeforeChangeListeners() {
 
             val primaryColorPref = findColorPreference(getString(R.string.primary_color_key))
             val accentColorPref = findColorPreference(getString(R.string.accent_color_key))
@@ -94,8 +102,7 @@ class SettingsActivity : BaseActivity() {
         }
 
         private fun applyTheme() {
-            (this.activity!! as BaseActivity).applyTheme(primaryColor, accentColor, toolbarItemColor)
-            (this.activity!! as BaseActivity).styleToolbar(toolbar)
+            (this.activity!! as SettingsActivity).saveChanges(primaryColor, accentColor, toolbarItemColor)
         }
 
     }

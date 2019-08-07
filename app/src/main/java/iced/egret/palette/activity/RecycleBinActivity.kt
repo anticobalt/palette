@@ -4,6 +4,7 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import iced.egret.palette.R
+import iced.egret.palette.activity.inherited.GridCoverableActivity
 import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager

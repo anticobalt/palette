@@ -14,7 +14,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
-import iced.egret.palette.activity.BaseActivity
+import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.activity.MainActivity.Constants.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.activity.MainPagerActivity
 import iced.egret.palette.delegate.AlbumViewDelegate
@@ -23,6 +23,7 @@ import iced.egret.palette.delegate.FolderViewDelegate
 import iced.egret.palette.flexible.CoverableItem
 import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
+import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.model.Folder

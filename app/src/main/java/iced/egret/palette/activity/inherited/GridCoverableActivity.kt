@@ -1,4 +1,4 @@
-package iced.egret.palette.activity
+package iced.egret.palette.activity.inherited
 
 import android.content.res.Configuration
 import android.os.Bundle

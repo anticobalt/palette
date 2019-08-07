@@ -1,4 +1,4 @@
-package iced.egret.palette.activity
+package iced.egret.palette.activity.inherited
 
 import android.content.Intent
 import android.content.SharedPreferences

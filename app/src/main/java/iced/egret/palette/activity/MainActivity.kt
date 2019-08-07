@@ -20,9 +20,10 @@ import androidx.fragment.app.Fragment
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
+import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.LinksFragment
-import iced.egret.palette.fragment.MainFragment
+import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Folder

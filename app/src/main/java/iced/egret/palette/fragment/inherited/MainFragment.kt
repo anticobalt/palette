@@ -1,4 +1,4 @@
-package iced.egret.palette.fragment
+package iced.egret.palette.fragment.inherited
 
 import android.content.SharedPreferences
 import android.graphics.Color

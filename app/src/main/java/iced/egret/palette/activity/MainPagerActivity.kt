@@ -4,6 +4,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
+import iced.egret.palette.activity.inherited.PicturePagerActivity
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator

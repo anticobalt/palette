@@ -13,6 +13,8 @@ import androidx.preference.PreferenceManager
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import iced.egret.palette.R
+import iced.egret.palette.activity.inherited.PicturePagerActivity
+import iced.egret.palette.activity.inherited.SlideActivity
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.StateBuilder

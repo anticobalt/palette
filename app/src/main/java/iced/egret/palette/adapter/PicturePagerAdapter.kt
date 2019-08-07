@@ -7,7 +7,7 @@ import androidx.viewpager.widget.PagerAdapter
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import iced.egret.palette.R
-import iced.egret.palette.activity.PicturePagerActivity
+import iced.egret.palette.activity.inherited.PicturePagerActivity
 import iced.egret.palette.model.Picture
 import kotlinx.android.synthetic.main.item_main_pager_standard.view.*
 import kotlinx.android.synthetic.main.item_main_pager_true_zoom.view.*

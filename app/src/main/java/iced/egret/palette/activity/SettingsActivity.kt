@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.core.app.TaskStackBuilder
 import androidx.preference.PreferenceFragmentCompat
 import iced.egret.palette.R
+import iced.egret.palette.activity.inherited.SlideActivity
 import kotlinx.android.synthetic.main.appbar.*
 
 class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceChangeListener {

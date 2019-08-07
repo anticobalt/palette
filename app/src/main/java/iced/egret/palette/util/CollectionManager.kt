@@ -7,7 +7,7 @@ import android.graphics.Bitmap
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import iced.egret.palette.R
-import iced.egret.palette.activity.BaseActivity
+import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.model.*
 import iced.egret.palette.model.Collection
 import kotlinx.coroutines.CoroutineScope

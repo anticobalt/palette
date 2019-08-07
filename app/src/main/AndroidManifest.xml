@@ -23,7 +23,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.BaseActivity.ActionMode">
+            android:theme="@style/AppTheme.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,25 +32,25 @@
         <activity
             android:name=".activity.RecycleBinActivity"
             android:label="@string/recycle_bin"
-            android:theme="@style/AppTheme.BaseActivity.ActionMode" />
+            android:theme="@style/AppTheme.SlideActivity" />
         <activity
             android:name=".activity.WaitingRoomActivity"
             android:label="@string/waiting_room"
-            android:theme="@style/AppTheme.BaseActivity.ActionMode" />
+            android:theme="@style/AppTheme.SlideActivity" />
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.BaseActivity" />
+            android:theme="@style/AppTheme.SlideActivity" />
         <activity
             android:name=".activity.MainPagerActivity"
-            android:theme="@style/AppTheme.BaseActivity" />
+            android:theme="@style/AppTheme.SlideActivity" />
         <activity
             android:name=".activity.WaitingRoomPagerActivity"
-            android:theme="@style/AppTheme.BaseActivity" />
+            android:theme="@style/AppTheme.SlideActivity" />
         <activity
             android:name=".activity.CropActivity"
             android:label="@string/title_activity_crop"
-            android:theme="@style/AppTheme.BaseActivity" />
+            android:theme="@style/AppTheme.SlideActivity" />
     </application>
 
 </manifest>

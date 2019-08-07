@@ -162,19 +162,23 @@ class MainActivity : BasicThemedActivity(), HackySlidingPaneLayout.HackyPanelSli
     private fun buildApp(savedInstanceState: Bundle?) {
 
         if (isFirstRun()) applyDefaultSettings()
+        checkSdWriteAccess()
 
         if (savedInstanceState == null) {
             // First start of activity
-            StateBuilder.build(this, null)
-            makeFragments()
+            StateBuilder.build(this, null) {
+                makeFragments()
+                buildSlidingPane()
+                mainLayout.visibility = View.VISIBLE
+            }
         } else {
             val navigateToPath = savedInstanceState.getString(ON_SCREEN_COLLECTION_KEY)
             StateBuilder.build(this, navigateToPath)
             // Save the remade fragments (which are technically different).
             updateFragments(supportFragmentManager.fragments)
+            buildSlidingPane()
+            mainLayout.visibility = View.VISIBLE
         }
-        buildSlidingPane()
-        checkSdWriteAccess()
     }
 
     private fun isFirstRun(): Boolean {

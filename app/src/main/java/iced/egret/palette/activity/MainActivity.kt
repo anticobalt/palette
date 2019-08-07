@@ -226,7 +226,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
             supportFragmentManager
                     .beginTransaction()
                     .replace(frames[i], fragments[i])
-                    .commit()
+                    .commitAllowingStateLoss()
         }
 
     }

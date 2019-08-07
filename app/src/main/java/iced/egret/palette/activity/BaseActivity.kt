@@ -61,7 +61,7 @@ abstract class BaseActivity : AppCompatActivity() {
     /**
      * Colors a normal support toolbar. Nested items not supported.
      */
-    fun styleToolbar(toolbar: Toolbar) {
+    fun colorToolbar(toolbar: Toolbar) {
         val iPrimaryColor = getColorInt(ColorType.PRIMARY)
         val iItemColor = getColorInt(ColorType.ITEM)
 

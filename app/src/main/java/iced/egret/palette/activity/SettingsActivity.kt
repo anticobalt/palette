@@ -37,7 +37,7 @@ class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceCh
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         buildToolbar()
-        styleToolbar(toolbar)
+        colorToolbar(toolbar)
         defSharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
         supportFragmentManager

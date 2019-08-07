@@ -53,7 +53,7 @@ abstract class GridCoverableActivity : SlideActivity(), ActionMode.Callback,
         buildToolbar()
         buildRecyclerView()
 
-        styleToolbar(mToolbar)
+        colorToolbar(mToolbar)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

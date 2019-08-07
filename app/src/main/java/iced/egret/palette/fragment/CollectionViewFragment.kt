@@ -91,6 +91,10 @@ class CollectionViewFragment :
         mSwipeRefreshLayout.setOnRefreshListener(this)
         mFloatingActionButton.setOnClickListener { onFabClick() }
 
+        // Color changes force recreation (see SettingsActivity)
+        colorToolbar()
+        colorFab()
+
         return mRootView
 
     }
@@ -132,7 +136,6 @@ class CollectionViewFragment :
      */
     override fun onResume() {
         super.onResume()
-        colorFab()
         // Never refresh if currently selecting stuff.
         // If not selecting, refresh if onCreate() not called.
         if (mSelectedContentType != null) {

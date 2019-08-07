@@ -44,7 +44,7 @@ class CropActivity : SlideActivity() {
         buildToolbar()
         buildBottomBar()
 
-        styleToolbar(toolbar)
+        colorToolbar(toolbar)
         colorBottomBar()
     }
 

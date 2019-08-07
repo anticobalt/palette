@@ -39,20 +39,18 @@ abstract class MainFragment : Fragment() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    protected open fun setToolbarItemColor() {
+    /**
+     * Only needs to be done on creation b/c SettingsActivity recreates activity when
+     * theme changes.
+     */
+    protected open fun colorToolbar() {
         // Basic stuff
-        mActivity.styleToolbar(toolbar)
+        mActivity.colorToolbar(toolbar)
 
         // Advanced stuff
         val color = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
         toolbar.toolbarTitle.setTextColor(color)
         navigationDrawable.color = color  // Only DrawerArrowDrawable's own color function works
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Allow updating whenever returning to fragment from Settings
-        setToolbarItemColor()
     }
 
 }

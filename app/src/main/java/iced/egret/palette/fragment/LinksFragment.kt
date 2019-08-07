@@ -72,6 +72,9 @@ class LinksFragment :
         buildRecyclerView()
         buildSideActions()
         styleSlidePane()
+
+        // Color changes force recreation (see SettingsActivity)
+        colorToolbar()
         colorSideLayout()
 
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)

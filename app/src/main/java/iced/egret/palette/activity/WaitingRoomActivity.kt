@@ -3,7 +3,6 @@ package iced.egret.palette.activity
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import com.jaredrummler.cyanea.tinting.MenuTint
 import iced.egret.palette.R
 import iced.egret.palette.flexible.GridCoverableItem
 import iced.egret.palette.model.Picture
@@ -49,15 +48,10 @@ class WaitingRoomActivity : GridCoverableActivity() {
         }
     }
 
-    override fun styleToolbar() {
-        val itemColor = getColorInt(ColorType.ITEM)
-        mToolbar.setTitleTextColor(itemColor)
-        MenuTint(mToolbar.menu, itemColor, tintOverflowIcon = true, tintNavigationIcon = true).apply(this)
-    }
-
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         super.onCreateActionMode(mode, menu)
-        MenuTint(menu, Painter.currentDrawableColor, tintOverflowIcon = true, tintNavigationIcon = true).apply(this)
+        Painter.paintDrawable(menu.findItem(R.id.actionSelectAll).icon)
+        Painter.paintDrawable(menu.findItem(R.id.actionClear).icon)
         return true
     }
 

@@ -2,7 +2,6 @@ package iced.egret.palette.activity
 
 import android.graphics.Color
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -12,13 +11,13 @@ import com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
 import iced.egret.palette.R
 import kotlinx.android.synthetic.main.appbar.*
 
-class SettingsActivity : BasicThemedActivity() {
+class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         buildToolbar()
-        styleToolbar()
+        styleToolbar(toolbar)
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings, SettingsFragment())
@@ -30,14 +29,6 @@ class SettingsActivity : BasicThemedActivity() {
         toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
-    }
-
-    private fun styleToolbar() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val itemColor = getColorInt(ColorType.ITEM)
-
-        toolbar.setTitleTextColor(itemColor)
-        toolbar.navigationIcon?.setTint(itemColor)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -103,8 +94,8 @@ class SettingsActivity : BasicThemedActivity() {
         }
 
         private fun applyTheme() {
-            (this.activity!! as BasicThemedActivity).applyTheme(primaryColor, accentColor, toolbarItemColor)
-            (this.activity!! as SettingsActivity).styleToolbar()
+            (this.activity!! as BaseActivity).applyTheme(primaryColor, accentColor, toolbarItemColor)
+            (this.activity!! as BaseActivity).styleToolbar(toolbar)
         }
 
     }

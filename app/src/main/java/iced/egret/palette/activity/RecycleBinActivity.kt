@@ -26,13 +26,6 @@ class RecycleBinActivity : GridCoverableActivity() {
         }
     }
 
-    override fun styleToolbar() {
-        val itemColor = getColorInt(ColorType.ITEM)
-        mToolbar.setTitleTextColor(itemColor)
-        mToolbar.navigationIcon?.setTint(itemColor)
-        mToolbar.menu.findItem(R.id.actionEmpty).icon.setTint(itemColor)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_recycle_bin, menu)
         return super.onCreateOptionsMenu(menu)

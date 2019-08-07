@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Cyanea.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Disables default action bar, allowing you to specify your own toolbar in the layout. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -26,7 +26,6 @@
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">?menuIconColor</item>
     </style>
 
     <style name="BannerMainText" parent="@style/TextAppearance.AppCompat.Body1">

@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.view_empty.*
  * Works with and assumes the existence of a valid CollectionManager, unless activity was stopped.
  * All lateinits are initialized here for safety.
  */
-abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callback,
+abstract class GridCoverableActivity : BaseActivity(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
 
     protected lateinit var mActionModeHelper: ToolbarActionModeHelper
@@ -42,7 +42,6 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
 
     abstract fun fetchContents()
     abstract fun buildToolbar()
-    abstract fun styleToolbar()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +52,8 @@ abstract class GridCoverableActivity : BasicThemedActivity(), ActionMode.Callbac
         fetchContents()
         buildToolbar()
         buildRecyclerView()
-    }
 
-    override fun onResume() {
-        super.onResume()
-        styleToolbar()
+        styleToolbar(mToolbar)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

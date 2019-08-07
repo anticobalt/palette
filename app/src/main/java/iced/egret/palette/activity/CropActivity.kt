@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.bottom_bar_crop.view.*
 import java.io.File
 import java.io.IOException
 
-class CropActivity : BasicThemedActivity() {
+class CropActivity : BaseActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -43,6 +43,9 @@ class CropActivity : BasicThemedActivity() {
         buildCropView()
         buildToolbar()
         buildBottomBar()
+
+        styleToolbar(toolbar)
+        styleBottomBar()
     }
 
     override fun onResume() {
@@ -51,9 +54,6 @@ class CropActivity : BasicThemedActivity() {
         // If handling on-disk item, but it was moved, get out.
         val path = mImageUri.path
         if (path != null && !Storage.fileExists(path)) finish()
-
-        styleToolbar()
-        styleBottomBar()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -116,16 +116,6 @@ class CropActivity : BasicThemedActivity() {
             cropImageView.clearAspectRatio()
             cropImageView.resetCropRect()  // expand to fill whole image
         }
-    }
-
-    private fun styleToolbar() {
-        val itemColor = getColorInt(ColorType.ITEM)
-        toolbar.setTitleTextColor(itemColor)
-
-        toolbar.navigationIcon?.setTint(itemColor)
-        toolbar.menu.findItem(R.id.crop_image_menu_rotate_right).icon.setTint(itemColor)
-        toolbar.menu.findItem(R.id.crop_image_menu_flip).icon.setTint(itemColor)
-        toolbar.menu.findItem(R.id.crop_image_menu_crop).icon.setTint(itemColor)
     }
 
     private fun styleBottomBar() {

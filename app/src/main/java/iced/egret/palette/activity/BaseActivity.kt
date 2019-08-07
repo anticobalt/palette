@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import com.r0adkll.slidr.Slidr
@@ -63,6 +64,27 @@ abstract class BaseActivity : AppCompatActivity() {
         sendBroadcast(mediaScanIntent)
     }
 
+    fun applyTheme(primaryColor: Int?, accentColor: Int?, toolbarItemColor: Int?) {
+
+    }
+
+    /**
+     * Colors a normal support toolbar. Nested items not supported.
+     */
+    fun styleToolbar(toolbar: Toolbar) {
+        val primaryColor = getColorInt(ColorType.PRIMARY)
+        val itemColor = getColorInt(ColorType.ITEM)
+
+        for (i in 0 until toolbar.menu.size()) {
+            val item = toolbar.menu.getItem(i)
+            item.icon.setTint(itemColor)
+        }
+        toolbar.setTitleTextColor(itemColor)
+        toolbar.navigationIcon?.setTint(itemColor)
+        toolbar.overflowIcon?.setTint(itemColor)
+        toolbar.setBackgroundColor(primaryColor)
+    }
+
     fun idToColor(colorResId: Int) = ContextCompat.getColor(this, colorResId)
 
     fun getColorInt(type: ColorType) : Int {
@@ -73,7 +95,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
         val defaultRef = when (type) {
             ColorType.PRIMARY -> R.color.cyanea_primary_reference
-            ColorType.ACCENT -> R.color.cyanea_accent
+            ColorType.ACCENT -> R.color.cyanea_accent_reference
             ColorType.ITEM -> R.color.white
         }
         return defSharedPreferences.getInt(getString(keyRef), idToColor(defaultRef))

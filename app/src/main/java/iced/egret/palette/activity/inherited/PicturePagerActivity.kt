@@ -25,7 +25,6 @@ import kotlinx.android.synthetic.main.appbar_picture_pager.*
 /**
  * Allows image flipping via ViewPager. Translucent top and bottom bars with seamless transition
  * between system's and app's bars; all toolbar menu actions in overflow.
- * Themed by reading shared preferences, to make translucency possible.
  */
 abstract class PicturePagerActivity : SlideActivity() {
 

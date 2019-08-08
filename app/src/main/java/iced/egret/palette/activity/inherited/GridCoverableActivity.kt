@@ -24,7 +24,7 @@ import iced.egret.palette.util.StateBuilder
 import kotlinx.android.synthetic.main.view_empty.*
 
 /**
- * Basic themed activity with selectable and long-clickable GridCoverableItems.
+ * Basic activity with selectable and long-clickable GridCoverableItems.
  * Works with and assumes the existence of a valid CollectionManager, unless activity was stopped.
  * All lateinits are initialized here for safety.
  */

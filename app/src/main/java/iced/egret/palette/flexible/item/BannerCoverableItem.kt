@@ -1,7 +1,9 @@
-package iced.egret.palette.flexible
+package iced.egret.palette.flexible.item
 
 import android.widget.TextView
 import iced.egret.palette.R
+import iced.egret.palette.flexible.item.inherited.CoverableItem
+import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.Painter
 

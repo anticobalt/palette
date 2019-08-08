@@ -1,4 +1,4 @@
-package iced.egret.palette.flexible
+package iced.egret.palette.flexible.viewholder
 
 import android.view.View
 import android.widget.ImageView

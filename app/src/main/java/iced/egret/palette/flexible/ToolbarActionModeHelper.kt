@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter.Mode
 import eu.davidea.flexibleadapter.utils.Log
+import iced.egret.palette.flexible.item.inherited.CoverableItem
 
 /**
  * A copy of ActionModeHelper (from FlexibleAdapter) that uses Toolbar

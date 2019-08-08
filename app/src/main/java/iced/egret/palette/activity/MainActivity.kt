@@ -372,6 +372,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         const val EXTERNAL_CODE = 100
         const val PICTURE_ACTIVITY_REQUEST = 1
         const val SD_CARD_WRITE_REQUEST = 2
+        const val FOLDER_LIST_ACTIVITY_REQUEST = 3
     }
 
     class DummyFragment : MainFragment() {

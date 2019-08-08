@@ -6,6 +6,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
+import iced.egret.palette.delegate.inherited.CollectionViewDelegate
+import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Coverable
 
@@ -27,7 +29,7 @@ class FolderViewDelegate : CollectionViewDelegate() {
         // TODO
     }
 
-    override fun onOptionsItemSelected(item: MenuItem, context: Context, currentCollection: Collection): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem, fragment: CollectionViewFragment, currentCollection: Collection): Boolean {
         return true
     }
 

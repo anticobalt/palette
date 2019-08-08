@@ -1,4 +1,4 @@
-package iced.egret.palette.flexible
+package iced.egret.palette.flexible.item.inherited
 
 import android.view.View
 import android.widget.ImageView
@@ -7,6 +7,7 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
+import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import iced.egret.palette.model.Coverable
 import iced.egret.palette.util.Painter
 

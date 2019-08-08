@@ -29,7 +29,7 @@ A copy of crop_image_menu from Android-Image_Cropper
 
     <item
         android:id="@+id/crop_image_menu_crop"
-        android:icon="@drawable/checkmark_black"
+        android:icon="@drawable/ic_check_black_24dp"
         android:title="@string/crop_image_menu_crop"
         app:showAsAction="always" />
 

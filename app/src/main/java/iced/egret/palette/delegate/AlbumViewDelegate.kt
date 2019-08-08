@@ -1,12 +1,17 @@
 package iced.egret.palette.delegate
 
 import android.content.Context
+import android.content.Intent
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.R
+import iced.egret.palette.activity.FolderListActivity
+import iced.egret.palette.activity.MainActivity.Constants.FOLDER_LIST_ACTIVITY_REQUEST
+import iced.egret.palette.delegate.inherited.CollectionViewDelegate
+import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Collection
 import iced.egret.palette.model.Coverable
@@ -18,6 +23,7 @@ class AlbumViewDelegate : CollectionViewDelegate() {
 
     override fun onBuildToolbar(toolbar: Toolbar) {
         toolbar.menu.findItem(R.id.actionRename).isVisible = true
+        toolbar.menu.findItem(R.id.actionShowSyncFolders).isVisible = true
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu, selectedContentType: String): Boolean {
@@ -53,10 +59,11 @@ class AlbumViewDelegate : CollectionViewDelegate() {
         createAlbum(contents, context)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem, context: Context, currentCollection: Collection): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem, fragment: CollectionViewFragment, currentCollection: Collection): Boolean {
         if (currentCollection !is Album) return false
         when (item.itemId) {
-            R.id.actionRename -> rename(currentCollection, context)
+            R.id.actionRename -> rename(currentCollection, fragment.context!!)
+            R.id.actionShowSyncFolders -> showSyncFolders(currentCollection, fragment)
         }
         return true
     }
@@ -88,6 +95,10 @@ class AlbumViewDelegate : CollectionViewDelegate() {
         CoverableMutator.rename(album, context) {
             alert(ActionAlert(true))
         }
+    }
+
+    private fun showSyncFolders(album: Album, fragment: CollectionViewFragment) {
+        fragment.startActivityForResult(Intent(fragment.context, FolderListActivity::class.java), FOLDER_LIST_ACTIVITY_REQUEST)
     }
 
 }

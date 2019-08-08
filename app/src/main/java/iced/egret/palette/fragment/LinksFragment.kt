@@ -17,8 +17,8 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.*
 import iced.egret.palette.activity.inherited.BaseActivity
-import iced.egret.palette.flexible.BannerCoverableItem
-import iced.egret.palette.flexible.CoverableItem
+import iced.egret.palette.flexible.item.BannerCoverableItem
+import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.itemdecoration.PinnedCollectionMargin

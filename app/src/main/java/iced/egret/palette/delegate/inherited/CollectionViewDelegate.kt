@@ -1,4 +1,4 @@
-package iced.egret.palette.delegate
+package iced.egret.palette.delegate.inherited
 
 import android.content.Context
 import android.view.ActionMode
@@ -30,7 +30,7 @@ abstract class CollectionViewDelegate {
                                      context: Context, selectedContentType: String): Boolean
 
     abstract fun onDestroyActionMode(mode: ActionMode)
-    abstract fun onOptionsItemSelected(item: MenuItem, context: Context, currentCollection: Collection): Boolean
+    abstract fun onOptionsItemSelected(item: MenuItem, fragment: CollectionViewFragment, currentCollection: Collection): Boolean
     abstract fun onFabClick(context: Context, contents: List<Coverable>)
 
     protected fun alert(actionAlert: ActionAlert) {

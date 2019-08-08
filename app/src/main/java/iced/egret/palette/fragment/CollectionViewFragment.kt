@@ -14,15 +14,15 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
-import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.activity.MainActivity.Constants.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.activity.MainPagerActivity
+import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.delegate.AlbumViewDelegate
-import iced.egret.palette.delegate.CollectionViewDelegate
 import iced.egret.palette.delegate.FolderViewDelegate
-import iced.egret.palette.flexible.CoverableItem
-import iced.egret.palette.flexible.GridCoverableItem
+import iced.egret.palette.delegate.inherited.CollectionViewDelegate
 import iced.egret.palette.flexible.ToolbarActionModeHelper
+import iced.egret.palette.flexible.item.GridCoverableItem
+import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Coverable
@@ -359,7 +359,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        mDelegate.onOptionsItemSelected(item, context!!, CollectionManager.currentCollection!!)
+        mDelegate.onOptionsItemSelected(item, this, CollectionManager.currentCollection!!)
         return true
     }
 

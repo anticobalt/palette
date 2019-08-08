@@ -6,16 +6,14 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.View
 import androidx.appcompat.widget.ActionBarContextView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
-import iced.egret.palette.flexible.GridCoverableItem
+import iced.egret.palette.flexible.item.GridCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
@@ -26,35 +24,22 @@ import kotlinx.android.synthetic.main.view_empty.*
 /**
  * Basic activity with selectable and long-clickable GridCoverableItems.
  * Works with and assumes the existence of a valid CollectionManager, unless activity was stopped.
- * All lateinits are initialized here for safety.
+ * All lateinits belong to this class and its parent are initialized here for safety.
  */
-abstract class GridCoverableActivity : SlideActivity(), ActionMode.Callback,
-        FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
+abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callback,
+        FlexibleAdapter.OnItemLongClickListener {
 
     protected lateinit var mActionModeHelper: ToolbarActionModeHelper
-    protected lateinit var mRecyclerView: RecyclerView
     protected lateinit var mAdapter: FlexibleAdapter<GridCoverableItem>
-    protected lateinit var mToolbar: Toolbar
 
     protected var mContents = mutableListOf<Picture>()
     protected var mContentItems = mutableListOf<GridCoverableItem>()
 
     abstract var actionModeMenuRes: Int
 
-    abstract fun fetchContents()
-    abstract fun buildToolbar()
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        setState(savedInstanceState)  // must occur before making stuff
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_grid_coverable)
-        setState(savedInstanceState)
-        mToolbar = findViewById(R.id.toolbar)
-
-        fetchContents()
-        buildToolbar()
-        buildRecyclerView()
-
-        colorStandardElements(mToolbar)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -86,7 +71,7 @@ abstract class GridCoverableActivity : SlideActivity(), ActionMode.Callback,
         }
     }
 
-    private fun buildRecyclerView() {
+    override fun buildRecyclerView() {
         val orientation = resources.configuration.orientation
         val numColumns = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 5 else 3
         val manager = GridLayoutManager(this, numColumns)

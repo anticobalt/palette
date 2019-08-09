@@ -79,7 +79,9 @@ class WaitingRoomPagerActivity : PicturePagerActivity() {
     private fun initiateMoveToRecycleBin() {
         val picture = mCurrentPicture
         CoverableMutator.delete(listOf(picture), this) {
-            clearAndFinish()
+            // Deletion always clears internally
+            setResult(RESULT_OK)
+            finish()
         }
     }
 

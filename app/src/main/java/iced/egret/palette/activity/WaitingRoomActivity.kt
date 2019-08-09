@@ -19,8 +19,12 @@ class WaitingRoomActivity : GridCoverableActivity() {
     private val autoClear : Boolean
         get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
 
-    override fun onStart() {
-        super.onStart()
+    /**
+     * Update when returning to activity.
+     * onStart() not called when another other activity finishes.
+     */
+    override fun onResume() {
+        super.onResume()
         CollectionManager.fetchNewMedia(this) {
             refresh()
         }

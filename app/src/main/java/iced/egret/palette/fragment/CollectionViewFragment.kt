@@ -1,10 +1,10 @@
 package iced.egret.palette.fragment
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -14,7 +14,6 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
-import iced.egret.palette.activity.MainActivity.Constants.PICTURE_ACTIVITY_REQUEST
 import iced.egret.palette.activity.MainPagerActivity
 import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.delegate.AlbumViewDelegate
@@ -34,6 +33,7 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
+import java.io.File
 
 /**
  * Meat of the app. Shows Collection contents and allows navigation through them.
@@ -108,7 +108,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         //If selected content type is saved, restore it, otherwise get out
         if (savedInstanceState == null) return
-        val contentType = savedInstanceState.getString(selectedType, "")
+        val contentType = savedInstanceState.getString(SELECTED_TYPE, "")
         if (contentType.isEmpty()) return
 
         // Isolate internal contents and self
@@ -145,7 +145,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onSaveInstanceState(outState: Bundle) {
         mAdapter.onSaveInstanceState(outState)
-        outState.putString(selectedType, mSelectedContentType)
+        outState.putString(SELECTED_TYPE, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
 
@@ -158,12 +158,39 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICTURE_ACTIVITY_REQUEST) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                // Changes occurred: notify update; self-update occurs automatically in onResume()
-                mReturningFromStop = true
+        when (requestCode) {
+            PICTURE_ACTIVITY_REQUEST -> {
+                if (resultCode == RESULT_OK) {
+                    // Changes occurred: notify update; self-update occurs automatically in onResume()
+                    mReturningFromStop = true
+                }
+            }
+            FOLDER_LIST_ACTIVITY_REQUEST -> {
+                if (resultCode == RESULT_OK) {
+                    applySyncedFolders(data)
+                    mReturningFromStop = true
+                }
             }
         }
+    }
+
+    private fun applySyncedFolders(intent: Intent?) {
+        val album = CollectionManager.currentCollection
+
+        // These really shouldn't ever happen
+        if (intent == null) {
+            toast(R.string.intent_extra_error)
+            return
+        }
+        if (album !is Album) {
+            toast(R.string.edit_fail_error)
+            return
+        }
+
+        val filePaths = intent.getStringArrayListExtra(getString(R.string.intent_synced_folder_paths))
+        val folderFiles = filePaths.map {path -> File(path) }
+        album.syncedFolderFiles.clear()
+        album.syncedFolderFiles.addAll(folderFiles)
     }
 
 
@@ -599,8 +626,14 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         return mActivity.getColorInt(type)
     }
 
-    companion object SaveDataKeys {
-        const val selectedType = "CollectionViewFragment_ST"
+    private fun toast(strId: Int) {
+        return mActivity.toast(strId)
+    }
+
+    companion object Constants {
+        const val SELECTED_TYPE = "CollectionViewFragment_ST"
+        const val PICTURE_ACTIVITY_REQUEST = 1
+        const val FOLDER_LIST_ACTIVITY_REQUEST = 2
     }
 
 }

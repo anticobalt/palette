@@ -9,7 +9,7 @@ import androidx.appcompat.widget.Toolbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.R
 import iced.egret.palette.activity.SyncedFoldersActivity
-import iced.egret.palette.activity.MainActivity.Constants.FOLDER_LIST_ACTIVITY_REQUEST
+import iced.egret.palette.fragment.CollectionViewFragment.Constants.FOLDER_LIST_ACTIVITY_REQUEST
 import iced.egret.palette.delegate.inherited.CollectionViewDelegate
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.Album

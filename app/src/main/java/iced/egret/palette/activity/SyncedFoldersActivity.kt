@@ -1,5 +1,7 @@
 package iced.egret.palette.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -18,7 +20,6 @@ import java.io.File
 
 class SyncedFoldersActivity : RecyclerViewActivity() {
 
-    private val mFiles = mutableListOf<File>()
     private val mFileItems = mutableListOf<FileItem>()
     private lateinit var mAdapter: FlexibleAdapter<FileItem>
     private lateinit var albumPath : String
@@ -31,19 +32,17 @@ class SyncedFoldersActivity : RecyclerViewActivity() {
 
     override fun fetchContents() {
         StateBuilder.build(this, null)  // ensure Collections set up
-        mFiles.clear()
         mFileItems.clear()
 
         // Add synced folders
         val album = CollectionManager.getNestedAlbums().find { album -> album.path == albumPath }
                 ?: return
-        mFiles.addAll(album.syncedFolderFiles)
-        mFileItems.addAll(mFiles.map { file -> FileItem(file, true) })
+        val files = album.syncedFolderFiles
+        mFileItems.addAll(files.map { file -> FileItem(file, true) })
 
         // Add some other folders that user may want to sync
         val candidates = getPotentialFolderFiles(CollectionManager.folders)
-                .filter { candidate -> candidate !in mFiles }
-        mFiles.addAll(candidates)
+                .filter { candidate -> candidate !in files }
         mFileItems.addAll(candidates.map { file -> FileItem(file, false) })
     }
 
@@ -104,7 +103,15 @@ class SyncedFoldersActivity : RecyclerViewActivity() {
     }
 
     private fun apply() {
+        val fileNames = mFileItems
+                .filter {item -> item.isChecked}
+                .map {item -> item.file.path}
+                as ArrayList
 
+        val intent = Intent()
+        intent.putStringArrayListExtra(getString(R.string.intent_synced_folder_paths), fileNames)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
 }

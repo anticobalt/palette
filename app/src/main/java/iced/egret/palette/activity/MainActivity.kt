@@ -25,8 +25,8 @@ import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.LinksFragment
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.layout.HackySlidingPaneLayout
-import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.Folder
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Permission
@@ -370,9 +370,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     companion object Constants {
         const val ON_SCREEN_COLLECTION_KEY = "on-screen-collection"
         const val EXTERNAL_CODE = 100
-        const val PICTURE_ACTIVITY_REQUEST = 1
-        const val SD_CARD_WRITE_REQUEST = 2
-        const val FOLDER_LIST_ACTIVITY_REQUEST = 3
+        const val SD_CARD_WRITE_REQUEST = 1
     }
 
     class DummyFragment : MainFragment() {

@@ -15,11 +15,14 @@ import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import iced.egret.palette.R
-import iced.egret.palette.activity.*
+import iced.egret.palette.activity.MainActivity
+import iced.egret.palette.activity.RecycleBinActivity
+import iced.egret.palette.activity.SettingsActivity
+import iced.egret.palette.activity.WaitingRoomActivity
 import iced.egret.palette.activity.inherited.BaseActivity
+import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.flexible.item.BannerCoverableItem
 import iced.egret.palette.flexible.item.inherited.CoverableItem
-import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.model.Album
@@ -163,7 +166,7 @@ class LinksFragment : MainFragment() {
     private fun styleSlidePane() {
         val slider = mRootView!!.findViewById<SlidingPaneLayout>(R.id.slider)
         slider.sliderFadeColor = Color.TRANSPARENT  // make right not greyed out
-        slider.setShadowResourceLeft(R.drawable.shadow_left_fixed)
+        //slider.setShadowResourceLeft(R.drawable.shadow_left_fixed)
     }
 
     private fun colorSideLayout() {
@@ -177,6 +180,12 @@ class LinksFragment : MainFragment() {
                 touchable.imageTintList = ColorStateList.valueOf(iconColor)
             }
         }
+
+        /*
+        val shadow = sideLayout.findViewById<View>(R.id.sideActionsTopShadow)
+        shadow.layoutParams.width =
+                resources.getDimensionPixelSize(R.dimen.side_icon_total_width) -
+                resources.getDimensionPixelSize(R.dimen.fixed_shadow_size) */
     }
 
     /**

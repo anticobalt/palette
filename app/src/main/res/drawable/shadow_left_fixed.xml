@@ -5,5 +5,5 @@
         android:angle="0"
         android:endColor="#40000000"
         android:startColor="#00000000" />
-    <size android:width="10dp" />
+    <size android:width="@dimen/fixed_shadow_size" />
 </shape>

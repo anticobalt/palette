@@ -23,6 +23,7 @@
             android:orientation="vertical">
 
             <View
+                android:id="@+id/sideActionsTopShadow"
                 android:layout_width="@dimen/side_icon_total_width"
                 android:layout_height="10dp"
                 android:background="@drawable/shadow_bottom"

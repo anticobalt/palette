@@ -9,7 +9,10 @@ import androidx.fragment.app.Fragment
 import iced.egret.palette.R
 import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.model.*
-import iced.egret.palette.model.Collection
+import iced.egret.palette.model.inherited.Collection
+import iced.egret.palette.model.inherited.Coverable
+import iced.egret.palette.model.inherited.FileObject
+import iced.egret.palette.model.inherited.TerminalCoverable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

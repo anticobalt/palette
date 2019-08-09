@@ -8,8 +8,8 @@ import androidx.appcompat.widget.Toolbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.delegate.inherited.CollectionViewDelegate
 import iced.egret.palette.fragment.CollectionViewFragment
-import iced.egret.palette.model.Collection
-import iced.egret.palette.model.Coverable
+import iced.egret.palette.model.inherited.Collection
+import iced.egret.palette.model.inherited.Coverable
 
 class FolderViewDelegate : CollectionViewDelegate() {
 

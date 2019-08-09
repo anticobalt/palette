@@ -1,4 +1,4 @@
-package iced.egret.palette.model
+package iced.egret.palette.model.inherited
 
 /**
  * An object that represents a File: folders, images, videos, etc.

@@ -20,7 +20,7 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.Collection
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.Picture
 import java.io.File
 

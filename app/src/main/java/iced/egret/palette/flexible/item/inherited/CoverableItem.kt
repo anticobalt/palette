@@ -8,7 +8,7 @@ import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
 import eu.davidea.flexibleadapter.items.IFlexible
 import iced.egret.palette.R
 import iced.egret.palette.flexible.viewholder.CoverViewHolder
-import iced.egret.palette.model.Coverable
+import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.Painter
 
 /**

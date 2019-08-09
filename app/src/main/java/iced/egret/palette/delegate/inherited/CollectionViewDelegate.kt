@@ -7,8 +7,8 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.fragment.CollectionViewFragment
-import iced.egret.palette.model.Collection
-import iced.egret.palette.model.Coverable
+import iced.egret.palette.model.inherited.Collection
+import iced.egret.palette.model.inherited.Coverable
 
 /**
  * Used to differentiate actions available depending on the collection type being viewed by

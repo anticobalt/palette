@@ -26,7 +26,7 @@ import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.Collection
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator

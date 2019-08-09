@@ -25,7 +25,7 @@ import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.LinksFragment
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.layout.HackySlidingPaneLayout
-import iced.egret.palette.model.Collection
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter

@@ -1,10 +1,11 @@
-package iced.egret.palette.model
+package iced.egret.palette.model.inherited
 
 import android.net.Uri
 import android.view.View
 import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.flexible.viewholder.CoverViewHolder
+import iced.egret.palette.model.Picture
 
 /***
  * Properties:

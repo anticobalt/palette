@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.Coverable
+import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.model.Picture
 import java.io.File
 

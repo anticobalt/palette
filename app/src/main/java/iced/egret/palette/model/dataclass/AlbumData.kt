@@ -1,5 +1,8 @@
-package iced.egret.palette.model
+package iced.egret.palette.model.dataclass
 
+import iced.egret.palette.model.Album
+import iced.egret.palette.model.Folder
+import iced.egret.palette.model.Picture
 import java.io.Serializable
 
 data class AlbumData(val name: String,

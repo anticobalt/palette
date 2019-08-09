@@ -16,7 +16,11 @@ import androidx.annotation.RequiresApi
 import androidx.documentfile.provider.DocumentFile
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import iced.egret.palette.model.*
+import iced.egret.palette.model.Album
+import iced.egret.palette.model.Folder
+import iced.egret.palette.model.Picture
+import iced.egret.palette.model.dataclass.AlbumData
+import iced.egret.palette.model.inherited.FileObject
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*

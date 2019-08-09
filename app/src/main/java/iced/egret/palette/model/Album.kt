@@ -2,6 +2,9 @@ package iced.egret.palette.model
 
 import android.net.Uri
 import iced.egret.palette.R
+import iced.egret.palette.model.dataclass.AlbumData
+import iced.egret.palette.model.inherited.Collection
+import iced.egret.palette.model.inherited.Coverable
 
 /***
  * Properties:

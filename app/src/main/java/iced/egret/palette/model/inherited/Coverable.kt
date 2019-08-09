@@ -1,4 +1,4 @@
-package iced.egret.palette.model
+package iced.egret.palette.model.inherited
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -12,6 +12,12 @@ import com.bumptech.glide.signature.MediaStoreSignature
 import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import java.io.File
 import java.io.FileNotFoundException
+
+interface TerminalCoverable : Coverable {
+    override val terminal: Boolean
+        get() = true
+    fun loadInto(view: View)
+}
 
 interface Coverable {
     val terminal: Boolean
@@ -67,10 +73,4 @@ interface Coverable {
         return progressDrawable
     }
 
-}
-
-interface TerminalCoverable : Coverable {
-    override val terminal: Boolean
-        get() = true
-    fun loadInto(view: View)
 }

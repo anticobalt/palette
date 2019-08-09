@@ -2,6 +2,10 @@ package iced.egret.palette.model
 
 import android.net.Uri
 import iced.egret.palette.R
+import iced.egret.palette.model.dataclass.FolderData
+import iced.egret.palette.model.inherited.Collection
+import iced.egret.palette.model.inherited.Coverable
+import iced.egret.palette.model.inherited.FileObject
 
 /***
  * Properties:

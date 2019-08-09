@@ -13,8 +13,8 @@ import iced.egret.palette.activity.MainActivity.Constants.FOLDER_LIST_ACTIVITY_R
 import iced.egret.palette.delegate.inherited.CollectionViewDelegate
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.Collection
-import iced.egret.palette.model.Coverable
+import iced.egret.palette.model.inherited.Collection
+import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.Painter

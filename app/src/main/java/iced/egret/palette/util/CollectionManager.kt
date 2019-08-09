@@ -71,7 +71,8 @@ object CollectionManager : CoroutineScope {
      */
     internal fun setup(path: String?) {
         if (!ready) {
-            buildFromScratch(path)
+            buildPictures(path)
+            mCollections.addAll(Storage.buildAlbumsFromDisk())
             ready = true
         } else if (path != null) {
             clearStack()
@@ -79,7 +80,7 @@ object CollectionManager : CoroutineScope {
         }
     }
 
-    private fun buildFromScratch(path: String?) {
+    private fun buildPictures(path: String?) {
 
         mPictureCache.putAll(Storage.knownPictures)
         root = Storage.initialFolders.firstOrNull() ?: return
@@ -100,7 +101,6 @@ object CollectionManager : CoroutineScope {
             unwindStack(path ?: PRACTICAL_MAIN_STORAGE_PATH)
         }
 
-        mCollections.addAll(Storage.initialAlbums)
         mBufferPictures.addAll(Storage.initialBufferPictures)
 
     }

@@ -61,10 +61,18 @@ object Storage {
 
     private fun setup(context: Context) {
         fileDirectory = context.filesDir
-        contentBuilder.run(context)
+        contentBuilder.runForPictures(context)
         knownPictures.putAll(contentBuilder.pictures)
         recycleBin = RecycleBin(fileDirectory)
         recycleBin.loadLocationsFromDisk()
+    }
+
+    /**
+     * Require Folders and Pictures to be in place
+     */
+    internal fun buildAlbumsFromDisk() : List<Album> {
+        contentBuilder.runForAlbums()
+        return contentBuilder.albums
     }
 
     internal fun getUpdateKit(context: Context): UpdateKit {
@@ -526,21 +534,28 @@ object Storage {
      * Gets all albums/folders/media from disk ONCE, ideally when app is created.
      */
     private class ContentBuilder {
-        var ran = false
+        private var picturesRan = false
+        private var albumsRan = false
 
-        // Purposely set as lateinit to prevent usage before run() is called
+        // Purposely set as lateinit to prevent usage before run functions is called
         lateinit var folders: List<Folder>
         lateinit var albums: List<Album>
         lateinit var pictures : LinkedHashMap<String, Picture>
         lateinit var bufferPictures: List<Picture>
 
-        fun run(context: Context) {
-            if (!ran) {
-                ran = true
+        fun runForPictures(context: Context) {
+            if (!picturesRan) {
+                picturesRan = true
                 pictures = linkedMapOf()
                 folders = getPictureFoldersMediaStore(context)
-                albums = getAlbumsFromDisk()
                 bufferPictures = getAllBufferPictures()
+            }
+        }
+
+        fun runForAlbums() {
+            if (!albumsRan) {
+                albumsRan = true
+                albums = getAlbumsFromDisk()
             }
         }
 

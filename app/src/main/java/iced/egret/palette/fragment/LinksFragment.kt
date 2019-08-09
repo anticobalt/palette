@@ -26,8 +26,8 @@ import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.Folder
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.Painter
@@ -438,9 +438,17 @@ class LinksFragment : MainFragment() {
 
     }
 
+    /**
+     * Since this can be called whenever CollectionViewFragment fetches new content,
+     * (even when it's clicks are blocked and this fragment is isolated), don't
+     * update the adapter if in selection mode.
+     *
+     * If the cover changes while in selection mode, need to manually refresh for it
+     * to show up.
+     */
     fun onCollectionsUpdated() {
         fetchContents()
-        mAdapter.updateDataSet(mCollectionItems)
+        if (mSelectedContentType == null) mAdapter.updateDataSet(mCollectionItems)
     }
 
     private fun getColorInt(type: BaseActivity.ColorType): Int {

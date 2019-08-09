@@ -13,6 +13,11 @@ class PinnedCollectionMargin(private val space : Int) : RecyclerView.ItemDecorat
         outRect.left = space
         outRect.right = space
         outRect.top = space
+
+        // Put bottom margin on last item
+        if (parent.getChildAdapterPosition(view) == (state.itemCount - 1)) {
+            outRect.bottom = space
+        }
     }
 
 }

@@ -42,7 +42,8 @@ class SyncedFoldersActivity : RecyclerViewActivity() {
 
         // Add some other folders that user may want to sync
         val candidates = getPotentialFolderFiles(CollectionManager.folders)
-                .filter { candidate -> candidate !in files }
+                .filter { file -> file !in files }
+                .sortedBy { file -> file.path }
         mFileItems.addAll(candidates.map { file -> FileItem(file, false) })
     }
 

@@ -42,8 +42,6 @@ class Picture(override var name: String, override var filePath: String) : Termin
         get() = File(filePath)
     val uri: Uri
         get() = Uri.fromFile(file)
-    val fileLocation
-        get() = filePath.removeSuffix(name).removeSuffix("/")
 
     override val terminal = true
     override val cover: MutableMap<String, Uri>

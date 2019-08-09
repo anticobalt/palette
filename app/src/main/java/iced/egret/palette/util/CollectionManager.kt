@@ -73,8 +73,7 @@ object CollectionManager : CoroutineScope {
         if (!ready) {
             buildFromScratch(path)
             ready = true
-        }
-        else if (path != null){
+        } else if (path != null) {
             clearStack()
             unwindStack(path)
         }
@@ -204,6 +203,22 @@ object CollectionManager : CoroutineScope {
         return mContentsMap
     }
 
+    // Pictures sometimes not removed from Collections after moving to Recycle Bin.
+    // Bug doesn't seem reproducible.
+    fun cleanCurrentCollection() {
+        val collection = currentCollection ?: return
+        for (picture in collection.pictures) {
+            if (!Storage.fileExists(picture.filePath)) {
+                collection.removePicture(picture)
+                // If collection is album, won't remove Pictures in synced Folders,
+                // which is an expected safeguard conforming to read-only property
+                // of synced Folders.
+                // You would have to call cleanCurrentCollection() in the respective Folders
+                // to clean them out.
+            }
+        }
+    }
+
     /**
      * @return Relative position of new album amongst other albums
      */
@@ -259,8 +274,7 @@ object CollectionManager : CoroutineScope {
         if (fromCurrent) {
             val currentAlbum = (currentCollection as? Album) ?: return  // should always succeed
             currentAlbum.removeAlbums(albums)
-        }
-        else mCollections.removeAll(albums)
+        } else mCollections.removeAll(albums)
         Storage.saveAlbumsToDisk(this.albums)
     }
 
@@ -320,8 +334,7 @@ object CollectionManager : CoroutineScope {
                     val key = lp.callingFragment.getString(R.string.intent_item_key)
                     intent.putExtra(key, lp.position)
                     lp.callingFragment.startActivityForResult(intent, lp.requestCode)
-                }
-                else if (lp.callingActivity != null) {
+                } else if (lp.callingActivity != null) {
                     val intent = Intent(lp.callingActivity, lp.newActivityClass)
                     val key = lp.callingActivity.getString(R.string.intent_item_key)
                     intent.putExtra(key, lp.position)
@@ -385,7 +398,7 @@ object CollectionManager : CoroutineScope {
      *
      */
     fun findFolderByPath(path: String, startFolder: Folder? = null,
-                                 onMissing: (Folder, List<String>, Int) -> Folder? = { _, _, _ -> null }): Folder? {
+                         onMissing: (Folder, List<String>, Int) -> Folder? = { _, _, _ -> null }): Folder? {
 
         var currentFolder = startFolder ?: root
         val destinationPath = path.removeSuffix("/")
@@ -528,7 +541,7 @@ object CollectionManager : CoroutineScope {
         for (picture in pictures) {
 
             // Look for existing folder
-            oldFolder = findFolderByPath(picture.fileLocation)
+            oldFolder = findFolderByPath(picture.parentFilePath)
                     // something terrible happened, abort
                     ?: return failCount + pictures.size - i  // remaining items fail
 
@@ -584,7 +597,7 @@ object CollectionManager : CoroutineScope {
 
         mPictureCache.remove(picture.filePath)
         mBufferPictures.removeAll { pic -> pic.filePath == files.first.path }  // remove if in buffer
-        findFolderByPath(picture.fileLocation)?.removePicture(picture)
+        findFolderByPath(picture.parentFilePath)?.removePicture(picture)
         return files.first
     }
 

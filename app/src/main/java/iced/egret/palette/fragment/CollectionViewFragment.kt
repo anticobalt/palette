@@ -25,9 +25,9 @@ import iced.egret.palette.flexible.item.GridCoverableItem
 import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
+import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
@@ -503,6 +503,10 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             CollectionManager.PICTURE_KEY -> {
                 @Suppress("UNCHECKED_CAST")  // assume internal consistency
                 CoverableMutator.delete(coverables as List<Picture>, context!!) {
+                    // Resolve weird bug where Pictures not removed from Collections
+                    // but removed from disk
+                    CollectionManager.cleanCurrentCollection()
+                    // Refresh
                     onCurrentContentsChanged()
                     mActionModeHelper.destroyActionModeIfCan()
                 }

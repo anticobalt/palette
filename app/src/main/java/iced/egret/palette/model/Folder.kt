@@ -43,10 +43,10 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
     val folders: List<Folder>
         get() = _folders
 
-    val nestedPictures : List<Picture>
+    val nestedPictures: List<Picture>
         get() {
-            val all = pictures + folders.flatMap {folder -> folder.nestedPictures}
-            return all.sortedByDescending { picture -> picture.file.lastModified() }
+            return (pictures + folders.flatMap { folder -> folder.nestedPictures })
+                    .sortedByDescending { picture -> picture.file.lastModified() }
         }
 
     override val contentsMap: Map<String, List<Coverable>>

@@ -8,7 +8,9 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import iced.egret.palette.R
 import iced.egret.palette.activity.inherited.BaseActivity
-import iced.egret.palette.model.*
+import iced.egret.palette.model.Album
+import iced.egret.palette.model.Folder
+import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.model.inherited.FileObject
@@ -272,14 +274,6 @@ object CollectionManager : CoroutineScope {
         for (album in albums) {
             loop@ for (content in contents) {
                 when (content) {
-                    is Folder -> {
-                        if (album.folders.contains(content)) continue@loop
-                        album.addFolder(content)
-                    }
-                    is Album -> {
-                        if (album.albums.contains(content)) continue@loop
-                        album.addAlbum(content)
-                    }
                     is Picture -> {
                         if (album.pictures.contains(content)) continue@loop
                         album.addPicture(content)
@@ -301,7 +295,6 @@ object CollectionManager : CoroutineScope {
         val album = currentCollection as Album
         for (content in contents) {
             when (content) {
-                is Folder -> album.removeFolder(content)
                 is Album -> album.removeAlbum(content)
                 is Picture -> album.removePicture(content)
             }
@@ -391,7 +384,7 @@ object CollectionManager : CoroutineScope {
      * to handle failure and return something else.
      *
      */
-    private fun findFolderByPath(path: String, startFolder: Folder? = null,
+    fun findFolderByPath(path: String, startFolder: Folder? = null,
                                  onMissing: (Folder, List<String>, Int) -> Folder? = { _, _, _ -> null }): Folder? {
 
         var currentFolder = startFolder ?: root

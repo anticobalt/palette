@@ -5,6 +5,8 @@ import iced.egret.palette.R
 import iced.egret.palette.model.dataclass.AlbumData
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
+import iced.egret.palette.util.CollectionManager
+import java.io.File
 
 /***
  * Properties:
@@ -15,7 +17,8 @@ import iced.egret.palette.model.inherited.Coverable
  * - cover
  * - icon
  * - albums
- * - folders
+ * - syncedFolderFiles
+ * - syncedFolders
  * - pictures
  * - size
  * - totalSize
@@ -32,15 +35,25 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
 
     override var _pictures: MutableList<Picture> = ArrayList()
     override val pictures: List<Picture>
-        get() = _pictures
+        get() = (_pictures + syncedFolders.flatMap { folder -> folder.nestedPictures })
+                .sortedByDescending { picture -> picture.file.lastModified() }
 
     private var _albums: MutableList<Album> = ArrayList()
     val albums: List<Album>
         get() = _albums
 
-    private var _folders: MutableList<Folder> = ArrayList()
-    val folders: List<Folder>
-        get() = _folders
+    // All folders, existent or not, that is synced
+    var syncedFolderFiles: MutableList<File> = ArrayList()
+    // Folders that are synced and actually currently exist and have Pictures in them
+    private val syncedFolders : List<Folder>
+        get() {
+            val folders = mutableListOf<Folder>()
+            for (file in syncedFolderFiles) {
+                val folder = CollectionManager.findFolderByPath(file.path) ?: continue
+                folders.add(folder)
+            }
+            return folders
+        }
 
     override fun rename(name: String) {
         this.name = name
@@ -57,7 +70,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
      */
     private fun onParentPathChange(parentPath: String) {
         path = "$parentPath/$name"
-        for (album in albums) {
+        for (album in _albums) {
             album.onParentPathChange(path)
         }
     }
@@ -65,8 +78,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
     override val contentsMap: Map<String, List<Coverable>>
         get() {
             val map = mutableMapOf<String, List<Coverable>>()
-            map["folders"] = folders
-            map["albums"] = albums
+            map["albums"] = _albums
             map["pictures"] = pictures
             return map
         }
@@ -74,20 +86,20 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
     override val totalSize: Int
         get() {
             var rs = pictures.size
-            for (folder in folders) {
+            for (folder in syncedFolders) {
                 rs += folder.totalSize
             }
-            for (album in albums) {
+            for (album in _albums) {
                 rs += album.totalSize
             }
             return rs
         }
 
     fun toDataClass(): AlbumData {
-        val picturePaths = pictures.map { picture -> picture.filePath }
-        val foldersData = folders.map { folder -> folder.toDataClass() }
-        val albumsData = albums.map { album -> album.toDataClass() }
-        return AlbumData(name, path, picturePaths, foldersData, albumsData)
+        val picturePaths = _pictures.map { picture -> picture.filePath }
+        val syncedFolderFileData = syncedFolderFiles.map { file -> file.path }
+        val albumsData = _albums.map { album -> album.toDataClass() }
+        return AlbumData(name, path, picturePaths, syncedFolderFileData, albumsData)
     }
 
     override fun getOnePictureUri(): Uri? {
@@ -101,50 +113,22 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
     }
 
     private fun getCollections(): List<Collection> {
-        return ((albums as List<Collection>) + (folders as List<Collection>))
+        return ((_albums as List<Collection>) + (syncedFolders as List<Collection>))
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun getContents(): List<Coverable> {
-        val folders = folders as List<Coverable>
         val pictures = pictures as List<Coverable>
-        val albums = albums as List<Coverable>
-        return (folders + albums + pictures)
+        val albums = _albums as List<Coverable>
+        return (albums + pictures)
     }
 
-    private fun addCollection(newCollection: Collection, collectionList: MutableList<Collection>) {
-        collectionList.add(newCollection)
+    fun addAlbum(newAlbum: Album) {
+        _albums.add(newAlbum)
         size += 1
     }
 
-    private fun addCollections(newCollections: List<Collection>, collectionList: MutableList<Collection>) {
-        collectionList.addAll(newCollections)
-        size += newCollections.size
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun addFolder(newFolder: Folder) {
-        addCollection(newFolder, _folders as MutableList<Collection>)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun addFolders(newFolders: List<Folder>) {
-        addCollections(newFolders as List<Collection>, _folders as MutableList<Collection>)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun addAlbum(newAlbum: Album) {
-        addCollection(newAlbum, _albums as MutableList<Collection>)
-    }
-
-    @Suppress("UNCHECKED_CAST")
     fun addAlbums(newAlbums: List<Album>) {
-        addCollections(newAlbums as List<Collection>, _albums as MutableList<Collection>)
-    }
-
-    fun removeFolder(folder: Folder) {
-        _folders.remove(folder)
-        size -= 1
+        newAlbums.map {album -> addAlbum(album) }
     }
 
     fun removeAlbum(album: Album) {

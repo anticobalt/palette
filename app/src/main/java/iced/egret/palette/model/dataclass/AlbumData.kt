@@ -1,20 +1,20 @@
 package iced.egret.palette.model.dataclass
 
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
+import java.io.File
 import java.io.Serializable
 
 data class AlbumData(val name: String,
                      val path: String,
                      val picturePaths: List<String>,
-                     val foldersData: List<FolderData>,
+                     val syncedFolderFileData: List<String>,
                      val albumsData: List<AlbumData>) : Serializable {
 
     fun toFullClass(existingPictures: Map<String, Picture> = mapOf()): Album {
 
         val album = Album(name, path)
-        val folders = foldersData.map { data -> data.toFullClass() } as MutableList<Folder>
+        val syncedFolderFiles = syncedFolderFileData.map { data -> File(data) }
         val albums = albumsData.map { data -> data.toFullClass(existingPictures) } as MutableList<Album>
         val pictures = arrayListOf<Picture>()
 
@@ -26,7 +26,7 @@ data class AlbumData(val name: String,
             }
         }
 
-        album.addFolders(folders)
+        album.syncedFolderFiles.addAll(syncedFolderFiles)
         album.addAlbums(albums)
         album.addPictures(pictures)
         return album

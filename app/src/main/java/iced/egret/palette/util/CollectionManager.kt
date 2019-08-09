@@ -280,7 +280,6 @@ object CollectionManager : CoroutineScope {
 
     /**
      * Adds given contents to all given albums. Does not add if already exists in collection.
-     * TODO: remove cases for adding folders and albums
      */
     fun addContentToAllAlbums(contents: List<Coverable>, albums: List<Album>) {
         if (contents.isEmpty()) return

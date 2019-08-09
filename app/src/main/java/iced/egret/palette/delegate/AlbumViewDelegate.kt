@@ -8,7 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.R
-import iced.egret.palette.activity.FolderListActivity
+import iced.egret.palette.activity.SyncedFoldersActivity
 import iced.egret.palette.activity.MainActivity.Constants.FOLDER_LIST_ACTIVITY_REQUEST
 import iced.egret.palette.delegate.inherited.CollectionViewDelegate
 import iced.egret.palette.fragment.CollectionViewFragment
@@ -98,7 +98,9 @@ class AlbumViewDelegate : CollectionViewDelegate() {
     }
 
     private fun showSyncFolders(album: Album, fragment: CollectionViewFragment) {
-        fragment.startActivityForResult(Intent(fragment.context, FolderListActivity::class.java), FOLDER_LIST_ACTIVITY_REQUEST)
+        val intent = Intent(fragment.context, SyncedFoldersActivity::class.java)
+        intent.putExtra(fragment.getString(R.string.intent_album_path_key), album.path)
+        fragment.startActivityForResult(intent, FOLDER_LIST_ACTIVITY_REQUEST)
     }
 
 }

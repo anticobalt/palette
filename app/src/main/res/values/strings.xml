@@ -69,7 +69,7 @@
     <string name="action_clear_all">Clear All</string>
     <string name="action_clear">Clear</string>
     <string name="action_apply">Apply</string>
-    <string name="action_show_sync_folders">Show Synced Folders</string>
+    <string name="action_show_sync_folders">Synced Folders</string>
 
     <!-- Menu switches/checkboxes -->
     <string name="switch_true_zoom">True Zoom</string>
@@ -131,6 +131,7 @@
 
     <!-- For intents -->
     <string name="intent_item_key">item</string>
+    <string name="intent_album_path_key">album_path</string>
 
     <!-- Crop ratio buttons -->
     <string name="ratio_1x1">1:1</string>

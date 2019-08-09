@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.FolderListActivity"
+            android:name=".activity.SyncedFoldersActivity"
             android:label="@string/folder_list"
             android:theme="@style/AppTheme.SlideActivity" />
         <activity

@@ -9,7 +9,7 @@ import eu.davidea.flexibleadapter.items.IFlexible
 import eu.davidea.viewholders.FlexibleViewHolder
 import iced.egret.palette.R
 
-class FileViewHolder(view: View,
+class FileViewHolder(val view: View,
                      adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>)
     : FlexibleViewHolder(view, adapter) {
 

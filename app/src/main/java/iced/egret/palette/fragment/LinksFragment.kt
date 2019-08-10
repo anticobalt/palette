@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.*
 import android.widget.ImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -14,6 +15,7 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.transition.Visibility
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
+import eu.davidea.flexibleadapter.common.FlexibleItemDecoration
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
 import iced.egret.palette.activity.RecycleBinActivity
@@ -24,7 +26,6 @@ import iced.egret.palette.flexible.ToolbarActionModeHelper
 import iced.egret.palette.flexible.item.BannerCoverableItem
 import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.fragment.inherited.MainFragment
-import iced.egret.palette.itemdecoration.PinnedCollectionMargin
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.inherited.Collection
@@ -34,6 +35,7 @@ import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_links.*
 import java.util.*
+
 
 /**
  * Has links to other activities and pinned collections, organized inside a SlidePaneLayout.
@@ -147,8 +149,14 @@ class LinksFragment : MainFragment() {
         mAdapter = FlexibleAdapter(mCollectionItems, this, true)
         mRecyclerView.adapter = mAdapter
 
+        // Pixel to DPI: https://stackoverflow.com/a/9563438
         val marginInPx = resources.getDimensionPixelSize(R.dimen.banner_margin)
-        mRecyclerView.addItemDecoration(PinnedCollectionMargin(marginInPx))
+        val marginInDp = marginInPx / (mActivity.resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
+        mRecyclerView.addItemDecoration(FlexibleItemDecoration(context!!)
+                .addItemViewType(R.layout.item_coverable_banner)
+                .withOffset(marginInDp)
+                .withEdge(true)
+        )
     }
 
     private fun buildSideActions() {

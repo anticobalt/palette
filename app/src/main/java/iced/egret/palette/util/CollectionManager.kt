@@ -73,6 +73,7 @@ object CollectionManager : CoroutineScope {
         if (!ready) {
             buildPictures(path)
             mCollections.addAll(Storage.buildAlbumsFromDisk())
+            bindCustomCovers(Storage.customCovers)
             ready = true
         } else if (path != null) {
             clearStack()
@@ -105,6 +106,23 @@ object CollectionManager : CoroutineScope {
 
         mBufferPictures.addAll(Storage.initialBufferPictures)
 
+    }
+
+    private fun bindCustomCovers(customCovers: Map<String, String>) {
+        val coversToSave = customCovers.toMutableMap<String, String?>()
+        var misses = 0
+        for ((collectionPath, picturePath) in customCovers) {
+            val picture = mPictureCache[picturePath]
+            if (picture == null) {
+                coversToSave[collectionPath] = null
+                misses += 1
+                continue
+            }
+            // Find Album or Folder and set cover
+            (getNestedAlbums().find { album -> album.path == collectionPath }
+                    ?: findFolderByPath(collectionPath))?.addCustomCover(picture)
+        }
+        if (misses > 0) Storage.setCustomCovers(coversToSave.toList())
     }
 
     /**

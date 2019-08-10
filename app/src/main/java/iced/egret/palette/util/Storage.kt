@@ -40,15 +40,17 @@ object Storage {
     val initialBufferPictures: List<Picture>
         get() = contentBuilder.bufferPictures
 
-    val knownPictures = linkedMapOf<String, Picture>()
-    lateinit var recycleBin: RecycleBin
-        private set
-
     private var ready = false
     private const val pictureCacheFileName = "pictures-cache.json"
     private const val pictureBufferFileName = "pictures-buffer.json"
     private const val albumsFileName = "albums.json"
+    private const val customCoversFileName = "custom-covers.json"
     private lateinit var fileDirectory: File
+
+    val knownPictures = linkedMapOf<String, Picture>()
+    internal val customCovers = mutableMapOf<String, String>()
+    lateinit var recycleBin: RecycleBin
+        private set
 
     internal fun setupIfRequired(context: Context) {
         if (!ready) {
@@ -61,6 +63,7 @@ object Storage {
         fileDirectory = context.filesDir
         contentBuilder.runForPictures(context)
         knownPictures.putAll(contentBuilder.pictures)
+        customCovers.putAll(contentBuilder.customCovers)
         recycleBin = RecycleBin(fileDirectory)
         recycleBin.loadLocationsFromDisk()
     }
@@ -124,6 +127,26 @@ object Storage {
     internal fun saveBufferPicturesToDisk(pictures: List<Picture>) {
         val json = gson.toJson(pictures.map { picture -> picture.filePath })
         saveJsonToDisk(json, pictureBufferFileName)
+    }
+
+    fun setCustomCovers(pairs: List<Pair<String, String?>>) {
+        // Only save to disk after everything's done
+        for (pair in pairs) setCustomCover(pair.first, pair.second, false)
+        val json = gson.toJson(customCovers)
+        saveJsonToDisk(json, customCoversFileName)
+    }
+
+    fun setCustomCover(collectionId: String, coverId: String?) {
+        setCustomCover(collectionId, coverId, true)
+    }
+
+    private fun setCustomCover(collectionId: String, coverId: String?, saveToDisk: Boolean) {
+        if (coverId == null) customCovers.remove(collectionId)
+        else customCovers[collectionId] = coverId
+        if (saveToDisk) {
+            val json = gson.toJson(customCovers)
+            saveJsonToDisk(json, customCoversFileName)
+        }
     }
 
     private fun saveJsonToDisk(json: String, fileName: String) {
@@ -540,6 +563,7 @@ object Storage {
         lateinit var albums: List<Album>
         lateinit var pictures: LinkedHashMap<String, Picture>
         lateinit var bufferPictures: List<Picture>
+        lateinit var customCovers : Map<String, String>
 
         fun runForPictures(context: Context) {
             if (!picturesRan) {
@@ -547,11 +571,12 @@ object Storage {
                 pictures = linkedMapOf()
                 folders = getPictureFoldersMediaStore(context)
                 bufferPictures = getAllBufferPictures()
+                customCovers = getCustomCoversFromDisk()
             }
         }
 
         fun runForAlbums() {
-            if (!albumsRan) {
+            if (picturesRan && !albumsRan) {
                 albumsRan = true
                 albums = getAlbumsFromDisk()
             }
@@ -701,6 +726,12 @@ object Storage {
                 return gson.fromJson(json, type)
             }
             return null
+        }
+
+        private fun getCustomCoversFromDisk() : Map<String, String> {
+            val json = readJsonFromDisk(customCoversFileName) ?: return mapOf()
+            val type = object : TypeToken<HashMap<String, String>>() {}.type
+            return gson.fromJson<HashMap<String, String>>(json, type)
         }
     }
 

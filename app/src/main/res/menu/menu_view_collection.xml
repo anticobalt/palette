@@ -16,4 +16,11 @@
         android:visible="false"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/actionResetCover"
+        android:orderInCategory="3"
+        android:title="@string/action_reset_cover"
+        android:visible="true"
+        app:showAsAction="never" />
+
 </menu>

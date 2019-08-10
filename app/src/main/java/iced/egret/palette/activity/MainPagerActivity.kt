@@ -8,6 +8,7 @@ import iced.egret.palette.activity.inherited.PicturePagerActivity
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.bottom_bar_main_pager.view.*
 
 
@@ -97,6 +98,8 @@ class MainPagerActivity : PicturePagerActivity() {
             for (collection in it) {
                 collection.addCustomCover(picture)
             }
+            Storage.setCustomCovers(it.map { collection -> Pair(collection.path, picture.filePath) })
+            toast(R.string.success_set_cover)
             setResult(RESULT_OK)
         }
     }

@@ -68,6 +68,7 @@
     <string name="action_apply">Apply</string>
     <string name="action_show_sync_folders">Synced Folders</string>
     <string name="action_set_as_cover">Set As Cover</string>
+    <string name="action_reset_cover">Reset Cover</string>
 
     <!-- Menu switches/checkboxes -->
     <string name="switch_true_zoom">True Zoom</string>
@@ -85,6 +86,8 @@
     <string name="success_add_generic">Successfully added</string>
     <string name="success_delete_generic">Successfully deleted</string>
     <string name="success_move_to_recycle">Successfully moved to recycle bin</string>
+    <string name="success_set_cover">Cover set</string>
+    <string name="success_reset_cover">Cover reset to default</string>
 
     <!-- Errors -->
     <string name="title_permission_error">Permission request failed!</string>
@@ -98,7 +101,7 @@
     <string name="no_albums_available_error">Item already belongs to all existing albums</string>
     <string name="synced_is_not_removable_error">Pictures belonging to a synced folder cannot be removed!</string>
     <string name="access_denied_error">Access to storage was denied. Make sure access to this SD card is enabled in Settings.</string>
-    <string name="intent_extra_error">Something went wrong!</string>
+    <string name="generic_error">Something went wrong!</string>
     <string name="storage_fail_error_explain">If using an SD card, make sure access is enabled in Settings.</string>
 
     <!-- For dialogs -->

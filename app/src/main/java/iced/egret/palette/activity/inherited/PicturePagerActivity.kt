@@ -86,7 +86,7 @@ abstract class PicturePagerActivity : SlideActivity() {
         }
 
         return if (mActivePage == -1) {
-            toast(R.string.intent_extra_error)
+            toast(R.string.generic_error)
             false
         } else {
             true

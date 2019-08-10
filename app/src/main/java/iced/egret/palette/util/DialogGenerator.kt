@@ -307,4 +307,15 @@ object DialogGenerator {
         }
     }
 
+    fun genericConfirm(title : String, context: Context, onConfirm: () -> Unit) {
+        MaterialDialog(context).show {
+            title(text = title)
+            message(R.string.warning_generic)
+            negativeButton()
+            positiveButton {
+                onConfirm()
+            }
+        }
+    }
+
 }

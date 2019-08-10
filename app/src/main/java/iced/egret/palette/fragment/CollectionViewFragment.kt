@@ -26,11 +26,9 @@ import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
-import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.CoverableMutator
-import iced.egret.palette.util.DialogGenerator
-import iced.egret.palette.util.Painter
+import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.io.File
@@ -188,7 +186,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         // These really shouldn't ever happen
         if (intent == null) {
-            toast(R.string.intent_extra_error)
+            toast(R.string.generic_error)
             return
         }
         if (album !is Album) {
@@ -395,6 +393,9 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.actionResetCover -> resetCover()
+        }
         mDelegate.onOptionsItemSelected(item, this, CollectionManager.currentCollection!!)
         return true
     }
@@ -509,6 +510,21 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             mActivity.notifyCollectionsChanged()
             mActionModeHelper.destroyActionModeIfCan()
         }
+    }
+
+    private fun resetCover() {
+        val collection = CollectionManager.currentCollection
+
+        if (collection is Collection) {
+            DialogGenerator.genericConfirm(getString(R.string.action_reset_cover), context!!) {
+                collection.removeCustomCover()
+                Storage.setCustomCover(collection.path, null)
+                mActivity.notifyCollectionsChanged()  // update views if collection is pinned
+                toast(R.string.success_reset_cover)
+            }
+        }
+        else toast(R.string.generic_error)  // should never happen
+
     }
 
     private fun selectAll() {

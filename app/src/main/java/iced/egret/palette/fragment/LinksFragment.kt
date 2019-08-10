@@ -386,9 +386,9 @@ class LinksFragment : MainFragment() {
     }
 
     private fun deleteAlbum() {
-        @Suppress("UNCHECKED_CAST")  // assume internal consistency
-        val albums = mActionModeHelper.selectedPositions.map { i -> mCollections[i] } as List<Album>
-        CoverableMutator.deleteTopAlbums(albums, context!!) {
+        val allAlbums = mCollections.filterIsInstance<Album>()
+        val selectedAlbums = mActionModeHelper.selectedPositions.map { i -> allAlbums[i] }
+        CoverableMutator.deleteTopAlbums(selectedAlbums, context!!) {
             mActivity.notifyPinnedAlbumDeleted()
             mActionModeHelper.destroyActionModeIfCan()
             onCollectionsUpdated()

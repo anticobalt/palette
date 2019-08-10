@@ -14,8 +14,8 @@ import iced.egret.palette.util.Painter
 /**
  * An item with IFlexible functionality.
  */
-abstract class CoverableItem(val coverable: Coverable, private var defaultTint: Int?) :
-        AbstractFlexibleItem<CoverViewHolder>() {
+abstract class CoverableItem(val coverable: Coverable, private var defaultTint: Int?,
+                             private var iconRes: Int?) : AbstractFlexibleItem<CoverViewHolder>() {
 
     var viewHolder: CoverViewHolder? = null
     private var isSelected = false
@@ -82,15 +82,22 @@ abstract class CoverableItem(val coverable: Coverable, private var defaultTint: 
     }
 
     /**
-     * Set the little icon that indicates the type of the Coverable.
+     * Set the little icon that is either provided, or indicates the type of the Coverable.
      */
     private fun setIcon() {
-        val typeView = viewHolder?.itemView?.findViewById<ImageView>(R.id.typeIcon)
+        val iconView = viewHolder?.itemView?.findViewById<ImageView>(R.id.icon)
                 ?: return
-        if (coverable.icon == null) {
-            typeView.setImageDrawable(null)
-        } else {
-            typeView.setImageResource(coverable.icon ?: return)
+
+        if (iconRes != null) {
+            iconView.setImageResource(iconRes!!)
+        }
+        else {
+            if (coverable.icon == null) {
+                iconView.setImageDrawable(null)
+            }
+            else {
+                iconView.setImageResource(coverable.icon ?: return)
+            }
         }
     }
 }

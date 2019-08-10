@@ -79,12 +79,12 @@
             app:layout_constraintTop_toTopOf="@+id/cover" />
 
         <ImageView
-            android:id="@+id/typeIcon"
+            android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:background="@drawable/round_shaded_rect"
-            android:contentDescription="@string/label_collection_type"
+            android:contentDescription="@string/label_item_type"
             android:outlineProvider="background"
             android:padding="1dp"
             android:tint="@color/white"

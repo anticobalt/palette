@@ -65,11 +65,11 @@
             app:layout_constraintTop_toTopOf="@+id/cover" />
 
         <ImageView
-            android:id="@+id/typeIcon"
+            android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:contentDescription="@string/label_collection_type"
+            android:contentDescription="@string/label_item_type"
             android:tint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />

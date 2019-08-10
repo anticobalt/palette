@@ -7,7 +7,7 @@ import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import iced.egret.palette.model.inherited.Coverable
 
-class GridCoverableItem(obj: Coverable) : CoverableItem(obj, null) {
+class GridCoverableItem(obj: Coverable, iconRes : Int? = null) : CoverableItem(obj, null, iconRes) {
 
     override fun getLayoutRes(): Int {
         return R.layout.item_coverable_grid

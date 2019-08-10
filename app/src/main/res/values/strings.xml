@@ -81,7 +81,7 @@
 
     <!-- Strings indicate what buttons or objects represent -->
     <string name="label_album_actions">Album Actions</string>
-    <string name="label_collection_type">Collection Type</string>
+    <string name="label_item_type">Item Type</string>
 
     <!-- Successes -->
     <string name="file_save_success">File saved</string>

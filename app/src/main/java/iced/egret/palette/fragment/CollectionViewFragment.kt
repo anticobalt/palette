@@ -73,6 +73,8 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     private var mSelectedContentType: String? = null
     private var mReturningFromStop = false
 
+    private val syncIconRes = R.drawable.ic_sync_black_24dp
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         super.onCreateView(inflater, container, savedInstanceState)
@@ -570,10 +572,28 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         mContentItems.clear()
 
         val contentsMap = CollectionManager.getContentsMap()
+        val collection = CollectionManager.currentCollection
         for ((type, coverables) in contentsMap) {
-            val coverableItems = coverables.map { content -> GridCoverableItem(content) }
             mContents.addAll(coverables)
-            mContentItems.addAll(coverableItems)
+
+            // Inside albums, icons for synced pictures have to be set manually,
+            // b/c pictures have no idea if they are synced with anything.
+            if (collection is Album) {
+                var res : Int?
+                for (coverable in coverables) {
+                    // If synchronized picture
+                    if (coverable is Picture && !collection.ownsPictures(listOf(coverable))) {
+                        res = syncIconRes
+                    }
+                    else res = null
+                    mContentItems.add(GridCoverableItem(coverable, res))
+                }
+            }
+            else {
+                val coverableItems = coverables.map { content -> GridCoverableItem(content) }
+                mContentItems.addAll(coverableItems)
+            }
+
         }
     }
 

@@ -7,7 +7,7 @@ import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.Painter
 
-class BannerCoverableItem(obj: Coverable) : CoverableItem(obj, Painter.DARKEN_SLIGHT) {
+class BannerCoverableItem(obj: Coverable) : CoverableItem(obj, Painter.DARKEN_SLIGHT, null) {
 
     override fun getLayoutRes(): Int {
         return R.layout.item_coverable_banner

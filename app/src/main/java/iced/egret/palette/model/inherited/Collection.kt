@@ -26,7 +26,7 @@ abstract class Collection(override var name: String, path: String) : Coverable {
     var path = path
         protected set
 
-    abstract var _pictures: MutableList<Picture>  // internal
+    protected abstract var _pictures: MutableList<Picture>  // internal
     abstract val pictures: List<Picture>  // external
 
     abstract val contentsMap: Map<String, List<Coverable>>

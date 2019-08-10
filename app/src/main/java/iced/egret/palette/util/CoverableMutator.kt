@@ -95,7 +95,21 @@ object CoverableMutator {
     }
 
     fun addToAlbum(coverables: List<Coverable>, context: Context, onFinish: () -> Unit) {
-        DialogGenerator.addToAlbum(context) { indices, albums ->
+
+        // If only one coverable, hide albums it is already in
+        // TODO: hide albums shared by multiple coverables
+        var albums = CollectionManager.getNestedAlbums().toList()
+        if (albums.isEmpty()) {
+            toast(context, R.string.no_albums_exist_error)
+            return
+        }
+        if (coverables.size == 1) albums = albums.filterNot { album -> coverables[0] in album.pictures }
+        if (albums.isEmpty()) {
+            toast(context, R.string.no_albums_available_error)
+            return
+        }
+
+        DialogGenerator.addToAlbum(context, albums) { indices ->
             val destinations = albums.filterIndexed { index, _ -> indices.contains(index) }
             CollectionManager.addContentToAllAlbums(coverables, destinations)
             toast(context, R.string.success_add_generic)

@@ -20,8 +20,8 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.Picture
+import iced.egret.palette.model.inherited.Collection
 import java.io.File
 
 /**
@@ -105,13 +105,12 @@ object DialogGenerator {
         }
     }
 
-    fun addToAlbum(context: Context, onConfirm: (IntArray, List<Album>) -> Unit) {
-        val albums = CollectionManager.getNestedAlbums()
-        val albumPaths = albums.map { album -> album.path }
+    fun addToAlbum(context: Context, albumChoices: List<Album>, onConfirm: (IntArray) -> Unit) {
+        val albumPaths = albumChoices.map { album -> album.path }
         MaterialDialog(context).show {
             title(R.string.action_add_to_album)
             listItemsMultiChoice(items = albumPaths) { _, indices, _ ->
-                onConfirm(indices, albums)
+                onConfirm(indices)
             }
             negativeButton()
             positiveButton()

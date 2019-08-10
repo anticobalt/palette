@@ -235,38 +235,14 @@ object CollectionManager : CoroutineScope {
             position = mCollections.size
             mCollections.add(newAlbum)
         }
+        sortAllAlbums()
         Storage.saveAlbumsToDisk(albums)
         return position
     }
 
     fun renameCollection(collection: Collection, newName: String) {
         collection.rename(newName)
-        Storage.saveAlbumsToDisk(albums)
-    }
-
-    /**
-     * @param positions relative positions of albums within albums list
-     */
-    @Deprecated(message = "Use deleteAlbums() instead.")
-    fun deleteAlbumsByRelativePosition(positions: List<Int>, deleteFromCurrent: Boolean = false) {
-        val indices = positions.toSet()
-
-        if (deleteFromCurrent) {
-            val toDeleteAlbums = mutableListOf<Album>()
-            val currentAlbum = (currentCollection as? Album) ?: return  // should always succeed
-            for (position in positions) {
-                toDeleteAlbums.add(currentAlbum.albums[position])
-            }
-            currentAlbum.removeAlbums(toDeleteAlbums)
-        } else {
-            val remainingCollections: MutableList<Collection> = folders.toMutableList()
-            for (i in 0 until albums.size) {
-                if (!indices.contains(i)) {
-                    remainingCollections.add(albums[i])
-                }
-            }
-            mCollections = remainingCollections
-        }
+        sortAllAlbums()
         Storage.saveAlbumsToDisk(albums)
     }
 
@@ -276,6 +252,16 @@ object CollectionManager : CoroutineScope {
             currentAlbum.removeAlbums(albums)
         } else mCollections.removeAll(albums)
         Storage.saveAlbumsToDisk(this.albums)
+    }
+
+    // FIXME: very inefficient, you don't need to sort everything when only one album changes
+    private fun sortAllAlbums() {
+        val albums = this.albums
+        mCollections.removeAll(albums)
+        mCollections.addAll(albums.sortedBy { album -> album.name })
+        for (album in albums) {
+            album.sortSelf(albums = true)
+        }
     }
 
     /**

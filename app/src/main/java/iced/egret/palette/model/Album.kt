@@ -148,4 +148,16 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
         return setDifference.isEmpty()
     }
 
+    fun sortSelf(albums: Boolean) {
+        if (albums) {
+            val sorted = this._albums.sortedBy { album -> album.name }
+            this._albums.clear()
+            this._albums.addAll(sorted)
+
+            for (album in this._albums) {
+                album.sortSelf(true)
+            }
+        }
+    }
+
 }

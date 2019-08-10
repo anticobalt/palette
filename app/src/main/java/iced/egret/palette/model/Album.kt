@@ -85,7 +85,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
 
     override val totalSize: Int
         get() {
-            var rs = pictures.size
+            var rs = _pictures.size
             for (folder in syncedFolders) {
                 rs += folder.totalSize
             }

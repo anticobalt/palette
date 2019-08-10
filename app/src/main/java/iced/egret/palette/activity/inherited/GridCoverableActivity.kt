@@ -13,13 +13,14 @@ import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
 import iced.egret.palette.R
-import iced.egret.palette.flexible.item.GridCoverableItem
 import iced.egret.palette.flexible.ToolbarActionModeHelper
+import iced.egret.palette.flexible.item.GridCoverableItem
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.StateBuilder
 import kotlinx.android.synthetic.main.view_empty.*
+import java.util.*
 
 /**
  * Basic activity with selectable and long-clickable GridCoverableItems.
@@ -43,19 +44,20 @@ abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callba
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        mAdapter.onSaveInstanceState(outState)
+        outState.putIntegerArrayList(SELECTED_POSITIONS, mActionModeHelper.selectedPositions.toMutableList() as ArrayList<Int>)
         outState.putString(COLLECTION, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        mAdapter.onRestoreInstanceState(savedInstanceState)
+        val selections = savedInstanceState?.getIntegerArrayList(SELECTED_POSITIONS) ?: return
+        mActionModeHelper.selectedPositions.addAll(selections)
         mActionModeHelper.restoreSelection(mToolbar)
 
         // Re-select all previously selected items
         for (i in 0 until mAdapter.currentItems.size) {
-            if (i in mAdapter.selectedPositionsAsSet) {
+            if (i in mActionModeHelper.selectedPositions) {
                 mAdapter.currentItems[i].setSelection(true)
             }
         }
@@ -125,8 +127,7 @@ abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callba
     override fun onItemClick(view: View?, position: Int): Boolean {
         return if (mAdapter.mode != SelectableAdapter.Mode.IDLE) {
             mActionModeHelper.onClick(position, mContentItems[position])
-        }
-        else {
+        } else {
             onIdleItemClick(position)
             false
         }
@@ -140,6 +141,7 @@ abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callba
 
     companion object SaveDataKeys {
         const val COLLECTION = "current-collection"
+        const val SELECTED_POSITIONS = "GC-SP"
     }
 
 }

@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.model.Picture
+import iced.egret.palette.model.inherited.Coverable
 import java.io.File
 
 /**
@@ -73,9 +73,9 @@ object CoverableMutator {
         }
     }
 
-    fun deleteTopAlbums(positions: List<Int>, context: Context, onFinish: () -> Unit) {
+    fun deleteTopAlbums(albums: List<Album>, context: Context, onFinish: () -> Unit) {
         DialogGenerator.deleteAlbum(context) {
-            CollectionManager.deleteAlbumsByRelativePosition(positions)
+            CollectionManager.deleteAlbums(albums, fromCurrent = false)
             onFinish()
         }
     }

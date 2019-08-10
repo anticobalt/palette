@@ -34,6 +34,7 @@ import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.io.File
+import java.util.*
 
 /**
  * Meat of the app. Shows Collection contents and allows navigation through them.
@@ -67,7 +68,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     private var mContentItems = mutableListOf<GridCoverableItem>()
 
     private lateinit var mAdapter: FlexibleAdapter<GridCoverableItem>
-    private lateinit var mLayoutManager : GridLayoutManager
+    private lateinit var mLayoutManager: GridLayoutManager
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
     private var mReturningFromStop = false
@@ -116,8 +117,13 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         mSelectedContentType = contentType
         isolateContent(mSelectedContentType!!)
 
-        // Must restore adapter and helper AFTER type isolation to keep position ints consistent
-        mAdapter.onRestoreInstanceState(savedInstanceState)
+        // Must restore selections and helper AFTER type isolation to keep position ints consistent
+        val selections = savedInstanceState.getIntegerArrayList(SELECTED_POSITIONS)
+        if (selections == null) {
+            restoreAllContent()
+            return
+        }
+        mActionModeHelper.selectedPositions.addAll(selections)
         mActionModeHelper.restoreSelection(toolbar)
 
         // Re-select all previously selected items
@@ -145,7 +151,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        mAdapter.onSaveInstanceState(outState)
+        outState.putIntegerArrayList(SELECTED_POSITIONS, mActionModeHelper.selectedPositions.toMutableList() as ArrayList<Int>)
         outState.putString(SELECTED_TYPE, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
@@ -189,7 +195,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         }
 
         val filePaths = intent.getStringArrayListExtra(getString(R.string.intent_synced_folder_paths))
-        val folderFiles = filePaths.map {path -> File(path) }
+        val folderFiles = filePaths.map { path -> File(path) }
         album.syncedFolderFiles.clear()
         album.syncedFolderFiles.addAll(folderFiles)
     }
@@ -546,15 +552,14 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         }
     }
 
-    private fun itemIsVisible(item: GridCoverableItem) : Boolean {
+    private fun itemIsVisible(item: GridCoverableItem): Boolean {
         val view = item.viewHolder?.view
         return if (view != null) {
             // These function names are almost as bad as mine
             val completelyVisible = mLayoutManager.isViewPartiallyVisible(view, true, true)
             val partiallyVisible = mLayoutManager.isViewPartiallyVisible(view, false, true)
             completelyVisible || partiallyVisible
-        }
-        else false
+        } else false
     }
 
     /**
@@ -648,6 +653,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
     companion object Constants {
         const val SELECTED_TYPE = "CollectionViewFragment_ST"
+        const val SELECTED_POSITIONS = "CVF_SP"
         const val PICTURE_ACTIVITY_REQUEST = 1
         const val FOLDER_LIST_ACTIVITY_REQUEST = 2
     }

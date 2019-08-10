@@ -16,7 +16,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
 
     override var actionModeMenuRes = R.menu.menu_waiting_room_edit
 
-    private val autoClear : Boolean
+    private val autoClear: Boolean
         get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
 
     /**
@@ -61,7 +61,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
     }
 
     override fun onActionItemClicked(mode: ActionMode, menuItem: MenuItem): Boolean {
-        val selected = mAdapter.selectedPositions.map { i -> mContents[i] }
+        val selected = mActionModeHelper.selectedPositions.map { i -> mContents[i] }
         when (menuItem.itemId) {
             R.id.actionSelectAll -> selectAll()
             R.id.actionClear -> processClear(selected)
@@ -87,9 +87,15 @@ class WaitingRoomActivity : GridCoverableActivity() {
     }
 
     private fun selectAll() {
-        mAdapter.currentItems.map { item -> item.setSelection(true) }
-        mAdapter.selectAll()
-        mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
+        if (mActionModeHelper.selectedPositions.size == mAdapter.currentItems.size) return
+
+        var i = 0
+        for (item in mAdapter.currentItems) {
+            item.setSelection(true)
+            mActionModeHelper.selectedPositions.add(i)
+            i += 1
+        }
+        mActionModeHelper.updateContextTitle(mActionModeHelper.selectedPositions.size)
     }
 
     private fun processClear(pictures: List<Picture>) {

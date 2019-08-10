@@ -33,6 +33,7 @@ import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_links.*
+import java.util.*
 
 /**
  * Has links to other activities and pinned collections, organized inside a SlidePaneLayout.
@@ -47,10 +48,6 @@ import kotlinx.android.synthetic.main.fragment_links.*
  * - Aliases
  */
 class LinksFragment : MainFragment() {
-
-    companion object SaveDataKeys {
-        const val selectedType = "LinksFragment_ST"
-    }
 
     private var mRootView: View? = null
     private lateinit var mRecyclerView: RecyclerView
@@ -92,7 +89,7 @@ class LinksFragment : MainFragment() {
 
         // If selected content type is saved, restore it, otherwise get out
         if (savedInstanceState == null) return
-        val contentType = savedInstanceState.getString(selectedType, "")
+        val contentType = savedInstanceState.getString(SELECTED_TYPE, "")
         if (contentType.isEmpty()) return
 
         // Isolate contents
@@ -100,12 +97,17 @@ class LinksFragment : MainFragment() {
         isolateContent(mSelectedContentType!!)
 
         // Must restore adapter and helper AFTER type isolation to keep position ints consistent
-        mAdapter.onRestoreInstanceState(savedInstanceState)
+        val selections = savedInstanceState.getIntegerArrayList(SELECTED_POSITIONS)
+        if (selections == null) {
+            restoreAllContent()
+            return
+        }
+        mActionModeHelper.selectedPositions.addAll(selections)
         mActionModeHelper.restoreSelection(toolbar)
 
         // Re-select all previously selected items
         for (i in 0 until mAdapter.currentItems.size) {
-            if (i in mAdapter.selectedPositionsAsSet) {
+            if (i in mActionModeHelper.selectedPositions) {
                 mAdapter.currentItems[i].setSelection(true)
             }
         }
@@ -119,8 +121,8 @@ class LinksFragment : MainFragment() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        mAdapter.onSaveInstanceState(outState)
-        outState.putString(selectedType, mSelectedContentType)
+        outState.putIntegerArrayList(SELECTED_POSITIONS, mActionModeHelper.selectedPositions.toMutableList() as ArrayList<Int>)
+        outState.putString(SELECTED_TYPE, mSelectedContentType)
         super.onSaveInstanceState(outState)
     }
 
@@ -376,17 +378,25 @@ class LinksFragment : MainFragment() {
     }
 
     private fun deleteAlbum() {
-        CoverableMutator.deleteTopAlbums(mAdapter.selectedPositions, context!!) {
-            onCollectionsUpdated()
+        @Suppress("UNCHECKED_CAST")  // assume internal consistency
+        val albums = mActionModeHelper.selectedPositions.map { i -> mCollections[i] } as List<Album>
+        CoverableMutator.deleteTopAlbums(albums, context!!) {
             mActivity.notifyPinnedAlbumDeleted()
             mActionModeHelper.destroyActionModeIfCan()
+            onCollectionsUpdated()
         }
     }
 
     private fun selectAll() {
-        mAdapter.currentItems.map { item -> item.setSelection(true) }
-        mAdapter.selectAll()
-        mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
+        if (mActionModeHelper.selectedPositions.size == mAdapter.currentItems.size) return
+
+        var i = 0
+        for (item in mAdapter.currentItems) {
+            item.setSelection(true)
+            mActionModeHelper.selectedPositions.add(i)
+            i += 1
+        }
+        mActionModeHelper.updateContextTitle(mActionModeHelper.selectedPositions.size)
     }
 
     override fun onAllFragmentsCreated() {
@@ -453,6 +463,11 @@ class LinksFragment : MainFragment() {
 
     private fun getColorInt(type: BaseActivity.ColorType): Int {
         return mActivity.getColorInt(type)
+    }
+
+    companion object SaveDataKeys {
+        const val SELECTED_TYPE = "LinksFragment_ST"
+        const val SELECTED_POSITIONS = "LF_SP"
     }
 
 }

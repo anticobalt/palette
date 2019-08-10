@@ -8,7 +8,7 @@ import eu.davidea.flexibleadapter.items.IFlexible
 import eu.davidea.viewholders.FlexibleViewHolder
 import iced.egret.palette.R
 
-class CoverViewHolder(view: View,
+class CoverViewHolder(val view: View,
                       adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>)
     : FlexibleViewHolder(view, adapter) {
 

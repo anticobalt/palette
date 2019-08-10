@@ -13,12 +13,15 @@ import eu.davidea.flexibleadapter.utils.Log
 import iced.egret.palette.flexible.item.inherited.CoverableItem
 
 /**
- * A copy of ActionModeHelper (from FlexibleAdapter) that uses Toolbar
- * instead of Activity to start Action Mode.
+ * A extension of ActionModeHelper (from FlexibleAdapter) that uses Toolbar
+ * instead of Activity to start Action Mode, and handles item selection instead of delgating to
+ * FlexibleAdapter.
  * https://github.com/davideas/FlexibleAdapter
  *
  * Literally copy-pasted the original class, converted to Kotlin,
- * changed the classes of some return objects and properties.
+ * changed the classes of some return objects and properties, and added selection.
+ *
+ * Selection handling added because the one in FlexibleAdapter is way too slow on large sets.
  *
  * ActionModes created with Toolbar.startActionMode() are the non-appcompat version.
  *
@@ -41,6 +44,8 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
     private var mAdapter: FlexibleAdapter<*> = adapter
     private val mCallback: ActionMode.Callback? = callback
     var mActionMode: ActionMode? = null
+
+    val selectedPositions = mutableSetOf<Int>()
 
     /**
      * Changes the default mode to apply when the ActionMode is destroyed and normal selection is
@@ -94,19 +99,6 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
     }
 
     /**
-     * Gets the activated position only when mode is `SINGLE`.
-     *
-     * @return the activated position when `SINGLE`. -1 if no item is selected
-     * @since 1.0.0-b1
-     */
-    fun getActivatedPosition(): Int {
-        val selectedPositions = mAdapter.selectedPositions
-        return if (mAdapter.mode == Mode.SINGLE && selectedPositions.size == 1) {
-            selectedPositions[0]
-        } else RecyclerView.NO_POSITION
-    }
-
-    /**
      * Implements the basic behavior of a CAB and multi select behavior.
      *
      * @param position the current item position
@@ -152,14 +144,18 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
      * @since 1.0.0-b1
      */
     fun toggleSelection(position: Int, item: CoverableItem?) {
-        if (position >= 0 && (mAdapter.mode == Mode.SINGLE && !mAdapter.isSelected(position) || mAdapter.mode == Mode.MULTI)) {
-            mAdapter.toggleSelection(position)
+        if (position >= 0 && (mAdapter.mode == Mode.SINGLE && position !in selectedPositions || mAdapter.mode == Mode.MULTI)) {
             item?.toggleSelection()
+            if (position in selectedPositions) {
+                selectedPositions.remove(position)
+            } else {
+                selectedPositions.add(position)
+            }
         }
         // If SINGLE is active then ActionMode can be null
         if (mActionMode == null) return
 
-        val count = mAdapter.selectedItemCount
+        val count = selectedPositions.size
         if (count == 0) {
             mActionMode!!.finish()
         } else {
@@ -193,7 +189,7 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
      * @since 1.0.0-b1
      */
     fun restoreSelection(toolbar: Toolbar) {
-        if (defaultMode == Mode.IDLE && mAdapter.selectedItemCount > 0 || defaultMode == Mode.SINGLE && mAdapter.selectedItemCount > 1) {
+        if (defaultMode == Mode.IDLE && selectedPositions.size > 0 || defaultMode == Mode.SINGLE && selectedPositions.size > 1) {
             onLongClick(toolbar, -1, null)
         }
     }
@@ -239,7 +235,7 @@ open class ToolbarActionModeHelper(adapter: FlexibleAdapter<*>,
         Log.d("ActionMode is about to be destroyed!")
         // Change mode and deselect everything
         mAdapter.mode = defaultMode
-        mAdapter.clearSelection()
+        selectedPositions.clear()
         mActionMode = null
         // Re-enable Swipe and Drag capabilities if they were disabled by this helper
         enableSwipeDragCapabilities()

@@ -5,7 +5,6 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
-import eu.davidea.flexibleadapter.FlexibleAdapter
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
@@ -26,7 +25,7 @@ abstract class CollectionViewDelegate {
 
     abstract fun onBuildToolbar(toolbar: Toolbar)
     abstract fun onCreateActionMode(mode: ActionMode, menu: Menu, selectedContentType: String): Boolean
-    abstract fun onActionItemClicked(mode: ActionMode, item: MenuItem, adapter: FlexibleAdapter<*>,
+    abstract fun onActionItemClicked(mode: ActionMode, item: MenuItem, selectedContent: List<Coverable>,
                                      context: Context, selectedContentType: String): Boolean
 
     abstract fun onDestroyActionMode(mode: ActionMode)

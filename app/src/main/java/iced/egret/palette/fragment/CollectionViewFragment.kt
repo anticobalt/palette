@@ -67,6 +67,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     private var mContentItems = mutableListOf<GridCoverableItem>()
 
     private lateinit var mAdapter: FlexibleAdapter<GridCoverableItem>
+    private lateinit var mLayoutManager : GridLayoutManager
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
     private var mReturningFromStop = false
@@ -121,7 +122,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         // Re-select all previously selected items
         for (i in 0 until mAdapter.currentItems.size) {
-            if (i in mAdapter.selectedPositionsAsSet) {
+            if (i in mActionModeHelper.selectedPositions) {
                 mAdapter.currentItems[i].setSelection(true)
             }
         }
@@ -265,12 +266,12 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     private fun buildRecyclerView() {
         val orientation = resources.configuration.orientation
         val numColumns = if (orientation == Configuration.ORIENTATION_LANDSCAPE) 5 else 3
-        val manager = GridLayoutManager(activity, numColumns)
+        mLayoutManager = GridLayoutManager(activity, numColumns)
 
         fetchContents()
         mAdapter = FlexibleAdapter(mContentItems, this, true)
         initializeActionModeHelper(SelectableAdapter.Mode.IDLE)
-        mCollectionRecyclerView.layoutManager = manager
+        mCollectionRecyclerView.layoutManager = mLayoutManager
         mCollectionRecyclerView.adapter = mAdapter
 
         // Need to supply explicit view in fragment
@@ -449,12 +450,10 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
 
-        // sanity check that selected type is valid
-        CollectionManager.getContentsMap()[mSelectedContentType] ?: return false
+        val coverablesOfType = CollectionManager.getContentsMap()[mSelectedContentType]
+                ?: return false  // sanity check that selected type is valid
 
-        val coverables = mAdapter.selectedPositions.map { index ->
-            CollectionManager.getContentsMap()[mSelectedContentType]!![index]
-        }
+        val selectedCoverables = mActionModeHelper.selectedPositions.map { index -> coverablesOfType[index] }
 
         when (item.itemId) {
             R.id.actionSelectAll -> selectAll()
@@ -463,12 +462,12 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
                 // Must return true for submenus to popup.
                 return true
             }
-            R.id.actionAddToAlbum -> addToAlbum(coverables)
-            R.id.actionMove -> move(coverables)
-            R.id.actionDelete -> delete(coverables)
+            R.id.actionAddToAlbum -> addToAlbum(selectedCoverables)
+            R.id.actionMove -> move(selectedCoverables)
+            R.id.actionDelete -> delete(selectedCoverables)
         }
 
-        mDelegate.onActionItemClicked(mode, item, mAdapter, context!!, mSelectedContentType!!)
+        mDelegate.onActionItemClicked(mode, item, selectedCoverables, context!!, mSelectedContentType!!)
         return true
     }
 
@@ -505,9 +504,15 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     private fun selectAll() {
-        mAdapter.currentItems.map { item -> item.setSelection(true) }
-        mAdapter.selectAll()
-        mActionModeHelper.updateContextTitle(mAdapter.selectedItemCount)
+        if (mActionModeHelper.selectedPositions.size == mAdapter.currentItems.size) return
+
+        var i = 0
+        for (item in mAdapter.currentItems) {
+            item.setSelection(true)
+            mActionModeHelper.selectedPositions.add(i)
+            i += 1
+        }
+        mActionModeHelper.updateContextTitle(mActionModeHelper.selectedPositions.size)
     }
 
     private fun addToAlbum(coverables: List<Coverable>) {
@@ -539,6 +544,17 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
                 }
             }
         }
+    }
+
+    private fun itemIsVisible(item: GridCoverableItem) : Boolean {
+        val view = item.viewHolder?.view
+        return if (view != null) {
+            // These function names are almost as bad as mine
+            val completelyVisible = mLayoutManager.isViewPartiallyVisible(view, true, true)
+            val partiallyVisible = mLayoutManager.isViewPartiallyVisible(view, false, true)
+            completelyVisible || partiallyVisible
+        }
+        else false
     }
 
     /**

@@ -61,13 +61,14 @@ abstract class CoverableItem(val coverable: Coverable, private var defaultTint: 
 
     /**
      * Update isSelected property, and try to draw selection indicator.
-     * If can't draw (e.g. after rotation b/c Views not re-created yet),
+     * If can't draw (e.g. after rotation b/c Views not re-created yet) or won't,
      * they will be drawn in onBindViewHolder()
      *
      * @param selected turn on (true) or off (false)
      */
-    fun setSelection(selected: Boolean) {
+    fun setSelection(selected: Boolean, shouldDraw: Boolean = true) {
         isSelected = selected
+        if (!shouldDraw) return
         val statusView = viewHolder?.itemView?.findViewById<ImageView>(R.id.selectCheckmark)
                 ?: return
 

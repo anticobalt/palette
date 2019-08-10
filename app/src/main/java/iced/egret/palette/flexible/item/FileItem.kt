@@ -1,7 +1,6 @@
 package iced.egret.palette.flexible.item
 
 import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
@@ -24,9 +23,6 @@ class FileItem(val file: File, checked: Boolean) : AbstractFlexibleItem<FileView
         viewHolder = holder
         holder.textView.text = file.path
         holder.checkBox.isChecked = isChecked
-
-        holder.textView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        holder.view.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
     }
 
     override fun equals(other: Any?): Boolean {

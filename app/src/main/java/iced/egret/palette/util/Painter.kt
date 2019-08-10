@@ -19,7 +19,7 @@ object Painter {
             DARKEN_MODERATE
     )
 
-    var currentDrawableColor = Color.WHITE
+    private var currentDrawableColor = Color.WHITE
 
     /**
      * Changes the color of object to a predetermined color.
@@ -50,13 +50,13 @@ object Painter {
      *
      * @param colorHex a string in form #RRGGBB or #AARRGGBB
      */
-    fun getMaterialDark(colorHex: String) : String {
+    fun getMaterialDark(colorHex: String): String {
         val colorInt = Color.parseColor(colorHex)
         val colorDarkInt = getMaterialDark(colorInt)
         return Integer.toHexString(colorDarkInt)
     }
 
-    fun getMaterialDark(colorInt: Int) : Int {
+    fun getMaterialDark(colorInt: Int): Int {
         val hsl = FloatArray(3)
         ColorUtils.colorToHSL(colorInt, hsl)
 

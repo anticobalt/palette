@@ -24,16 +24,12 @@ class FolderViewDelegate : CollectionViewDelegate() {
         return true
     }
 
-    override fun onDestroyActionMode(mode: ActionMode) {
-        // TODO
-    }
+    override fun onDestroyActionMode(mode: ActionMode) {}
 
     override fun onOptionsItemSelected(item: MenuItem, fragment: CollectionViewFragment, currentCollection: Collection): Boolean {
         return true
     }
 
-    override fun onFabClick(context: Context, contents: List<Coverable>) {
-        // TODO
-    }
+    override fun onFabClick(context: Context, contents: List<Coverable>) {}
 
 }

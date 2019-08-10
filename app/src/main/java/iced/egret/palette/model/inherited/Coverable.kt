@@ -16,6 +16,7 @@ import java.io.FileNotFoundException
 interface TerminalCoverable : Coverable {
     override val terminal: Boolean
         get() = true
+
     fun loadInto(view: View)
 }
 

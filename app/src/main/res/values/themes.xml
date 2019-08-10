@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- For setting accent colors, which are tedious to color manually -->
+<?xml version="1.0" encoding="utf-8"?><!-- For setting accent colors, which are tedious to color manually -->
 <resources>
 
     <!-- Inherits from StartActivity -->
@@ -7,46 +6,57 @@
         <item name="android:colorAccent">@color/dodger_blue</item>
         <item name="colorAccent">@color/dodger_blue</item>
     </style>
+
     <style name="AppTheme.StartActivity.SeaGreen">
         <item name="android:colorAccent">@color/sea_green</item>
         <item name="colorAccent">@color/sea_green</item>
     </style>
+
     <style name="AppTheme.StartActivity.FruitSalad">
         <item name="android:colorAccent">@color/fruit_salad</item>
         <item name="colorAccent">@color/fruit_salad</item>
     </style>
+
     <style name="AppTheme.StartActivity.Tangerine">
         <item name="android:colorAccent">@color/tangerine</item>
         <item name="colorAccent">@color/tangerine</item>
     </style>
+
     <style name="AppTheme.StartActivity.Lynch">
         <item name="android:colorAccent">@color/lynch</item>
         <item name="colorAccent">@color/lynch</item>
     </style>
+
     <style name="AppTheme.StartActivity.Coffee">
         <item name="android:colorAccent">@color/coffee</item>
         <item name="colorAccent">@color/coffee</item>
     </style>
+
     <style name="AppTheme.StartActivity.IdlePink">
         <item name="android:colorAccent">@color/idle_pink</item>
         <item name="colorAccent">@color/idle_pink</item>
     </style>
+
     <style name="AppTheme.StartActivity.BoppinBlue">
         <item name="android:colorAccent">@color/boppin_blue</item>
         <item name="colorAccent">@color/boppin_blue</item>
     </style>
+
     <style name="AppTheme.StartActivity.AstralYellow">
         <item name="android:colorAccent">@color/astral_yellow</item>
         <item name="colorAccent">@color/astral_yellow</item>
     </style>
+
     <style name="AppTheme.StartActivity.MyriadMagenta">
         <item name="android:colorAccent">@color/myriad_magenta</item>
         <item name="colorAccent">@color/myriad_magenta</item>
     </style>
+
     <style name="AppTheme.StartActivity.ResoluteCyan">
         <item name="android:colorAccent">@color/resolute_cyan</item>
         <item name="colorAccent">@color/resolute_cyan</item>
     </style>
+
     <style name="AppTheme.StartActivity.FashionRed">
         <item name="android:colorAccent">@color/fashion_red</item>
         <item name="colorAccent">@color/fashion_red</item>
@@ -57,46 +67,57 @@
         <item name="android:colorAccent">@color/dodger_blue</item>
         <item name="colorAccent">@color/dodger_blue</item>
     </style>
+
     <style name="AppTheme.SlideActivity.SeaGreen">
         <item name="android:colorAccent">@color/sea_green</item>
         <item name="colorAccent">@color/sea_green</item>
     </style>
+
     <style name="AppTheme.SlideActivity.FruitSalad">
         <item name="android:colorAccent">@color/fruit_salad</item>
         <item name="colorAccent">@color/fruit_salad</item>
     </style>
+
     <style name="AppTheme.SlideActivity.Tangerine">
         <item name="android:colorAccent">@color/tangerine</item>
         <item name="colorAccent">@color/tangerine</item>
     </style>
+
     <style name="AppTheme.SlideActivity.Lynch">
         <item name="android:colorAccent">@color/lynch</item>
         <item name="colorAccent">@color/lynch</item>
     </style>
+
     <style name="AppTheme.SlideActivity.Coffee">
         <item name="android:colorAccent">@color/coffee</item>
         <item name="colorAccent">@color/coffee</item>
     </style>
+
     <style name="AppTheme.SlideActivity.IdlePink">
         <item name="android:colorAccent">@color/idle_pink</item>
         <item name="colorAccent">@color/idle_pink</item>
     </style>
+
     <style name="AppTheme.SlideActivity.BoppinBlue">
         <item name="android:colorAccent">@color/boppin_blue</item>
         <item name="colorAccent">@color/boppin_blue</item>
     </style>
+
     <style name="AppTheme.SlideActivity.AstralYellow">
         <item name="android:colorAccent">@color/astral_yellow</item>
         <item name="colorAccent">@color/astral_yellow</item>
     </style>
+
     <style name="AppTheme.SlideActivity.MyriadMagenta">
         <item name="android:colorAccent">@color/myriad_magenta</item>
         <item name="colorAccent">@color/myriad_magenta</item>
     </style>
+
     <style name="AppTheme.SlideActivity.ResoluteCyan">
         <item name="android:colorAccent">@color/resolute_cyan</item>
         <item name="colorAccent">@color/resolute_cyan</item>
     </style>
+
     <style name="AppTheme.SlideActivity.FashionRed">
         <item name="android:colorAccent">@color/fashion_red</item>
         <item name="colorAccent">@color/fashion_red</item>

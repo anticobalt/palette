@@ -45,7 +45,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
     // All folders, existent or not, that is synced
     var syncedFolderFiles: MutableList<File> = ArrayList()
     // Folders that are synced and actually currently exist and have Pictures in them
-    private val syncedFolders : List<Folder>
+    private val syncedFolders: List<Folder>
         get() {
             val folders = mutableListOf<Folder>()
             for (file in syncedFolderFiles) {
@@ -128,7 +128,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
     }
 
     fun addAlbums(newAlbums: List<Album>) {
-        newAlbums.map {album -> addAlbum(album) }
+        newAlbums.map { album -> addAlbum(album) }
     }
 
     fun removeAlbum(album: Album) {
@@ -143,7 +143,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
     /**
      * Check if the given pictures all actually belong to the album, or contained synced ones.
      */
-    fun ownsPictures(samplePictures : List<Picture>) : Boolean {
+    fun ownsPictures(samplePictures: List<Picture>): Boolean {
         val setDifference = samplePictures.toSet() - _pictures.toSet()
         return setDifference.isEmpty()
     }

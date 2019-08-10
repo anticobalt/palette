@@ -8,9 +8,6 @@
     <string name="title_activity_settings">Settings</string>
 
     <!-- Names -->
-    <string name="folders">Folders</string>
-    <string name="albums">Albums</string>
-    <string name="pictures">Pictures</string>
     <string name="root_name">Root</string>
     <string name="recycle_bin">Recycle Bin</string>
     <string name="waiting_room">Waiting Room</string>
@@ -76,8 +73,6 @@
 
     <!-- Menu states -->
     <string name="drawer_toggle">Toggle Drawer</string>
-    <string name="drawer_open">Open Drawer</string>
-    <string name="drawer_close">Close Drawer</string>
 
     <!-- Strings indicate what buttons or objects represent -->
     <string name="label_album_actions">Album Actions</string>
@@ -85,7 +80,6 @@
 
     <!-- Successes -->
     <string name="file_save_success">File saved</string>
-    <string name="file_move_success">File moved</string>
     <string name="success_move_generic">Successfully moved</string>
     <string name="success_add_generic">Successfully added</string>
     <string name="success_delete_generic">Successfully deleted</string>
@@ -105,9 +99,6 @@
     <string name="access_denied_error">Access to storage was denied. Make sure access to this SD card is enabled in Settings.</string>
     <string name="intent_extra_error">Something went wrong!</string>
     <string name="storage_fail_error_explain">If using an SD card, make sure access is enabled in Settings.</string>
-
-    <!-- Alerts -->
-    <string name="alert_no_folders">No folders found!</string>
 
     <!-- For dialogs -->
     <string name="title_album_form">New Album</string>

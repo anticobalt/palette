@@ -6,6 +6,6 @@
         android:id="@+id/apply"
         android:icon="@drawable/ic_check_black_24dp"
         android:title="@string/action_apply"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
 </menu>

@@ -60,7 +60,7 @@ object CollectionManager : CoroutineScope {
     var currentCollection: Collection?
         get() = mCollectionStack.peek()
         private set(value) = mCollectionStack.push(value)
-    val contents: List<Coverable>
+    private val contents: List<Coverable>
         get() = currentCollection?.getContents() ?: listOf()
 
     private val mPictureCache = mutableMapOf<String, Picture>()

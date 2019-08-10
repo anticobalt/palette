@@ -554,16 +554,6 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         }
     }
 
-    private fun itemIsVisible(item: GridCoverableItem): Boolean {
-        val view = item.viewHolder?.view
-        return if (view != null) {
-            // These function names are almost as bad as mine
-            val completelyVisible = mLayoutManager.isViewPartiallyVisible(view, true, true)
-            val partiallyVisible = mLayoutManager.isViewPartiallyVisible(view, false, true)
-            completelyVisible || partiallyVisible
-        } else false
-    }
-
     /**
      * Get new data from Collection Manager.
      */
@@ -579,17 +569,15 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             // Inside albums, icons for synced pictures have to be set manually,
             // b/c pictures have no idea if they are synced with anything.
             if (collection is Album) {
-                var res : Int?
+                var res: Int?
                 for (coverable in coverables) {
                     // If synchronized picture
                     if (coverable is Picture && !collection.ownsPictures(listOf(coverable))) {
                         res = syncIconRes
-                    }
-                    else res = null
+                    } else res = null
                     mContentItems.add(GridCoverableItem(coverable, res))
                 }
-            }
-            else {
+            } else {
                 val coverableItems = coverables.map { content -> GridCoverableItem(content) }
                 mContentItems.addAll(coverableItems)
             }

@@ -101,7 +101,7 @@ class AlbumViewDelegate : CollectionViewDelegate() {
         }
     }
 
-    private fun hasSyncedPicture(pictures: List<Picture>) : Boolean {
+    private fun hasSyncedPicture(pictures: List<Picture>): Boolean {
         val album = CollectionManager.currentCollection as Album
         return !album.ownsPictures(pictures)
     }

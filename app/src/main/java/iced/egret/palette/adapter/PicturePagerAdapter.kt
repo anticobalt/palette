@@ -15,12 +15,6 @@ import java.lang.ref.WeakReference
 
 class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: PicturePagerActivity) : PagerAdapter() {
 
-    private class DummyTouchListener : View.OnTouchListener {
-        override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-            return false
-        }
-    }
-
     private val activityReference = WeakReference(activity)
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {

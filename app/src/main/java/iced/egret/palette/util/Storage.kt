@@ -37,9 +37,7 @@ object Storage {
 
     val initialFolders: List<Folder>
         get() = contentBuilder.folders
-    val initialAlbums: List<Album>
-        get() = contentBuilder.albums
-    val initialBufferPictures : List<Picture>
+    val initialBufferPictures: List<Picture>
         get() = contentBuilder.bufferPictures
 
     val knownPictures = linkedMapOf<String, Picture>()
@@ -70,7 +68,7 @@ object Storage {
     /**
      * Require Folders and Pictures to be in place
      */
-    internal fun buildAlbumsFromDisk() : List<Album> {
+    internal fun buildAlbumsFromDisk(): List<Album> {
         contentBuilder.runForAlbums()
         return contentBuilder.albums
     }
@@ -124,7 +122,7 @@ object Storage {
     }
 
     internal fun saveBufferPicturesToDisk(pictures: List<Picture>) {
-        val json = gson.toJson(pictures.map {picture -> picture.filePath })
+        val json = gson.toJson(pictures.map { picture -> picture.filePath })
         saveJsonToDisk(json, pictureBufferFileName)
     }
 
@@ -540,7 +538,7 @@ object Storage {
         // Purposely set as lateinit to prevent usage before run functions is called
         lateinit var folders: List<Folder>
         lateinit var albums: List<Album>
-        lateinit var pictures : LinkedHashMap<String, Picture>
+        lateinit var pictures: LinkedHashMap<String, Picture>
         lateinit var bufferPictures: List<Picture>
 
         fun runForPictures(context: Context) {
@@ -661,7 +659,7 @@ object Storage {
          * Since this function is supposed to run once on app start, assumption is that the last
          * time the cache was saved was the last time the app was open.
          */
-        private fun getAllBufferPictures() : List<Picture> {
+        private fun getAllBufferPictures(): List<Picture> {
             val fromPreviousSession = getBufferPicturesFromDisk()
             val fromPreviousSessionAsSet = fromPreviousSession.toSet()
             val newToSession = getNewPicturePaths()
@@ -724,11 +722,9 @@ object Storage {
         val file = File(directory, name)
         val oldLocations = mutableMapOf<String, String>()
 
-        val valid: Boolean
-            get() = file.isDirectory && file.canRead()
         val contents: List<Picture>
             get() = file.listFiles().map { file -> Picture(file.path.split("/").last(), file.path) }
-        val contentsByDateDesc : List<Picture>  // new ones first
+        val contentsByDateDesc: List<Picture>  // new ones first
             get() = contents.sortedByDescending { picture -> picture.file.lastModified() }
 
         init {

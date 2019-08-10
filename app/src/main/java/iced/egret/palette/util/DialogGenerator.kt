@@ -29,12 +29,12 @@ import java.io.File
  */
 object DialogGenerator {
 
-    private fun hasInvalidCharacters(sequence: CharSequence) : Boolean {
+    private fun hasInvalidCharacters(sequence: CharSequence): Boolean {
         val invalidSymbols = setOf('|', '/', '\\', '\'', '"', '?', '*', '<', '>', '+', '=', ':')
         return sequence.any { char -> char in invalidSymbols }
     }
 
-    private fun albumNameError(name: CharSequence, nameInUse: (CharSequence) -> Boolean) : String? {
+    private fun albumNameError(name: CharSequence, nameInUse: (CharSequence) -> Boolean): String? {
         return when {
             nameInUse(name) -> "Album with name already exists"
             hasInvalidCharacters(name) -> "Invalid characters"
@@ -45,7 +45,7 @@ object DialogGenerator {
         }
     }
 
-    private fun fileNameError(name: CharSequence) : String? {
+    private fun fileNameError(name: CharSequence): String? {
         return when {
             hasInvalidCharacters(name) -> "Invalid characters"
             name.firstOrNull() == ' ' -> "Cannot start with space"

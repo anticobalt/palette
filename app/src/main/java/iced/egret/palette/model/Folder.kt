@@ -2,7 +2,6 @@ package iced.egret.palette.model
 
 import android.net.Uri
 import iced.egret.palette.R
-import iced.egret.palette.model.dataclass.FolderData
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.model.inherited.FileObject
@@ -70,12 +69,6 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
         size = folders.size
     }
 
-    fun toDataClass(): FolderData {
-        val picturePaths = pictures.map { picture -> picture.filePath }
-        val subFolders = folders.map { folder -> folder.toDataClass() }
-        return FolderData(name, path, subFolders, picturePaths)
-    }
-
     override fun getOnePictureUri(): Uri? {
         if (pictures.isNotEmpty()) {
             return pictures[0].uri
@@ -106,7 +99,7 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
         size += newFolders.size
     }
 
-    fun removeFolder(folder: Folder) {
+    private fun removeFolder(folder: Folder) {
         _folders.remove(folder)
         size -= 1
         deleteIfShould()

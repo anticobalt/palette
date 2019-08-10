@@ -90,12 +90,10 @@ abstract class CoverableItem(val coverable: Coverable, private var defaultTint: 
 
         if (iconRes != null) {
             iconView.setImageResource(iconRes!!)
-        }
-        else {
+        } else {
             if (coverable.icon == null) {
                 iconView.setImageDrawable(null)
-            }
-            else {
+            } else {
                 iconView.setImageResource(coverable.icon ?: return)
             }
         }

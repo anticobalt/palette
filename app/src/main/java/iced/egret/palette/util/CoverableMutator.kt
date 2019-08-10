@@ -127,7 +127,7 @@ object CoverableMutator {
     fun move(pictures: List<Picture>, context: Context, onFinish: () -> Unit) {
 
         // If all pictures are in same location, set it as initial
-        val oldLocations = pictures.map {picture -> picture.parentFilePath }.toSet()
+        val oldLocations = pictures.map { picture -> picture.parentFilePath }.toSet()
         val initialLocation = if (oldLocations.size == 1) oldLocations.min() else null
 
         DialogGenerator.moveTo(context, initialLocation) {
@@ -148,8 +148,7 @@ object CoverableMutator {
                     toast(context, "Failed! " +
                             context.getString(R.string.storage_fail_error_explain))
                 }
-            }
-            else toast(context, R.string.success_move_generic)
+            } else toast(context, R.string.success_move_generic)
             onFinish()
         }
     }
@@ -164,18 +163,16 @@ object CoverableMutator {
                 if (pictures.size > 1) {
                     toast(context, "Failed to move $failedCounter pictures to recycle bin! " +
                             context.getString(R.string.storage_fail_error_explain))
-                }
-                else {
+                } else {
                     toast(context, "Failed! " +
                             context.getString(R.string.storage_fail_error_explain))
                 }
-            }
-            else toast(context, R.string.success_move_to_recycle)
+            } else toast(context, R.string.success_move_to_recycle)
             onFinish()
         }
     }
 
-    fun delete(albums: List<Album>, fromCurrent : Boolean, context: Context, onFinish: () -> Unit) {
+    fun delete(albums: List<Album>, fromCurrent: Boolean, context: Context, onFinish: () -> Unit) {
         DialogGenerator.deleteAlbum(context) {
             CollectionManager.deleteAlbums(albums, fromCurrent)
             toast(context, R.string.success_delete_generic)

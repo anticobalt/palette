@@ -43,7 +43,7 @@ class MainPagerActivity : PicturePagerActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        val retVal =  when (item?.itemId) {
+        val retVal = when (item?.itemId) {
             R.id.switchTrueZoom -> {
                 item.isChecked = !item.isChecked
                 mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()

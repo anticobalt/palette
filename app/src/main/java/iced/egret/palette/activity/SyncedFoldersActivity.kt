@@ -22,7 +22,7 @@ class SyncedFoldersActivity : RecyclerViewActivity() {
 
     private val mFileItems = mutableListOf<FileItem>()
     private lateinit var mAdapter: FlexibleAdapter<FileItem>
-    private lateinit var albumPath : String
+    private lateinit var albumPath: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Get path before fetching contents (done by superclass)
@@ -105,8 +105,8 @@ class SyncedFoldersActivity : RecyclerViewActivity() {
 
     private fun apply() {
         val fileNames = mFileItems
-                .filter {item -> item.isChecked}
-                .map {item -> item.file.path}
+                .filter { item -> item.isChecked }
+                .map { item -> item.file.path }
                 as ArrayList
 
         val intent = Intent()

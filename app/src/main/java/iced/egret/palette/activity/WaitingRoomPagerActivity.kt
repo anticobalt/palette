@@ -14,7 +14,7 @@ class WaitingRoomPagerActivity : PicturePagerActivity() {
     override val bottomBarRes = R.layout.bottom_bar_waiting_room_pager
     override val menuRes = R.menu.menu_waiting_room_pager
 
-    private val autoClear : Boolean
+    private val autoClear: Boolean
         get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
@@ -41,7 +41,7 @@ class WaitingRoomPagerActivity : PicturePagerActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        val retVal =  when (item?.itemId) {
+        val retVal = when (item?.itemId) {
             R.id.switchTrueZoom -> {
                 item.isChecked = !item.isChecked
                 mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()

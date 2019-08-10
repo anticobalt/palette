@@ -18,7 +18,8 @@ import java.io.File
 abstract class BaseActivity : AppCompatActivity() {
 
     enum class ColorType { PRIMARY, ACCENT, ITEM }
-    protected lateinit var defSharedPreferences : SharedPreferences
+
+    protected lateinit var defSharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,7 +78,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun idToColor(colorResId: Int) = ContextCompat.getColor(this, colorResId)
 
-    fun getColorInt(type: ColorType) : Int {
+    fun getColorInt(type: ColorType): Int {
         val keyRef = when (type) {
             ColorType.PRIMARY -> R.string.primary_color_key
             ColorType.ACCENT -> R.string.accent_color_key

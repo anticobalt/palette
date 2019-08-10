@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Left side looks lower -->
+<?xml version="1.0" encoding="utf-8"?><!-- Left side looks lower -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
         android:angle="0"

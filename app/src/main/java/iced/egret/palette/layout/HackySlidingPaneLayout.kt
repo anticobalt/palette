@@ -35,7 +35,7 @@ class HackySlidingPaneLayout(context: Context, attributeSet: AttributeSet? = nul
         fun onSlidingPanelReady()
     }
 
-    private var exposedListener : HackyPanelSlideListener? = null
+    private var exposedListener: HackyPanelSlideListener? = null
 
     override fun setPanelSlideListener(listener: PanelSlideListener?) {
         super.setPanelSlideListener(listener)
@@ -55,12 +55,11 @@ class HackySlidingPaneLayout(context: Context, attributeSet: AttributeSet? = nul
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         val action = ev.actionMasked
         val bound = findViewById<SlidingPaneLayout?>(R.id.slider)?.right
-        ?: return super.onInterceptTouchEvent(ev)
+                ?: return super.onInterceptTouchEvent(ev)
 
         return if (isOpen && action == MotionEvent.ACTION_MOVE && ev.x < bound) {
             false // don't intercept, let child handle
-        }
-        else super.onInterceptTouchEvent(ev)
+        } else super.onInterceptTouchEvent(ev)
     }
 
 }

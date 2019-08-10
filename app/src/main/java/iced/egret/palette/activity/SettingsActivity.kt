@@ -21,7 +21,7 @@ class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceCh
                 R.string.primary_color_key,
                 R.string.accent_color_key,
                 R.string.toolbar_item_color_key
-        ).map {id -> getString(id)}
+        ).map { id -> getString(id) }
 
         if (key != null && key in themeKeys) {
             // Rebuild all activities in stack to refresh theme

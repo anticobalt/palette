@@ -4,7 +4,6 @@ import android.os.Bundle
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrConfig
 import iced.egret.palette.R
-import iced.egret.palette.activity.inherited.BaseActivity
 
 abstract class SlideActivity : BaseActivity() {
 

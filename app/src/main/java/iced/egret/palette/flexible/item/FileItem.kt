@@ -11,8 +11,8 @@ import java.io.File
 
 class FileItem(val file: File, checked: Boolean) : AbstractFlexibleItem<FileViewHolder>() {
 
-    private var viewHolder : FileViewHolder? = null
-    var isChecked : Boolean = checked
+    private var viewHolder: FileViewHolder? = null
+    var isChecked: Boolean = checked
         private set
 
     override fun bindViewHolder(adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,

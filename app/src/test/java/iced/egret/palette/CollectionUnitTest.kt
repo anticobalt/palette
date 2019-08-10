@@ -9,13 +9,14 @@ class CollectionUnitTest {
     private val name = "a name"
     private val path = "a/path/to/a name"
 
-    @Test fun folderInit() {
+    @Test
+    fun folderInit() {
 
         var folder = Folder(name, path)
         assert(folder.name == name)
         assert(folder.path == path)
-        assert(folder.folders.size == 0)
-        assert(folder.pictures.size == 0)
+        assert(folder.folders.isEmpty())
+        assert(folder.pictures.isEmpty())
 
         val subFolders = arrayListOf(
                 Folder("a", "path/to/a"),
@@ -23,11 +24,12 @@ class CollectionUnitTest {
         )
         folder = Folder(name, path, subFolders = subFolders)
         assert(folder.folders == subFolders)
-        assert(folder.pictures.size == 0)
+        assert(folder.pictures.isEmpty())
 
     }
 
-    @Test fun folderAddChildren() {
+    @Test
+    fun folderAddChildren() {
 
         val folder = Folder(name, path)
         val subFolder = Folder("z", "antipath/to/z")
@@ -66,7 +68,8 @@ class CollectionUnitTest {
 
     }
 
-    @Test fun folderSizes() {
+    @Test
+    fun folderSizes() {
 
         val folder = Folder(name, path)
         val subFolders = arrayListOf(

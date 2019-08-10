@@ -141,7 +141,6 @@ object CollectionManager : CoroutineScope {
             val folder = getParentFolder(picture)
             // Don't add if Picture already exists
             if (folder != null && folder.findPictureByPath(picture.filePath) == null) {
-                picture.parent = folder
                 folder.addPicture(picture, toFront = true)
                 toPrependToBuffer.add(picture)  // keep order
                 mPictureCache[picture.filePath] = picture
@@ -442,14 +441,12 @@ object CollectionManager : CoroutineScope {
 
                 // Link the parent and child
                 workingFolder.addFolder(childFolder)
-                childFolder.parent = workingFolder
 
                 workingFolder = childFolder
                 index += 1
             }
             workingFolder
         }
-        fileObject.parent = parent
         return parent
     }
 

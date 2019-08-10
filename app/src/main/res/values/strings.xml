@@ -67,6 +67,7 @@
     <string name="action_clear">Clear</string>
     <string name="action_apply">Apply</string>
     <string name="action_show_sync_folders">Synced Folders</string>
+    <string name="action_set_as_cover">Set As Cover</string>
 
     <!-- Menu switches/checkboxes -->
     <string name="switch_true_zoom">True Zoom</string>

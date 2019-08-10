@@ -58,6 +58,10 @@ class MainPagerActivity : PicturePagerActivity() {
                 initiateRename()
                 true
             }
+            R.id.actionSetAsCover -> {
+                initiateCoverSet()
+                true
+            }
             else -> false
         }
         return if (retVal) true  // consume action
@@ -84,6 +88,16 @@ class MainPagerActivity : PicturePagerActivity() {
         val picture = mCurrentPicture
         CoverableMutator.rename(picture, this) {
             setToolbarTitle()  // to update name
+        }
+    }
+
+    private fun initiateCoverSet() {
+        val picture = mCurrentPicture
+        DialogGenerator.setAsCover(picture, this) {
+            for (collection in it) {
+                collection.addCustomCover(picture)
+            }
+            setResult(RESULT_OK)
         }
     }
 

@@ -18,4 +18,9 @@
         android:title="@string/action_rename"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/actionSetAsCover"
+        android:title="@string/action_set_as_cover"
+        app:showAsAction="never" />
+
 </menu>

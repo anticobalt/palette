@@ -20,8 +20,10 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
+import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
+import iced.egret.palette.model.inherited.FileObject
 import java.io.File
 
 /**
@@ -261,6 +263,46 @@ object DialogGenerator {
             positiveButton {
                 onConfirm()
             }
+        }
+    }
+
+    fun setAsCover(picture: Picture, context: Context, onConfirm: (List<Collection>) -> Unit) {
+        val candidates = mutableMapOf<String, Collection>()
+
+        // Get (most) Folders that this Picture is in, directly or indirectly
+        var obj: FileObject? = picture.parent
+        val topFolders = CollectionManager.folders
+        while (obj != null) {
+            if (obj is Folder) candidates[obj.path] = obj
+            if (obj in topFolders) break
+            obj = obj.parent
+        }
+        // Get all Albums this Picture is directly in
+        // TODO: handle indirection by making Albums doubly-linked
+        for (album in CollectionManager.getNestedAlbums()) {
+            if (picture in album.pictures) candidates[album.path] = album
+        }
+        // Get all pinned Albums
+        for (album in CollectionManager.albums) {
+            candidates[album.path] = album
+        }
+
+        val candidateCollections = candidates.values.sortedBy { c -> c.path }
+        val disabledIndices = candidateCollections
+                .filter { c -> c.hasCustomCoverable && c.cover["uri"] == picture.uri }
+                .map { c -> candidateCollections.indexOf(c) }
+                .toIntArray()
+
+        MaterialDialog(context).show {
+            title(R.string.action_set_as_cover)
+            listItemsMultiChoice(
+                    items = candidateCollections.map { c -> c.path },
+                    disabledIndices = disabledIndices
+            ) { _, indices, _ ->
+                onConfirm(indices.map {i -> candidateCollections[i]})
+            }
+            negativeButton()
+            positiveButton()
         }
     }
 

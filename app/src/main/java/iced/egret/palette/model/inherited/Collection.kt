@@ -17,12 +17,14 @@ import iced.egret.palette.model.Picture
  * - size
  * - totalSize
  */
-abstract class Collection(override var name: String, path: String) : Coverable {
+abstract class Collection(override var name: String, path: String, hasSetCoverable: Boolean = false) : Coverable {
 
     override val terminal = false
     override val cover = mutableMapOf<String, Any>(
             "id" to R.drawable.default_collection_cover
     )
+    var hasCustomCoverable = hasSetCoverable
+        private set
     var path = path
         protected set
 
@@ -100,8 +102,7 @@ abstract class Collection(override var name: String, path: String) : Coverable {
     }
 
     open fun addPictures(newPictures: List<Picture>) {
-        _pictures.addAll(newPictures)
-        size += newPictures.size
+        newPictures.map { p -> addPicture(p) }
     }
 
     open fun removePicture(picture: Picture) {
@@ -110,6 +111,8 @@ abstract class Collection(override var name: String, path: String) : Coverable {
     }
 
     private fun setCoverUri() {
+        if (hasCustomCoverable) return
+
         val uri = getOnePictureUri()
         if (uri != null) {
             cover["uri"] = uri
@@ -119,5 +122,14 @@ abstract class Collection(override var name: String, path: String) : Coverable {
     }
 
     abstract fun getOnePictureUri(): Uri?
+
+    fun addCustomCover(picture: Picture) {
+        hasCustomCoverable = true
+        cover["uri"] = picture.uri
+    }
+
+    fun removeCustomCover() {
+        hasCustomCoverable = false
+    }
 
 }

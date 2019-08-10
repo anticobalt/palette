@@ -91,18 +91,28 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
 
     fun addFolder(newFolder: Folder) {
         _folders.add(newFolder)
+        newFolder.parent = this
         size += 1
     }
 
     fun addFolders(newFolders: List<Folder>) {
-        _folders.addAll(newFolders)
-        size += newFolders.size
+        newFolders.map { f -> addFolder(f) }
     }
 
     private fun removeFolder(folder: Folder) {
         _folders.remove(folder)
+        folder.parent = null
         size -= 1
         deleteIfShould()
+    }
+
+    override fun addPicture(newPicture: Picture, toFront: Boolean, position: Int?) {
+        super.addPicture(newPicture, toFront, position)
+        newPicture.parent = this
+    }
+
+    override fun addPictures(newPictures: List<Picture>) {
+        newPictures.map { p -> addPicture(p) }
     }
 
     /**
@@ -110,6 +120,7 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
      */
     override fun removePicture(picture: Picture) {
         super.removePicture(picture)
+        picture.parent = null
         deleteIfShould()
     }
 
@@ -126,7 +137,6 @@ class Folder(name: String, override var filePath: String, subFolders: MutableLis
     private fun delete(): Boolean {
         val parentAsFolder = parent as? Folder ?: return false
         parentAsFolder.removeFolder(this)
-        parent = null
         return true
     }
 

@@ -8,6 +8,7 @@ interface FileObject {
     var filePath: String
     var parent: FileObject?
     val parentFilePath: String
+        // TODO: replace with parent.filePath
         get() = filePath.split("/").dropLast(1).joinToString("/")
 
     /**

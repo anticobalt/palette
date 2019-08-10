@@ -2,7 +2,6 @@ package iced.egret.palette.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -94,37 +93,43 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
 
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             when (requestCode) {
-
-                // Get write access to SD card, and save SD card URI to preferences.
-                // https://stackoverflow.com/a/43317703
-                SD_CARD_WRITE_REQUEST -> {
-                    val sdTreeUri = intent?.data
-                    if (sdTreeUri == null) {
-                        toast("Failed to gain SD card access!")
-                        return
-                    }
-
-                    // Try to get SD card
-                    val directory = DocumentFile.fromTreeUri(this, sdTreeUri)
-                    if (directory?.name == null) {
-                        toast("Failed to connect with SD card!")
-                        return
-                    }
-
-                    val modeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                    grantUriPermission(packageName, sdTreeUri, modeFlags)
-                    contentResolver.takePersistableUriPermission(sdTreeUri, modeFlags)
-
-                    with(sharedPrefs.edit()) {
-                        putString(getString(R.string.sd_card_uri_key), sdTreeUri.toString())
-                        apply()
-                    }
-
+                SD_CARD_WRITE_REQUEST -> tryAccessSdCard()
+                GO_HOME_REQUEST -> {
+                    (fragments[rightIndex] as CollectionViewFragment).onNavigation()
+                    slidingPaneLayout.closePane()
                 }
             }
+        }
+    }
+
+    /**
+     * Get write access to SD card, and save SD card URI to preferences.
+     * https://stackoverflow.com/a/43317703
+     */
+    private fun tryAccessSdCard() {
+        val sdTreeUri = intent?.data
+        if (sdTreeUri == null) {
+            toast("Failed to gain SD card access!")
+            return
+        }
+
+        // Try to get SD card
+        val directory = DocumentFile.fromTreeUri(this, sdTreeUri)
+        if (directory?.name == null) {
+            toast("Failed to connect with SD card!")
+            return
+        }
+
+        val modeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        grantUriPermission(packageName, sdTreeUri, modeFlags)
+        contentResolver.takePersistableUriPermission(sdTreeUri, modeFlags)
+
+        with(sharedPrefs.edit()) {
+            putString(getString(R.string.sd_card_uri_key), sdTreeUri.toString())
+            apply()
         }
     }
 
@@ -357,11 +362,13 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     fun buildCollectionView(collection: Collection) {
         val cvFragment = fragments[rightIndex] as CollectionViewFragment
         findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
-        CollectionManager.clearStack()
 
         when (collection) {
             is Folder -> CollectionManager.launchAsShortcut(collection)
-            else -> CollectionManager.launch(collection)
+            else -> {
+                CollectionManager.clearStack()
+                CollectionManager.launch(collection)
+            }
         }
 
         cvFragment.onTopCollectionChanged()
@@ -371,6 +378,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         const val ON_SCREEN_COLLECTION_KEY = "on-screen-collection"
         const val EXTERNAL_CODE = 100
         const val SD_CARD_WRITE_REQUEST = 1
+        const val GO_HOME_REQUEST = 2
     }
 
     class DummyFragment : MainFragment() {

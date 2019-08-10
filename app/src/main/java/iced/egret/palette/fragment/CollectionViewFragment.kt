@@ -173,6 +173,9 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
                 if (resultCode == RESULT_OK) {
                     // Changes occurred: notify update; self-update occurs automatically in onResume()
                     mReturningFromStop = true
+                    if (data?.getBooleanExtra(getString(R.string.intent_go_home), false) == true) {
+                        setToolbarTitle()
+                    }
                 }
             }
             FOLDER_LIST_ACTIVITY_REQUEST -> {
@@ -615,7 +618,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         }
     }
 
-    private fun onNavigation() {
+    fun onNavigation() {
         fetchContents()
         mAdapter.updateDataSet(mContentItems)
         setToolbarTitle()

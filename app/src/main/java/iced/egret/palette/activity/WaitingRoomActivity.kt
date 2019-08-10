@@ -1,5 +1,6 @@
 package iced.egret.palette.activity
 
+import android.content.Intent
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -27,6 +28,20 @@ class WaitingRoomActivity : GridCoverableActivity() {
         super.onResume()
         CollectionManager.fetchNewMedia(this) {
             refresh()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK  && requestCode == PAGER_REQUEST) {
+            val goHome = getString(R.string.intent_go_home)
+            if (data?.getBooleanExtra(goHome, false) == true) {
+                val intent = Intent()
+                intent.putExtra(goHome, true)
+                setResult(RESULT_OK, intent)
+                finish()
+            }
         }
     }
 
@@ -81,9 +96,9 @@ class WaitingRoomActivity : GridCoverableActivity() {
     }
 
     override fun onIdleItemClick(position: Int) {
-        val launchPack = CollectionManager.PagerLaunchPack(position, callingActivity = this,
-                newActivityClass = WaitingRoomPagerActivity::class.java)
-        CollectionManager.launch(mContents[position], launchPack)
+        val intent = Intent(this, WaitingRoomPagerActivity::class.java)
+        intent.putExtra(getString(R.string.intent_item_key), position)
+        startActivityForResult(intent, PAGER_REQUEST)
     }
 
     private fun selectAll() {
@@ -150,6 +165,10 @@ class WaitingRoomActivity : GridCoverableActivity() {
         CollectionManager.removeFromBufferPictures(pictures)
         mContents.removeAll(pictures)
         mContentItems.removeAll { item -> item.coverable in set }
+    }
+
+    companion object Constants {
+        private const val PAGER_REQUEST = 1
     }
 
 }

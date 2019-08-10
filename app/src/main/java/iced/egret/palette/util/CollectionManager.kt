@@ -353,6 +353,7 @@ object CollectionManager : CoroutineScope {
      * Similar behaviour to launch(), but unwinds to improve QoL.
      */
     fun launchAsShortcut(item: Folder) {
+        clearStack()
         unwindStack(item.path)
     }
 

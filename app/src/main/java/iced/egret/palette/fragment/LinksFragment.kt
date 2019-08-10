@@ -18,6 +18,7 @@ import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.common.FlexibleItemDecoration
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainActivity
+import iced.egret.palette.activity.MainActivity.Constants.GO_HOME_REQUEST
 import iced.egret.palette.activity.RecycleBinActivity
 import iced.egret.palette.activity.SettingsActivity
 import iced.egret.palette.activity.WaitingRoomActivity
@@ -162,14 +163,16 @@ class LinksFragment : MainFragment() {
     private fun buildSideActions() {
         val sideLayout = mRootView!!.findViewById<ConstraintLayout>(R.id.sideActionsLayout)
 
+        // None of these actions have anything really to do with the fragment's state,
+        // they're just housed here visually, so let activity handle them.
         sideLayout.findViewById<ImageButton>(R.id.settings).setOnClickListener {
-            startActivity(Intent(this.context, SettingsActivity::class.java))
+            mActivity.startActivity(Intent(this.context, SettingsActivity::class.java))
         }
         sideLayout.findViewById<ImageButton>(R.id.recycleBin).setOnClickListener {
-            startActivity(Intent(this.context, RecycleBinActivity::class.java))
+            mActivity.startActivity(Intent(this.context, RecycleBinActivity::class.java))
         }
         sideLayout.findViewById<ImageButton>(R.id.waitingRoom).setOnClickListener {
-            startActivity(Intent(this.context, WaitingRoomActivity::class.java))
+            mActivity.startActivityForResult(Intent(this.context, WaitingRoomActivity::class.java), GO_HOME_REQUEST)
         }
     }
 

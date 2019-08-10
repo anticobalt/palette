@@ -131,6 +131,7 @@
     <string name="intent_item_key">item</string>
     <string name="intent_album_path_key">album_path</string>
     <string name="intent_synced_folder_paths">synced_folder_paths</string>
+    <string name="intent_go_home">go_home</string>
 
     <!-- Crop ratio buttons -->
     <string name="ratio_1x1">1:1</string>

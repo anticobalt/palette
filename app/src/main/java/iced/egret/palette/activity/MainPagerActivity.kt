@@ -1,10 +1,12 @@
 package iced.egret.palette.activity
 
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
 import iced.egret.palette.activity.inherited.PicturePagerActivity
+import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
@@ -27,7 +29,9 @@ class MainPagerActivity : PicturePagerActivity() {
         mBottomBar.details.setOnClickListener {
             DialogGenerator.pictureDetails(this, mCurrentPicture)
         }
-        mBottomBar.home_folder.setOnClickListener {}
+        mBottomBar.home_folder.setOnClickListener {
+            goToHomeFolder()
+        }
         mBottomBar.share.setOnClickListener {}
         mBottomBar.crop.setOnClickListener {
             startCropActivity()
@@ -66,6 +70,20 @@ class MainPagerActivity : PicturePagerActivity() {
         }
         return if (retVal) true  // consume action
         else super.onOptionsItemSelected(item)
+    }
+
+    private fun goToHomeFolder() {
+        val home = mCurrentPicture.parent
+        if (home !is Folder) {
+            toast(R.string.generic_error)
+        }
+        else {
+            CollectionManager.launchAsShortcut(home)
+            val intent = Intent()
+            intent.putExtra(getString(R.string.intent_go_home), true)
+            setResult(RESULT_OK, intent)
+            finish()
+        }
     }
 
     private fun startCropActivity() {

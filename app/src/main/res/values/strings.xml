@@ -99,6 +99,7 @@
     </string>
     <string name="edit_fail_error">Failed to save changes!</string>
     <string name="already_exists_error">File already exists at this location!</string>
+    <string name="synced_is_not_removable_error">Pictures belonging to a synced folder cannot be removed!</string>
     <string name="access_denied_error">Access to storage was denied. Make sure access to this SD card is enabled in Settings.</string>
     <string name="intent_extra_error">Something went wrong!</string>
     <string name="storage_fail_error_explain">If using an SD card, make sure access is enabled in Settings.</string>

@@ -140,4 +140,12 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
         albums.map { album -> removeAlbum(album) }
     }
 
+    /**
+     * Check if the given pictures all actually belong to the album, or contained synced ones.
+     */
+    fun ownsPictures(samplePictures : List<Picture>) : Boolean {
+        val setDifference = samplePictures.toSet() - _pictures.toSet()
+        return setDifference.isEmpty()
+    }
+
 }

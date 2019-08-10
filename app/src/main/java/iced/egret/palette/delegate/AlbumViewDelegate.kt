@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import iced.egret.palette.R
 import iced.egret.palette.activity.SyncedFoldersActivity
@@ -12,6 +13,7 @@ import iced.egret.palette.delegate.inherited.CollectionViewDelegate
 import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.fragment.CollectionViewFragment.Constants.FOLDER_LIST_ACTIVITY_REQUEST
 import iced.egret.palette.model.Album
+import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.CollectionManager
@@ -71,7 +73,12 @@ class AlbumViewDelegate : CollectionViewDelegate() {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")  // assume internal consistency
     private fun removeContents(coverables: List<Coverable>, context: Context) {
+        if (hasSyncedPicture(coverables as List<Picture>)) {
+            Toast.makeText(context, R.string.synced_is_not_removable_error, Toast.LENGTH_SHORT).show()
+            return
+        }
         CoverableMutator.removeFromAlbum(coverables, context) {
             alert(ActionAlert(true))
         }
@@ -92,6 +99,11 @@ class AlbumViewDelegate : CollectionViewDelegate() {
         CoverableMutator.rename(album, context) {
             alert(ActionAlert(true))
         }
+    }
+
+    private fun hasSyncedPicture(pictures: List<Picture>) : Boolean {
+        val album = CollectionManager.currentCollection as Album
+        return !album.ownsPictures(pictures)
     }
 
     private fun showSyncFolders(album: Album, fragment: CollectionViewFragment) {

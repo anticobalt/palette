@@ -536,10 +536,10 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         }
     }
 
+    @Suppress("UNCHECKED_CAST")  // assume internal consistency
     private fun delete(coverables: List<Coverable>) {
         when (mSelectedContentType) {
             CollectionManager.PICTURE_KEY -> {
-                @Suppress("UNCHECKED_CAST")  // assume internal consistency
                 CoverableMutator.delete(coverables as List<Picture>, context!!) {
                     // Resolve weird bug where Pictures not removed from Collections
                     // but removed from disk

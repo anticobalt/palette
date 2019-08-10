@@ -267,27 +267,28 @@ object DialogGenerator {
     }
 
     fun setAsCover(picture: Picture, context: Context, onConfirm: (List<Collection>) -> Unit) {
-        val candidates = mutableMapOf<String, Collection>()
+        val candidates = mutableSetOf<Collection>()
 
         // Get (most) Folders that this Picture is in, directly or indirectly
         var obj: FileObject? = picture.parent
-        val topFolders = CollectionManager.folders
+        val pinnedFolders = CollectionManager.folders
         while (obj != null) {
-            if (obj is Folder) candidates[obj.path] = obj
-            if (obj in topFolders) break
+            if (obj is Folder) candidates.add(obj)
+            if (obj in pinnedFolders) break
             obj = obj.parent
         }
         // Get all Albums this Picture is directly in
         // TODO: handle indirection by making Albums doubly-linked
         for (album in CollectionManager.getNestedAlbums()) {
-            if (picture in album.pictures) candidates[album.path] = album
+            if (picture in album.pictures) candidates.add(album)
         }
         // Get all pinned Albums
         for (album in CollectionManager.albums) {
-            candidates[album.path] = album
+            candidates.add(album)
         }
 
-        val candidateCollections = candidates.values.sortedBy { c -> c.path }
+        val candidateCollections = candidates.sortedBy { c -> c.path }
+        val candidateStrings = candidateCollections.map { c -> if (c in pinnedFolders) c.name else c.path }
         val disabledIndices = candidateCollections
                 .filter { c -> c.hasCustomCoverable && c.cover["uri"] == picture.uri }
                 .map { c -> candidateCollections.indexOf(c) }
@@ -296,7 +297,7 @@ object DialogGenerator {
         MaterialDialog(context).show {
             title(R.string.action_set_as_cover)
             listItemsMultiChoice(
-                    items = candidateCollections.map { c -> c.path },
+                    items = candidateStrings,
                     disabledIndices = disabledIndices
             ) { _, indices, _ ->
                 onConfirm(indices.map {i -> candidateCollections[i]})

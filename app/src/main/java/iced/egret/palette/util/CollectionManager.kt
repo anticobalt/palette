@@ -91,13 +91,15 @@ object CollectionManager : CoroutineScope {
         mCollections.clear()
         mBufferPictures.clear()
 
-        // Add Folders
+        // Add Folders.
+        // Also do some hacks to make /storage/emulated/0 a pinned collection
+        // instead of /storage/emulated.
         mCollections.addAll(displayedFolders)
-        val baseStorage = mCollections.find { collection -> collection.path == MAIN_STORAGE_PATH }
+        val baseStorage = mCollections.find { collection -> collection.path == MAIN_STORAGE_PATH } as? Folder
         if (baseStorage != null) {  // should be true if displayedFolders initialized as normal
-            baseStorage.name = MAIN_STORAGE_NAME
             mCollections.remove(baseStorage)
-            mCollections.add(0, baseStorage)
+            if (baseStorage.folders.size == 1) baseStorage.folders[0].name = MAIN_STORAGE_NAME
+            mCollections.addAll(0, baseStorage.folders)
             unwindStack(path ?: PRACTICAL_MAIN_STORAGE_PATH)
         }
 
@@ -330,13 +332,10 @@ object CollectionManager : CoroutineScope {
     }
 
     /**
-     * Similar behaviour to launch(), but unwinds with some specific configurations to improve QoL.
+     * Similar behaviour to launch(), but unwinds to improve QoL.
      */
     fun launchAsShortcut(item: Folder) {
-        when (item.name) {
-            MAIN_STORAGE_NAME -> unwindStack(PRACTICAL_MAIN_STORAGE_PATH) // skip the empty sub-folders
-            else -> unwindStack(item.path)
-        }
+        unwindStack(item.path)
     }
 
     fun revertToParent(): List<Coverable>? {

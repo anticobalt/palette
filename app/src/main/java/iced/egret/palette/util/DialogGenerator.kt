@@ -17,13 +17,12 @@ import com.afollestad.materialdialogs.files.FileFilter
 import com.afollestad.materialdialogs.files.folderChooser
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.list.checkItems
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
-import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
-import iced.egret.palette.model.inherited.FileObject
 import java.io.File
 
 /**
@@ -266,42 +265,18 @@ object DialogGenerator {
         }
     }
 
-    fun setAsCover(picture: Picture, context: Context, onConfirm: (List<Collection>) -> Unit) {
-        val candidates = mutableSetOf<Collection>()
-
-        // Get (most) Folders that this Picture is in, directly or indirectly
-        var obj: FileObject? = picture.parent
-        val pinnedFolders = CollectionManager.folders
-        while (obj != null) {
-            if (obj is Folder) candidates.add(obj)
-            if (obj in pinnedFolders) break
-            obj = obj.parent
-        }
-        // Get all Albums this Picture is directly in
-        // TODO: handle indirection by making Albums doubly-linked
-        for (album in CollectionManager.getNestedAlbums()) {
-            if (picture in album.pictures) candidates.add(album)
-        }
-        // Get all pinned Albums
-        for (album in CollectionManager.albums) {
-            candidates.add(album)
-        }
-
-        val candidateCollections = candidates.sortedBy { c -> c.path }
-        val candidateStrings = candidateCollections.map { c -> if (c in pinnedFolders) c.name else c.path }
-        val disabledIndices = candidateCollections
-                .filter { c -> c.hasCustomCoverable && c.cover["uri"] == picture.uri }
-                .map { c -> candidateCollections.indexOf(c) }
-                .toIntArray()
+    fun setAsCover(candidateStrings: List<String>, alreadySetIndices: IntArray,
+                   context: Context, onConfirm: (IntArray) -> Unit) {
 
         MaterialDialog(context).show {
             title(R.string.action_set_as_cover)
             listItemsMultiChoice(
                     items = candidateStrings,
-                    disabledIndices = disabledIndices
+                    disabledIndices = alreadySetIndices
             ) { _, indices, _ ->
-                onConfirm(indices.map {i -> candidateCollections[i]})
+                onConfirm(indices)
             }
+            checkItems(alreadySetIndices)
             negativeButton()
             positiveButton()
         }

@@ -28,7 +28,10 @@ import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
-import iced.egret.palette.util.*
+import iced.egret.palette.util.CollectionManager
+import iced.egret.palette.util.CoverableMutator
+import iced.egret.palette.util.DialogGenerator
+import iced.egret.palette.util.Painter
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.io.File
@@ -516,9 +519,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         val collection = CollectionManager.currentCollection
 
         if (collection is Collection) {
-            DialogGenerator.genericConfirm(getString(R.string.action_reset_cover), context!!) {
-                collection.removeCustomCover()
-                Storage.setCustomCover(collection.path, null)
+            CoverableMutator.resetCover(collection, context!!) {
                 mActivity.notifyCollectionsChanged()  // update views if collection is pinned
                 toast(R.string.success_reset_cover)
             }

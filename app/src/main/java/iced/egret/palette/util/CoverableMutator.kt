@@ -7,8 +7,11 @@ import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import iced.egret.palette.R
 import iced.egret.palette.model.Album
+import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
+import iced.egret.palette.model.inherited.FileObject
 import java.io.File
 
 /**
@@ -176,6 +179,55 @@ object CoverableMutator {
         DialogGenerator.deleteAlbum(context) {
             CollectionManager.deleteAlbums(albums, fromCurrent)
             toast(context, R.string.success_delete_generic)
+            onFinish()
+        }
+    }
+
+    fun setAsCover(picture: Picture, context: Context, onFinish: () -> Unit) {
+        val candidates = mutableSetOf<Collection>()
+
+        // Get (most) Folders that this Picture is in, directly or indirectly
+        var obj: FileObject? = picture.parent
+        val pinnedFolders = CollectionManager.folders
+        while (obj != null) {
+            if (obj is Folder) candidates.add(obj)
+            if (obj in pinnedFolders) break
+            obj = obj.parent
+        }
+        // Get all Albums this Picture is directly in
+        // TODO: handle indirection by making Albums doubly-linked
+        for (album in CollectionManager.getNestedAlbums()) {
+            if (picture in album.pictures) candidates.add(album)
+        }
+        // Get all pinned Albums
+        for (album in CollectionManager.albums) {
+            candidates.add(album)
+        }
+
+        val candidateCollections = candidates.sortedBy { c -> c.path }
+        val candidateStrings = candidateCollections.map { c -> if (c in pinnedFolders) c.name else c.path }
+        val alreadySetIndices = candidateCollections
+                .filter { c -> c.hasCustomCoverable && c.cover["uri"] == picture.uri }
+                .map { c -> candidateCollections.indexOf(c) }
+                .toIntArray()
+
+        DialogGenerator.setAsCover(candidateStrings, alreadySetIndices, context) {
+            val skipSet = alreadySetIndices.toSet()
+            val toCover = it.filter { int -> int !in skipSet }.map { i -> candidateCollections[i] }
+
+            for (collection in toCover) {
+                collection.addCustomCover(picture)
+            }
+            Storage.setCustomCovers(toCover.map { collection -> Pair(collection.path, picture.filePath) })
+
+            onFinish()
+        }
+    }
+
+    fun resetCover(collection: Collection, context: Context, onFinish: () -> Unit) {
+        DialogGenerator.genericConfirm(context.getString(R.string.action_reset_cover), context) {
+            collection.removeCustomCover()
+            Storage.setCustomCover(collection.path, null)
             onFinish()
         }
     }

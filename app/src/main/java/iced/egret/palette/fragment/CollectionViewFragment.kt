@@ -431,6 +431,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         mActivity.colorActionMode()
         mActivity.isolateFragment(this)
+        swipeRefreshLayout.isEnabled = false
 
         // Always visible
         val selectAll = menu.findItem(R.id.actionSelectAll)
@@ -501,6 +502,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         // so can't clear all selections visually
         mAdapter.currentItems.map { item -> item.setSelection(false) }
         restoreAllContent()
+        swipeRefreshLayout.isEnabled = true
         mSelectedContentType = null  // nothing isolated
         mActivity.restoreAllFragments()
         mActivity.undoColorActionMode()

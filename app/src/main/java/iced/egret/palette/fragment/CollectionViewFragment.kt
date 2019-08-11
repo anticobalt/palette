@@ -2,9 +2,11 @@ package iced.egret.palette.fragment
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
+import android.view.Surface.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -385,7 +387,8 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         when (item.itemId) {
             R.id.actionResetCover -> resetCover()
         }
-        mDelegate.onOptionsItemSelected(item, this, CollectionManager.currentCollection ?: return true)
+        mDelegate.onOptionsItemSelected(item, this, CollectionManager.currentCollection
+                ?: return true)
         return true
     }
 
@@ -393,13 +396,26 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         mDelegate.onFabClick(context!!, mContents)
     }
 
+    /**
+     * Block touch events and rotation.
+     * If user forces rotation by some third-party app, there's nothing you can do:
+     * callback won't be called b/c new fragment instance created, and touch will be unblocked.
+     * https://stackoverflow.com/a/10721034 and https://stackoverflow.com/a/20017878
+     */
     override fun onRefresh() {
-        // Block touch events: https://stackoverflow.com/a/10721034
+
+        when (mActivity.windowManager.defaultDisplay.rotation) {
+            ROTATION_180 -> mActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+            ROTATION_270 -> mActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+            ROTATION_0 -> mActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            ROTATION_90 -> mActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }
+
         mActivity.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         StateBuilder.rebuild(context!!, CollectionManager.currentCollection?.path) {
-
             onCurrentContentsChanged()
             mActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            mActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             mSwipeRefreshLayout.isRefreshing = false
         }
     }
@@ -516,8 +532,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
                 mActivity.notifyCollectionsChanged()  // update views if collection is pinned
                 toast(R.string.success_reset_cover)
             }
-        }
-        else toast(R.string.generic_error)  // should never happen
+        } else toast(R.string.generic_error)  // should never happen
 
     }
 

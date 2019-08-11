@@ -172,8 +172,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         when (requestCode) {
             PICTURE_ACTIVITY_REQUEST -> {
                 if (resultCode == RESULT_OK) {
-                    // Changes occurred: notify update; self-update occurs automatically in onResume()
-                    mReturningFromStop = true
+                    onCurrentContentsChanged()
                     if (data?.getBooleanExtra(getString(R.string.intent_go_home), false) == true) {
                         setToolbarTitle()
                     }
@@ -413,7 +412,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
     override fun onRefresh() {
         StateBuilder.rebuild(context!!, CollectionManager.currentCollection?.path) {
-            fetchContents()
+            onCurrentContentsChanged()
             mSwipeRefreshLayout.isRefreshing = false
         }
     }

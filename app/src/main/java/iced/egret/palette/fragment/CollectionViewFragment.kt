@@ -31,7 +31,6 @@ import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
-import java.io.File
 import java.util.*
 
 /**
@@ -178,22 +177,15 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     private fun applySyncedFolders(intent: Intent?) {
-        val album = CollectionManager.currentCollection
 
-        // These really shouldn't ever happen
+        // This really shouldn't ever happen
         if (intent == null) {
             toast(R.string.generic_error)
             return
         }
-        if (album !is Album) {
-            toast(R.string.edit_fail_error)
-            return
-        }
 
         val filePaths = intent.getStringArrayListExtra(getString(R.string.intent_synced_folder_paths))
-        val folderFiles = filePaths.map { path -> File(path) }
-        album.syncedFolderFiles.clear()
-        album.syncedFolderFiles.addAll(folderFiles)
+        CollectionManager.applySyncedFolders(filePaths, true)
     }
 
 

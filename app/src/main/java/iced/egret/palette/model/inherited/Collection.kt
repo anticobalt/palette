@@ -6,6 +6,7 @@ import com.bumptech.glide.Glide
 import iced.egret.palette.R
 import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import iced.egret.palette.model.Picture
+import iced.egret.palette.util.Storage
 
 /***
  * Properties:
@@ -111,7 +112,16 @@ abstract class Collection(override var name: String, path: String, hasSetCoverab
     }
 
     private fun setCoverUri() {
-        if (hasCustomCoverable) return
+        if (hasCustomCoverable) {
+            val picture = cover["picture"] as? Picture
+            if (picture != null && Storage.fileExists(picture.filePath)) {
+                cover["uri"] = picture.uri
+                return
+            }
+            else {
+                removeCustomCover()
+            }
+        }
 
         val uri = getOnePictureUri()
         if (uri != null) {
@@ -125,7 +135,7 @@ abstract class Collection(override var name: String, path: String, hasSetCoverab
 
     fun addCustomCover(picture: Picture) {
         hasCustomCoverable = true
-        cover["uri"] = picture.uri
+        cover["picture"] = picture
     }
 
     fun removeCustomCover() {

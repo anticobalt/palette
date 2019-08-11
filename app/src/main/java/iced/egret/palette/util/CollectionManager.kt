@@ -224,6 +224,7 @@ object CollectionManager : CoroutineScope {
 
     // Pictures sometimes not removed from Collections after moving to Recycle Bin.
     // Bug doesn't seem reproducible.
+    // This probably doesn't solve the problem.
     fun cleanCurrentCollection() {
         val collection = currentCollection ?: return
         for (picture in collection.pictures) {
@@ -479,6 +480,8 @@ object CollectionManager : CoroutineScope {
 
     /**
      * Save a Picture to disk and update Collections as required.
+     *
+     * @param isNew if false, the new bitmap is replacing an existing file
      */
     fun createPictureFromBitmap(bitmap: Bitmap, name: String, location: String, isNew: Boolean,
                                 sdCardFile: DocumentFile?, contentResolver: ContentResolver): File? {
@@ -493,12 +496,14 @@ object CollectionManager : CoroutineScope {
         picture = folder.findPictureByPath(file.path) ?: Picture(name, file.path)
 
         // Update Folder
-        if (!isNew) folder.removePicture(picture)  // move Picture
+        if (!isNew) folder.removePicture(picture)  // if replacing Picture
         folder.addPicture(picture, toFront = true)
 
-        // Update current Collection if it's an Album, otherwise another update would be redundant
-        if (currentCollection is Album) {
-            if (!isNew) currentCollection?.removePicture(picture)  // move Picture
+        // Update current Collection if it's an Album and picture actually belongs to it (i.e. not synced),
+        // otherwise another update would be redundant
+        val album = currentCollection as? Album
+        if (album is Album && album.ownsPictures(listOf(picture))) {
+            if (!isNew) currentCollection?.removePicture(picture)  // if replacing Picture
             currentCollection?.addPicture(picture, toFront = true)
             Storage.saveAlbumsToDisk(albums)
         }

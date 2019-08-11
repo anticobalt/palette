@@ -69,7 +69,6 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     private lateinit var mLayoutManager: GridLayoutManager
     private lateinit var mActionModeHelper: ToolbarActionModeHelper
     private var mSelectedContentType: String? = null
-    private var mReturningFromStop = false
 
     private val syncIconRes = R.drawable.ic_sync_black_24dp
 
@@ -145,9 +144,6 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             mActivity.isolateFragment(this)
             return
         }
-        if (mReturningFromStop) {
-            fetchNewMedia()
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -159,12 +155,6 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     override fun onPause() {
         super.onPause()
         CollectionManager.writeCache()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // Assume need to update onResume().
-        mReturningFromStop = true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -181,7 +171,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             FOLDER_LIST_ACTIVITY_REQUEST -> {
                 if (resultCode == RESULT_OK) {
                     applySyncedFolders(data)
-                    mReturningFromStop = true
+                    onCurrentContentsChanged()
                 }
             }
         }
@@ -229,8 +219,9 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         // Set title
         setToolbarTitle()
         toolbar.toolbarTitle.setOnLongClickListener {
-            if (CollectionManager.currentCollection != null) {
-                DialogGenerator.showCollectionDetails(context!!, CollectionManager.currentCollection!!)
+            val collection = CollectionManager.currentCollection
+            if (collection != null) {
+                DialogGenerator.showCollectionDetails(context!!, collection)
             }
             true
         }
@@ -402,7 +393,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         when (item.itemId) {
             R.id.actionResetCover -> resetCover()
         }
-        mDelegate.onOptionsItemSelected(item, this, CollectionManager.currentCollection!!)
+        mDelegate.onOptionsItemSelected(item, this, CollectionManager.currentCollection ?: return true)
         return true
     }
 
@@ -411,8 +402,12 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun onRefresh() {
+        // Block touch events: https://stackoverflow.com/a/10721034
+        mActivity.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         StateBuilder.rebuild(context!!, CollectionManager.currentCollection?.path) {
+
             onCurrentContentsChanged()
+            mActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             mSwipeRefreshLayout.isRefreshing = false
         }
     }
@@ -657,16 +652,6 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             rvCollectionItems.visibility = View.VISIBLE
             fab.show()
             blocker.visibility = View.GONE
-        }
-    }
-
-    /**
-     * Queries CollectionManager to get fresh data from disk, and shows it.
-     */
-    private fun fetchNewMedia() {
-        CollectionManager.fetchNewMedia(activity!!) {
-            // When done async fetch, refresh fragment to view up-to-date contents
-            onCurrentContentsChanged()
         }
     }
 

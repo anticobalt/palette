@@ -52,7 +52,7 @@ abstract class PicturePagerActivity : SlideActivity() {
         setContentView(R.layout.activity_picture_pager)
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
 
-        if (!setStartPosition(savedInstanceState)) return
+        if (!setStartPosition(savedInstanceState)) finish()
         setState(savedInstanceState)
 
         setColors()

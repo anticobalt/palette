@@ -27,4 +27,19 @@ object StateBuilder : CoroutineScope {
         }
     }
 
+    fun rebuild(context: Context, path: String?, callback: (() -> Unit)? = null) {
+        if (callback == null) {
+            // On UI thread
+            Storage.reset(context)
+            CollectionManager.reset(path)
+        } else {
+            launch {
+                // On IO thread, then do UI callback
+                Storage.reset(context)
+                CollectionManager.reset(path)
+                withContext(Dispatchers.Main) { callback() }
+            }
+        }
+    }
+
 }

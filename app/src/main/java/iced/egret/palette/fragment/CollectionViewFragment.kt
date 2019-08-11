@@ -28,10 +28,7 @@ import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
-import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.CoverableMutator
-import iced.egret.palette.util.DialogGenerator
-import iced.egret.palette.util.Painter
+import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.io.File
@@ -149,7 +146,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             return
         }
         if (mReturningFromStop) {
-            showUpdatedContents()
+            fetchNewMedia()
         }
     }
 
@@ -415,7 +412,10 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     override fun onRefresh() {
-        showUpdatedContents()
+        StateBuilder.rebuild(context!!, CollectionManager.currentCollection?.path) {
+            fetchContents()
+            mSwipeRefreshLayout.isRefreshing = false
+        }
     }
 
     /**
@@ -567,9 +567,6 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         when (mSelectedContentType) {
             CollectionManager.PICTURE_KEY -> {
                 CoverableMutator.delete(coverables as List<Picture>, context!!) {
-                    // Resolve weird bug where Pictures not removed from Collections
-                    // but removed from disk
-                    CollectionManager.cleanCurrentCollection()
                     // Refresh
                     onCurrentContentsChanged()
                     mActionModeHelper.destroyActionModeIfCan()
@@ -667,11 +664,10 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     /**
      * Queries CollectionManager to get fresh data from disk, and shows it.
      */
-    private fun showUpdatedContents() {
+    private fun fetchNewMedia() {
         CollectionManager.fetchNewMedia(activity!!) {
             // When done async fetch, refresh fragment to view up-to-date contents
             onCurrentContentsChanged()
-            mSwipeRefreshLayout.isRefreshing = false
         }
     }
 

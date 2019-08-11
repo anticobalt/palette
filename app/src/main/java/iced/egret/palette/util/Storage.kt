@@ -59,6 +59,12 @@ object Storage {
         }
     }
 
+    internal fun reset(context: Context) {
+        contentBuilder = ContentBuilder()
+        setup(context)
+        ready = true
+    }
+
     private fun setup(context: Context) {
         fileDirectory = context.filesDir
         contentBuilder.runForPictures(context)

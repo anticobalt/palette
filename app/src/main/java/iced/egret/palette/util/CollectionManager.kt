@@ -81,6 +81,19 @@ object CollectionManager : CoroutineScope {
         }
     }
 
+    internal fun reset(path: String?) {
+        mPictureCache.clear()
+        buildPictures(path)
+        mCollections.addAll(Storage.buildAlbumsFromDisk())
+        bindCustomCovers(Storage.customCovers)
+
+        if (path != null) {
+            clearStack()
+            unwindStack(path)
+        }
+        ready = true
+    }
+
     private fun buildPictures(path: String?) {
 
         mPictureCache.putAll(Storage.knownPictures)
@@ -220,23 +233,6 @@ object CollectionManager : CoroutineScope {
             mContentsMap[type] = contentsOfType
         }
         return mContentsMap
-    }
-
-    // Pictures sometimes not removed from Collections after moving to Recycle Bin.
-    // Bug doesn't seem reproducible.
-    // This probably doesn't solve the problem.
-    fun cleanCurrentCollection() {
-        val collection = currentCollection ?: return
-        for (picture in collection.pictures) {
-            if (!Storage.fileExists(picture.filePath)) {
-                collection.removePicture(picture)
-                // If collection is album, won't remove Pictures in synced Folders,
-                // which is an expected safeguard conforming to read-only property
-                // of synced Folders.
-                // You would have to call cleanCurrentCollection() in the respective Folders
-                // to clean them out.
-            }
-        }
     }
 
     /**

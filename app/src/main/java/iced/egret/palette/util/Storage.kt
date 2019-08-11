@@ -333,24 +333,33 @@ object Storage {
         val name = newName ?: sourceFile.name
         val destinationLocation = destinationParent.path.removeSuffix("/") + "/"
         val destinationOnSdCard = pathOnSdCard(destinationLocation)
+
         val inStream = FileInputStream(sourceFile)
         val outStream: OutputStream
+
         val copyAsFile = File(destinationLocation + name)
         val copyAsDocumentFile: DocumentFile
+        val isNormalFile : Boolean
 
         if (destinationOnSdCard != null && sdCardFile != null && contentResolver != null) {
             copyAsDocumentFile = getImageDocumentFile(name, destinationOnSdCard, "image/webp", sdCardFile)
                     ?: return null
             outStream = contentResolver.openOutputStream(copyAsDocumentFile.uri) ?: return null
+            isNormalFile = false
         } else {
             try {
                 outStream = FileOutputStream(copyAsFile)
+                isNormalFile = true
             } catch (accessDenied: FileNotFoundException) {
                 return null
             }
         }
 
         copyStreams(inStream, outStream)
+        if (isNormalFile) {
+            // Only non-SD card files can preserve modified date
+            copyAsFile.setLastModified(sourceFile.lastModified())
+        }
         return copyAsFile
     }
 

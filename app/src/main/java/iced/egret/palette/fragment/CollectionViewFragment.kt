@@ -159,9 +159,13 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         super.onSaveInstanceState(outState)
     }
 
+    override fun onPause() {
+        super.onPause()
+        CollectionManager.writeCache()
+    }
+
     override fun onStop() {
         super.onStop()
-        CollectionManager.writeCache()
         // Assume need to update onResume().
         mReturningFromStop = true
     }

@@ -16,7 +16,6 @@ import androidx.appcompat.widget.ActionBarContextView
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
-import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
 import iced.egret.palette.activity.inherited.BaseActivity
@@ -54,6 +53,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
 
     private val fragments = Array<MainFragment>(2) { DummyFragment() }
     private val finishedFragments = mutableListOf<MainFragment>()
+    private var afterPanelClosed: () -> Unit = {}
     private val leftIndex = 0
     private val rightIndex = 1
 
@@ -271,8 +271,13 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         else slidingPaneLayout.openPane()
     }
 
+    /**
+     * [afterPanelClosed] must be explicitly reset, to avoid doing it every time the panel closes.
+     */
     override fun onPanelClosed(panel: View) {
         fragments[leftIndex].slider.closePane()
+        afterPanelClosed()
+        afterPanelClosed = {}
     }
 
     override fun onPanelSlide(panel: View, slideOffset: Float) {
@@ -359,19 +364,28 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         }
     }
 
+    /**
+     * Close the main panel, then launch the collection.
+     * Launching collection is UI intensive, so trying to do it at the same time
+     * as animating the panel closing causes stuttering.
+     *
+     * See [onPanelClosed] as well.
+     */
     fun buildCollectionView(collection: Collection) {
         val cvFragment = fragments[rightIndex] as CollectionViewFragment
-        findViewById<SlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
 
-        when (collection) {
-            is Folder -> CollectionManager.launchAsShortcut(collection)
-            else -> {
-                CollectionManager.clearStack()
-                CollectionManager.launch(collection)
+        afterPanelClosed = {
+            when (collection) {
+                is Folder -> CollectionManager.launchAsShortcut(collection)
+                else -> {
+                    CollectionManager.clearStack()
+                    CollectionManager.launch(collection)
+                }
             }
+            cvFragment.onTopCollectionChanged()
         }
 
-        cvFragment.onTopCollectionChanged()
+        findViewById<HackySlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
     }
 
     companion object Constants {

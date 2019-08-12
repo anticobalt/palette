@@ -4,9 +4,11 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.view.Surface.*
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -15,6 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import eu.davidea.flexibleadapter.helpers.EmptyViewHelper
+import iced.egret.palette.BuildConfig
 import iced.egret.palette.R
 import iced.egret.palette.activity.MainPagerActivity
 import iced.egret.palette.activity.inherited.BaseActivity
@@ -430,10 +433,12 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         // Always visible
         val selectAll = menu.findItem(R.id.actionSelectAll)
+        Painter.paintDrawable(selectAll.icon)
 
         // Conditional
         val albumActions = menu.findItem(R.id.albumActions)
         val addToAlbum = menu.findItem(R.id.actionAddToAlbum)
+        val share = menu.findItem(R.id.actionShare)
         val move = menu.findItem(R.id.actionMove)
         val delete = menu.findItem(R.id.actionDelete)
 
@@ -452,14 +457,14 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             }
             CollectionManager.PICTURE_KEY -> {
                 setFolderOrPicture()
-                move.isVisible = true; Painter.paintDrawable(move.icon)
-                delete.isVisible = true; Painter.paintDrawable(delete.icon)
+                share.isVisible = true
+                move.isVisible = true
+                delete.isVisible = true
             }
             CollectionManager.ALBUM_KEY -> {
-                delete.isVisible = true; Painter.paintDrawable(delete.icon)
+                delete.isVisible = true
             }
         }
-        Painter.paintDrawable(selectAll.icon)
 
         mDelegate.onCreateActionMode(mode, menu, mSelectedContentType!!)
         return true
@@ -480,6 +485,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
                 return true
             }
             R.id.actionAddToAlbum -> addToAlbum(selectedCoverables)
+            R.id.actionShare -> share(selectedCoverables)
             R.id.actionMove -> move(selectedCoverables)
             R.id.actionDelete -> delete(selectedCoverables)
         }
@@ -504,6 +510,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         mode.menu.findItem(R.id.albumActions).isVisible = false
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
+        mode.menu.findItem(R.id.actionShare).isVisible = false
         mode.menu.findItem(R.id.actionMove).isVisible = false
         mode.menu.findItem(R.id.actionDelete).isVisible = false
 
@@ -552,8 +559,28 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         }
     }
 
+    @Suppress("UNCHECKED_CAST")  // assume internal consistency
+    private fun share(coverables: List<Coverable>) {
+        // Need to create content:// URI to share, instead of natively-used file:// one
+        // https://stackoverflow.com/a/38858040
+        // https://developer.android.com/training/sharing/send
+        val pictures = coverables as List<Picture>
+        val imageUris : ArrayList<Uri> = pictures.map {
+            picture -> FileProvider.getUriForFile(
+                context!!, BuildConfig.APPLICATION_ID + ".file_provider", picture.file)
+        } as ArrayList<Uri>
+
+        val intent = Intent().apply {
+            action = Intent.ACTION_SEND_MULTIPLE
+            putExtra(Intent.EXTRA_STREAM, imageUris)
+            type = "image/*"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(intent, getText(R.string.share_intent_title)))
+    }
+
+    @Suppress("UNCHECKED_CAST")  // assume internal consistency
     private fun move(coverables: List<Coverable>) {
-        @Suppress("UNCHECKED_CAST")  // assume internal consistency
         CoverableMutator.move(coverables as List<Picture>, context!!) {
             onCurrentContentsChanged()
             mActionModeHelper.destroyActionModeIfCan()

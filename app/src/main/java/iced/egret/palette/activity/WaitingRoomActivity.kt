@@ -1,9 +1,12 @@
 package iced.egret.palette.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.content.FileProvider
+import iced.egret.palette.BuildConfig
 import iced.egret.palette.R
 import iced.egret.palette.activity.inherited.GridCoverableActivity
 import iced.egret.palette.flexible.item.GridCoverableItem
@@ -80,6 +83,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
         when (menuItem.itemId) {
             R.id.actionSelectAll -> selectAll()
             R.id.actionClear -> processClear(selected)
+            R.id.actionShare -> processShare(selected)
             R.id.actionMove -> processMove(selected)
             R.id.actionAddToAlbum -> processAddToAlbum(selected)
             R.id.actionDelete -> processDelete(selected)
@@ -129,6 +133,24 @@ class WaitingRoomActivity : GridCoverableActivity() {
             mAdapter.updateDataSet(mContentItems)
             mActionModeHelper.destroyActionModeIfCan()
         }
+    }
+
+    private fun processShare(pictures: List<Picture>) {
+        // Need to create content:// URI to share, instead of natively-used file:// one
+        // https://stackoverflow.com/a/38858040
+        // https://developer.android.com/training/sharing/send
+        val imageUris : ArrayList<Uri> = pictures.map {
+            picture -> FileProvider.getUriForFile(
+                this, BuildConfig.APPLICATION_ID + ".file_provider", picture.file)
+        } as ArrayList<Uri>
+
+        val intent = Intent().apply {
+            action = Intent.ACTION_SEND_MULTIPLE
+            putExtra(Intent.EXTRA_STREAM, imageUris)
+            type = "image/*"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(intent, getText(R.string.share_intent_title)))
     }
 
     private fun processMove(pictures: List<Picture>) {

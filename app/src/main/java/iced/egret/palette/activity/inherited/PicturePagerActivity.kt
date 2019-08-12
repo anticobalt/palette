@@ -264,6 +264,7 @@ abstract class PicturePagerActivity : SlideActivity() {
     protected fun startShareActivity() {
         // Need to create content:// URI to share, instead of natively-used file:// one
         // https://stackoverflow.com/a/38858040
+        // https://developer.android.com/training/sharing/send
         val picture = mCurrentPicture
         val imageUri = FileProvider.getUriForFile(
                 this,

@@ -15,6 +15,15 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:supportsRtl">
+        <provider
+            android:name=".util.PaletteFileProvider"
+            android:authorities="${applicationId}.file_provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
         <activity
             android:name="cat.ereza.customactivityoncrash.activity.DefaultErrorActivity"
             android:process=":error_activity"

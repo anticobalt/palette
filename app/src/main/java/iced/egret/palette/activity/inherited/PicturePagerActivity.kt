@@ -10,8 +10,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
+import androidx.core.content.FileProvider
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
+import iced.egret.palette.BuildConfig
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
@@ -257,6 +259,24 @@ abstract class PicturePagerActivity : SlideActivity() {
             setResult(RESULT_OK)
             finish()
         }
+    }
+
+    protected fun startShareActivity() {
+        // Need to create content:// URI to share, instead of natively-used file:// one
+        // https://stackoverflow.com/a/38858040
+        val picture = mCurrentPicture
+        val imageUri = FileProvider.getUriForFile(
+                this,
+                BuildConfig.APPLICATION_ID + ".file_provider",
+                picture.file
+        )
+        val intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, imageUri)
+            type = picture.mimeType
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(intent, getText(R.string.share_intent_title)))
     }
 
     private fun hideSystemUI() {

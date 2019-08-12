@@ -32,7 +32,9 @@ class MainPagerActivity : PicturePagerActivity() {
         mBottomBar.home_folder.setOnClickListener {
             goToHomeFolder()
         }
-        mBottomBar.share.setOnClickListener {}
+        mBottomBar.share.setOnClickListener {
+            startShareActivity()
+        }
         mBottomBar.crop.setOnClickListener {
             startCropActivity()
         }

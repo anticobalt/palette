@@ -142,5 +142,6 @@
 
     <!-- Misc -->
     <string name="empty_list">Nothing to see here</string>
+    <string name="share_intent_title">Send to…</string>
 
 </resources>

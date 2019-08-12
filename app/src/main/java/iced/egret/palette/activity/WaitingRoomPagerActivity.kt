@@ -33,7 +33,9 @@ class WaitingRoomPagerActivity : PicturePagerActivity() {
         mBottomBar.home_folder.setOnClickListener {
             goToHomeFolder()
         }
-        mBottomBar.share.setOnClickListener {}
+        mBottomBar.share.setOnClickListener {
+            startShareActivity()
+        }
         mBottomBar.delete.setOnClickListener {
             initiateMoveToRecycleBin()
         }

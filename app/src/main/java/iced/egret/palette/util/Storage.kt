@@ -20,6 +20,7 @@ import iced.egret.palette.model.Album
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.dataclass.AlbumData
+import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.FileObject
 import java.io.*
 import java.text.SimpleDateFormat
@@ -85,7 +86,7 @@ object Storage {
     internal fun getUpdateKit(context: Context): UpdateKit {
 
         val foundPicturePaths = mutableListOf<String>()
-        val existingPicturePaths = contentBuilder.pictures.keys
+        val existingPicturePaths = getPathsFromPictureCache() ?: return UpdateKit()
 
         val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(MediaColumns.DATA)
@@ -114,6 +115,15 @@ object Storage {
         for (path in removedPaths) knownPictures.remove(path)
 
         return UpdateKit(addedPictures, removedPaths)
+    }
+
+    private fun getPathsFromPictureCache(): Set<String>? {
+        val json = readJsonFromDisk(pictureCacheFileName)
+        if (json != null) {
+            val type = object : TypeToken<HashSet<String>>() {}.type
+            return gson.fromJson(json, type)
+        }
+        return null
     }
 
     internal fun saveAlbumsToDisk(albums: List<Album>) {
@@ -555,20 +565,17 @@ object Storage {
     }
 
     /**
-     * Ensure all Pictures in album exist on disk. If they don't, remove them.
+     * Ensure all Pictures in collection exist on disk. If they don't, remove them.
      */
-    internal fun cleanAlbum(album: Album) {
-        val pictures = album.pictures.toList()  // a copy to avoid concurrency error
+    internal fun cleanCollection(collection: Collection) {
+        val pictures = collection.pictures.toList()  // a copy to avoid concurrency error
         for (picture in pictures) {
             if (!fileExists(picture.filePath)) {
-                album.removePicture(picture)
+                collection.removePicture(picture)
             }
         }
     }
 
-    /**
-     * Gets all albums/folders/media from disk ONCE, ideally when app is created.
-     */
     private class ContentBuilder {
         private var picturesRan = false
         private var albumsRan = false
@@ -580,6 +587,7 @@ object Storage {
         lateinit var bufferPictures: List<Picture>
         lateinit var customCovers : Map<String, String>
 
+        // Only runs once
         fun runForPictures(context: Context) {
             if (!picturesRan) {
                 picturesRan = true
@@ -590,6 +598,7 @@ object Storage {
             }
         }
 
+        // Only runs once
         fun runForAlbums() {
             if (picturesRan && !albumsRan) {
                 albumsRan = true
@@ -685,7 +694,7 @@ object Storage {
                 for (data in albumsData) {
                     val album = data.toFullClass(existingPictures = pictures)
                     albums.add(album)
-                    cleanAlbum(album)
+                    cleanCollection(album)
                 }
                 return albums
             }
@@ -732,15 +741,6 @@ object Storage {
          */
         private fun getNewPicturePaths(): List<String> {
             return pictures.keys.toList() - (getPathsFromPictureCache() ?: return listOf())
-        }
-
-        private fun getPathsFromPictureCache(): Set<String>? {
-            val json = readJsonFromDisk(pictureCacheFileName)
-            if (json != null) {
-                val type = object : TypeToken<HashSet<String>>() {}.type
-                return gson.fromJson(json, type)
-            }
-            return null
         }
 
         private fun getCustomCoversFromDisk() : Map<String, String> {

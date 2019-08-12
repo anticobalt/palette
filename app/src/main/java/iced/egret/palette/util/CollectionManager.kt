@@ -147,9 +147,10 @@ object CollectionManager : CoroutineScope {
             // On IO thread
             val updateKit = Storage.getUpdateKit(context)
             updatePicturesFromKit(updateKit)
-            cleanAlbums()
+            cleanCollections()
             Storage.saveAlbumsToDisk(albums)
             Storage.saveBufferPicturesToDisk(mBufferPictures)
+            writeCache()
 
             // On UI thread
             withContext(Dispatchers.Main) { callback() }
@@ -195,7 +196,7 @@ object CollectionManager : CoroutineScope {
         }
     }
 
-    fun writeCache() {
+    private fun writeCache() {
         Storage.savePictureCacheToDisk(mPictureCache)
     }
 
@@ -515,6 +516,7 @@ object CollectionManager : CoroutineScope {
         }
 
         mPictureCache[file.path] = picture
+        writeCache()
         return file
     }
 
@@ -578,6 +580,7 @@ object CollectionManager : CoroutineScope {
 
         // Save changes
         Storage.saveAlbumsToDisk(albums)
+        writeCache()
 
         return failCount
     }
@@ -592,7 +595,9 @@ object CollectionManager : CoroutineScope {
 
         picture.name = newName
         picture.filePath = files.second.path
+
         Storage.saveAlbumsToDisk(albums)
+        writeCache()
         return files
     }
 
@@ -626,6 +631,7 @@ object CollectionManager : CoroutineScope {
             Storage.saveAlbumsToDisk(albums)
             Storage.saveBufferPicturesToDisk(mBufferPictures)
             Storage.recycleBin.saveLocationsToDisk()
+            writeCache()
         }
 
         return failCounter
@@ -654,7 +660,10 @@ object CollectionManager : CoroutineScope {
             else afterEachRestored(restoredFile)
         }
 
-        if (failCounter != pictures.size) Storage.recycleBin.saveLocationsToDisk()
+        if (failCounter != pictures.size) {
+            Storage.recycleBin.saveLocationsToDisk()
+            writeCache()
+        }
         return failCounter
     }
 
@@ -664,23 +673,44 @@ object CollectionManager : CoroutineScope {
             if (!Storage.deleteFileFromRecycleBin(picture.filePath, null)) failCounter += 1
         }
 
-        if (failCounter != pictures.size) Storage.recycleBin.saveLocationsToDisk()
+        if (failCounter != pictures.size) {
+            Storage.recycleBin.saveLocationsToDisk()
+            writeCache()
+        }
         return failCounter
     }
 
     /**
-     * Remove all Pictures that don't exist on device from all albums.
+     * Remove all Pictures that don't exist on device from all collections.
      */
+    fun cleanCollections() {
+        cleanFolders()
+        cleanAlbums()
+    }
+
     private fun cleanAlbums(start: Album? = null) {
         val toCheck: List<Album>
         if (start != null) {
-            Storage.cleanAlbum(start)
+            Storage.cleanCollection(start)
             toCheck = start.albums
         } else {
             toCheck = albums
         }
         for (album in toCheck) {
             cleanAlbums(album)
+        }
+    }
+
+    private fun cleanFolders(start: Folder? = null) {
+        val toCheck: List<Folder>
+        if (start != null) {
+            Storage.cleanCollection(start)
+            toCheck = start.folders
+        } else {
+            toCheck = folders
+        }
+        for (folder in toCheck) {
+            cleanFolders(folder)
         }
     }
 

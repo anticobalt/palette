@@ -139,23 +139,18 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
      */
     override fun onResume() {
         super.onResume()
-        // Never refresh if currently selecting stuff.
-        // If not selecting, refresh if onCreate() not called.
         if (mSelectedContentType != null) {
             mActivity.isolateFragment(this)
-            return
         }
+        // In case anything slips through the cracks
+        CollectionManager.cleanCollections()
+        onCurrentContentsChanged()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putIntegerArrayList(SELECTED_POSITIONS, mActionModeHelper.selectedPositions.toMutableList() as ArrayList<Int>)
         outState.putString(SELECTED_TYPE, mSelectedContentType)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        CollectionManager.writeCache()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

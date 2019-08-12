@@ -15,9 +15,7 @@ import androidx.viewpager.widget.ViewPager
 import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
-import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.Device
-import iced.egret.palette.util.StateBuilder
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_picture_pager.*
 import kotlinx.android.synthetic.main.appbar_picture_pager.*
@@ -53,7 +51,6 @@ abstract class PicturePagerActivity : SlideActivity() {
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         if (!setStartPosition(savedInstanceState)) finish()
-        setState(savedInstanceState)
 
         setColors()
         buildSystemBars()
@@ -63,15 +60,16 @@ abstract class PicturePagerActivity : SlideActivity() {
 
     }
 
+    /**
+     * If process is killed and this is the returning activity, trying to invoke StateBuilder
+     * to set up the state again in onCreate() or onRestoreInstanceState() doesn't work.
+     * So just get out if state is reset.
+     *
+     * Also get out if the picture doesn't exist anymore.
+     */
     override fun onResume() {
         super.onResume()
-        if (!Storage.fileExists(mCurrentPicture.filePath)) finish()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(COLLECTION, CollectionManager.currentCollection?.path)
-        outState.putInt(INDEX, mActivePage)
-        super.onSaveInstanceState(outState)
+        if (mPictures.size == 0 || !Storage.fileExists(mCurrentPicture.filePath)) finish()
     }
 
     /**
@@ -90,16 +88,6 @@ abstract class PicturePagerActivity : SlideActivity() {
             false
         } else {
             true
-        }
-    }
-
-    private fun setState(savedInstanceState: Bundle?) {
-        // Build state if activity restarted. Don't if entering for the first time
-        // (b/c it is already built by another activity).
-        // Supply saved Collection path to unwind stack properly.
-        if (savedInstanceState != null) {
-            val path = savedInstanceState.getString(COLLECTION)
-            StateBuilder.build(this, path)
         }
     }
 

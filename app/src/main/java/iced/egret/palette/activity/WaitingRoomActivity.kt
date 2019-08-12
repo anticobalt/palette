@@ -29,8 +29,10 @@ class WaitingRoomActivity : GridCoverableActivity() {
      */
     override fun onResume() {
         super.onResume()
-        CollectionManager.fetchNewMedia(this) {
-            refresh()
+        if (!mActionModeIsRunning) {
+            CollectionManager.fetchNewMedia(this) {
+                refresh()
+            }
         }
     }
 

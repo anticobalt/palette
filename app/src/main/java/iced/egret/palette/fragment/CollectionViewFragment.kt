@@ -137,17 +137,16 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         }
     }
 
-    /**
-     * Called after onActivityResult() if applicable.
-     */
     override fun onResume() {
         super.onResume()
         if (mSelectedContentType != null) {
+            // Activity may have been rebuilt, so need to isolate again
             mActivity.isolateFragment(this)
+        } else {
+            // In case some Pictures that shouldn't exist anymore still exist (rare)
+            CollectionManager.cleanCollections()
+            onCurrentContentsChanged()
         }
-        // In case anything slips through the cracks
-        CollectionManager.cleanCollections()
-        onCurrentContentsChanged()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

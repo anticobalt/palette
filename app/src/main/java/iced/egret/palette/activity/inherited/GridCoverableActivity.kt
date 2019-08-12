@@ -32,6 +32,7 @@ abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callba
 
     protected lateinit var mActionModeHelper: ToolbarActionModeHelper
     protected lateinit var mAdapter: FlexibleAdapter<GridCoverableItem>
+    protected var mActionModeIsRunning = false
 
     protected var mContents = mutableListOf<Picture>()
     protected var mContentItems = mutableListOf<GridCoverableItem>()
@@ -111,6 +112,7 @@ abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callba
     }
 
     override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+        mActionModeIsRunning = true
         return true
     }
 
@@ -119,6 +121,7 @@ abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callba
         window.statusBarColor = Painter.getMaterialDark(primaryColor)
         window.navigationBarColor = Painter.getMaterialDark(primaryColor)
         mContentItems.map { item -> item.setSelection(false) }
+        mActionModeIsRunning = false
     }
 
     /**

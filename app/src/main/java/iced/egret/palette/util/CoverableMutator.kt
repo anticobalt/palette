@@ -97,6 +97,34 @@ object CoverableMutator {
         }
     }
 
+    fun syncToAlbum(folders: List<Folder>, context: Context, onFinish: () -> Unit) {
+
+        val albums = CollectionManager.getNestedAlbums()
+
+        // If only one folder, should skip the albums that are already synced.
+        // TODO: skip all albums in common
+        val toSkip = if (folders.size == 1) {
+            albums.filter { album -> folders[0].path in album.syncedFolderFiles.map { file -> file.path } }
+                    .map { album -> albums.indexOf(album) }
+                    .toIntArray()
+        } else intArrayOf()
+
+        DialogGenerator.syncToAlbum(context, albums, toSkip) {
+            val skipSet = toSkip.toSet()
+            val toSyncTo = it.filter { i -> i !in skipSet }.map { i -> albums[i] }
+
+            for (album in toSyncTo) {
+                val syncedPathSet = album.syncedFolderFiles.map { file -> file.path }.toMutableSet()
+                for (folder in folders) {
+                    syncedPathSet.add(folder.path)
+                }
+                CollectionManager.applySyncedFolders(syncedPathSet, false, album)
+            }
+            toast(context, R.string.success_sync)
+            onFinish()
+        }
+    }
+
     fun addToAlbum(coverables: List<Coverable>, context: Context, onFinish: () -> Unit) {
 
         // If only one coverable, hide albums it is already in

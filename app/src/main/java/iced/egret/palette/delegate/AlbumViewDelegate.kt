@@ -30,9 +30,6 @@ class AlbumViewDelegate : CollectionViewDelegate() {
     override fun onCreateActionMode(mode: ActionMode, menu: Menu, selectedContentType: String): Boolean {
         val removeFromAlbum = menu.findItem(R.id.actionRemoveFromAlbum)
         when (selectedContentType) {
-            CollectionManager.FOLDER_KEY -> {
-                removeFromAlbum.isVisible = true; Painter.paintDrawable(removeFromAlbum.icon)
-            }
             CollectionManager.PICTURE_KEY -> {
                 removeFromAlbum.isVisible = true; Painter.paintDrawable(removeFromAlbum.icon)
             }

@@ -106,6 +106,19 @@ object DialogGenerator {
         }
     }
 
+    fun syncToAlbum(context: Context, albums: List<Album>, toSkip: IntArray, onConfirm: (IntArray) -> Unit) {
+        val albumPaths = albums.map { album -> album.path }
+        MaterialDialog(context).show {
+            title(R.string.action_sync_to_album)
+            listItemsMultiChoice(items = albumPaths, disabledIndices = toSkip) { _, indices, _ ->
+                onConfirm(indices)
+            }
+            checkItems(toSkip)
+            negativeButton()
+            positiveButton()
+        }
+    }
+
     fun addToAlbum(context: Context, albumChoices: List<Album>, onConfirm: (IntArray) -> Unit) {
         val albumPaths = albumChoices.map { album -> album.path }
         MaterialDialog(context).show {

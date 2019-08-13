@@ -67,6 +67,7 @@
     <string name="action_clear">Clear</string>
     <string name="action_apply">Apply</string>
     <string name="action_show_sync_folders">Synced Folders</string>
+    <string name="action_sync_to_album">Sync to Album</string>
     <string name="action_set_as_cover">Set As Cover</string>
     <string name="action_reset_cover">Reset Cover</string>
 
@@ -88,6 +89,7 @@
     <string name="success_move_to_recycle">Successfully moved to recycle bin</string>
     <string name="success_set_cover">Cover set</string>
     <string name="success_reset_cover">Cover reset to default</string>
+    <string name="success_sync">Successfully synchronized</string>
 
     <!-- Errors -->
     <string name="title_permission_error">Permission request failed!</string>

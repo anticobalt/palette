@@ -436,26 +436,23 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         // Conditional
         val albumActions = menu.findItem(R.id.albumActions)
+        val syncToAlbum = menu.findItem(R.id.actionSyncToAlbum)
         val addToAlbum = menu.findItem(R.id.actionAddToAlbum)
         val share = menu.findItem(R.id.actionShare)
         val move = menu.findItem(R.id.actionMove)
         val delete = menu.findItem(R.id.actionDelete)
-
-        // Display settings common to Folders and Pictures
-        fun setFolderOrPicture() {
-            albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
-            addToAlbum.isVisible = true; Painter.paintDrawable(addToAlbum.icon)
-        }
 
         // Make items visible depending on selected content.
         // Painting has to be done here for ActionMode icons, because XML app:iconTint
         // doesn't work on items not visible on activity start.
         when (mSelectedContentType) {
             CollectionManager.FOLDER_KEY -> {
-                setFolderOrPicture()
+                albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
+                syncToAlbum.isVisible = true
             }
             CollectionManager.PICTURE_KEY -> {
-                setFolderOrPicture()
+                albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
+                addToAlbum.isVisible = true
                 share.isVisible = true
                 move.isVisible = true
                 delete.isVisible = true
@@ -483,6 +480,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
                 // Must return true for submenus to popup.
                 return true
             }
+            R.id.actionSyncToAlbum -> syncToAlbum(selectedCoverables)
             R.id.actionAddToAlbum -> addToAlbum(selectedCoverables)
             R.id.actionShare -> share(selectedCoverables)
             R.id.actionMove -> move(selectedCoverables)
@@ -508,6 +506,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         mActivity.undoColorActionMode()
 
         mode.menu.findItem(R.id.albumActions).isVisible = false
+        mode.menu.findItem(R.id.actionSyncToAlbum).isVisible = false
         mode.menu.findItem(R.id.actionAddToAlbum).isVisible = false
         mode.menu.findItem(R.id.actionShare).isVisible = false
         mode.menu.findItem(R.id.actionMove).isVisible = false
@@ -549,6 +548,15 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             i += 1
         }
         mActionModeHelper.updateContextTitle(mActionModeHelper.selectedPositions.size)
+    }
+
+    @Suppress("UNCHECKED_CAST")  // assume internal consistency
+    private fun syncToAlbum(coverables: List<Coverable>) {
+        val folders = coverables as List<Folder>
+        CoverableMutator.syncToAlbum(folders, context!!) {
+            mActivity.notifyCollectionsChanged()
+            mActionModeHelper.destroyActionModeIfCan()
+        }
     }
 
     private fun addToAlbum(coverables: List<Coverable>) {

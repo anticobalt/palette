@@ -263,12 +263,17 @@ object CollectionManager : CoroutineScope {
         Storage.saveAlbumsToDisk(albums)
     }
 
-    fun applySyncedFolders(filePaths: List<String>, toCurrent : Boolean) {
-        val album = currentCollection as? Album
-        if (toCurrent && album is Album) {
+    fun applySyncedFolders(filePaths: kotlin.collections.Collection<String>, toCurrent: Boolean, album: Album? = null) {
+        if (album != null && !toCurrent) {
             val folderFiles = filePaths.map { path -> File(path) }
             album.syncedFolderFiles.clear()
             album.syncedFolderFiles.addAll(folderFiles)
+            Storage.saveAlbumsToDisk(albums)
+        } else if (toCurrent) {
+            val currentAlbum = currentCollection as? Album ?: return
+            val folderFiles = filePaths.map { path -> File(path) }
+            currentAlbum.syncedFolderFiles.clear()
+            currentAlbum.syncedFolderFiles.addAll(folderFiles)
             Storage.saveAlbumsToDisk(albums)
         }
     }

@@ -20,6 +20,11 @@
         android:visible="false">
         <menu>
             <item
+                android:id="@+id/actionSyncToAlbum"
+                android:title="@string/action_sync_to_album"
+                android:visible="false"
+                />
+            <item
                 android:id="@+id/actionAddToAlbum"
                 android:title="@string/action_add_to_album"
                 android:visible="false" />

@@ -4,14 +4,14 @@ import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import iced.egret.palette.R
-import iced.egret.palette.activity.inherited.PicturePagerActivity
+import iced.egret.palette.activity.inherited.StatefulPagerActivity
 import iced.egret.palette.model.Folder
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.bottom_bar_waiting_room_pager.view.*
 
-class WaitingRoomPagerActivity : PicturePagerActivity() {
+class WaitingRoomPagerActivity : StatefulPagerActivity() {
 
     override val bottomBarRes = R.layout.bottom_bar_waiting_room_pager
     override val menuRes = R.menu.menu_waiting_room_pager

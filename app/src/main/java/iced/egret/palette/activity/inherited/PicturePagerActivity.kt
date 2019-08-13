@@ -18,7 +18,6 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.Device
-import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_picture_pager.*
 import kotlinx.android.synthetic.main.appbar_picture_pager.*
 
@@ -29,7 +28,7 @@ import kotlinx.android.synthetic.main.appbar_picture_pager.*
 abstract class PicturePagerActivity : SlideActivity() {
 
     abstract val bottomBarRes: Int?
-    abstract val menuRes: Int
+    abstract val menuRes: Int?
 
     protected lateinit var mSharedPrefs: SharedPreferences
     private var mBarBackgroundColor: Int = Color.BLACK
@@ -60,18 +59,6 @@ abstract class PicturePagerActivity : SlideActivity() {
         buildViewPager()
         if (bottomBarRes != null) buildBottomBar()
 
-    }
-
-    /**
-     * If process is killed and this is the returning activity, trying to invoke StateBuilder
-     * to set up the state again in onCreate() or onRestoreInstanceState() doesn't work.
-     * So just get out if state is reset.
-     *
-     * Also get out if the picture doesn't exist anymore.
-     */
-    override fun onResume() {
-        super.onResume()
-        if (mPictures.size == 0 || !Storage.fileExists(mCurrentPicture.filePath)) finish()
     }
 
     /**
@@ -234,7 +221,7 @@ abstract class PicturePagerActivity : SlideActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(menuRes, menu)
+        if (menuRes != null) menuInflater.inflate(menuRes!!, menu)
         return super.onCreateOptionsMenu(menu)
     }
 

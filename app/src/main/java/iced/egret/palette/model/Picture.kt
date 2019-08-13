@@ -35,12 +35,12 @@ import java.util.*
  * - lastModifiedDate
  * - createdDate
  */
-class Picture(override var name: String, override var filePath: String) : TerminalCoverable, FileObject {
+open class Picture(override var name: String, override var filePath: String) : TerminalCoverable, FileObject {
 
     // Getters computed lazily, so that changing path doesn't break everything
-    val file: File
+    open val file: File
         get() = File(filePath)
-    val uri: Uri
+    open val uri: Uri
         get() = Uri.fromFile(file)
 
     override val terminal = true

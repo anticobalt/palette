@@ -2,7 +2,6 @@ package iced.egret.palette.util
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Environment
 import android.text.InputType
 import android.view.View
 import android.widget.TextView
@@ -13,8 +12,6 @@ import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.afollestad.materialdialogs.files.FileFilter
-import com.afollestad.materialdialogs.files.folderChooser
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.checkItems
@@ -23,6 +20,7 @@ import iced.egret.palette.R
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
+import yogesh.firzen.filelister.FileListerDialog
 import java.io.File
 
 /**
@@ -198,17 +196,16 @@ object DialogGenerator {
     }
 
     fun moveTo(context: Context, initialPath: String? = null, onConfirm: (File) -> Unit) {
-        val filter: FileFilter = { it.path.startsWith("/storage") }
-        val initial = if (initialPath == null) Environment.getExternalStorageDirectory() else File(initialPath)
-        MaterialDialog(context).show {
-            folderChooser(
-                    emptyTextRes = R.string.folder_empty,
-                    initialDirectory = initial,
-                    filter = filter) { _, file ->
-                onConfirm(file)
-                negativeButton()
-            }
+
+        val dialog = FileListerDialog.createFileListerDialog(context)
+
+        dialog.setFileFilter(FileListerDialog.FILE_FILTER.DIRECTORY_ONLY)
+        if (initialPath != null) dialog.setDefaultDir(initialPath)
+
+        dialog.setOnFileSelectedListener { file, path ->
+            onConfirm(file)
         }
+        dialog.show()
     }
 
     fun restore(context: Context, typeString: String, onConfirm: () -> Unit) {

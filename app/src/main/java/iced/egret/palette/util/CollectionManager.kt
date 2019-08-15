@@ -424,7 +424,7 @@ object CollectionManager : CoroutineScope {
         var index = getDepthOfPath(startPath, destinationPath)
         if (index == 0) return null
 
-        while (currentFolder.folders.isNotEmpty() && index < levels.size) {
+        while (index < levels.size) {
             currentFolder = currentFolder.folders.find { child -> child.filePath.split("/")[index] == levels[index] }
                     ?: return onMissing(currentFolder, levels, index)
             index += 1

@@ -92,12 +92,12 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         buildDelegate()
         buildToolbar()
         buildRecyclerView()
+        setupFab()
         mSwipeRefreshLayout.setOnRefreshListener(this)
         mFloatingActionButton.setOnClickListener { onFabClick() }
 
         // Color changes force recreation (see SettingsActivity)
         colorBars()
-        colorFab()
 
         return mRootView
 
@@ -255,11 +255,6 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         toolbar.toolbarTitle.text = text
     }
 
-    private fun colorFab() {
-        val color = getColorInt(BaseActivity.ColorType.ITEM)
-        mFloatingActionButton.drawable.setTint(color)
-    }
-
     private fun buildDelegate() {
         when (CollectionManager.currentCollection) {
             is Folder -> {
@@ -287,6 +282,29 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         // Need to supply explicit view in fragment
         EmptyViewHelper.create(mAdapter, mRootView!!.findViewById(R.id.empty_view))
+    }
+
+    /**
+     * FAB's visibility is conditional.
+     * Setup includes coloring, since you can't color a non-existence view.
+     */
+    private fun setupFab() {
+        if (mDelegate is AlbumViewDelegate) {
+            mFloatingActionButton.show()
+            val color = getColorInt(BaseActivity.ColorType.ITEM)
+            mFloatingActionButton.drawable.setTint(color)
+        }
+        else {
+            mFloatingActionButton.hide()
+        }
+    }
+
+
+    /**
+     * Revert to expected visibility of FAB after unconditional hide.
+     */
+    private fun restoreFabVisibility() {
+        setupFab()
     }
 
     /**
@@ -692,6 +710,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         mAdapter.updateDataSet(mContentItems)
         buildDelegate()
         buildToolbar()  // updates title and delegate's menu items
+        setupFab()
     }
 
     override fun onAllFragmentsCreated() {
@@ -705,7 +724,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             blocker.visibility = View.VISIBLE
         } else {
             rvCollectionItems.visibility = View.VISIBLE
-            fab.show()
+            restoreFabVisibility()
             blocker.visibility = View.GONE
         }
     }

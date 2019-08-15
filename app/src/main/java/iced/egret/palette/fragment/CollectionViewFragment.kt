@@ -33,6 +33,7 @@ import iced.egret.palette.model.Folder
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
+import iced.egret.palette.model.inherited.FileObject
 import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 import kotlinx.android.synthetic.main.fragment_view_collection.*
@@ -60,6 +61,8 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             value.listener = this
             field = value
         }
+
+    var toLaunchFromIntent : FileObject? = null
 
     private var mRootView: View? = null
     private lateinit var mCollectionRecyclerView: RecyclerView
@@ -103,6 +106,20 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         mActivity.notifyFragmentCreationFinished(this)
+        launchFromIntentIfRequired()
+    }
+
+    private fun launchFromIntentIfRequired() {
+        val fileObject = toLaunchFromIntent ?: return
+
+        val position = if (fileObject is Picture && fileObject.parent is Collection) {
+            (fileObject.parent as Collection).pictures.indexOf(fileObject)
+        }
+        else return
+
+        val launchPack = CollectionManager.PagerLaunchPack(position, callingFragment = this,
+                newActivityClass = MainPagerActivity::class.java, requestCode = PICTURE_ACTIVITY_REQUEST)
+        CollectionManager.launch(fileObject, launchPack)
     }
 
     /**

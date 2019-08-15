@@ -25,10 +25,8 @@ import iced.egret.palette.fragment.inherited.MainFragment
 import iced.egret.palette.layout.HackySlidingPaneLayout
 import iced.egret.palette.model.Folder
 import iced.egret.palette.model.inherited.Collection
-import iced.egret.palette.util.CollectionManager
-import iced.egret.palette.util.Painter
-import iced.egret.palette.util.Permission
-import iced.egret.palette.util.StateBuilder
+import iced.egret.palette.model.inherited.FileObject
+import iced.egret.palette.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_links.*
 
@@ -166,6 +164,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
             // First start of activity
             StateBuilder.build(this, null) {
                 makeFragments()
+                handleIntentViewRequest()
                 buildSlidingPane()
                 if (isFirstRun()) applyDefaultSettings()  // may recreate, so must be after UI building
                 checkSdWriteAccess()
@@ -176,6 +175,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
             StateBuilder.build(this, navigateToPath)
             // Save the remade fragments (which are technically different).
             updateFragments(supportFragmentManager.fragments)
+            handleIntentViewRequest()
             buildSlidingPane()
             mainLayout.visibility = View.VISIBLE
         }
@@ -386,6 +386,26 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         }
 
         findViewById<HackySlidingPaneLayout>(R.id.slidingPaneLayout)?.closePane()
+    }
+
+    private fun handleIntentViewRequest() {
+        val requestFileObject = ThirdPartyIntentHandler.getViewRequest(intent, contentResolver) {
+            toast(R.string.generic_error)
+            null
+        }
+        val pathToFulfillRequest = requestFileObject?.parent?.filePath
+
+        if (pathToFulfillRequest == null) {
+            // No path, can only preview
+            startActivity(Intent(this, PreviewPagerActivity::class.java))
+        } else {
+            StateBuilder.build(this, pathToFulfillRequest)  // unwinds stack with path
+            notifyFragmentsOfIntentRequest(requestFileObject)
+        }
+    }
+
+    private fun notifyFragmentsOfIntentRequest(fileObject: FileObject?) {
+        (fragments[rightIndex] as CollectionViewFragment).toLaunchFromIntent = fileObject
     }
 
     companion object Constants {

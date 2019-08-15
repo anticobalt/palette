@@ -15,7 +15,8 @@ object ThirdPartyIntentHandler {
 
     /**
      * Try to find the Picture referenced by the Intent.
-     * If it doesn't exist (i.e. file not on disk), then create a Preview Picture and return it.
+     * If it doesn't exist (i.e. file not on disk or not accessible),
+     * then create a Preview Picture and return it.
      */
     fun getViewRequest(intent: Intent, contentResolver: ContentResolver,
                        onError: () -> FileObject?) : FileObject? {
@@ -27,19 +28,13 @@ object ThirdPartyIntentHandler {
 
             val picturePath = if (uri.scheme == "file") File(uri.toString()).path
             else getFilePathFromUri(uri, contentResolver)
-
-            if (picturePath == null) {
-                val preview = PreviewPicture(uri, contentResolver)
-                previewPictures.clear()
-                previewPictures.add(preview)
-                return preview
-            }
+                    ?: return makePreviewPicture(uri, contentResolver)
 
             val folderPath = picturePath.split("/").dropLast(1).joinToString("/")
             val folder = CollectionManager.findFolderByPath(folderPath)
-                    ?: return onError()
 
-            return folder.findPictureByPath(picturePath) ?: return onError()
+            return folder?.findPictureByPath(picturePath)
+                    ?: makePreviewPicture(uri, contentResolver)
         }
 
         return null
@@ -62,6 +57,13 @@ object ThirdPartyIntentHandler {
         }
         cursor?.close()
         return path
+    }
+
+    private fun makePreviewPicture(uri: Uri, contentResolver: ContentResolver) : PreviewPicture {
+        val preview = PreviewPicture(uri, contentResolver)
+        previewPictures.clear()
+        previewPictures.add(preview)
+        return preview
     }
 
 }

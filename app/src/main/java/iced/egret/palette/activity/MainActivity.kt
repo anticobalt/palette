@@ -395,12 +395,20 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         }
         val pathToFulfillRequest = requestFileObject?.parent?.filePath
 
-        if (pathToFulfillRequest == null) {
-            // No path, can only preview
-            startActivity(Intent(this, PreviewPagerActivity::class.java))
-        } else {
-            StateBuilder.build(this, pathToFulfillRequest)  // unwinds stack with path
-            notifyFragmentsOfIntentRequest(requestFileObject)
+        when {
+            pathToFulfillRequest == null && requestFileObject != null -> {
+                // No path, can only preview
+                startActivity(Intent(this, PreviewPagerActivity::class.java))
+            }
+            pathToFulfillRequest == null -> {
+                // Can't preview
+                return
+            }
+            else -> {
+                // Is file, can show in entirety
+                StateBuilder.build(this, pathToFulfillRequest)  // unwinds stack with path
+                notifyFragmentsOfIntentRequest(requestFileObject)
+            }
         }
     }
 

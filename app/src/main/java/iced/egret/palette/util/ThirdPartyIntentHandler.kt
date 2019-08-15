@@ -10,6 +10,7 @@ import java.io.File
 
 object ThirdPartyIntentHandler {
 
+    // As a list for future-proofing
     val previewPictures = mutableListOf<PreviewPicture>()
 
     /**
@@ -29,6 +30,7 @@ object ThirdPartyIntentHandler {
 
             if (picturePath == null) {
                 val preview = PreviewPicture(uri, contentResolver)
+                previewPictures.clear()
                 previewPictures.add(preview)
                 return preview
             }

@@ -173,10 +173,10 @@ object CoverableMutator {
             }
             if (failedCounter > 0) {
                 if (pictures.size > 1) {
-                    toast(context, "Failed to move $failedCounter pictures! " +
+                    toastLong(context, "Failed to move $failedCounter pictures! " +
                             context.getString(R.string.storage_fail_error_explain))
                 } else {
-                    toast(context, "Failed! " +
+                    toastLong(context, "Failed! " +
                             context.getString(R.string.storage_fail_error_explain))
                 }
             } else toast(context, R.string.success_move_generic)
@@ -192,10 +192,10 @@ object CoverableMutator {
             }
             if (failedCounter > 0) {
                 if (pictures.size > 1) {
-                    toast(context, "Failed to move $failedCounter pictures to recycle bin! " +
+                    toastLong(context, "Failed to move $failedCounter pictures to recycle bin! " +
                             context.getString(R.string.storage_fail_error_explain))
                 } else {
-                    toast(context, "Failed! " +
+                    toastLong(context, "Failed! " +
                             context.getString(R.string.storage_fail_error_explain))
                 }
             } else toast(context, R.string.success_move_to_recycle)
@@ -291,4 +291,7 @@ object CoverableMutator {
         Toast.makeText(context, res, Toast.LENGTH_SHORT).show()
     }
 
+    private fun toastLong(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
 }

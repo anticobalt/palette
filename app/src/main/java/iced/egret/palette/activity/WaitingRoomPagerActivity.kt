@@ -1,7 +1,6 @@
 package iced.egret.palette.activity
 
 import android.content.Intent
-import android.view.Menu
 import android.view.MenuItem
 import iced.egret.palette.R
 import iced.egret.palette.activity.inherited.StatefulPagerActivity
@@ -18,13 +17,6 @@ class WaitingRoomPagerActivity : StatefulPagerActivity() {
 
     private val autoClear: Boolean
         get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
-        val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
-        trueZoomItem.isChecked = trueZoomOn
-        return super.onPrepareOptionsMenu(menu)
-    }
 
     override fun setBottomBarListeners() {
         mBottomBar.details.setOnClickListener {

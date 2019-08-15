@@ -14,7 +14,7 @@ import iced.egret.palette.model.PreviewPicture
 class PreviewPagerActivity : PicturePagerActivity() {
 
     override val bottomBarRes: Nothing? = null
-    override val menuRes: Nothing? = null
+    override val menuRes = R.menu.menu_preview_pager
 
     private val previewPictures = mutableListOf<Picture>()
 
@@ -23,12 +23,12 @@ class PreviewPagerActivity : PicturePagerActivity() {
         when (intent.action) {
             Intent.ACTION_SEND -> {
                 val extra = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM)
-                if (extra is Uri) previewPictures.add(PreviewPicture(getName(extra), extra))
+                if (extra is Uri) previewPictures.add(PreviewPicture(getName(extra), extra, contentResolver))
             }
             Intent.ACTION_SEND_MULTIPLE -> {
                 val extras = intent.getParcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
                 for (extra in extras) {
-                    if (extra is Uri) previewPictures.add(PreviewPicture(getName(extra), extra))
+                    if (extra is Uri) previewPictures.add(PreviewPicture(getName(extra), extra, contentResolver))
                 }
             }
         }

@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.appbar_picture_pager.*
 /**
  * Allows image flipping via ViewPager. Translucent top and bottom bars with seamless transition
  * between system's and app's bars; all toolbar menu actions in overflow.
+ * Supports true-zoom toggling and sharing/sending image. Hides/shows UI on click.
  */
 abstract class PicturePagerActivity : SlideActivity() {
 
@@ -225,10 +226,26 @@ abstract class PicturePagerActivity : SlideActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    /**
+     * Sets the true zoom checkbox if it exists
+     */
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
+        val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
+        trueZoomItem?.isChecked = trueZoomOn
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retVal = when (item?.itemId) {
             android.R.id.home -> {
                 onBackPressed()
+                true
+            }
+            R.id.switchTrueZoom -> {
+                item.isChecked = !item.isChecked
+                mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
+                refreshViewPager()
                 true
             }
             else -> false

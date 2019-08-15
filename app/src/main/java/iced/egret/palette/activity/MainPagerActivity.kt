@@ -1,7 +1,6 @@
 package iced.egret.palette.activity
 
 import android.content.Intent
-import android.view.Menu
 import android.view.MenuItem
 import com.theartofdev.edmodo.cropper.CropImage
 import iced.egret.palette.R
@@ -17,13 +16,6 @@ class MainPagerActivity : StatefulPagerActivity() {
 
     override val bottomBarRes = R.layout.bottom_bar_main_pager
     override val menuRes = R.menu.menu_main_pager
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
-        val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
-        trueZoomItem.isChecked = trueZoomOn
-        return super.onPrepareOptionsMenu(menu)
-    }
 
     override fun setBottomBarListeners() {
         mBottomBar.details.setOnClickListener {
@@ -50,12 +42,6 @@ class MainPagerActivity : StatefulPagerActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val retVal = when (item?.itemId) {
-            R.id.switchTrueZoom -> {
-                item.isChecked = !item.isChecked
-                mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
-                refreshViewPager()
-                true
-            }
             R.id.actionMove -> {
                 initiateMove()
                 true

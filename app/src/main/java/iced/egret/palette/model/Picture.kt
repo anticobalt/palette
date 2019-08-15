@@ -59,7 +59,7 @@ open class Picture(override var name: String, override var filePath: String) : T
         get() = ""
 
     // Image Properties
-    val mimeType: String
+    open val mimeType: String
         get() {
             // Tries to get type from actual file instead of reading off the extension
             // https://stackoverflow.com/a/19739471

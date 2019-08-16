@@ -16,7 +16,7 @@ class WaitingRoomPagerActivity : StatefulPagerActivity() {
     override val menuRes = R.menu.menu_waiting_room_pager
 
     private val autoClear: Boolean
-        get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
+        get() = defSharedPreferences.getBoolean(getString(R.string.key_waiting_room_autoclear), false)
 
     override fun setBottomBarListeners() {
         mBottomBar.details.setOnClickListener {
@@ -42,7 +42,7 @@ class WaitingRoomPagerActivity : StatefulPagerActivity() {
         val retVal = when (item?.itemId) {
             R.id.switchTrueZoom -> {
                 item.isChecked = !item.isChecked
-                mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
+                mSharedPrefs.edit().putBoolean(getString(R.string.key_true_zoom), item.isChecked).apply()
                 refreshViewPager()
                 true
             }
@@ -63,7 +63,7 @@ class WaitingRoomPagerActivity : StatefulPagerActivity() {
     private fun goToHomeFolder() {
         val home = mCurrentPicture.parent
         if (home !is Folder) {
-            toastLong(R.string.generic_error)
+            toastLong(R.string.error_generic)
         } else {
             CollectionManager.launchAsShortcut(home)
             val intent = Intent()

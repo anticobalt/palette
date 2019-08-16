@@ -47,12 +47,12 @@ object CoverableMutator {
         DialogGenerator.nameFile(context, nameWithoutExtension) { charSequence, dialog ->
             val newName = "$charSequence.$extension"
             if (Storage.fileExists(newName, picture.parentFilePath)) {
-                toast(context, R.string.already_exists_error)
+                toast(context, R.string.error_already_exists)
             } else {
                 val files = CollectionManager.renamePicture(picture, newName, getSdCardDocumentFile(context))
                 if (files == null) {
-                    toastLong(context, context.getString(R.string.edit_fail_error) + " " +
-                            context.getString(R.string.storage_fail_error_explain))
+                    toastLong(context, context.getString(R.string.error_edit_fail) + " " +
+                            context.getString(R.string.error_explain_storage_fail))
                 } else {
                     // File by old name is technically it's own file
                     broadcastMediaChanged(context, files.first)
@@ -132,12 +132,12 @@ object CoverableMutator {
         // TODO: hide albums shared by multiple coverables
         var albums = CollectionManager.getNestedAlbums().toList()
         if (albums.isEmpty()) {
-            toast(context, R.string.no_albums_exist_error)
+            toast(context, R.string.error_no_albums_exist)
             return
         }
         if (coverables.size == 1) albums = albums.filterNot { album -> coverables[0] in album.pictures }
         if (albums.isEmpty()) {
-            toast(context, R.string.no_albums_available_error)
+            toast(context, R.string.error_no_albums_available)
             return
         }
 
@@ -164,7 +164,7 @@ object CoverableMutator {
 
         DialogGenerator.moveTo(context, initialLocation) {
             if (initialLocation == it.path) {
-                toast(context, R.string.already_exists_error)
+                toast(context, R.string.error_already_exists)
                 return@moveTo
             }
             val failedCounter = CollectionManager.movePictures(pictures, it,
@@ -175,10 +175,10 @@ object CoverableMutator {
             if (failedCounter > 0) {
                 if (pictures.size > 1) {
                     toastLong(context, "Failed to move $failedCounter pictures! " +
-                            context.getString(R.string.storage_fail_error_explain))
+                            context.getString(R.string.error_explain_storage_fail))
                 } else {
                     toastLong(context, "Failed! " +
-                            context.getString(R.string.storage_fail_error_explain))
+                            context.getString(R.string.error_explain_storage_fail))
                 }
             } else toast(context, R.string.success_move_generic)
             onFinish()
@@ -194,10 +194,10 @@ object CoverableMutator {
             if (failedCounter > 0) {
                 if (pictures.size > 1) {
                     toastLong(context, "Failed to move $failedCounter pictures to recycle bin! " +
-                            context.getString(R.string.storage_fail_error_explain))
+                            context.getString(R.string.error_explain_storage_fail))
                 } else {
                     toastLong(context, "Failed! " +
-                            context.getString(R.string.storage_fail_error_explain))
+                            context.getString(R.string.error_explain_storage_fail))
                 }
             } else toast(context, R.string.success_move_to_recycle)
             onFinish()
@@ -263,11 +263,11 @@ object CoverableMutator {
 
     private fun getSdCardDocumentFile(context: Context): DocumentFile? {
         val preferences = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key),
+                context.getString(R.string.key_preference_file),
                 Context.MODE_PRIVATE
         )
         val uriAsString = preferences.getString(
-                context.getString(R.string.sd_card_uri_key), null)
+                context.getString(R.string.key_sd_card_uri), null)
                 ?: return null
         val uri = Uri.parse(uriAsString)
         return DocumentFile.fromTreeUri(context, uri)

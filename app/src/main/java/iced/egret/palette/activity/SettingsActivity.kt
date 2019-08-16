@@ -21,9 +21,9 @@ class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceCh
 
     override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
         val themeKeys = listOf(
-                R.string.primary_color_key,
-                R.string.accent_color_key,
-                R.string.toolbar_item_color_key
+                R.string.key_primary_color,
+                R.string.key_accent_color,
+                R.string.key_toolbar_item_color
         ).map { id -> getString(id) }
 
         if (key != null && key in themeKeys) {
@@ -76,7 +76,7 @@ class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceCh
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-            val sdPref = findPreference<Preference>(getString(R.string.sd_card_grant_key))
+            val sdPref = findPreference<Preference>(getString(R.string.key_sd_card_grant))
             sdPref?.setOnPreferenceClickListener {
                 DialogGenerator.grantSdCardPrompt(activity as BaseActivity)
                 true

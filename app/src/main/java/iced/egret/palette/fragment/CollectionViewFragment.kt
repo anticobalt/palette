@@ -195,7 +195,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         // This really shouldn't ever happen
         if (intent == null) {
-            toast(R.string.generic_error)
+            toast(R.string.error_generic)
             return
         }
 
@@ -567,7 +567,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
                 mActivity.notifyCollectionsChanged()  // update views if collection is pinned
                 toast(R.string.success_reset_cover)
             }
-        } else toast(R.string.generic_error)  // should never happen
+        } else toast(R.string.error_generic)  // should never happen
 
     }
 

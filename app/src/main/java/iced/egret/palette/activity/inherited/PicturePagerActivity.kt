@@ -74,7 +74,7 @@ abstract class PicturePagerActivity : SlideActivity() {
         }
 
         return if (mActivePage == -1) {
-            toastLong(R.string.generic_error)
+            toastLong(R.string.error_generic)
             false
         } else {
             true
@@ -86,7 +86,7 @@ abstract class PicturePagerActivity : SlideActivity() {
      */
     private fun setColors() {
 
-        val usePrimary = mSharedPrefs.getBoolean(getString(R.string.pager_toolbar_color_key), false)
+        val usePrimary = mSharedPrefs.getBoolean(getString(R.string.key_pager_toolbar_color), false)
         if (usePrimary) {
             mBarBackgroundColor = getColorInt(ColorType.PRIMARY)
         }  // else use default
@@ -230,7 +230,7 @@ abstract class PicturePagerActivity : SlideActivity() {
      * Sets the true zoom checkbox if it exists
      */
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.true_zoom_key), false)
+        val trueZoomOn = mSharedPrefs.getBoolean(getString(R.string.key_true_zoom), false)
         val trueZoomItem = menu.findItem(R.id.switchTrueZoom)
         trueZoomItem?.isChecked = trueZoomOn
         return super.onPrepareOptionsMenu(menu)
@@ -244,7 +244,7 @@ abstract class PicturePagerActivity : SlideActivity() {
             }
             R.id.switchTrueZoom -> {
                 item.isChecked = !item.isChecked
-                mSharedPrefs.edit().putBoolean(getString(R.string.true_zoom_key), item.isChecked).apply()
+                mSharedPrefs.edit().putBoolean(getString(R.string.key_true_zoom), item.isChecked).apply()
                 refreshViewPager()
                 true
             }

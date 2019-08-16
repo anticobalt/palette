@@ -21,7 +21,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
     override var actionModeMenuRes = R.menu.menu_waiting_room_edit
 
     private val autoClear: Boolean
-        get() = defSharedPreferences.getBoolean(getString(R.string.waiting_room_autoclear_key), false)
+        get() = defSharedPreferences.getBoolean(getString(R.string.key_waiting_room_autoclear), false)
 
     /**
      * Update when returning to activity.

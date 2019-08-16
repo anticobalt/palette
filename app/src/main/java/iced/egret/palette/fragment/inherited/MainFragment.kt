@@ -51,7 +51,7 @@ abstract class MainFragment : Fragment(), ActionMode.Callback,
         mActivity.colorStandardElements(toolbar)
 
         // Advanced stuff
-        val color = sharedPrefs.getInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
+        val color = sharedPrefs.getInt(getString(R.string.key_toolbar_item_color), Color.WHITE)
         toolbar.toolbarTitle.setTextColor(color)
         navigationDrawable.color = color  // Only DrawerArrowDrawable's own color function works
     }

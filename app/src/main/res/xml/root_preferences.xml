@@ -3,7 +3,7 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/appearance_header">
+        app:title="@string/header_appearance">
 
         <!--
         Didn't use normal Preference + MaterialDialogs ColorPicker because
@@ -13,66 +13,66 @@
             android:defaultValue="@color/colorPrimary"
             app:colorChoices="@array/theme_colors"
             app:iconSpaceReserved="false"
-            app:key="@string/primary_color_key"
+            app:key="@string/key_primary_color"
             app:numColumns="6"
-            app:title="@string/primary_color_preference" />
+            app:title="@string/preference_primary_color" />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
             android:defaultValue="@color/colorAccent"
             app:colorChoices="@array/theme_colors"
             app:iconSpaceReserved="false"
-            app:key="@string/accent_color_key"
+            app:key="@string/key_accent_color"
             app:numColumns="6"
-            app:title="@string/accent_color_preference" />
+            app:title="@string/preference_accent_color" />
 
         <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
             android:defaultValue="@color/white"
             app:colorChoices="@array/text_colors"
             app:iconSpaceReserved="false"
-            app:key="@string/toolbar_item_color_key"
+            app:key="@string/key_toolbar_item_color"
             app:numColumns="6"
-            app:title="@string/toolbar_item_color_preference" />
+            app:title="@string/preference_toolbar_item_color" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/pager_header">
+        app:title="@string/header_pager">
 
         <androidx.preference.SwitchPreferenceCompat
             app:iconSpaceReserved="false"
-            app:key="@string/pager_toolbar_color_key"
-            app:summary="@string/pager_toolbar_color_summary"
-            app:title="@string/pager_toolbar_color_preference" />
+            app:key="@string/key_pager_toolbar_color"
+            app:summary="@string/summary_pager_toolbar_color"
+            app:title="@string/preference_pager_toolbar_color" />
 
         <androidx.preference.SwitchPreferenceCompat
             app:iconSpaceReserved="false"
-            app:key="@string/true_zoom_key"
-            app:summary="@string/true_zoom_summary"
-            app:title="@string/true_zoom_preference" />
+            app:key="@string/key_true_zoom"
+            app:summary="@string/summary_true_zoom"
+            app:title="@string/preference_true_zoom" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/waiting_room_header">
+        app:title="@string/header_waiting_room">
 
         <androidx.preference.SwitchPreferenceCompat
             app:iconSpaceReserved="false"
-            app:key="@string/waiting_room_autoclear_key"
-            app:summary="@string/waiting_room_autoclear_summary"
-            app:title="@string/waiting_room_autoclear_preference" />
+            app:key="@string/key_waiting_room_autoclear"
+            app:summary="@string/summary_waiting_room_autoclear"
+            app:title="@string/preference_waiting_room_autoclear" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/permissions_header">
+        app:title="@string/header_permissions">
 
         <Preference
             app:iconSpaceReserved="false"
-            app:key="@string/sd_card_grant_key"
-            app:title="@string/sd_card_grant_permission" />
+            app:key="@string/key_sd_card_grant"
+            app:title="@string/preference_sd_card_grant_permission" />
 
     </PreferenceCategory>
 

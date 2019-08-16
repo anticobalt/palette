@@ -14,38 +14,38 @@
     <string name="folder_list">Folders</string>
 
     <!-- Preference keys -->
-    <string name="preference_file_key">iced.egret.palette.PREFERENCES_KEY</string>
-    <string name="sd_card_uri_key">iced.egret.palette.SD_CARD_URI_KEY</string>
-    <string name="primary_color_key">iced.egret.palette.PRIMARY_COLOR</string>
-    <string name="accent_color_key">iced.egret.palette.ACCENT_COLOR</string>
-    <string name="toolbar_item_color_key">iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
-    <string name="pager_toolbar_color_key">iced.egret.palette.PAGER_TOOLBAR_COLOR</string>
-    <string name="true_zoom_key">iced.egret.palette.TRUE_ZOOM</string>
-    <string name="waiting_room_autoclear_key">iced.egret.palette.AUTO_CLEAR</string>
-    <string name="sd_card_grant_key">iced.egret.palette.GRANT_SD_CARD</string>
+    <string name="key_preference_file">iced.egret.palette.PREFERENCES_KEY</string>
+    <string name="key_sd_card_uri">iced.egret.palette.SD_CARD_URI_KEY</string>
+    <string name="key_primary_color">iced.egret.palette.PRIMARY_COLOR</string>
+    <string name="key_accent_color">iced.egret.palette.ACCENT_COLOR</string>
+    <string name="key_toolbar_item_color">iced.egret.palette.TOOLBAR_ITEM_COLOR</string>
+    <string name="key_pager_toolbar_color">iced.egret.palette.PAGER_TOOLBAR_COLOR</string>
+    <string name="key_true_zoom">iced.egret.palette.TRUE_ZOOM</string>
+    <string name="key_waiting_room_autoclear">iced.egret.palette.AUTO_CLEAR</string>
+    <string name="key_sd_card_grant">iced.egret.palette.GRANT_SD_CARD</string>
 
     <!-- Preference names -->
-    <string name="appearance_header">Appearance</string>
-    <string name="primary_color_preference">Primary Color</string>
-    <string name="accent_color_preference">Accent Color</string>
-    <string name="toolbar_item_color_preference">Toolbar Item Color</string>
-    <string name="pager_header">Picture Pager</string>
-    <string name="pager_toolbar_color_preference">Primary Color in Toolbars</string>
-    <string name="true_zoom_preference">True Zoom</string>
-    <string name="waiting_room_header">Waiting Room</string>
-    <string name="waiting_room_autoclear_preference">Automatically Clear After Organizing</string>
-    <string name="permissions_header">Permissions</string>
-    <string name="sd_card_grant_permission">Grant SD Card Access</string>
+    <string name="header_appearance">Appearance</string>
+    <string name="preference_primary_color">Primary Color</string>
+    <string name="preference_accent_color">Accent Color</string>
+    <string name="preference_toolbar_item_color">Toolbar Item Color</string>
+    <string name="header_pager">Picture Pager</string>
+    <string name="preference_pager_toolbar_color">Primary Color in Toolbars</string>
+    <string name="preference_true_zoom">True Zoom</string>
+    <string name="header_waiting_room">Waiting Room</string>
+    <string name="preference_waiting_room_autoclear">Automatically Clear After Organizing</string>
+    <string name="header_permissions">Permissions</string>
+    <string name="preference_sd_card_grant_permission">Grant SD Card Access</string>
 
     <!-- Preference summaries -->
-    <string name="pager_toolbar_color_summary">Turn off to use default black color</string>
-    <string name="true_zoom_summary">
-        Show pictures as-is. Enabling allows large pictures to be viewed clearly, at the cost of increased load times.
-    </string>
-    <string name="waiting_room_autoclear_summary">
-        Enable to automatically clear items after moving them or adding them to albums.
-        Disable to always clear manually.
-    </string>
+    <string name="summary_pager_toolbar_color">Turn off to use default black color</string>
+    <string name="summary_true_zoom">
+	Show pictures as-is. Enabling allows large pictures to be viewed clearly, at the cost of increased load times.
+</string>
+    <string name="summary_waiting_room_autoclear">
+	Enable to automatically clear items after moving them or adding them to albums.
+	Disable to always clear manually.
+</string>
 
     <!-- Actions -->
     <string name="action_settings">Settings</string>
@@ -97,19 +97,19 @@
     <string name="success_sd_connect">Successfully connected to SD card</string>
 
     <!-- Errors -->
-    <string name="title_permission_error">Permission request failed!</string>
-    <string name="message_permission_error">
+    <string name="error_title_permission">Permission request failed!</string>
+    <string name="error_message_permission">
         You have not given &app_name; permission to access your photos,
         which is required for it to work.
     </string>
-    <string name="edit_fail_error">Failed to save changes!</string>
-    <string name="already_exists_error">File already exists at this location!</string>
-    <string name="no_albums_exist_error">You haven\'t made any albums yet. Go to left panel to create one</string>
-    <string name="no_albums_available_error">Item already belongs to all existing albums</string>
-    <string name="synced_is_not_removable_error">Pictures belonging to a synced folder cannot be removed!</string>
-    <string name="access_denied_error">Access to storage was denied. Make sure access to this SD card is enabled in Settings.</string>
-    <string name="generic_error">Something went wrong!</string>
-    <string name="storage_fail_error_explain">If using an SD card, make sure access is enabled in Settings.</string>
+    <string name="error_edit_fail">Failed to save changes!</string>
+    <string name="error_already_exists">File already exists at this location!</string>
+    <string name="error_no_albums_exist">You haven\'t made any albums yet. Go to left panel to create one</string>
+    <string name="error_no_albums_available">Item already belongs to all existing albums</string>
+    <string name="error_synced_is_not_removable">Pictures belonging to a synced folder cannot be removed!</string>
+    <string name="error_access_denied">Access to storage was denied. Make sure access to this SD card is enabled in Settings.</string>
+    <string name="error_generic">Something went wrong!</string>
+    <string name="error_explain_storage_fail">If using an SD card, make sure access is enabled in Settings.</string>
     <string name="error_sd_access">Failed to gain SD card access!</string>
     <string name="error_sd_connect">Failed to gain SD card access!</string>
 
@@ -120,7 +120,6 @@
     <string name="message_delete_album_confirm">This action is irreversible. You are NOT deleting pictures.</string>
     <string name="title_remove">Remove</string>
     <string name="message_replace_file">File with this name already exists. Are you sure you want to replace it?</string>
-    <string name="folder_empty">Folder is empty!</string>
     <string name="warning_generic">Are you sure?</string>
     <string name="grant_sd_explain">
         Due to Android security policies, you must manually approve access to the SD card

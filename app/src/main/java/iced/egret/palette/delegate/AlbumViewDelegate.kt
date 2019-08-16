@@ -73,7 +73,7 @@ class AlbumViewDelegate : CollectionViewDelegate() {
     @Suppress("UNCHECKED_CAST")  // assume internal consistency
     private fun removeContents(coverables: List<Coverable>, context: Context) {
         if (hasSyncedPicture(coverables as List<Picture>)) {
-            Toast.makeText(context, R.string.synced_is_not_removable_error, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.error_synced_is_not_removable, Toast.LENGTH_SHORT).show()
             return
         }
         CoverableMutator.removeFromAlbum(coverables, context) {

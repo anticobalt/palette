@@ -63,7 +63,7 @@ class MainPagerActivity : StatefulPagerActivity() {
     private fun goToHomeFolder() {
         val home = mCurrentPicture.parent
         if (home !is Folder) {
-            toastLong(R.string.generic_error)
+            toastLong(R.string.error_generic)
         } else {
             CollectionManager.launchAsShortcut(home)
             val intent = Intent()

@@ -108,8 +108,8 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
                     val dialog = MaterialDialog(this)
                     dialog.cancelable(false)
                     dialog.show {
-                        title(R.string.title_permission_error)
-                        message(R.string.message_permission_error)
+                        title(R.string.error_title_permission)
+                        message(R.string.error_message_permission)
                         positiveButton {
                             finish()
                         }
@@ -155,9 +155,9 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     private fun applyDefaultSettings() {
         defSharedPreferences
                 .edit()
-                .putInt(getString(R.string.toolbar_item_color_key), Color.WHITE)
-                .putInt(getString(R.string.primary_color_key), idToColor(R.color.colorPrimary))
-                .putInt(getString(R.string.accent_color_key), idToColor(R.color.colorAccent))
+                .putInt(getString(R.string.key_toolbar_item_color), Color.WHITE)
+                .putInt(getString(R.string.key_primary_color), idToColor(R.color.colorPrimary))
+                .putInt(getString(R.string.key_accent_color), idToColor(R.color.colorAccent))
                 .commit()
         recreate()
     }
@@ -353,7 +353,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
 
     private fun handleIntentViewRequest() {
         val requestFileObject = ThirdPartyIntentHandler.getViewRequest(intent, contentResolver) {
-            toastLong(R.string.generic_error)
+            toastLong(R.string.error_generic)
             null
         }
         val pathToFulfillRequest = requestFileObject?.parent?.filePath

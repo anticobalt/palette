@@ -34,7 +34,7 @@ class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: 
         val picture = pictures[position]
         val trueZoomOn = PreferenceManager
                 .getDefaultSharedPreferences(activityReference.get())
-                .getBoolean(activityReference.get()?.getString(R.string.true_zoom_key), false)
+                .getBoolean(activityReference.get()?.getString(R.string.key_true_zoom), false)
 
         // Set layout and build ImageView
         val layoutItem: View

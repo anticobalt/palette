@@ -31,7 +31,7 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         defSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        sharedPrefs = getSharedPreferences(getString(R.string.key_preference_file), Context.MODE_PRIVATE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -45,7 +45,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     protected fun hasSdCardAccess(): Boolean {
-        return sharedPrefs.getString(getString(R.string.sd_card_uri_key), null) != null
+        return sharedPrefs.getString(getString(R.string.key_sd_card_uri), null) != null
     }
 
     /**
@@ -72,7 +72,7 @@ abstract class BaseActivity : AppCompatActivity() {
         contentResolver.takePersistableUriPermission(sdTreeUri, modeFlags)
 
         with(sharedPrefs.edit()) {
-            putString(getString(R.string.sd_card_uri_key), sdTreeUri.toString())
+            putString(getString(R.string.key_sd_card_uri), sdTreeUri.toString())
             apply()
         }
 
@@ -97,11 +97,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun getSdCardDocumentFile(): DocumentFile? {
         val preferences = getSharedPreferences(
-                getString(R.string.preference_file_key),
+                getString(R.string.key_preference_file),
                 Context.MODE_PRIVATE
         )
         val uriAsString = preferences
-                .getString(getString(R.string.sd_card_uri_key), null) ?: return null
+                .getString(getString(R.string.key_sd_card_uri), null) ?: return null
         val uri = Uri.parse(uriAsString)
         return DocumentFile.fromTreeUri(this, uri)
     }
@@ -141,9 +141,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun getColorInt(type: ColorType): Int {
         val keyRef = when (type) {
-            ColorType.PRIMARY -> R.string.primary_color_key
-            ColorType.ACCENT -> R.string.accent_color_key
-            ColorType.ITEM -> R.string.toolbar_item_color_key
+            ColorType.PRIMARY -> R.string.key_primary_color
+            ColorType.ACCENT -> R.string.key_accent_color
+            ColorType.ITEM -> R.string.key_toolbar_item_color
         }
         val defaultRef = when (type) {
             ColorType.PRIMARY -> R.color.colorPrimary

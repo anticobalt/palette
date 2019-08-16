@@ -250,11 +250,11 @@ class CropActivity : SlideActivity() {
     }
 
     private fun showFailToast() {
-        toast(R.string.generic_error)
+        toast(R.string.error_generic)
     }
 
     private fun showAccessDeniedToast() {
-        toastLong(R.string.access_denied_error)
+        toastLong(R.string.error_access_denied)
     }
 
     companion object SaveDataKeys {

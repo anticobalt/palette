@@ -20,8 +20,6 @@ import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
  * A Fragment that generally shows a list of objects, and sits inside MainActivity along with other
  * MainFragments. List objects are selectable. Toolbar has a TextView inside (allowing for more
  * granular control of the title's display).
- *
- * Coloring has to be done in onResume to show up when returning from SettingsActivity.
  */
 abstract class MainFragment : Fragment(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {

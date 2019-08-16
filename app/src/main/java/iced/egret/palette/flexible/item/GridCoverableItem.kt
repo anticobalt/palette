@@ -7,6 +7,10 @@ import iced.egret.palette.flexible.item.inherited.CoverableItem
 import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import iced.egret.palette.model.inherited.Coverable
 
+/**
+ * Used in fragments/activities with typical squarish-item RecyclerViews, like CollectionViewFragment
+ * or GridCoverableActivities.
+ */
 class GridCoverableItem(obj: Coverable, iconRes: Int? = null) : CoverableItem(obj, null, iconRes) {
 
     override fun getLayoutRes(): Int {

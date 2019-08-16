@@ -13,6 +13,9 @@ import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import java.io.File
 import java.io.FileNotFoundException
 
+/**
+ * Has a thumbnail state and a complete visual representation.
+ */
 interface TerminalCoverable : Coverable {
     override val terminal: Boolean
         get() = true
@@ -20,6 +23,9 @@ interface TerminalCoverable : Coverable {
     fun loadInto(view: View)
 }
 
+/**
+ * Can be represented in a thumbnail/preview state.
+ */
 interface Coverable {
     val terminal: Boolean
     var name: String

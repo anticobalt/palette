@@ -25,6 +25,9 @@ import kotlinx.android.synthetic.main.bottom_bar_crop.view.*
 import java.io.File
 import java.io.IOException
 
+/**
+ * Handles image cropping + saving result.
+ */
 class CropActivity : SlideActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences

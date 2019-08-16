@@ -10,6 +10,9 @@ import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.bottom_bar_waiting_room_pager.view.*
 
+/**
+ * Pager for WaitingRoomActivity items.
+ */
 class WaitingRoomPagerActivity : StatefulPagerActivity() {
 
     override val bottomBarRes = R.layout.bottom_bar_waiting_room_pager

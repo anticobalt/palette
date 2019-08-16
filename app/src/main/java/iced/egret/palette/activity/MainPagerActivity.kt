@@ -11,7 +11,9 @@ import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.bottom_bar_main_pager.view.*
 
-
+/**
+ * The main, default Picture-viewing activity.
+ */
 class MainPagerActivity : StatefulPagerActivity() {
 
     override val bottomBarRes = R.layout.bottom_bar_main_pager

@@ -12,6 +12,10 @@ import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 import iced.egret.palette.util.Storage
 
+/**
+ * Shows deleted items until they are permanently deleted or restored.
+ * Also processes the deleting/restoring.
+ */
 class RecycleBinActivity : GridCoverableActivity() {
 
     override var actionModeMenuRes = R.menu.menu_recycle_bin_edit

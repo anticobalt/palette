@@ -8,6 +8,9 @@ import iced.egret.palette.model.PreviewPicture
 import iced.egret.palette.model.inherited.FileObject
 import java.io.File
 
+/**
+ * Handles intents sent by other apps.
+ */
 object ThirdPartyIntentHandler {
 
     // As a list for future-proofing

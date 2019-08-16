@@ -20,6 +20,9 @@ import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.Painter
 
+/**
+ * Delegate for albums in CollectionViewFragment.
+ */
 class AlbumViewDelegate : CollectionViewDelegate() {
 
     override fun onBuildToolbar(toolbar: Toolbar) {

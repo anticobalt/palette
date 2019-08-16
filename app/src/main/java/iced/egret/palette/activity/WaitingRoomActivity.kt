@@ -16,6 +16,10 @@ import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.DialogGenerator
 import iced.egret.palette.util.Painter
 
+/**
+ * Shows items in the buffer i.e. new items that haven't been processed, and allows basic
+ * actions on them.
+ */
 class WaitingRoomActivity : GridCoverableActivity() {
 
     override var actionModeMenuRes = R.menu.menu_waiting_room_edit

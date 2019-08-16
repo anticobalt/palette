@@ -5,6 +5,9 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+/**
+ * Alias functions for basic permission checking/requesting.
+ */
 object Permission {
 
     fun isAccepted(activity: Activity, permission: String): Boolean {

@@ -10,6 +10,9 @@ import iced.egret.palette.fragment.CollectionViewFragment
 import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
 
+/**
+ * Delegate for folders in CollectionViewFragment.
+ */
 class FolderViewDelegate : CollectionViewDelegate() {
 
     override fun onBuildToolbar(toolbar: Toolbar) {

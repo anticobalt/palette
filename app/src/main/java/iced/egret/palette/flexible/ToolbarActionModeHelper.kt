@@ -14,7 +14,7 @@ import iced.egret.palette.flexible.item.inherited.CoverableItem
 
 /**
  * A extension of ActionModeHelper (from FlexibleAdapter) that uses Toolbar
- * instead of Activity to start Action Mode, and handles item selection instead of delgating to
+ * instead of Activity to start Action Mode, and handles item selection instead of delegating to
  * FlexibleAdapter.
  * https://github.com/davideas/FlexibleAdapter
  *

@@ -6,7 +6,9 @@ import android.widget.ImageView
 import androidx.core.graphics.ColorUtils
 
 /**
- * Handles color-related operations.
+ * Handles basic color-related operations.
+ *
+ * TODO: most of this stuff can probably be moved into BaseActivity, since a lot of visual stuff is there anyways.
  */
 object Painter {
 

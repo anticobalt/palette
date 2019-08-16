@@ -18,6 +18,13 @@ import iced.egret.palette.util.StateBuilder
 import kotlinx.android.synthetic.main.view_empty.*
 import java.io.File
 
+/**
+ * Shows a list of synchronized folders based on the album referenced in the passed Intent,
+ * as well as a list of all other folders that can be synchronized if desired.
+ *
+ * This activity is more modular in that it doesn't do any work on the album, and instead returns
+ * a list of selected folders to the activity that called it.
+ */
 class SyncedFoldersActivity : RecyclerViewActivity() {
 
     private val mFileItems = mutableListOf<FileItem>()

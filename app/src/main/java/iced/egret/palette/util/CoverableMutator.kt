@@ -16,7 +16,7 @@ import java.io.File
 
 /**
  * Handles changes to Coverables. Different activities use the same functions to do tasks
- * in response to user action under different contexts.
+ * in response to user action under different contexts, so they're all put here.
  */
 object CoverableMutator {
 

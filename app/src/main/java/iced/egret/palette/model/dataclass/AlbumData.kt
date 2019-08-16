@@ -5,6 +5,9 @@ import iced.egret.palette.model.Picture
 import java.io.File
 import java.io.Serializable
 
+/**
+ * Used for saving to disk.
+ */
 data class AlbumData(val name: String,
                      val path: String,
                      val picturePaths: List<String>,

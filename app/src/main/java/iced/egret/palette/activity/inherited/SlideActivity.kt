@@ -5,6 +5,10 @@ import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrConfig
 import iced.egret.palette.R
 
+/**
+ * An activity that is transparent and can finish via sliding.
+ * When sliding, previous activity is visible.
+ */
 abstract class SlideActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

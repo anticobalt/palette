@@ -17,6 +17,9 @@ import iced.egret.palette.activity.inherited.SlideActivity
 import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.appbar.*
 
+/**
+ * Shows all mutable settings and processes their changes.
+ */
 class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {

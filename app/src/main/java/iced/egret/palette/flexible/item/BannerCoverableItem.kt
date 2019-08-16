@@ -7,6 +7,9 @@ import iced.egret.palette.flexible.viewholder.CoverViewHolder
 import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.Painter
 
+/**
+ * Used in LinksFragment.
+ */
 class BannerCoverableItem(obj: Coverable) : CoverableItem(obj, Painter.DARKEN_SLIGHT, null) {
 
     override fun getLayoutRes(): Int {

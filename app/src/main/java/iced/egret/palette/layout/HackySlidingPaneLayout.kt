@@ -25,7 +25,7 @@ import iced.egret.palette.R
  * open. This prevents dragging open nested SlidingPaneLayouts from the very left side.
  *
  * This class fixes the issue by unconditionally refusing to intercept all ACTION_MOVE events that
- * are inside the nested SlidingPaneLayout and happen while this layout is open.
+ * a) are inside the nested SlidingPaneLayout and b) happen while this layout is open.
  *
  */
 class HackySlidingPaneLayout(context: Context, attributeSet: AttributeSet? = null)

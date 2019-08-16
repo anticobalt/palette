@@ -13,6 +13,9 @@ import kotlinx.android.synthetic.main.item_main_pager_standard.view.*
 import kotlinx.android.synthetic.main.item_main_pager_true_zoom.view.*
 import java.lang.ref.WeakReference
 
+/**
+ * Adapter for PicturePagerActivities.
+ */
 class PicturePagerAdapter(private val pictures: MutableList<Picture>, activity: PicturePagerActivity) : PagerAdapter() {
 
     private val activityReference = WeakReference(activity)

@@ -19,6 +19,7 @@ import java.util.*
  * Properties:
  * - name
  * - filePath
+ * - file
  * - uri
  * - fileLocation
  * - parent

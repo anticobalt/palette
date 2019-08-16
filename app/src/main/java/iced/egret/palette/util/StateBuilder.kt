@@ -7,6 +7,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Constructs the state of all files tracked in the app.
+ */
 object StateBuilder : CoroutineScope {
 
     override val coroutineContext: CoroutineContext

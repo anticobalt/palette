@@ -734,7 +734,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     private fun toast(strId: Int) {
-        return mActivity.toast(strId)
+        return mActivity.toastLong(strId)
     }
 
     companion object Constants {

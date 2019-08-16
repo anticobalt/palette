@@ -65,4 +65,15 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/permissions_header">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="@string/sd_card_grant_key"
+            app:title="@string/sd_card_grant_permission" />
+
+    </PreferenceCategory>
+
 </androidx.preference.PreferenceScreen>

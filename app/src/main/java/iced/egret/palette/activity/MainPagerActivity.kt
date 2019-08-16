@@ -63,7 +63,7 @@ class MainPagerActivity : StatefulPagerActivity() {
     private fun goToHomeFolder() {
         val home = mCurrentPicture.parent
         if (home !is Folder) {
-            toast(R.string.generic_error)
+            toastLong(R.string.generic_error)
         }
         else {
             CollectionManager.launchAsShortcut(home)
@@ -100,7 +100,7 @@ class MainPagerActivity : StatefulPagerActivity() {
     private fun initiateCoverSet() {
         val picture = mCurrentPicture
         CoverableMutator.setAsCover(picture, this) {
-            toast(R.string.success_set_cover)
+            toastLong(R.string.success_set_cover)
             setResult(RESULT_OK)
         }
     }

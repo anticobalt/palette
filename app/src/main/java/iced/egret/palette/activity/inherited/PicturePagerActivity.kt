@@ -74,7 +74,7 @@ abstract class PicturePagerActivity : SlideActivity() {
         }
 
         return if (mActivePage == -1) {
-            toast(R.string.generic_error)
+            toastLong(R.string.generic_error)
             false
         } else {
             true
@@ -259,7 +259,7 @@ abstract class PicturePagerActivity : SlideActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            toast(R.string.file_save_success)
+            toastLong(R.string.file_save_success)
             setResult(RESULT_OK)
             finish()
         }

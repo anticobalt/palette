@@ -9,9 +9,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.TaskStackBuilder
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import iced.egret.palette.R
+import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.activity.inherited.SlideActivity
+import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.appbar.*
 
 class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -72,6 +75,12 @@ class SettingsActivity : SlideActivity(), SharedPreferences.OnSharedPreferenceCh
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
+            val sdPref = findPreference<Preference>(getString(R.string.sd_card_grant_key))
+            sdPref?.setOnPreferenceClickListener {
+                DialogGenerator.grantSdCardPrompt(activity as BaseActivity)
+                true
+            }
         }
 
     }

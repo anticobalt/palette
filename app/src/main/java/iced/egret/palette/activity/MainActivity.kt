@@ -2,9 +2,7 @@ package iced.egret.palette.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
@@ -14,7 +12,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.ActionBarContextView
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import iced.egret.palette.R
@@ -55,13 +52,10 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     private val leftIndex = 0
     private val rightIndex = 1
 
-    private lateinit var sharedPrefs: SharedPreferences
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setAccentThemeFromSettings()
         setContentView(R.layout.activity_main)
-        sharedPrefs = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         hasPermission = permissions
                 .map { permission -> Permission.isAccepted(this, permission) }
@@ -88,46 +82,22 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         super.onStop()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
+    private fun checkSdWriteAccess() {
+        if (!hasSdCardAccess()) {
+            DialogGenerator.grantSdCardPrompt(this)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK) {
             when (requestCode) {
-                SD_CARD_WRITE_REQUEST -> tryAccessSdCard()
                 GO_HOME_REQUEST -> {
                     (fragments[rightIndex] as CollectionViewFragment).onNavigation()
                     slidingPaneLayout.closePane()
                 }
             }
-        }
-    }
-
-    /**
-     * Get write access to SD card, and save SD card URI to preferences.
-     * https://stackoverflow.com/a/43317703
-     */
-    private fun tryAccessSdCard() {
-        val sdTreeUri = intent?.data
-        if (sdTreeUri == null) {
-            toast("Failed to gain SD card access!")
-            return
-        }
-
-        // Try to get SD card
-        val directory = DocumentFile.fromTreeUri(this, sdTreeUri)
-        if (directory?.name == null) {
-            toast("Failed to connect with SD card!")
-            return
-        }
-
-        val modeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        grantUriPermission(packageName, sdTreeUri, modeFlags)
-        contentResolver.takePersistableUriPermission(sdTreeUri, modeFlags)
-
-        with(sharedPrefs.edit()) {
-            putString(getString(R.string.sd_card_uri_key), sdTreeUri.toString())
-            apply()
         }
     }
 
@@ -148,13 +118,6 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
                     buildApp(null)
                 }
             }
-        }
-    }
-
-    private fun checkSdWriteAccess() {
-        val sdTreeUri = sharedPrefs.getString(getString(R.string.sd_card_uri_key), null)
-        if (sdTreeUri == null) {
-            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SD_CARD_WRITE_REQUEST)
         }
     }
 
@@ -390,7 +353,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
 
     private fun handleIntentViewRequest() {
         val requestFileObject = ThirdPartyIntentHandler.getViewRequest(intent, contentResolver) {
-            toast(R.string.generic_error)
+            toastLong(R.string.generic_error)
             null
         }
         val pathToFulfillRequest = requestFileObject?.parent?.filePath
@@ -419,7 +382,6 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     companion object Constants {
         const val ON_SCREEN_COLLECTION_KEY = "on-screen-collection"
         const val EXTERNAL_CODE = 100
-        const val SD_CARD_WRITE_REQUEST = 1
         const val GO_HOME_REQUEST = 2
     }
 

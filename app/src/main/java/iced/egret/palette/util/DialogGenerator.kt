@@ -2,6 +2,8 @@ package iced.egret.palette.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.text.InputType
 import android.view.View
 import android.widget.TextView
@@ -17,6 +19,7 @@ import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.list.checkItems
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import iced.egret.palette.R
+import iced.egret.palette.activity.inherited.BaseActivity
 import iced.egret.palette.model.Album
 import iced.egret.palette.model.Picture
 import iced.egret.palette.model.inherited.Collection
@@ -24,7 +27,7 @@ import yogesh.firzen.filelister.FileListerDialog
 import java.io.File
 
 /**
- * Shows MaterialDialogs with custom actions on confirmation.
+ * Shows various dialogs with custom actions on confirmation.
  */
 object DialogGenerator {
 
@@ -290,6 +293,26 @@ object DialogGenerator {
             negativeButton()
             positiveButton()
         }
+    }
+
+    /**
+     * Shows a message about needing to manually grant the app access to SD card.
+     */
+    fun grantSdCardPrompt(activity: BaseActivity) {
+
+        MaterialDialog(activity).show {
+            title(R.string.action_grant_sd)
+            message(R.string.grant_sd_explain)
+            negativeButton()
+            neutralButton(R.string.grant_sd_instructions_button) {
+                val link = activity.getString(R.string.grant_sd_instructions_link)
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
+            }
+            positiveButton {
+                activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), BaseActivity.SD_CARD_WRITE_REQUEST)
+            }
+        }
+
     }
 
     fun genericConfirm(title : String, context: Context, onConfirm: () -> Unit) {

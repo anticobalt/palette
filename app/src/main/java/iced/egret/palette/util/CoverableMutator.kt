@@ -51,7 +51,8 @@ object CoverableMutator {
             } else {
                 val files = CollectionManager.renamePicture(picture, newName, getSdCardDocumentFile(context))
                 if (files == null) {
-                    toast(context, R.string.edit_fail_error)  // either no SD card access, or OS-level rename error
+                    toastLong(context, context.getString(R.string.edit_fail_error) + " " +
+                            context.getString(R.string.storage_fail_error_explain))
                 } else {
                     // File by old name is technically it's own file
                     broadcastMediaChanged(context, files.first)

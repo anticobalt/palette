@@ -63,7 +63,7 @@ class WaitingRoomPagerActivity : StatefulPagerActivity() {
     private fun goToHomeFolder() {
         val home = mCurrentPicture.parent
         if (home !is Folder) {
-            toast(R.string.generic_error)
+            toastLong(R.string.generic_error)
         }
         else {
             CollectionManager.launchAsShortcut(home)

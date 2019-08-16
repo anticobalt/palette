@@ -46,8 +46,6 @@ class WaitingRoomActivity : GridCoverableActivity() {
         if (resultCode == RESULT_OK && requestCode == PAGER_REQUEST) {
             val goHome = getString(R.string.intent_go_home)
             if (data?.getBooleanExtra(goHome, false) == true) {
-                val intent = Intent()
-                intent.putExtra(goHome, true)
                 setResult(RESULT_OK, intent)
                 finish()
             }
@@ -196,7 +194,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
     }
 
     companion object Constants {
-        private const val PAGER_REQUEST = 1
+        private const val PAGER_REQUEST = 2
     }
 
 }

@@ -117,8 +117,7 @@ abstract class Collection(override var name: String, path: String, hasSetCoverab
             if (picture != null && Storage.fileExists(picture.filePath)) {
                 cover["uri"] = picture.uri
                 return
-            }
-            else {
+            } else {
                 removeCustomCover()
             }
         }

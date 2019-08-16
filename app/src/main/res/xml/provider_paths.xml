@@ -1,6 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- https://stackoverflow.com/a/41660839 -->
+<?xml version="1.0" encoding="utf-8"?><!-- https://stackoverflow.com/a/41660839 -->
 <paths>
-    <external-path path="Android/data/${applicationId}/" name="files_root" />
-    <root-path name="root" path="/" />
+    <external-path
+        path="Android/data/${applicationId}/"
+        name="files_root" />
+    <root-path
+        name="root"
+        path="/" />
 </paths>

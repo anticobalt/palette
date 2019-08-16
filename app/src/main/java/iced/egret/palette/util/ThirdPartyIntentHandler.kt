@@ -19,11 +19,11 @@ object ThirdPartyIntentHandler {
      * then create a Preview Picture and return it.
      */
     fun getViewRequest(intent: Intent, contentResolver: ContentResolver,
-                       onError: () -> FileObject?) : FileObject? {
+                       onError: () -> FileObject?): FileObject? {
 
         // Confirm that Picture referenced by intent exists, then return its Folder's path
         if (intent.action == Intent.ACTION_VIEW) {
-            val uri : Uri = intent.data
+            val uri: Uri = intent.data
                     ?: return onError()
 
             val picturePath = if (uri.scheme == "file") File(uri.toString()).path
@@ -51,7 +51,7 @@ object ThirdPartyIntentHandler {
             try {
                 val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
                 path = cursor.getString(columnIndex)
-            } catch (e : IllegalArgumentException) {
+            } catch (e: IllegalArgumentException) {
                 // No file path exists
             }
         }
@@ -59,7 +59,7 @@ object ThirdPartyIntentHandler {
         return path
     }
 
-    private fun makePreviewPicture(uri: Uri, contentResolver: ContentResolver) : PreviewPicture {
+    private fun makePreviewPicture(uri: Uri, contentResolver: ContentResolver): PreviewPicture {
         val preview = PreviewPicture(uri, contentResolver)
         previewPictures.clear()
         previewPictures.add(preview)

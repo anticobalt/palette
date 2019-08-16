@@ -39,7 +39,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode == RESULT_OK  && requestCode == PAGER_REQUEST) {
+        if (resultCode == RESULT_OK && requestCode == PAGER_REQUEST) {
             val goHome = getString(R.string.intent_go_home)
             if (data?.getBooleanExtra(goHome, false) == true) {
                 val intent = Intent()
@@ -141,9 +141,9 @@ class WaitingRoomActivity : GridCoverableActivity() {
         // Need to create content:// URI to share, instead of natively-used file:// one
         // https://stackoverflow.com/a/38858040
         // https://developer.android.com/training/sharing/send
-        val imageUris : ArrayList<Uri> = pictures.map {
-            picture -> FileProvider.getUriForFile(
-                this, BuildConfig.APPLICATION_ID + ".file_provider", picture.file)
+        val imageUris: ArrayList<Uri> = pictures.map { picture ->
+            FileProvider.getUriForFile(
+                    this, BuildConfig.APPLICATION_ID + ".file_provider", picture.file)
         } as ArrayList<Uri>
 
         val intent = Intent().apply {

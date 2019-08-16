@@ -62,7 +62,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             field = value
         }
 
-    var toLaunchFromIntent : FileObject? = null
+    var toLaunchFromIntent: FileObject? = null
 
     private var mRootView: View? = null
     private lateinit var mCollectionRecyclerView: RecyclerView
@@ -114,8 +114,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
 
         val position = if (fileObject is Picture && fileObject.parent is Collection) {
             (fileObject.parent as Collection).pictures.indexOf(fileObject)
-        }
-        else return
+        } else return
 
         val launchPack = CollectionManager.PagerLaunchPack(position, callingFragment = this,
                 newActivityClass = MainPagerActivity::class.java, requestCode = PICTURE_ACTIVITY_REQUEST)
@@ -293,8 +292,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             mFloatingActionButton.show()
             val color = getColorInt(BaseActivity.ColorType.ITEM)
             mFloatingActionButton.drawable.setTint(color)
-        }
-        else {
+        } else {
             mFloatingActionButton.hide()
         }
     }
@@ -607,9 +605,9 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
         // https://stackoverflow.com/a/38858040
         // https://developer.android.com/training/sharing/send
         val pictures = coverables as List<Picture>
-        val imageUris : ArrayList<Uri> = pictures.map {
-            picture -> FileProvider.getUriForFile(
-                context!!, BuildConfig.APPLICATION_ID + ".file_provider", picture.file)
+        val imageUris: ArrayList<Uri> = pictures.map { picture ->
+            FileProvider.getUriForFile(
+                    context!!, BuildConfig.APPLICATION_ID + ".file_provider", picture.file)
         } as ArrayList<Uri>
 
         val intent = Intent().apply {

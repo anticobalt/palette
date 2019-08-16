@@ -355,7 +355,7 @@ object Storage {
 
         val copyAsFile = File(destinationLocation + name)
         val copyAsDocumentFile: DocumentFile
-        val isNormalFile : Boolean
+        val isNormalFile: Boolean
 
         if (destinationOnSdCard != null && sdCardFile != null && contentResolver != null) {
             copyAsDocumentFile = getImageDocumentFile(name, destinationOnSdCard, "image/webp", sdCardFile)
@@ -585,7 +585,7 @@ object Storage {
         lateinit var albums: List<Album>
         lateinit var pictures: LinkedHashMap<String, Picture>
         lateinit var bufferPictures: List<Picture>
-        lateinit var customCovers : Map<String, String>
+        lateinit var customCovers: Map<String, String>
 
         // Only runs once
         fun runForPictures(context: Context) {
@@ -743,7 +743,7 @@ object Storage {
             return pictures.keys.toList() - (getPathsFromPictureCache() ?: return listOf())
         }
 
-        private fun getCustomCoversFromDisk() : Map<String, String> {
+        private fun getCustomCoversFromDisk(): Map<String, String> {
             val json = readJsonFromDisk(customCoversFileName) ?: return mapOf()
             val type = object : TypeToken<HashMap<String, String>>() {}.type
             return gson.fromJson<HashMap<String, String>>(json, type)

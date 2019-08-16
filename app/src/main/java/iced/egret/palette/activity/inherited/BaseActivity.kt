@@ -44,7 +44,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    protected fun hasSdCardAccess() : Boolean {
+    protected fun hasSdCardAccess(): Boolean {
         return sharedPrefs.getString(getString(R.string.sd_card_uri_key), null) != null
     }
 

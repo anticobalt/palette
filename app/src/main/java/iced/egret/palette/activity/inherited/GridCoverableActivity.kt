@@ -93,8 +93,7 @@ abstract class GridCoverableActivity : RecyclerViewActivity(), ActionMode.Callba
     private fun initializeActionModeHelper(@Visibility.Mode mode: Int, menuRes: Int) {
         mActionModeHelper = object : ToolbarActionModeHelper(mAdapter, menuRes, this as ActionMode.Callback) {
             override fun updateContextTitle(count: Int) {
-                mActionMode?.title = if (count == 1) getString(R.string.action_selected_one, count)
-                else getString(R.string.action_selected_many, count)
+                mActionMode?.title = getString(R.string.action_selected, count, mAdapter.itemCount)
             }
         }.withDefaultMode(mode)
     }

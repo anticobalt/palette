@@ -314,10 +314,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             // Override to customize the title
             override fun updateContextTitle(count: Int) {
                 // You can use the internal mActionMode instance
-                mActionMode?.title = if (count == 1)
-                    getString(R.string.action_selected_one, count)
-                else
-                    getString(R.string.action_selected_many, count)
+                mActionMode?.title = getString(R.string.action_selected, count, mAdapter.itemCount)
             }
         }.withDefaultMode(mode)
     }

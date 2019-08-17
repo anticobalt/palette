@@ -138,9 +138,7 @@
     <string name="title_created">Creation Date</string>
 
     <!-- For selections -->
-    <string name="action_selected_one">%1$d item selected</string>
-    <string name="action_selected_many">%1$d items selected</string>
-
+    <string name="action_selected">%1$d / %2$d</string>
     <!-- For intents -->
     <string name="intent_item_key">item</string>
     <string name="intent_album_path_key">album_path</string>

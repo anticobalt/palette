@@ -36,8 +36,9 @@
 
     <item
         android:id="@+id/actionShare"
+        android:icon="@drawable/ic_share_black_24dp"
         android:orderInCategory="3"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/action_share"
         android:visible="false" />
 

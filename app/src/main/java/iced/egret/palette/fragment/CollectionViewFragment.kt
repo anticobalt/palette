@@ -483,7 +483,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
             CollectionManager.PICTURE_KEY -> {
                 albumActions.isVisible = true; Painter.paintDrawable(albumActions.icon)
                 addToAlbum.isVisible = true
-                share.isVisible = true
+                share.isVisible = true; Painter.paintDrawable(share.icon)
                 move.isVisible = true
                 delete.isVisible = true
             }

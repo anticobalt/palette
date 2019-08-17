@@ -79,6 +79,7 @@ class WaitingRoomActivity : GridCoverableActivity() {
         super.onCreateActionMode(mode, menu)
         Painter.paintDrawable(menu.findItem(R.id.actionSelectAll).icon)
         Painter.paintDrawable(menu.findItem(R.id.actionClear).icon)
+        Painter.paintDrawable(menu.findItem(R.id.actionShare).icon)
         return true
     }
 

@@ -18,6 +18,7 @@ import iced.egret.palette.R
 import iced.egret.palette.adapter.PicturePagerAdapter
 import iced.egret.palette.model.Picture
 import iced.egret.palette.util.Device
+import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_picture_pager.*
 import kotlinx.android.synthetic.main.appbar_picture_pager.*
 
@@ -60,6 +61,16 @@ abstract class PicturePagerActivity : SlideActivity() {
         buildViewPager()
         if (bottomBarRes != null) buildBottomBar()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mPictures.size == 0 || !Storage.fileExists(mCurrentPicture.filePath)) finish()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(INDEX, mActivePage)
+        super.onSaveInstanceState(outState)
     }
 
     /**
@@ -325,7 +336,6 @@ abstract class PicturePagerActivity : SlideActivity() {
     }
 
     companion object SaveDataKeys {
-        const val COLLECTION = "current-collection"
         const val INDEX = "media-index"
     }
 

@@ -13,11 +13,9 @@ import androidx.preference.PreferenceManager
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import iced.egret.palette.R
-import iced.egret.palette.activity.inherited.PicturePagerActivity
 import iced.egret.palette.activity.inherited.SlideActivity
 import iced.egret.palette.util.CollectionManager
 import iced.egret.palette.util.DialogGenerator
-import iced.egret.palette.util.StateBuilder
 import iced.egret.palette.util.Storage
 import kotlinx.android.synthetic.main.activity_crop.*
 import kotlinx.android.synthetic.main.appbar.*
@@ -39,7 +37,6 @@ class CropActivity : SlideActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crop)
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        setState(savedInstanceState)
 
         val bundle = intent.getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE)
         mImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE)
@@ -59,21 +56,9 @@ class CropActivity : SlideActivity() {
         // If handling on-disk item, but it was moved, get out.
         val path = mImageUri.path
         if (path != null && !Storage.fileExists(path)) finish()
-    }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(PicturePagerActivity.COLLECTION, CollectionManager.currentCollection?.path)
-        super.onSaveInstanceState(outState)
-    }
-
-    private fun setState(savedInstanceState: Bundle?) {
-        // Build state if activity restarted. Don't if entering for the first time
-        // (b/c it is already built by another activity).
-        // Supply saved Collection path to unwind stack properly.
-        if (savedInstanceState != null) {
-            val path = savedInstanceState.getString(COLLECTION)
-            StateBuilder.build(this, path)
-        }
+        // If state doesn't exist anymore, get out.
+        if (CollectionManager.currentCollection == null) finish()
     }
 
     private fun buildCropView() {
@@ -258,10 +243,6 @@ class CropActivity : SlideActivity() {
 
     private fun showAccessDeniedToast() {
         toastLong(R.string.error_access_denied)
-    }
-
-    companion object SaveDataKeys {
-        const val COLLECTION = "current-collection"
     }
 
 }

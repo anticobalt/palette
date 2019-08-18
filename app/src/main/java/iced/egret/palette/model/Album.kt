@@ -36,6 +36,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
     override var _pictures: MutableList<Picture> = ArrayList()
     override val pictures: List<Picture>
         get() = (_pictures + syncedFolders.flatMap { folder -> folder.nestedPictures })
+                .toSet()
                 .sortedByDescending { picture -> picture.file.lastModified() }
 
     private var _albums: MutableList<Album> = ArrayList()
@@ -85,10 +86,7 @@ class Album(name: String, path: String, val parent: Album? = null) : Collection(
 
     override val totalSize: Int
         get() {
-            var rs = _pictures.size
-            for (folder in syncedFolders) {
-                rs += folder.totalSize
-            }
+            var rs = pictures.size  // owned pictures + synced
             for (album in _albums) {
                 rs += album.totalSize
             }

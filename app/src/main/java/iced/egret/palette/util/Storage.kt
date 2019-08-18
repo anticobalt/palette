@@ -531,7 +531,7 @@ object Storage {
         val extension = name.split(".").last().toLowerCase()
         val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
                 ?: defaultMimeType
-        val subFolderFile = findFileInsideRecursive(sdCardFile, locationOnSdCard) ?: return null
+        val subFolderFile = getDirectoryInsideRecursive(sdCardFile, locationOnSdCard) ?: return null
         return getChildFile(subFolderFile, mimeType, name)
     }
 
@@ -551,6 +551,25 @@ object Storage {
         var currentFile = rootFile
         for (level in levels) {
             currentFile = currentFile.findFile(level) ?: return null
+        }
+        return currentFile
+    }
+
+    /**
+     * Similar to [findFileInsideRecursive], but makes a directory if can't find matching child.
+     * Directory creation seems to be much slower than the File counterpart [File.mkdirs].
+     */
+    private fun getDirectoryInsideRecursive(rootFile: DocumentFile, relativePath: String) : DocumentFile? {
+
+        // splitting empty string will still produce list with one element
+        if (relativePath.isEmpty()) {
+            return rootFile
+        }
+
+        val levels = relativePath.split("/")
+        var currentFile : DocumentFile? = rootFile
+        for (level in levels) {
+            currentFile = currentFile?.findFile(level) ?: currentFile?.createDirectory(level)
         }
         return currentFile
     }

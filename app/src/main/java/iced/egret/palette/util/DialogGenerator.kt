@@ -172,6 +172,10 @@ object DialogGenerator {
         }
     }
 
+    /**
+     * FileListerDialog is unable to create directories on SD cards, because it uses [File.mkdirs]
+     * instead of [androidx.documentfile.provider.DocumentFile.createDirectory].
+     */
     fun moveTo(context: Context, initialPath: String? = null, onConfirm: (File) -> Unit) {
 
         val dialog = FileListerDialog.createFileListerDialog(context)

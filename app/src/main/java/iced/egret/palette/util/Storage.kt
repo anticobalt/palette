@@ -477,7 +477,7 @@ object Storage {
     }
 
     /**
-     * Set JPG metadata for specified FileDescriptor, which can be stand-in for a DocumentFile.
+     * Set JPG metadata for specified [FileDescriptor], which can be stand-in for a [DocumentFile].
      * Uses non-support version of ExifInterface because support ver. doesn't have FileDescriptor
      * constructor. Need to use FileDescriptor to edit SD card files.
      *
@@ -536,7 +536,7 @@ object Storage {
     }
 
     /**
-     * Get the DocumentFile for some folder/file somewhere inside given root DocumentFile.
+     * Get the [DocumentFile] for some folder/file somewhere inside given root DocumentFile.
      *
      * @return The desired DocumentFile, or null if not found.
      */
@@ -575,7 +575,7 @@ object Storage {
     }
 
     /**
-     * Find or make the DocumentFile with given name inside given DocumentFile.
+     * Find or make the [DocumentFile] with given name inside given DocumentFile.
      *
      * @return The desired DocumentFile, or null if it doesn't exist and couldn't be created.
      */
@@ -584,7 +584,7 @@ object Storage {
     }
 
     /**
-     * Ensure all Pictures in collection exist on disk. If they don't, remove them.
+     * Ensure all [Picture]s in collection exist on disk. If they don't, remove them.
      */
     internal fun cleanCollection(collection: Collection) {
         val pictures = collection.pictures.toList()  // a copy to avoid concurrency error
@@ -702,7 +702,7 @@ object Storage {
         }
 
         /**
-         * Uses initially retrieved Pictures to rebuild Albums from JSON.
+         * Uses initially retrieved [Picture]s to rebuild Albums from JSON.
          */
         private fun getAlbumsFromDisk(): List<Album> {
             val json = readJsonFromDisk(albumsFileName)
@@ -721,7 +721,7 @@ object Storage {
         }
 
         /**
-         * Get buffer pictures as saved in index file + anything new since last time
+         * Get buffer [Picture]s as saved in index file + anything new since last time
          * pictures cached was saved.
          *
          * Since this function is supposed to run once on app start, assumption is that the last
@@ -737,7 +737,7 @@ object Storage {
         }
 
         /**
-         * Gets all buffer pictures listed on save index file that still exist.
+         * Gets all buffer [Picture]s listed on save index file that still exist.
          */
         private fun getBufferPicturesFromDisk(): List<Picture> {
             val json = readJsonFromDisk(pictureBufferFileName)
@@ -755,7 +755,7 @@ object Storage {
         }
 
         /**
-         * Get paths for all Pictures that are not listed in the cache, in order.
+         * Get paths for all [Picture]s that are not listed in the cache, in order.
          * @return new paths, or empty list if cache doesn't exist (i.e. fresh install)
          */
         private fun getNewPicturePaths(): List<String> {

@@ -17,9 +17,7 @@ import iced.egret.palette.activity.MainActivity
 import kotlinx.android.synthetic.main.appbar_list_fragment.view.*
 
 /**
- * A Fragment that generally shows a list of objects, and sits inside MainActivity along with other
- * MainFragments. List objects are selectable. Toolbar has a TextView inside (allowing for more
- * granular control of the title's display).
+ * A Fragment that generally shows a list of objects, and sits inside [MainActivity] along with other MainFragments. List objects are selectable. Toolbar has a TextView inside (allowing for more granular control of the title's display).
  */
 abstract class MainFragment : Fragment(), ActionMode.Callback,
         FlexibleAdapter.OnItemClickListener, FlexibleAdapter.OnItemLongClickListener {
@@ -41,7 +39,7 @@ abstract class MainFragment : Fragment(), ActionMode.Callback,
     }
 
     /**
-     * Only needs to be done on creation b/c SettingsActivity recreates activity when
+     * Only needs to be done on creation b/c [iced.egret.palette.activity.SettingsActivity] recreates activity when
      * theme changes.
      */
     protected open fun colorBars() {

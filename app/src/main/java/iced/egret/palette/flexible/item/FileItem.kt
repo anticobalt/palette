@@ -10,7 +10,7 @@ import iced.egret.palette.flexible.viewholder.FileViewHolder
 import java.io.File
 
 /**
- * Used by SyncedFoldersActivity.
+ * Used by [iced.egret.palette.activity.SyncedFoldersActivity].
  */
 class FileItem(val file: File, checked: Boolean) : AbstractFlexibleItem<FileViewHolder>() {
 

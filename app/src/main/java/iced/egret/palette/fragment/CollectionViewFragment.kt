@@ -40,8 +40,8 @@ import kotlinx.android.synthetic.main.fragment_view_collection.*
 import java.util.*
 
 /**
- * Meat of the app. Shows Collection contents and allows navigation through them.
- * Automatically requests CollectionManager to get fresh data when returning from another activity
+ * Meat of the app. Shows [Collection] contents and allows navigation through them.
+ * Automatically requests [CollectionManager] to get fresh data when returning from another activity
  * or app.
  *
  * General order of functions:
@@ -122,7 +122,7 @@ class CollectionViewFragment : MainFragment(), SwipeRefreshLayout.OnRefreshListe
     }
 
     /**
-     * Called after MainActivity done loading collection, so safe to restore state here.
+     * Called after [iced.egret.palette.activity.MainActivity] done loading collection, so safe to restore state here.
      */
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)

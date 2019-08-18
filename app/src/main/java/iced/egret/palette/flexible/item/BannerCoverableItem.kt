@@ -8,7 +8,7 @@ import iced.egret.palette.model.inherited.Coverable
 import iced.egret.palette.util.Painter
 
 /**
- * Used in LinksFragment.
+ * Used in [iced.egret.palette.fragment.LinksFragment].
  */
 class BannerCoverableItem(obj: Coverable) : CoverableItem(obj, Painter.DARKEN_SLIGHT, null) {
 

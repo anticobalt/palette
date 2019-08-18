@@ -21,7 +21,7 @@ import iced.egret.palette.util.CoverableMutator
 import iced.egret.palette.util.Painter
 
 /**
- * Delegate for albums in CollectionViewFragment.
+ * Delegate for albums in [iced.egret.palette.fragment.CollectionViewFragment].
  */
 class AlbumViewDelegate : CollectionViewDelegate() {
 

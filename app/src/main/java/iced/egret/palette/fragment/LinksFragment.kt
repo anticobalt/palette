@@ -39,7 +39,7 @@ import java.util.*
 
 
 /**
- * Has links to other activities and pinned collections, organized inside a SlidePaneLayout.
+ * Has links to other activities and pinned collections, organized inside a [SlidePaneLayout].
  *
  * General order of functions:
  * - Lifecycle
@@ -427,14 +427,14 @@ class LinksFragment : MainFragment() {
 
     /**
      * Set up and slide open right panel.
-     * @param referencePosition Index of Collection to open with
+     * @param referencePosition Index of [Collection] to open with
      */
     private fun openCollectionViewPanel(referencePosition: Int) {
         mActivity.buildCollectionView(mCollections[referencePosition])
     }
 
     /**
-     * Get new data from Collection Manager.
+     * Get new data from [CollectionManager].
      */
     private fun fetchContents() {
         mCollections.clear()
@@ -457,7 +457,7 @@ class LinksFragment : MainFragment() {
     }
 
     /**
-     * Since this can be called whenever CollectionViewFragment fetches new content,
+     * Since this can be called whenever [CollectionViewFragment] fetches new content,
      * (even when it's clicks are blocked and this fragment is isolated), don't
      * update the adapter if in selection mode.
      *

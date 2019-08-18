@@ -11,7 +11,7 @@ import iced.egret.palette.util.DialogGenerator
 import kotlinx.android.synthetic.main.bottom_bar_waiting_room_pager.view.*
 
 /**
- * Pager for WaitingRoomActivity items.
+ * Pager for [WaitingRoomActivity] items.
  */
 class WaitingRoomPagerActivity : StatefulPagerActivity() {
 

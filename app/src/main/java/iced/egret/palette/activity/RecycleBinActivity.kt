@@ -100,7 +100,7 @@ class RecycleBinActivity : GridCoverableActivity() {
     }
 
     /**
-     * Get RecycleBin contents from storage, compare them with current contents,
+     * Get [iced.egret.palette.util.Storage.RecycleBin] contents from storage, compare them with current contents,
      * and discard those not found in storage.
      */
     private fun discardOutdatedContents() {

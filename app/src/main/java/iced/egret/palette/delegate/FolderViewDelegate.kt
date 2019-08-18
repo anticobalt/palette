@@ -11,7 +11,7 @@ import iced.egret.palette.model.inherited.Collection
 import iced.egret.palette.model.inherited.Coverable
 
 /**
- * Delegate for folders in CollectionViewFragment.
+ * Delegate for folders in [iced.egret.palette.fragment.CollectionViewFragment].
  */
 class FolderViewDelegate : CollectionViewDelegate() {
 

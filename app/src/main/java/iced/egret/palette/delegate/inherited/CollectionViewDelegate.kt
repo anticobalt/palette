@@ -11,8 +11,8 @@ import iced.egret.palette.model.inherited.Coverable
 
 /**
  * Used to differentiate actions available depending on the collection type being viewed by
- * CollectionViewFragment. When action is complete, it notifies the CollectionViewFragment that is
- * listening.
+ * [iced.egret.palette.fragment.CollectionViewFragment]. When action is complete, it notifies the
+ * CollectionViewFragment that is listening.
  *
  * Delegate used instead of subtypes of CollectionViewFragment because replacing fragments
  * on-the-fly is taxing and causes UI stuttering.

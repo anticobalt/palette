@@ -357,6 +357,7 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
             null
         }
         val pathToFulfillRequest = requestFileObject?.parent?.filePath
+        intent = Intent()  // clear intent so it can't be reused later
 
         when {
             pathToFulfillRequest == null && requestFileObject != null -> {

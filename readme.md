@@ -20,6 +20,10 @@ Full resolution previews can be found in the screenshots folder.
 - Recycle bin
 - And of course the basics, like moving, deleting, renaming, and cropping photos
 
+## Bugs
+
+- On some devices, the initial popup for accessing SD card might be not clickable after a fresh install. Tap the device's home button (or recent apps button) then return to the app to make it clickable again.
+
 ## Acknowledgements
 
 - Image viewing uses [Glide](https://github.com/bumptech/glide), [SSIV](https://github.com/davemorrissey/subsampling-scale-image-view), and [PhotoView](https://github.com/chrisbanes/PhotoView)

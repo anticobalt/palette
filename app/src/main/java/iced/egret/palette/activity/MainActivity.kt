@@ -68,14 +68,6 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Initial checking of SD access via dialog has to be here, because cold install triggers
-        // recreation in order to apply default theme, which causes touch/key events to be dropped
-        // (on the Nexus 5 at least).
-        checkSdWriteAccessIfRequired()
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(ON_SCREEN_COLLECTION_KEY, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
@@ -136,6 +128,8 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
                 if (isFirstRun()) { // may recreate, so must be after UI building
                     applyDefaultSettings()
                 }
+                // FIXME: cold install causes touch/key events to be dropped (on the Nexus 5 at least)
+                checkSdWriteAccessIfRequired()
 
                 mainLayout.visibility = View.VISIBLE
             }

@@ -123,7 +123,8 @@
     <string name="warning_generic">Are you sure?</string>
     <string name="grant_sd_explain">
         Due to Android security policies, you must manually approve access to the SD card
-        on the next screen, by opening the SD card and clicking "select" at the bottom.
+        on the next screen, by opening the SD card and clicking "select" at the bottom.\n\n
+        If you don\'t have an SD card, you don\'t need to do anything and can cancel.
     </string>
     <string name="grant_sd_instructions_button">How?</string>
     <string name="grant_sd_instructions_link">https://metactrl.com/docs/sdcard-on-lollipop/</string>

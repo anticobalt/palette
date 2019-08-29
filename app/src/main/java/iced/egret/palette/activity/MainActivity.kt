@@ -68,6 +68,14 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Initial checking of SD access via dialog has to be here, because cold install triggers
+        // recreation in order to apply default theme, which causes touch/key events to be dropped
+        // (on the Nexus 5 at least).
+        checkSdWriteAccessIfRequired()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(ON_SCREEN_COLLECTION_KEY, CollectionManager.currentCollection?.path)
         super.onSaveInstanceState(outState)
@@ -80,12 +88,6 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         // either).
         if (hasPermission) restoreAllFragments()
         super.onStop()
-    }
-
-    private fun checkSdWriteAccess() {
-        if (!hasSdCardAccess()) {
-            DialogGenerator.grantSdCardPrompt(this)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -126,11 +128,15 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
         if (savedInstanceState == null) {
             // First start of activity
             StateBuilder.build(this, null) {
+
                 makeFragments()
                 handleIntentViewRequest()
                 buildSlidingPane()
-                if (isFirstRun()) applyDefaultSettings()  // may recreate, so must be after UI building
-                checkSdWriteAccess()
+
+                if (isFirstRun()) { // may recreate, so must be after UI building
+                    applyDefaultSettings()
+                }
+
                 mainLayout.visibility = View.VISIBLE
             }
         } else {
@@ -145,10 +151,23 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
     }
 
     private fun isFirstRun(): Boolean {
-        val key = "isFirstRun"
-        val firstRun = sharedPrefs.getBoolean(key, true)
-        sharedPrefs.edit().putBoolean(key, false).apply()
+        val firstRun = sharedPrefs.getBoolean(FIRST_RUN_KEY, true)
+        sharedPrefs.edit().putBoolean(FIRST_RUN_KEY, false).apply()
         return firstRun
+    }
+
+    private fun checkSdWriteAccessIfRequired() {
+        val alreadyChecked = sharedPrefs.getBoolean(CHECKED_SD_WRITE_KEY, false)
+        if (!alreadyChecked) {
+            sharedPrefs.edit().putBoolean(CHECKED_SD_WRITE_KEY, true).apply()
+            checkSdWriteAccess()
+        }
+    }
+
+    private fun checkSdWriteAccess() {
+        if (!hasSdCardAccess()) {
+            DialogGenerator.grantSdCardPrompt(this)
+        }
     }
 
     @SuppressLint("ApplySharedPref")
@@ -382,6 +401,8 @@ class MainActivity : BaseActivity(), HackySlidingPaneLayout.HackyPanelSlideListe
 
     companion object Constants {
         const val ON_SCREEN_COLLECTION_KEY = "on-screen-collection"
+        private const val FIRST_RUN_KEY = "isFirstRun"
+        private const val CHECKED_SD_WRITE_KEY = "checkedSdWrite"
         const val EXTERNAL_CODE = 100
         const val GO_HOME_REQUEST = 2
     }

@@ -279,15 +279,19 @@ object DialogGenerator {
     fun grantSdCardPrompt(activity: BaseActivity) {
 
         MaterialDialog(activity).show {
+            noAutoDismiss()
             title(R.string.action_grant_sd)
             message(R.string.grant_sd_explain)
-            negativeButton()
+            negativeButton {
+                dismiss()
+            }
             neutralButton(R.string.grant_sd_instructions_button) {
                 val link = activity.getString(R.string.grant_sd_instructions_link)
                 activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
             }
             positiveButton {
                 activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), BaseActivity.SD_CARD_WRITE_REQUEST)
+                dismiss()
             }
         }
 
